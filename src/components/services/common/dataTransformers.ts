@@ -1,0 +1,2382 @@
+
+
+import {
+  parseRefreshPowerScrubDraftPayload,
+  REFRESH_POWER_SCRUB_DRAFT_CUSTOM_FIELD_ID,
+} from "../refreshPowerScrub/refreshPowerScrubDraftPayload";
+import { type RefreshFrequency } from "../refreshPowerScrub/refreshPowerScrubTypes";
+import { carpetFrequencyLabels } from "../carpetCleaning/carpetConfig";
+import type { CarpetFrequency } from "../carpetCleaning/carpetTypes";
+import { saniscrubFrequencyList } from "../saniscrub/saniscrubConfig";
+import { electrostaticSprayPricingConfig } from "../electrostaticSpray/electrostaticSprayConfig";
+import type { ElectrostaticSprayFrequency } from "../electrostaticSpray/electrostaticSprayTypes";
+
+function extractCustomFields(structuredData: any): any[] {
+  if (structuredData.customFields && Array.isArray(structuredData.customFields)) {
+    console.log('🔄 Processing custom fields for reverse mapping:', structuredData.customFields);
+    const customFields = structuredData.customFields.map((field: any) => {
+      const baseField = {
+        id: field.id || Date.now().toString(),
+        type: field.type || 'text',
+        name: field.name || field.label || 'Custom Field',
+        label: field.label || field.name || 'Custom Field',
+      };
+
+      if (field.type === 'calc' && field.calcValues) {
+        return {
+          ...baseField,
+          calcValues: {
+            left: field.calcValues.left || '',
+            middle: field.calcValues.middle || '',
+            right: field.calcValues.right || ''
+          }
+        };
+      } else {
+
+        return {
+          ...baseField,
+          value: field.value || ''
+        };
+      }
+    });
+    console.log(`  ✅ Custom Fields mapped: ${customFields.length} found`);
+    return customFields;
+  } else {
+    console.log('  ⚠️ No custom fields found in structured data');
+    return [];
+  }
+}
+
+const parseDraftPayloadFromCustomFields = (structuredData: any) => {
+  const fields = structuredData.customFields;
+  if (!Array.isArray(fields)) return undefined;
+
+  const draftField = fields.find(
+    (field: any) =>
+      (field?.id && field.id === REFRESH_POWER_SCRUB_DRAFT_CUSTOM_FIELD_ID) ||
+      (field?.name && field.name === REFRESH_POWER_SCRUB_DRAFT_CUSTOM_FIELD_ID)
+  );
+
+  if (!draftField || !draftField.value) return undefined;
+
+  try {
+    const value =
+      typeof draftField.value === "string"
+        ? JSON.parse(draftField.value)
+        : draftField.value;
+    return parseRefreshPowerScrubDraftPayload(value);
+  } catch (err) {
+    console.warn("Failed to parse refresh power scrub draft custom field:", err);
+    return undefined;
+  }
+};
+
+function normalizeStructuredValue(rawValue: any): any {
+  if (rawValue === undefined || rawValue === null) return undefined;
+  if (Array.isArray(rawValue)) return rawValue;
+  if (typeof rawValue !== "object") return rawValue;
+  if ("value" in rawValue) {
+    return normalizeStructuredValue(rawValue.value);
+  }
+  if ("amount" in rawValue) {
+    return normalizeStructuredValue(rawValue.amount);
+  }
+  if ("qty" in rawValue) {
+    return normalizeStructuredValue(rawValue.qty);
+  }
+  return rawValue;
+}
+
+function normalizeCarpetFrequencyLabel(label: string): string {
+  return label.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function normalizeFrequencyCandidate(value: any): string {
+  if (value === undefined || value === null) return "";
+  if (typeof value === "object") {
+    const nested =
+      value.frequencyKey ??
+      value.value ??
+      value.label ??
+      value.name ??
+      value.frequency ??
+      "";
+    if (nested !== value) {
+      return normalizeFrequencyCandidate(nested);
+    }
+    if (typeof value === "object" && value.toString && value.toString !== Object.prototype.toString) {
+      return value.toString();
+    }
+    return "";
+  }
+  return String(value);
+}
+
+function sanitizeFrequencyTextForDetection(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/\u00a0/g, " ")
+    .replace(/×/g, "x")
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+const EVERY_TWO_MONTHS_PATTERN = /every\s*2\s*months?|\b2\s*months?\b/;
+const KNOWN_FREQUENCY_KEYS = new Set<string>(saniscrubFrequencyList);
+
+function detectSaniscrubFrequencyText(cleaned: string): string | undefined {
+  if (!cleaned) return undefined;
+  const collapsed = cleaned.replace(/[\s-]+/g, "");
+
+  if (collapsed.includes("onetim") || cleaned.includes("one time") || cleaned.includes("1 time")) {
+    return "oneTime";
+  }
+  if (/^weekly$/.test(collapsed) || (cleaned.includes("weekly") && !cleaned.includes("biweekly"))) {
+    return "weekly";
+  }
+  if (cleaned.includes("biweekly")) {
+    return "biweekly";
+  }
+  if (
+    cleaned.includes("twice per month") ||
+    cleaned.includes("2 per month") ||
+    cleaned.includes("2x month") ||
+    cleaned.includes("2xmonth") ||
+    cleaned.includes("2 x month") ||
+    cleaned.includes("two times per month") ||
+    collapsed.includes("twicepermonth") ||
+    collapsed.includes("2permonth")
+  ) {
+    return "twicePerMonth";
+  }
+  if (
+    collapsed.includes("every4weeks") ||
+    collapsed.includes("everyfourweeks") ||
+    cleaned.includes("every 4 weeks") ||
+    cleaned.includes("every four weeks")
+  ) {
+    return "everyFourWeeks";
+  }
+  if (cleaned.includes("monthly") && !cleaned.includes("twice per")) {
+    return "monthly";
+  }
+  if (collapsed.includes("bimonth") || EVERY_TWO_MONTHS_PATTERN.test(cleaned)) {
+    return "bimonthly";
+  }
+  if (cleaned.includes("quarterly") || cleaned.includes("quarter")) {
+    return "quarterly";
+  }
+  if (cleaned.includes("biannual") || cleaned.includes("semiannual")) {
+    return "biannual";
+  }
+  if (cleaned.includes("annual") || cleaned.includes("yearly")) {
+    return "annual";
+  }
+  return undefined;
+}
+
+function resolveFrequencyKeyFromCandidate(candidate: any): string | undefined {
+  const candidateTextRaw = normalizeFrequencyCandidate(candidate);
+  if (!candidateTextRaw) return undefined;
+
+  const normalizedText = sanitizeFrequencyTextForDetection(candidateTextRaw);
+  if (KNOWN_FREQUENCY_KEYS.has(normalizedText)) {
+    return normalizedText;
+  }
+
+  return detectSaniscrubFrequencyText(normalizedText);
+}
+
+const carpetFrequencyLabelToValue = new Map<string, CarpetFrequency>(
+  Object.entries(carpetFrequencyLabels).map(([frequency, label]) => [
+    normalizeCarpetFrequencyLabel(label),
+    frequency as CarpetFrequency,
+  ])
+);
+
+const REFRESH_AREA_KEYS = ["dumpster", "patio", "walkway", "foh", "boh", "other"];
+
+const REFRESH_FALLBACKS = {
+  hourlyRate: 200,
+  workerRate: 200,
+  perHourRate: 400,
+  minimumVisit: 400,
+  tripCharge: 75,
+  insideRate: 0.6,
+  outsideRate: 0.4,
+  sqFtFixedFee: 200,
+  patioStandalone: 800,
+  patioUpsell: 500,
+};
+
+const normalizeFrequencyLabel = (raw?: string): RefreshFrequency | undefined => {
+  if (!raw) return undefined;
+  const cleaned = raw.toLowerCase().replace(/[^a-z0-9]/g, "");
+  switch (cleaned) {
+    case "onetime":
+    case "1time":
+      return "oneTime";
+    case "weekly":
+      return "weekly";
+    case "biweekly":
+      return "biweekly";
+    case "twicepermonth":
+    case "2permonth":
+    case "2month":
+    case "2xmonth":
+      return "twicePerMonth";
+    case "monthly":
+      return "monthly";
+    case "every4weeks":
+    case "everyfourweeks":
+      return "everyFourWeeks";
+    case "bimonthly":
+      return "bimonthly";
+    case "quarterly":
+      return "quarterly";
+    case "biannual":
+      return "biannual";
+    case "annual":
+      return "annual";
+    default:
+      return undefined;
+  }
+};
+
+const deriveFrequencyFromServices = (structuredData: any): RefreshFrequency | undefined => {
+  const explicit = structuredData.frequency && normalizeFrequencyLabel(structuredData.frequency);
+  if (explicit) return explicit;
+
+  if (structuredData.services) {
+    for (const areaRecord of Object.values(structuredData.services)) {
+      const label =
+        areaRecord?.frequency?.value ||
+        areaRecord?.frequencyLabel ||
+        areaRecord?.frequency;
+      const normalized = normalizeFrequencyLabel(label);
+      if (normalized) return normalized;
+    }
+  }
+
+  return undefined;
+};
+
+const createRefreshAreaTemplate = () => ({
+  enabled: false,
+  pricingType: "preset",
+  workers: 2,
+  hours: 0,
+  hourlyRate: REFRESH_FALLBACKS.perHourRate,
+  workerRate: REFRESH_FALLBACKS.workerRate,
+  insideSqFt: 0,
+  outsideSqFt: 0,
+  insideRate: REFRESH_FALLBACKS.insideRate,
+  outsideRate: REFRESH_FALLBACKS.outsideRate,
+  sqFtFixedFee: REFRESH_FALLBACKS.sqFtFixedFee,
+  customAmount: 0,
+  workerRateIsCustom: false,
+  hourlyRateIsCustom: false,
+  insideRateIsCustom: false,
+  outsideRateIsCustom: false,
+  sqFtFixedFeeIsCustom: false,
+  presetRateIsCustom: false,
+  smallMediumRateIsCustom: false,
+  largeRateIsCustom: false,
+  presetQuantity: 1,
+  presetRate: undefined,
+  kitchenSize: "smallMedium",
+  smallMediumQuantity: 0,
+  smallMediumRate: undefined,
+  smallMediumCustomAmount: 0,
+  largeQuantity: 0,
+  largeRate: undefined,
+  largeCustomAmount: 0,
+  patioMode: "standalone",
+  includePatioAddon: false,
+  patioAddonRate: undefined,
+  frequencyLabel: "",
+  contractMonths: 12,
+});
+
+const mergeRefreshAreaState = (data: any = {}) => ({
+  ...createRefreshAreaTemplate(),
+  ...data,
+});
+
+export function transformRpmWindowsData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.smallWindowRate !== undefined) {
+    formState.smallWindowRate = structuredData.smallWindowRate;
+  }
+  if (structuredData.mediumWindowRate !== undefined) {
+    formState.mediumWindowRate = structuredData.mediumWindowRate;
+  }
+  if (structuredData.largeWindowRate !== undefined) {
+    formState.largeWindowRate = structuredData.largeWindowRate;
+  }
+  if (structuredData.tripCharge !== undefined) {
+    formState.tripCharge = structuredData.tripCharge;
+  }
+  if (structuredData.installMultiplierFirstTime !== undefined) {
+    formState.installMultiplierFirstTime = structuredData.installMultiplierFirstTime;
+  }
+  if (structuredData.installMultiplierClean !== undefined) {
+    formState.installMultiplierClean = structuredData.installMultiplierClean;
+  }
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  }
+  if (structuredData.customSmallTotal !== undefined) {
+    formState.customSmallTotal = structuredData.customSmallTotal;
+  }
+  if (structuredData.customMediumTotal !== undefined) {
+    formState.customMediumTotal = structuredData.customMediumTotal;
+  }
+  if (structuredData.customLargeTotal !== undefined) {
+    formState.customLargeTotal = structuredData.customLargeTotal;
+  }
+  if (structuredData.customInstallationFee !== undefined) {
+    formState.customInstallationFee = structuredData.customInstallationFee;
+  }
+  if (structuredData.customPerVisitPrice !== undefined) {
+    formState.customPerVisitPrice = structuredData.customPerVisitPrice;
+  }
+  if (structuredData.customFirstMonthTotal !== undefined) {
+    formState.customFirstMonthTotal = structuredData.customFirstMonthTotal;
+  }
+  if (structuredData.customMonthlyRecurring !== undefined) {
+    formState.customMonthlyRecurring = structuredData.customMonthlyRecurring;
+  }
+  if (structuredData.customAnnualPrice !== undefined) {
+    formState.customAnnualPrice = structuredData.customAnnualPrice;
+  }
+  if (structuredData.customContractTotal !== undefined) {
+    formState.customContractTotal = structuredData.customContractTotal;
+  }
+
+  if (structuredData.windows && Array.isArray(structuredData.windows)) {
+    structuredData.windows.forEach((window: any) => {
+      if (window.label === "Small Windows") {
+        formState.smallQty = window.qty || 0;
+        if (window.rate !== undefined && window.rate !== null) {
+          formState.smallWindowRate = window.rate; 
+        }
+      } else if (window.label === "Medium Windows") {
+        formState.mediumQty = window.qty || 0;
+        if (window.rate !== undefined && window.rate !== null) {
+          formState.mediumWindowRate = window.rate; 
+        }
+      } else if (window.label === "Large Windows") {
+        formState.largeQty = window.qty || 0;
+        if (window.rate !== undefined && window.rate !== null) {
+          formState.largeWindowRate = window.rate; 
+        }
+      }
+    });
+  }
+
+  if (structuredData.installationFee?.amount != null && structuredData.installationFee?.isCustom === true) {
+    formState.customInstallationFee = structuredData.installationFee.amount;
+  }
+
+  if (structuredData.installType) {
+    formState.isFirstTimeInstall = structuredData.installType.value?.includes("First Time");
+  }
+
+  const frequencyField = structuredData.frequency || structuredData.serviceFrequency;
+  if (frequencyField) {
+    const freqKey = frequencyField.frequencyKey ?? frequencyField.value;
+    if (typeof freqKey === "string" && freqKey.trim()) {
+      formState.frequency = freqKey;
+    }
+  }
+
+  if (structuredData.mirrorCleaning) {
+    formState.includeMirrors = structuredData.mirrorCleaning.value?.includes("Include");
+  }
+
+  if (structuredData.rateCategory) {
+    formState.selectedRateCategory = structuredData.rateCategory.value?.includes("Green") ? "greenRate" : "redRate";
+  }
+
+  if (structuredData.extraCharges && Array.isArray(structuredData.extraCharges)) {
+    formState.extraCharges = structuredData.extraCharges.map((charge: any, index: number) => ({
+      id: Date.now() + index,
+      description: charge.label || "",
+      amount: charge.amount || 0,
+      calcText: "",
+    }));
+  }
+
+  if (structuredData.totals) {
+
+    if (structuredData.totals.perVisit?.isCustom === true) {
+      formState.customPerVisitPrice = structuredData.totals.perVisit.amount;
+    }
+    if (structuredData.totals.monthlyRecurring?.isCustom === true) {
+      formState.customMonthlyRecurring = structuredData.totals.monthlyRecurring.amount;
+    }
+    if (structuredData.totals.annual) {
+      formState.contractMonths = structuredData.totals.annual.months || 12;
+      if (structuredData.totals.annual?.isCustom === true) {
+        formState.customAnnualPrice = structuredData.totals.annual.amount;
+      }
+    }
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformSanicleanData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (formState.pricingMode === undefined && structuredData.pricingMode) {
+    const value = structuredData.pricingMode.value || structuredData.pricingMode;
+    if (typeof value === "string") {
+      if (value.includes("All Inclusive")) formState.pricingMode = "all_inclusive";
+      else formState.pricingMode = "per_item_charge";
+    }
+  }
+
+  if (formState.location === undefined && structuredData.location) {
+    const value = structuredData.location.value || structuredData.location;
+    if (typeof value === "string") {
+      formState.location = value.includes("Inside") ? "insideBeltway" : value.includes("Outside") ? "outsideBeltway" : value;
+    }
+  }
+
+  if (structuredData.mainServiceFrequency !== undefined) {
+    formState.mainServiceFrequency = structuredData.mainServiceFrequency;
+  }
+
+  const facilityFrequencyValue = normalizeStructuredValue(structuredData.facilityComponentsFrequency);
+  if (facilityFrequencyValue !== undefined) {
+    formState.facilityComponentsFrequency = facilityFrequencyValue;
+  }
+  if (structuredData.frequency !== undefined) {
+    formState.frequency = structuredData.frequency;
+  }
+  if (structuredData.facilityComponentFrequency !== undefined) {
+    formState.facilityComponentFrequency = structuredData.facilityComponentFrequency;
+  }
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  }
+  if (structuredData.rateTier !== undefined) {
+    formState.rateTier = structuredData.rateTier;
+  }
+
+  const pricingFields = [
+    "allInclusiveWeeklyRatePerFixture",
+    "luxuryUpgradePerDispenser",
+    "excessStandardSoapRate",
+    "excessLuxurySoapRate",
+    "paperCreditPerFixture",
+    "microfiberMoppingPerBathroom",
+    "insideBeltwayRatePerFixture",
+    "insideBeltwayMinimum",
+    "insideBeltwayTripCharge",
+    "insideBeltwayParkingFee",
+    "outsideBeltwayRatePerFixture",
+    "outsideBeltwayTripCharge",
+    "smallFacilityThreshold",
+    "smallFacilityMinimum",
+    "urinalScreenMonthly",
+    "urinalMatMonthly",
+    "toiletClipsMonthly",
+    "seatCoverDispenserMonthly",
+    "sanipodServiceMonthly",
+    "warrantyFeePerDispenserPerWeek",
+    "weeklyToMonthlyMultiplier",
+    "weeklyToAnnualMultiplier",
+    "redRateMultiplier",
+    "greenRateMultiplier",
+  ];
+
+  pricingFields.forEach((field) => {
+    const resolvedValue = normalizeStructuredValue(structuredData[field]);
+    if (resolvedValue !== undefined) {
+      formState[field] = resolvedValue;
+    }
+  });
+
+  const customOverrideFields = [
+    "customBaseService",
+    "customTripCharge",
+    "customFacilityComponents",
+    "customSoapUpgrade",
+    "customExcessSoap",
+    "customMicrofiberMopping",
+    "customWarrantyFees",
+    "customPaperOverage",
+    "customWeeklyTotal",
+    "customMonthlyTotal",
+    "customContractTotal",
+  ];
+
+  customOverrideFields.forEach((field) => {
+    const resolvedValue = normalizeStructuredValue(structuredData[field]);
+    if (resolvedValue !== undefined) {
+      formState[field] = resolvedValue;
+    }
+  });
+
+  const facilityComponentFields = [
+    "addUrinalComponents",
+    "urinalScreensQty",
+    "urinalMatsQty",
+    "addMaleToiletComponents",
+    "toiletClipsQty",
+    "seatCoverDispensersQty",
+    "addFemaleToiletComponents",
+    "sanipodsQty",
+    "warrantyDispensers",
+    "addMicrofiberMopping",
+    "microfiberBathrooms",
+  ];
+
+  facilityComponentFields.forEach((field) => {
+    const resolvedValue = normalizeStructuredValue(structuredData[field]);
+    if (resolvedValue !== undefined) {
+      formState[field] = resolvedValue;
+    }
+  });
+
+  if (structuredData.excessSoapGallonsPerWeek !== undefined) {
+    formState.excessSoapGallonsPerWeek = normalizeStructuredValue(structuredData.excessSoapGallonsPerWeek);
+  }
+  if (structuredData.estimatedPaperSpendPerWeek !== undefined) {
+    formState.estimatedPaperSpendPerWeek = normalizeStructuredValue(structuredData.estimatedPaperSpendPerWeek);
+  }
+
+  const facilityComponentsValue = normalizeStructuredValue(structuredData.facilityComponents);
+  if (facilityComponentsValue !== undefined) {
+    formState.customFacilityComponents = facilityComponentsValue;
+  }
+
+  const facilityMonthlyValue = normalizeStructuredValue(structuredData.facilityComponentsMonthly);
+  if (facilityMonthlyValue !== undefined) {
+
+    formState.facilityComponentsMonthly = facilityMonthlyValue;
+  }
+
+  if (structuredData.fixtureBreakdown && Array.isArray(structuredData.fixtureBreakdown)) {
+    structuredData.fixtureBreakdown.forEach((fixture: any) => {
+      if (fixture.label === "Sinks") {
+        formState.sinks = fixture.qty || 0;
+        if (fixture.rate !== undefined && fixture.rate !== null) {
+          formState.sinkRate = fixture.rate; 
+        }
+      } else if (fixture.label === "Urinals") {
+        formState.urinals = fixture.qty || 0;
+        if (fixture.rate !== undefined && fixture.rate !== null) {
+          formState.urinalRate = fixture.rate; 
+        }
+      } else if (fixture.label === "Male Toilets") {
+        formState.maleToilets = fixture.qty || 0;
+        if (fixture.rate !== undefined && fixture.rate !== null) {
+          formState.maleToiletRate = fixture.rate; 
+        }
+      } else if (fixture.label === "Female Toilets") {
+        formState.femaleToilets = fixture.qty || 0;
+        if (fixture.rate !== undefined && fixture.rate !== null) {
+          formState.femaleToiletRate = fixture.rate; 
+        }
+      }
+    });
+  }
+
+  const fixtureRateFallback =
+    formState.sinkRate ??
+    formState.urinalRate ??
+    formState.maleToiletRate ??
+    formState.femaleToiletRate;
+
+  if (fixtureRateFallback !== undefined) {
+    if (formState.pricingMode === "all_inclusive" && formState.allInclusiveWeeklyRatePerFixture === undefined) {
+      formState.allInclusiveWeeklyRatePerFixture = fixtureRateFallback;
+    } else if (formState.location === "outsideBeltway" && formState.outsideBeltwayRatePerFixture === undefined) {
+      formState.outsideBeltwayRatePerFixture = fixtureRateFallback;
+    } else if (formState.insideBeltwayRatePerFixture === undefined) {
+      formState.insideBeltwayRatePerFixture = fixtureRateFallback;
+    }
+  }
+  console.log("🔄 [Saniclean] Derived fixtureRateFallback:", structuredData);
+
+  if (structuredData.soapType) {
+    const soapValue = normalizeStructuredValue(structuredData.soapType);
+    let resolvedType: "luxury" | "standard" = "standard";
+    if (typeof soapValue === "string" && soapValue.toLowerCase().includes("luxury")) {
+      resolvedType = "luxury";
+    }
+    formState.soapType = resolvedType;
+    console.log("🔄 [Saniclean] Loaded soapType:", {
+      raw: structuredData.soapType,
+      resolvedType,
+      normalizedValue: soapValue,
+    });
+  }
+
+  if (structuredData.luxuryUpgradeQty !== undefined) {
+    formState.luxuryUpgradeQty = normalizeStructuredValue(structuredData.luxuryUpgradeQty);
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  const frequencyField = structuredData.frequency || structuredData.serviceFrequency;
+  if (frequencyField) {
+    const freq = frequencyField.value?.toLowerCase();
+    formState.frequency = freq || "weekly";
+  }
+
+  if (structuredData.rateCategory) {
+    formState.rateCategory = structuredData.rateCategory.value?.includes("Green") ? "greenRate" : "redRate";
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformFoamingDrainData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  const foamingFrequencySources = [
+    structuredData.frequency,
+    structuredData.frequency?.frequencyKey,
+    structuredData.frequency?.value,
+    structuredData.frequency?.label,
+    structuredData.serviceFrequency,
+    structuredData.serviceFrequency?.frequencyKey,
+    structuredData.serviceFrequency?.value,
+    structuredData.serviceFrequency?.label,
+  ];
+
+  for (const candidate of foamingFrequencySources) {
+    const freq = resolveFrequencyKeyFromCandidate(candidate);
+    if (freq) {
+      formState.frequency = freq;
+      break;
+    }
+  }
+
+  if (!formState.frequency) {
+    formState.frequency = "weekly";
+  }
+
+  if (structuredData.installFrequency !== undefined) {
+    if (typeof structuredData.installFrequency === 'string') {
+      formState.installFrequency = structuredData.installFrequency;
+    } else if (typeof structuredData.installFrequency === 'object' && structuredData.installFrequency !== null) {
+
+      const installFreqValue = structuredData.installFrequency.value || structuredData.installFrequency.frequencyKey;
+      if (installFreqValue && typeof installFreqValue === 'string') {
+        formState.installFrequency = installFreqValue.toLowerCase(); 
+      }
+    }
+  }
+  if (structuredData.location !== undefined && typeof structuredData.location === 'string') {
+    formState.location = structuredData.location;
+  }
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  }
+  if (structuredData.facilityCondition !== undefined) {
+    formState.facilityCondition = structuredData.facilityCondition;
+  }
+
+  if (structuredData.standardDrainRate !== undefined) {
+    formState.standardDrainRate = structuredData.standardDrainRate;
+  }
+  if (structuredData.altBaseCharge !== undefined) {
+    formState.altBaseCharge = structuredData.altBaseCharge;
+  }
+  if (structuredData.altExtraPerDrain !== undefined) {
+    formState.altExtraPerDrain = structuredData.altExtraPerDrain;
+  }
+  if (structuredData.volumeWeeklyRate !== undefined) {
+    formState.volumeWeeklyRate = structuredData.volumeWeeklyRate;
+  }
+  if (structuredData.volumeBimonthlyRate !== undefined) {
+    formState.volumeBimonthlyRate = structuredData.volumeBimonthlyRate;
+  }
+  if (structuredData.greaseWeeklyRate !== undefined) {
+    formState.greaseWeeklyRate = structuredData.greaseWeeklyRate;
+  }
+  if (structuredData.greaseInstallRate !== undefined) {
+    formState.greaseInstallRate = structuredData.greaseInstallRate;
+  }
+  if (structuredData.greenWeeklyRate !== undefined) {
+    formState.greenWeeklyRate = structuredData.greenWeeklyRate;
+  }
+  if (structuredData.greenInstallRate !== undefined) {
+    formState.greenInstallRate = structuredData.greenInstallRate;
+  }
+  if (structuredData.plumbingAddonRate !== undefined) {
+    formState.plumbingAddonRate = structuredData.plumbingAddonRate;
+  }
+  if (structuredData.filthyMultiplier !== undefined) {
+    formState.filthyMultiplier = structuredData.filthyMultiplier;
+  }
+
+  if (structuredData.standardDrainCount !== undefined) {
+    formState.standardDrainCount = structuredData.standardDrainCount;
+  }
+  if (structuredData.installDrainCount !== undefined) {
+    formState.installDrainCount = structuredData.installDrainCount;
+  }
+  if (structuredData.greaseTrapCount !== undefined) {
+    formState.greaseTrapCount = structuredData.greaseTrapCount;
+  }
+  if (structuredData.greenDrainCount !== undefined) {
+    formState.greenDrainCount = structuredData.greenDrainCount;
+  }
+  if (structuredData.plumbingDrainCount !== undefined) {
+    formState.plumbingDrainCount = structuredData.plumbingDrainCount;
+  }
+  if (structuredData.filthyDrainCount !== undefined) {
+    formState.filthyDrainCount = structuredData.filthyDrainCount;
+  }
+
+  if (structuredData.useSmallAltPricingWeekly !== undefined) {
+    formState.useSmallAltPricingWeekly = structuredData.useSmallAltPricingWeekly;
+  }
+  if (structuredData.useBigAccountTenWeekly !== undefined) {
+    formState.useBigAccountTenWeekly = structuredData.useBigAccountTenWeekly;
+  }
+  if (structuredData.isAllInclusive !== undefined) {
+    formState.isAllInclusive = structuredData.isAllInclusive;
+  }
+  if (structuredData.chargeGreaseTrapInstall !== undefined) {
+    formState.chargeGreaseTrapInstall = structuredData.chargeGreaseTrapInstall;
+  }
+  if (structuredData.needsPlumbing !== undefined) {
+    formState.needsPlumbing = structuredData.needsPlumbing;
+  }
+
+  if (formState.frequency === undefined && structuredData.frequencyDisplay?.value) {
+    formState.frequency = structuredData.frequencyDisplay.value.toLowerCase();
+  }
+
+  if (formState.installFrequency === undefined) {
+
+    if (structuredData.installFrequencyDisplay?.value) {
+      formState.installFrequency = structuredData.installFrequencyDisplay.value.toLowerCase();
+    }
+
+    else if (structuredData.installFrequency && typeof structuredData.installFrequency === 'object') {
+      const installFreqValue = structuredData.installFrequency.value || structuredData.installFrequency.frequencyKey;
+      if (installFreqValue && typeof installFreqValue === 'string') {
+        formState.installFrequency = installFreqValue.toLowerCase();
+      }
+    }
+  }
+  if (formState.location === undefined && structuredData.locationDisplay?.value) {
+    formState.location = structuredData.locationDisplay.value.includes("Inside") ? "beltway" : "standard";
+  }
+
+  if (formState.frequency === undefined && structuredData.frequency?.value) {
+    formState.frequency = structuredData.frequency.value.toLowerCase() || "weekly";
+  }
+  if (formState.location === undefined && structuredData.location?.value) {
+    formState.location = structuredData.location.value.includes("Inside") ? "beltway" : "standard";
+  }
+
+  if (structuredData.drainBreakdown && Array.isArray(structuredData.drainBreakdown)) {
+    structuredData.drainBreakdown.forEach((drain: any) => {
+      if (drain.label === "Standard Drains") {
+        if (formState.standardDrainCount === undefined) {
+          formState.standardDrainCount = drain.qty || 0;
+        }
+        if (formState.standardDrainRate === undefined && drain.rate !== undefined) {
+          formState.standardDrainRate = drain.rate;
+        }
+      } else if (drain.label === "Grease Trap Drains") {
+        if (formState.greaseTrapCount === undefined) {
+          formState.greaseTrapCount = drain.qty || 0;
+        }
+        if (formState.greaseWeeklyRate === undefined && drain.rate !== undefined) {
+          formState.greaseWeeklyRate = drain.rate;
+        }
+      } else if (drain.label === "Green Drains") {
+        if (formState.greenDrainCount === undefined) {
+          formState.greenDrainCount = drain.qty || 0;
+        }
+        if (formState.greenWeeklyRate === undefined && drain.rate !== undefined) {
+          formState.greenWeeklyRate = drain.rate;
+        }
+      }
+    });
+  }
+
+  if (formState.contractMonths === undefined && structuredData.totals?.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformCarpetCleanData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  console.log('🔄 [transformCarpetCleanData] Received structured data:', JSON.stringify(structuredData, null, 2));
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.frequency) {
+    const rawValue = structuredData.frequency.value;
+    let freqLabel = "";
+    if (typeof rawValue === "string") {
+      freqLabel = rawValue;
+    } else if (typeof rawValue === "object" && rawValue !== null) {
+      freqLabel = (rawValue.value || rawValue.label || rawValue.name || "");
+    }
+
+    const normalizedLabel = normalizeCarpetFrequencyLabel(freqLabel);
+    if (normalizedLabel) {
+      let mappedFrequency = carpetFrequencyLabelToValue.get(normalizedLabel);
+      if (!mappedFrequency) {
+        for (const [labelKey, freqValue] of carpetFrequencyLabelToValue.entries()) {
+          if (labelKey && normalizedLabel.includes(labelKey)) {
+            mappedFrequency = freqValue;
+            break;
+          }
+        }
+      }
+
+      if (mappedFrequency) {
+        formState.frequency = mappedFrequency;
+      }
+
+      if (!formState.frequency) {
+        const freq = normalizedLabel;
+        const everyMatch = freq.match(/every\s+(\d+)\s+months?/);
+
+        if (freq.includes("once") || freq.includes("one-time") || freq.includes("one time")) {
+          formState.frequency = "oneTime";
+        }
+        if (!formState.frequency && freq.includes("weekly")) {
+          formState.frequency = "weekly";
+        }
+        if (!formState.frequency && freq.includes("biweekly")) {
+          formState.frequency = "biweekly";
+        }
+        if (!formState.frequency && freq.includes("twice")) {
+          formState.frequency = "twicePerMonth";
+        }
+        if (!formState.frequency && everyMatch) {
+          const everyValue = Number(everyMatch[1]);
+          switch (everyValue) {
+            case 1:
+              formState.frequency = "monthly";
+              break;
+            case 2:
+              formState.frequency = "bimonthly";
+              break;
+            case 3:
+              formState.frequency = "quarterly";
+              break;
+            case 6:
+              formState.frequency = "biannual";
+              break;
+            case 12:
+              formState.frequency = "annual";
+              break;
+            default:
+              break;
+          }
+        }
+        if (!formState.frequency && freq.includes("monthly")) {
+          formState.frequency = "monthly";
+        }
+        if (!formState.frequency && freq.includes("bimonthly")) {
+          formState.frequency = "bimonthly";
+        }
+        if (!formState.frequency && freq.includes("quarterly")) {
+          formState.frequency = "quarterly";
+        }
+        if (!formState.frequency && (freq.includes("biannual") || freq.includes("semiannual"))) {
+          formState.frequency = "biannual";
+        }
+        if (!formState.frequency && (freq.includes("annual") || freq.includes("yearly"))) {
+          formState.frequency = "annual";
+        }
+      }
+    }
+  }
+
+  if (structuredData.location) {
+    formState.location = structuredData.location.value?.includes("Inside") ? "insideBeltway" : "outsideBeltway";
+  }
+
+  if (structuredData.firstUnitRate !== undefined) {
+    console.log('🔄 [transformCarpetCleanData] Extracting firstUnitRate:', structuredData.firstUnitRate);
+    formState.firstUnitRate = structuredData.firstUnitRate;
+  }
+  if (structuredData.additionalUnitRate !== undefined) {
+    console.log('🔄 [transformCarpetCleanData] Extracting additionalUnitRate:', structuredData.additionalUnitRate);
+    formState.additionalUnitRate = structuredData.additionalUnitRate;
+  }
+  if (structuredData.perVisitMinimum !== undefined) {
+    console.log('🔄 [transformCarpetCleanData] Extracting perVisitMinimum:', structuredData.perVisitMinimum);
+    formState.perVisitMinimum = structuredData.perVisitMinimum;
+  }
+  if (structuredData.installMultiplierDirty !== undefined) {
+    formState.installMultiplierDirty = structuredData.installMultiplierDirty;
+  }
+  if (structuredData.installMultiplierClean !== undefined) {
+    formState.installMultiplierClean = structuredData.installMultiplierClean;
+  }
+  if (structuredData.unitSqFt !== undefined) {
+    formState.unitSqFt = structuredData.unitSqFt;
+  }
+  if (structuredData.useExactSqft !== undefined) {
+    formState.useExactSqft = structuredData.useExactSqft;
+  }
+
+  if (structuredData.service) {
+    formState.areaSqFt = structuredData.service.qty || 0;
+
+    if (formState.firstUnitRate === undefined && structuredData.service.rate !== undefined) {
+      console.log('🔄 [transformCarpetCleanData] Using fallback firstUnitRate from service.rate:', structuredData.service.rate);
+      formState.firstUnitRate = structuredData.service.rate;
+    }
+  }
+
+  console.log('🔄 [transformCarpetCleanData] Final formState with pricing fields:', {
+    firstUnitRate: formState.firstUnitRate,
+    additionalUnitRate: formState.additionalUnitRate,
+    perVisitMinimum: formState.perVisitMinimum,
+    areaSqFt: formState.areaSqFt,
+  });
+
+  if (structuredData.installation) {
+    formState.includeInstall = true;
+    formState.isDirtyInstall = structuredData.installation.isDirty || false;
+
+    if (structuredData.installation.multiplier != null) {
+      if (formState.isDirtyInstall) {
+        formState.installMultiplierDirty = structuredData.installation.multiplier;
+      } else {
+        formState.installMultiplierClean = structuredData.installation.multiplier;
+      }
+    }
+
+    if (structuredData.installation?.total != null && structuredData.installation?.isCustom === true) {
+      formState.customInstallationFee = structuredData.installation.total;
+    }
+  }
+
+  if (structuredData.totals) {
+
+    if (structuredData.totals.contract) {
+      formState.contractMonths = structuredData.totals.contract.months || 12;
+
+      if (structuredData.totals.contract.isCustom === true) {
+        formState.customContractTotal = structuredData.totals.contract.amount;
+      }
+    }
+
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformStripWaxData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.ratePerSqFt !== undefined) {
+    formState.ratePerSqFt = structuredData.ratePerSqFt;
+  }
+  if (structuredData.minCharge !== undefined) {
+    formState.minCharge = structuredData.minCharge;
+  }
+  if (structuredData.serviceVariant !== undefined) {
+    formState.serviceVariant = structuredData.serviceVariant;
+  }
+  if (structuredData.rateCategory !== undefined) {
+    formState.rateCategory = structuredData.rateCategory;
+  }
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  } else if (structuredData.totals?.contract?.months !== undefined) {
+    formState.contractMonths = structuredData.totals.contract.months;
+  }
+
+  const stripFrequencySources = [
+    structuredData.frequency,
+    structuredData.frequency?.frequencyKey,
+    structuredData.frequency?.value,
+    structuredData.frequency?.label,
+    structuredData.frequencyDisplay?.frequencyKey,
+    structuredData.frequencyDisplay?.value,
+    structuredData.frequencyDisplay?.label,
+  ];
+
+  for (const candidate of stripFrequencySources) {
+    const freq = resolveFrequencyKeyFromCandidate(candidate);
+    if (freq) {
+      formState.frequency = freq;
+      break;
+    }
+  }
+
+  if (!formState.frequency) {
+    formState.frequency = "weekly";
+  }
+
+  if (structuredData.service) {
+    formState.floorAreaSqFt = structuredData.service.qty || 0;
+    if (structuredData.service.rate !== undefined && formState.ratePerSqFt === undefined) {
+      formState.ratePerSqFt = structuredData.service.rate;
+    }
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformJanitorialData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  console.log('🔄 Transforming janitorial data:', structuredData);
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.serviceType) {
+    const rawValue =
+      typeof structuredData.serviceType === "string"
+        ? structuredData.serviceType
+        : structuredData.serviceType.value || structuredData.serviceType.label || "";
+    const normalized = rawValue.toString().toLowerCase();
+    if (normalized.includes("one-time") || normalized.includes("one time") || normalized.includes("one")) {
+      formState.serviceType = "oneTime";
+    } else if (normalized.includes("recurring")) {
+      formState.serviceType = "recurring";
+    } else if (normalized.includes("service")) {
+      formState.serviceType = normalized.includes("one") ? "oneTime" : "recurring";
+    }
+  }
+
+  if (structuredData.frequency) {
+    const freq = structuredData.frequency.value?.toLowerCase();
+    if (freq) {
+
+      const frequencyMap: Record<string, string> = {
+        'daily': 'daily',
+        'weekly': 'weekly',
+        'bi-weekly': 'biweekly',
+        'biweekly': 'biweekly',
+        'monthly': 'monthly'
+      };
+      formState.frequency = frequencyMap[freq] || 'weekly';
+    }
+  }
+
+  if (structuredData.location) {
+    const location = structuredData.location.value?.toLowerCase() || '';
+
+    formState.schedulingMode = 'normalRoute';
+  }
+
+  let totalHours = 0;
+  let manualHours = 0;
+  let vacuumingHours = 0;
+  let dustingPlaces = 0;
+  let dustingHours = 0;
+  let addonTimeMinutes = 0;
+
+  if (structuredData.service) {
+    totalHours = Number(structuredData.service.qty) || 0;
+
+    if (structuredData.service.rate) {
+      const rate = typeof structuredData.service.rate === 'string'
+        ? parseFloat(structuredData.service.rate.replace(/[^0-9.]/g, ''))
+        : structuredData.service.rate;
+
+      formState.baseHourlyRate = rate;
+      formState.shortJobHourlyRate = rate; 
+    }
+  }
+
+  if (structuredData.otherTasks) {
+    const hoursMatch = structuredData.otherTasks.value?.match(/(\d+(?:\.\d+)?)/);
+    if (hoursMatch) {
+      manualHours = parseFloat(hoursMatch[1]);
+      formState.manualHours = manualHours;
+    }
+  }
+
+  if (structuredData.vacuuming) {
+    const hoursMatch = structuredData.vacuuming.value?.match(/(\d+(?:\.\d+)?)/);
+    if (hoursMatch) {
+      vacuumingHours = parseFloat(hoursMatch[1]);
+      formState.vacuumingHours = vacuumingHours;
+    }
+  }
+
+  if (structuredData.dusting) {
+    const dustingText = structuredData.dusting.value || "";
+    const fullMatch = dustingText.match(/(\d+(?:\.\d+)?)\s*places\s*=\s*(\d+(?:\.\d+)?)/i);
+    if (fullMatch) {
+      dustingPlaces = parseFloat(fullMatch[1]);
+      dustingHours = parseFloat(fullMatch[2]);
+    } else {
+      const placesMatch = dustingText.match(/(\d+(?:\.\d+)?)/);
+      if (placesMatch) {
+        dustingPlaces = parseFloat(placesMatch[1]);
+      }
+      const hoursMatch = dustingText.match(/=\s*(\d+(?:\.\d+)?)/);
+      if (hoursMatch) {
+        dustingHours = parseFloat(hoursMatch[1]);
+      }
+    }
+
+    formState.dustingTotalPlaces = dustingPlaces;
+    formState.dustingCalculatedHours = dustingHours;
+    formState.dustingPlacesPerHour = dustingHours > 0
+      ? dustingPlaces / dustingHours
+      : 4;
+  }
+
+  if (structuredData.addonTime) {
+    const minutesMatch = structuredData.addonTime.value?.match(/(\d+(?:\.\d+)?)/);
+    if (minutesMatch) {
+      addonTimeMinutes = parseInt(minutesMatch[1]);
+      formState.addonTimeMinutes = addonTimeMinutes;
+    }
+  }
+
+  if (structuredData.visitsPerWeek) {
+    const visitsMatch = structuredData.visitsPerWeek.value?.match(/(\d+)/);
+    if (visitsMatch) {
+      formState.visitsPerWeek = parseInt(visitsMatch[1]);
+    }
+  }
+
+  if (!manualHours && totalHours > 0) {
+
+    const dustingPlacesPerHour = formState.dustingPlacesPerHour || 4;
+    const dustingHours = formState.dustingCalculatedHours || (dustingPlaces / dustingPlacesPerHour);
+
+    const calculatedManualHours = Math.max(0, totalHours - vacuumingHours - dustingHours);
+    formState.manualHours = Math.round(calculatedManualHours * 100) / 100; 
+    manualHours = formState.manualHours;
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  formState.rateCategory = formState.rateCategory || 'red';
+  formState.dirtyInitial = false; 
+  formState.installation = false; 
+
+  console.log('🔄 Janitorial reverse mapping breakdown:');
+  console.log(`  Total Hours from PDF: ${totalHours}`);
+  console.log(`  Manual Hours (Other Tasks): ${manualHours}`);
+  console.log(`  Vacuuming Hours: ${vacuumingHours}`);
+  console.log(`  Dusting Places: ${dustingPlaces}`);
+  console.log(`  Addon Time Minutes: ${addonTimeMinutes}`);
+  console.log(`  Visits per Week: ${formState.visitsPerWeek || 'not set'}`);
+  console.log('✅ Final mapped janitorial form state:', formState);
+
+  return formState;
+}
+
+export function transformPureJanitorialData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  console.log('🔄 Transforming pureJanitorial data:', structuredData);
+
+  
+  if (structuredData._restoreData) {
+    console.log('✅ Using _restoreData for pureJanitorial restoration:', structuredData._restoreData);
+    return {
+      frequency: structuredData._restoreData.frequency || 'weekly',
+      visitsPerWeek: structuredData._restoreData.visitsPerWeek || 1,
+      placeType: structuredData._restoreData.placeType || 'office',
+      sqFt: structuredData._restoreData.sqFt || 0,
+      costPerHour: structuredData._restoreData.costPerHour || 25,
+      laborTaxPct: structuredData._restoreData.laborTaxPct || 0,
+      grossProfitPct: structuredData._restoreData.grossProfitPct || 30,
+      supplies: structuredData._restoreData.supplies || [],
+      contractMonths: structuredData._restoreData.contractMonths || 12,
+      notes: structuredData._restoreData.notes || '',
+    };
+  }
+
+  if (structuredData.formData) {
+    console.log('✅ Using formData for pureJanitorial restoration:', structuredData.formData);
+    return {
+      frequency: structuredData.formData.frequency || 'weekly',
+      visitsPerWeek: structuredData.formData.visitsPerWeek || 1,
+      placeType: structuredData.formData.placeType || 'office',
+      sqFt: structuredData.formData.sqFt || 0,
+      costPerHour: structuredData.formData.costPerHour || 25,
+      laborTaxPct: structuredData.formData.laborTaxPct || 0,
+      grossProfitPct: structuredData.formData.grossProfitPct || 30,
+      supplies: structuredData.formData.supplies || [],
+      contractMonths: structuredData.formData.contractMonths || 12,
+      notes: structuredData.formData.notes || '',
+    };
+  }
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.frequency) {
+    const frequencyKey = structuredData.frequency.frequencyKey;
+    if (frequencyKey) {
+      formState.frequency = frequencyKey;
+    } else {
+      
+      const freq = structuredData.frequency.value?.toLowerCase();
+      const frequencyMap: Record<string, string> = {
+        'weekly': 'weekly',
+        'monthly': 'monthly',
+        'one-time': 'oneTime',
+        'one time': 'oneTime',
+        'every 4 weeks': 'everyFourWeeks',
+        'bimonthly': 'bimonthly',
+        'quarterly': 'quarterly',
+        'biannual': 'biannual',
+        'annual': 'annual',
+      };
+      formState.frequency = frequencyMap[freq] || 'weekly';
+    }
+  }
+
+  if (structuredData.visitsPerWeek) {
+    const value = structuredData.visitsPerWeek.value;
+    formState.visitsPerWeek = parseInt(value) || 1;
+  }
+
+  if (structuredData.placeType) {
+    const placeTypeKey = structuredData.placeType.placeTypeKey;
+    if (placeTypeKey) {
+      formState.placeType = placeTypeKey;
+    } else {
+      
+      const placeType = structuredData.placeType.value?.toLowerCase();
+      const placeTypeMap: Record<string, string> = {
+        'office': 'office',
+        'home': 'home',
+        'restaurant': 'restaurant',
+        'business place': 'businessPlace',
+      };
+      formState.placeType = placeTypeMap[placeType] || 'office';
+    }
+  }
+
+  if (structuredData.sqFt) {
+    const value = structuredData.sqFt.value;
+    formState.sqFt = parseInt(value) || 0;
+  }
+
+  if (structuredData.costPerHour) {
+    formState.costPerHour = structuredData.costPerHour.amount || 25;
+  }
+
+  if (structuredData.totals?.annualLaborTax?.laborTaxPct !== undefined) {
+    formState.laborTaxPct = structuredData.totals.annualLaborTax.laborTaxPct;
+  } else if (structuredData.totals?.annualLaborTax?.label) {
+    
+    const match = structuredData.totals.annualLaborTax.label.match(/\((\d+(?:\.\d+)?)%\)/);
+    if (match) {
+      formState.laborTaxPct = parseFloat(match[1]);
+    }
+  }
+
+  if (structuredData.totals?.grossProfit?.grossProfitPct !== undefined) {
+    formState.grossProfitPct = structuredData.totals.grossProfit.grossProfitPct;
+  } else if (structuredData.totals?.grossProfit?.label) {
+    
+    const match = structuredData.totals.grossProfit.label.match(/\((\d+(?:\.\d+)?)%\)/);
+    if (match) {
+      formState.grossProfitPct = parseFloat(match[1]);
+    }
+  }
+
+  if (structuredData.supplies && Array.isArray(structuredData.supplies)) {
+    formState.supplies = structuredData.supplies;
+  }
+
+  if (structuredData.totals?.contract?.months) {
+    formState.contractMonths = structuredData.totals.contract.months;
+  }
+
+  console.log('✅ Final mapped pureJanitorial form state:', formState);
+
+  return formState;
+}
+
+export function transformSaniscrubData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  const directFields = [
+    "fixtureCount",
+    "nonBathroomSqFt",
+    "useExactNonBathroomSqft",
+    "hasSaniClean",
+    "includeInstall",
+    "isDirtyInstall",
+    "contractMonths",
+    "fixtureRateMonthly",
+    "fixtureRateBimonthly",
+    "fixtureRateQuarterly",
+    "minimumMonthly",
+    "minimumBimonthly",
+    "nonBathroomFirstUnitRate",
+    "nonBathroomAdditionalUnitRate",
+    "installMultiplierDirty",
+    "installMultiplierClean",
+    "twoTimesPerMonthDiscount",
+  ];
+
+  for (const field of directFields) {
+    if (structuredData[field] !== undefined) {
+      formState[field] = structuredData[field];
+    }
+  }
+
+  const frequencyCandidates = [
+    structuredData.frequency,
+    structuredData.frequencyKey,
+    structuredData.frequencyLabel,
+    structuredData.frequencyValue,
+  ];
+
+  for (const candidate of frequencyCandidates) {
+    const freq = resolveFrequencyKeyFromCandidate(candidate);
+    if (freq) {
+      formState.frequency = freq;
+      break;
+    }
+  }
+
+  if (structuredData.location) {
+    formState.location = structuredData.location.value?.includes("Inside") ? "insideBeltway" : "outsideBeltway";
+  }
+
+  if (structuredData.restroomFixtures) {
+    formState.fixtureCount = structuredData.restroomFixtures.qty || 0;
+    if (structuredData.restroomFixtures.rate !== undefined && structuredData.restroomFixtures.rate !== null) {
+
+      const savedRate = structuredData.restroomFixtures.rate;
+      const freq = formState.frequency || "monthly";
+      if (freq === "bimonthly") formState.fixtureRateBimonthly = formState.fixtureRateBimonthly ?? savedRate;
+      else if (freq === "quarterly" || freq === "biannual" || freq === "annual") formState.fixtureRateQuarterly = formState.fixtureRateQuarterly ?? savedRate;
+      else formState.fixtureRateMonthly = formState.fixtureRateMonthly ?? savedRate;
+    }
+  }
+
+  if (structuredData.nonBathroomArea) {
+    formState.nonBathroomSqFt = structuredData.nonBathroomArea.qty || 0;
+    if (structuredData.nonBathroomArea.rate !== undefined && structuredData.nonBathroomArea.rate !== null) {
+
+      const rate = structuredData.nonBathroomArea.rate;
+      if (typeof rate === "string") {
+        const match = rate.match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)[+](\d+(?:\.\d+)?)$/);
+        if (match) {
+          formState.nonBathroomFirstUnitRate = formState.nonBathroomFirstUnitRate ?? Number(match[1]);
+          formState.nonBathroomAdditionalUnitRate = formState.nonBathroomAdditionalUnitRate ?? Number(match[3]);
+        }
+      }
+    }
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformMicrofiberMoppingData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  console.log('🔄 [transformMicrofiberMoppingData] Processing structured data:', structuredData);
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.includedBathroomRate !== undefined) {
+    formState.includedBathroomRate = structuredData.includedBathroomRate;
+    console.log('🔄 [Microfiber] Extracted includedBathroomRate:', structuredData.includedBathroomRate);
+  }
+  if (structuredData.hugeBathroomRatePerSqFt !== undefined) {
+    formState.hugeBathroomRatePerSqFt = structuredData.hugeBathroomRatePerSqFt;
+    console.log('🔄 [Microfiber] Extracted hugeBathroomRatePerSqFt:', structuredData.hugeBathroomRatePerSqFt);
+  }
+  if (structuredData.extraAreaRatePerUnit !== undefined) {
+    formState.extraAreaRatePerUnit = structuredData.extraAreaRatePerUnit;
+    console.log('🔄 [Microfiber] Extracted extraAreaRatePerUnit:', structuredData.extraAreaRatePerUnit);
+  }
+  if (structuredData.standaloneRatePerUnit !== undefined) {
+    formState.standaloneRatePerUnit = structuredData.standaloneRatePerUnit;
+    console.log('🔄 [Microfiber] Extracted standaloneRatePerUnit:', structuredData.standaloneRatePerUnit);
+  }
+  if (structuredData.dailyChemicalPerGallon !== undefined) {
+    formState.dailyChemicalPerGallon = structuredData.dailyChemicalPerGallon;
+    console.log('🔄 [Microfiber] Extracted dailyChemicalPerGallon:', structuredData.dailyChemicalPerGallon);
+  }
+
+  if (structuredData.bathroomCount !== undefined) {
+    formState.bathroomCount = structuredData.bathroomCount;
+  }
+  if (structuredData.hugeBathroomSqFt !== undefined) {
+    formState.hugeBathroomSqFt = structuredData.hugeBathroomSqFt;
+  }
+  if (structuredData.extraAreaSqFt !== undefined) {
+    formState.extraAreaSqFt = structuredData.extraAreaSqFt;
+  }
+  if (structuredData.standaloneSqFt !== undefined) {
+    formState.standaloneSqFt = structuredData.standaloneSqFt;
+  }
+  if (structuredData.chemicalGallons !== undefined) {
+    formState.chemicalGallons = structuredData.chemicalGallons;
+  }
+
+  const microfiberFrequencySources = [
+    structuredData.frequency?.frequencyKey,
+    structuredData.frequency?.value,
+    structuredData.frequency?.label,
+    structuredData.frequency,
+    structuredData.frequencyDisplay?.frequencyKey,
+    structuredData.frequencyDisplay?.value,
+    structuredData.frequencyDisplay?.label,
+  ];
+
+  for (const candidate of microfiberFrequencySources) {
+    const freq = resolveFrequencyKeyFromCandidate(candidate);
+    if (freq) {
+      formState.frequency = freq;
+      break;
+    }
+  }
+
+  if (!formState.frequency) {
+    formState.frequency = "weekly";
+  }
+
+  if (!formState.frequency && typeof structuredData.frequency === "object") {
+    const raw = structuredData.frequency.value || structuredData.frequency.label || "";
+    if (raw.toLowerCase().includes("bimonth")) {
+      formState.frequency = "bimonthly";
+    }
+  }
+
+  if (structuredData.hasExistingSaniService !== undefined) {
+    formState.hasExistingSaniService = structuredData.hasExistingSaniService;
+  }
+  if (structuredData.isAllInclusive !== undefined) {
+    formState.isAllInclusive = structuredData.isAllInclusive;
+  }
+  if (structuredData.isHugeBathroom !== undefined) {
+    formState.isHugeBathroom = structuredData.isHugeBathroom;
+  }
+  if (structuredData.useExactExtraAreaSqft !== undefined) {
+    formState.useExactExtraAreaSqft = structuredData.useExactExtraAreaSqft;
+  }
+  if (structuredData.useExactStandaloneSqft !== undefined) {
+    formState.useExactStandaloneSqft = structuredData.useExactStandaloneSqft;
+  }
+
+  if (structuredData.location !== undefined) {
+    formState.location = structuredData.location;
+  }
+  if (structuredData.needsParking !== undefined) {
+    formState.needsParking = structuredData.needsParking;
+  }
+
+  if (structuredData.serviceBreakdown && Array.isArray(structuredData.serviceBreakdown)) {
+    structuredData.serviceBreakdown.forEach((item: any) => {
+      if (item.label === "Bathrooms") {
+        if (formState.bathroomCount === undefined) {
+          formState.bathroomCount = item.qty || 0;
+        }
+        if (formState.includedBathroomRate === undefined && item.rate !== undefined) {
+          formState.includedBathroomRate = item.rate;
+          console.log('🔄 [Microfiber] Using fallback includedBathroomRate from serviceBreakdown:', item.rate);
+        }
+      } else if (item.label === "Huge Bathrooms") {
+        if (formState.hugeBathroomSqFt === undefined) {
+          formState.hugeBathroomSqFt = item.qty || 0;
+        }
+        if (formState.hugeBathroomRatePerSqFt === undefined && item.rate !== undefined) {
+          formState.hugeBathroomRatePerSqFt = item.rate;
+          console.log('🔄 [Microfiber] Using fallback hugeBathroomRatePerSqFt from serviceBreakdown:', item.rate);
+        }
+      } else if (item.label === "Extra Area") {
+        if (formState.extraAreaSqFt === undefined) {
+          formState.extraAreaSqFt = item.qty || 0;
+        }
+        if (formState.extraAreaRatePerUnit === undefined && item.rate !== undefined) {
+          formState.extraAreaRatePerUnit = item.rate;
+          console.log('🔄 [Microfiber] Using fallback extraAreaRatePerUnit from serviceBreakdown:', item.rate);
+        }
+      } else if (item.label === "Standalone Service") {
+        if (formState.standaloneSqFt === undefined) {
+          formState.standaloneSqFt = item.qty || 0;
+        }
+        if (formState.standaloneRatePerUnit === undefined && item.rate !== undefined) {
+          formState.standaloneRatePerUnit = item.rate;
+          console.log('🔄 [Microfiber] Using fallback standaloneRatePerUnit from serviceBreakdown:', item.rate);
+        }
+      } else if (item.label === "Chemical Supply") {
+        if (formState.chemicalGallons === undefined) {
+          formState.chemicalGallons = item.qty || 0;
+        }
+        if (formState.dailyChemicalPerGallon === undefined && item.rate !== undefined) {
+          formState.dailyChemicalPerGallon = item.rate;
+          console.log('🔄 [Microfiber] Using fallback dailyChemicalPerGallon from serviceBreakdown:', item.rate);
+        }
+      }
+    });
+  }
+
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  } else if (structuredData.totals?.contract) {
+
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  console.log('🔄 [transformMicrofiberMoppingData] Final form state:', {
+    bathroomCount: formState.bathroomCount,
+    includedBathroomRate: formState.includedBathroomRate,
+    hugeBathroomSqFt: formState.hugeBathroomSqFt,
+    hugeBathroomRatePerSqFt: formState.hugeBathroomRatePerSqFt,
+    extraAreaSqFt: formState.extraAreaSqFt,
+    extraAreaRatePerUnit: formState.extraAreaRatePerUnit,
+    standaloneSqFt: formState.standaloneSqFt,
+    standaloneRatePerUnit: formState.standaloneRatePerUnit,
+    chemicalGallons: formState.chemicalGallons,
+    dailyChemicalPerGallon: formState.dailyChemicalPerGallon,
+  });
+
+  return formState;
+}
+
+export function transformSanipodData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  const hydrateNumberField = (fieldName: string) => {
+    const value = normalizeStructuredValue(structuredData[fieldName]);
+    if (value !== undefined) {
+      formState[fieldName] = value;
+    }
+  };
+
+  hydrateNumberField("weeklyRatePerUnit");
+  hydrateNumberField("altWeeklyRatePerUnit");
+  hydrateNumberField("extraBagPrice");
+  hydrateNumberField("standaloneExtraWeeklyCharge");
+  hydrateNumberField("tripChargePerVisit");
+  hydrateNumberField("installRatePerPod");
+
+  if (structuredData.service) {
+    formState.podQuantity = structuredData.service.qty || 0;
+
+    if (structuredData.service.rate !== undefined && structuredData.service.rate !== null) {
+      formState.recurringPerPod = structuredData.service.rate; 
+    }
+  }
+
+  if (structuredData.extraBags) {
+    formState.extraBagsPerWeek = structuredData.extraBags.qty || 0;
+    formState.extraBagsRecurring = structuredData.extraBags.recurring !== false; 
+    if (structuredData.extraBags.rate != null) {
+      formState.extraBagPrice = structuredData.extraBags.rate;
+    }
+  }
+
+  const sanipodFrequencySources = [
+    structuredData.frequency?.frequencyKey,
+    structuredData.frequency?.value,
+    structuredData.frequency?.label,
+    structuredData.frequency,
+    structuredData.frequencyDisplay?.frequencyKey,
+    structuredData.frequencyDisplay?.value,
+    structuredData.frequencyDisplay?.label,
+  ];
+
+  for (const candidate of sanipodFrequencySources) {
+    const freq = resolveFrequencyKeyFromCandidate(candidate);
+    if (freq) {
+      formState.frequency = freq;
+      break;
+    }
+  }
+
+  if (!formState.frequency) {
+    formState.frequency = "weekly";
+  }
+
+  if (structuredData.installation) {
+    formState.isNewInstall = true;
+    formState.installQuantity = structuredData.installation.qty || 0;
+    if (structuredData.installation.rate != null) {
+      formState.installRatePerPod = structuredData.installation.rate;
+    }
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  const overrideFields = [
+    "customInstallationFee",
+    "customPerVisitPrice",
+    "customMonthlyPrice",
+    "customAnnualPrice",
+    "customWeeklyPodRate",
+    "customPodServiceTotal",
+    "customExtraBagsTotal",
+  ];
+  overrideFields.forEach((key) => {
+    if (structuredData[key] !== undefined && structuredData[key] !== null) {
+      formState[key] = structuredData[key];
+    }
+  });
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformGreaseTrapData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.frequency) {
+    formState.frequency = structuredData.frequency.value?.toLowerCase() || "weekly";
+  }
+
+  if (structuredData.service) {
+    formState.numberOfTraps = structuredData.service.qty || 0;
+    if (structuredData.service.rate !== undefined && structuredData.service.rate !== null) {
+      formState.perTrapWeeklyRate = structuredData.service.rate; 
+    }
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformRefreshPowerScrubData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const draftFormState =
+    parseRefreshPowerScrubDraftPayload(structuredData) ??
+    parseDraftPayloadFromCustomFields(structuredData);
+  if (draftFormState) {
+    console.log('🔄 [transformRefreshPowerScrubData] Detected draft schema, normalizing form state');
+    const normalizedFormState: any = {
+      notes: draftFormState.notes ?? "",
+      tripCharge: draftFormState.tripCharge ?? REFRESH_FALLBACKS.tripCharge,
+      hourlyRate: draftFormState.hourlyRate ?? REFRESH_FALLBACKS.hourlyRate,
+      minimumVisit: draftFormState.minimumVisit ?? REFRESH_FALLBACKS.minimumVisit,
+      frequency: draftFormState.frequency ?? "monthly",
+      contractMonths: draftFormState.contractMonths ?? 12,
+      hourlyRateIsCustom: draftFormState.hourlyRateIsCustom,
+      minimumVisitIsCustom: draftFormState.minimumVisitIsCustom,
+      tripChargeIncluded: draftFormState.tripChargeIncluded ?? true,
+    };
+
+    REFRESH_AREA_KEYS.forEach((areaKey) => {
+      normalizedFormState[areaKey] = mergeRefreshAreaState(draftFormState[areaKey]);
+    });
+
+    normalizedFormState.customFields = draftFormState.customFields ?? [];
+
+    return normalizedFormState;
+  }
+
+  console.log('🔄 [transformRefreshPowerScrubData] Processing structured data:', structuredData);
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (!structuredData.services && (structuredData.hourlyRate !== undefined || structuredData.minimumVisit !== undefined)) {
+    console.log('?"" [transformRefreshPowerScrubData] Using NEW converted format');
+
+    formState.hourlyRate = structuredData.hourlyRate ?? REFRESH_FALLBACKS.hourlyRate;
+    formState.minimumVisit = structuredData.minimumVisit ?? REFRESH_FALLBACKS.minimumVisit;
+    formState.frequency = structuredData.frequency || "monthly";
+    formState.contractMonths = structuredData.contractMonths || 12;
+    formState.tripCharge = structuredData.tripCharge ?? REFRESH_FALLBACKS.tripCharge;
+    formState.tripChargeIncluded = structuredData.tripChargeIncluded ?? true;
+
+    if (structuredData.hourlyRateIsCustom !== undefined) {
+      formState.hourlyRateIsCustom = structuredData.hourlyRateIsCustom;
+    }
+    if (structuredData.minimumVisitIsCustom !== undefined) {
+      formState.minimumVisitIsCustom = structuredData.minimumVisitIsCustom;
+    }
+
+    for (const areaKey of REFRESH_AREA_KEYS) {
+      const storedArea = structuredData[areaKey] || {};
+      const areaState = mergeRefreshAreaState(storedArea);
+
+      if (areaKey === "patio" && storedArea.includePatioAddon === undefined) {
+        const patioMode = storedArea.patioMode;
+        console.log(`?"" [Patio FIX] includePatioAddon missing, patioMode: ${patioMode}`);
+        const inferredAddon = patioMode === "upsell";
+        areaState.includePatioAddon = inferredAddon;
+        console.log(`?"" [Patio FIX] Inferred includePatioAddon: ${inferredAddon} (from patioMode: ${patioMode})`);
+      }
+
+      const savedFieldMap = {
+        savedPresetRate: "presetRate",
+        savedPresetQuantity: "presetQuantity",
+        savedWorkerRate: "workerRate",
+        savedHours: "hours",
+        savedHourlyRate: "hourlyRate",
+        savedInsideRate: "insideRate",
+        savedOutsideRate: "outsideRate",
+        savedSqFtFixedFee: "sqFtFixedFee",
+        savedSmallMediumRate: "smallMediumRate",
+        savedLargeRate: "largeRate",
+      };
+
+      Object.entries(savedFieldMap).forEach(([sourceKey, targetKey]) => {
+        if (storedArea[sourceKey] !== undefined) {
+          areaState[targetKey] = storedArea[sourceKey];
+        }
+      });
+
+      formState[areaKey] = areaState;
+      console.log(`?"" [transformRefreshPowerScrubData] Mapped ${areaKey}:`, areaState);
+    }
+
+    formState.customFields = extractCustomFields(structuredData);
+
+    const overrideField = formState.customFields.find(
+      (field) => field.name === "refreshPowerScrubOverrides" || field.id === "refreshPowerScrubOverrides"
+    );
+    if (overrideField) {
+      overrideField.isInternal = true;
+      try {
+        const overrides = JSON.parse(overrideField.value || "{}");
+        REFRESH_AREA_KEYS.forEach((key) => {
+          const areaOverride = overrides[key];
+          if (!areaOverride) return;
+
+          const targetArea = formState[key];
+          if (!targetArea) return;
+
+          if (areaOverride.presetRate !== undefined) {
+            targetArea.presetRate = areaOverride.presetRate;
+          }
+          if (areaOverride.presetQuantity !== undefined) {
+            targetArea.presetQuantity = areaOverride.presetQuantity;
+          }
+          if (areaOverride.workerRate !== undefined) {
+            targetArea.workerRate = areaOverride.workerRate;
+          }
+          if (areaOverride.workers !== undefined) {
+            targetArea.workers = areaOverride.workers;
+          }
+          if (areaOverride.hourlyRate !== undefined) {
+            targetArea.hourlyRate = areaOverride.hourlyRate;
+          }
+          if (areaOverride.hours !== undefined) {
+            targetArea.hours = areaOverride.hours;
+          }
+          if (areaOverride.insideRate !== undefined) {
+            targetArea.insideRate = areaOverride.insideRate;
+          }
+          if (areaOverride.outsideRate !== undefined) {
+            targetArea.outsideRate = areaOverride.outsideRate;
+          }
+          if (areaOverride.sqFtFixedFee !== undefined) {
+            targetArea.sqFtFixedFee = areaOverride.sqFtFixedFee;
+          }
+          if (areaOverride.insideSqFt !== undefined) {
+            targetArea.insideSqFt = areaOverride.insideSqFt;
+          }
+          if (areaOverride.outsideSqFt !== undefined) {
+            targetArea.outsideSqFt = areaOverride.outsideSqFt;
+          }
+          if (areaOverride.patioAddonRate !== undefined) {
+            targetArea.patioAddonRate = areaOverride.patioAddonRate;
+          }
+          if (areaOverride.smallMediumRate !== undefined) {
+            targetArea.smallMediumRate = areaOverride.smallMediumRate;
+          }
+          if (areaOverride.largeRate !== undefined) {
+            targetArea.largeRate = areaOverride.largeRate;
+          }
+          if (areaOverride.smallMediumQuantity !== undefined) {
+            targetArea.smallMediumQuantity = areaOverride.smallMediumQuantity;
+          }
+          if (areaOverride.largeQuantity !== undefined) {
+            targetArea.largeQuantity = areaOverride.largeQuantity;
+          }
+          if (areaOverride.smallMediumCustomAmount !== undefined) {
+            targetArea.smallMediumCustomAmount = areaOverride.smallMediumCustomAmount;
+          }
+          if (areaOverride.largeCustomAmount !== undefined) {
+            targetArea.largeCustomAmount = areaOverride.largeCustomAmount;
+          }
+          const overrideCustomFieldMap: Record<string, string> = {
+            presetRate: "presetRateIsCustom",
+            workerRate: "workerRateIsCustom",
+            hourlyRate: "hourlyRateIsCustom",
+            insideRate: "insideRateIsCustom",
+            outsideRate: "outsideRateIsCustom",
+            sqFtFixedFee: "sqFtFixedFeeIsCustom",
+            smallMediumRate: "smallMediumRateIsCustom",
+            largeRate: "largeRateIsCustom",
+          };
+          Object.keys(areaOverride).forEach((overrideKey) => {
+            const customFlag = overrideCustomFieldMap[overrideKey];
+            if (customFlag) {
+              targetArea[customFlag] = true;
+            }
+          });
+        });
+      } catch (err) {
+        console.warn("Failed to parse refresh power scrub overrides:", err);
+      }
+    }
+
+    console.log('?"" [transformRefreshPowerScrubData] Converted form state:', formState);
+    return formState;
+  }
+
+  if (structuredData.services) {
+    console.log('🔄 [transformRefreshPowerScrubData] Using CURRENT storage format (services object)');
+
+    if (structuredData.serviceInfo && structuredData.serviceInfo.value) {
+      const rateInfoStr = structuredData.serviceInfo.value;
+      const hourlyMatch = rateInfoStr.match(/Hourly Rate: \$(\d+)\/hr/);
+      const minMatch = rateInfoStr.match(/Minimum: \$(\d+)/);
+
+      formState.hourlyRate = hourlyMatch ? parseFloat(hourlyMatch[1]) : 200;
+      formState.minimumVisit = minMatch ? parseFloat(minMatch[1]) : 400;
+      if (structuredData.hourlyRateIsCustom !== undefined) {
+        formState.hourlyRateIsCustom = structuredData.hourlyRateIsCustom;
+      }
+      if (structuredData.minimumVisitIsCustom !== undefined) {
+        formState.minimumVisitIsCustom = structuredData.minimumVisitIsCustom;
+      }
+
+      console.log(`🔄 Extracted rates - hourly: ${formState.hourlyRate}, minimum: ${formState.minimumVisit}`);
+    }
+
+    formState.frequency = deriveFrequencyFromServices(structuredData) ?? "monthly";
+    formState.contractMonths = structuredData.contractMonths ?? 12;
+    formState.tripCharge = structuredData.tripCharge ?? REFRESH_FALLBACKS.tripCharge;
+    formState.tripChargeIncluded = structuredData.tripChargeIncluded ?? true;
+
+    const areaMapping = {
+      'dumpster': 'dumpster',
+      'patio': 'patio',
+      'frontHouse': 'foh',
+      'backHouse': 'boh',
+      'walkway': 'walkway',
+      'other': 'other'
+    };
+
+    Object.values(areaMapping).forEach(formAreaKey => {
+      formState[formAreaKey] = {
+        enabled: false,
+        pricingType: "preset",
+        workers: 2,
+        hours: 0,
+        hourlyRate: 200,
+        insideSqFt: 0,
+        outsideSqFt: 0,
+        insideRate: 0.6,
+        outsideRate: 0.4,
+        sqFtFixedFee: 200,
+        customAmount: 0,
+        kitchenSize: "smallMedium",
+        patioMode: "standalone",
+        frequencyLabel: "",
+        contractMonths: 12
+      };
+    });
+
+    Object.entries(structuredData.services).forEach(([storedAreaKey, areaData]: [string, any]) => {
+      const formAreaKey = areaMapping[storedAreaKey as keyof typeof areaMapping];
+      if (!formAreaKey) {
+        console.warn(`🔄 Unknown area key in stored data: ${storedAreaKey}`);
+        return;
+      }
+
+      console.log(`🔄 Processing area: ${storedAreaKey} -> ${formAreaKey}`, areaData);
+
+      let pricingType = "preset";
+      if (areaData.pricingMethod?.value) {
+        const methodValue = areaData.pricingMethod.value.toLowerCase();
+        if (methodValue.includes("per hour")) pricingType = "perHour";
+        else if (methodValue.includes("per worker")) pricingType = "perWorker";
+        else if (methodValue.includes("square feet")) pricingType = "squareFeet";
+        else if (methodValue.includes("custom")) pricingType = "custom";
+        else if (methodValue.includes("preset")) pricingType = "preset";
+      }
+
+      const areaState: any = {
+        enabled: areaData.enabled !== false, 
+        pricingType: pricingType,
+        workers: 2, 
+        hours: 0,
+        hourlyRate: 200,
+        insideSqFt: 0,
+        outsideSqFt: 0,
+        insideRate: 0.6,
+        outsideRate: 0.4,
+        sqFtFixedFee: 200,
+        customAmount: 0,
+        kitchenSize: "smallMedium",
+        patioMode: "standalone",
+        includePatioAddon: false, 
+        frequencyLabel: areaData.frequency?.value || "",
+        contractMonths: areaData.contract?.quantity || 12
+      };
+
+      if (pricingType === "perHour" && areaData.hours) {
+        areaState.hours = areaData.hours.quantity || 0;
+        if (areaData.hours.priceRate !== undefined) {
+          areaState.hourlyRate = areaData.hours.priceRate;
+        }
+      } else if (pricingType === "perWorker" && areaData.workersCalc) {
+        areaState.workers = areaData.workersCalc.quantity || 2;
+        if (areaData.workersCalc.priceRate !== undefined) {
+          areaState.workerRate = areaData.workersCalc.priceRate;
+        }
+      } else if (pricingType === "squareFeet") {
+        if (areaData.fixedFee?.value) areaState.sqFtFixedFee = areaData.fixedFee.value;
+        if (areaData.insideSqft?.quantity) areaState.insideSqFt = areaData.insideSqft.quantity;
+        if (areaData.outsideSqft?.quantity) areaState.outsideSqFt = areaData.outsideSqft.quantity;
+        if (areaData.insideSqft?.priceRate) areaState.insideRate = areaData.insideSqft.priceRate;
+        if (areaData.outsideSqft?.priceRate) areaState.outsideRate = areaData.outsideSqft.priceRate;
+      } else if (pricingType === "preset") {
+
+        if (storedAreaKey === 'patio') {
+
+          if (areaData.includePatioAddon !== undefined) {
+            if (typeof areaData.includePatioAddon === 'object' && areaData.includePatioAddon.value !== undefined) {
+
+              areaState.includePatioAddon = areaData.includePatioAddon.value;
+            } else {
+
+              areaState.includePatioAddon = areaData.includePatioAddon;
+            }
+          } else if (areaData.patioAddon !== undefined) {
+            areaState.includePatioAddon = areaData.patioAddon;
+          }
+
+          if (areaData.plan?.value) {
+            areaState.patioMode = areaData.plan.value.toLowerCase().includes('upsell') ? 'upsell' : 'standalone';
+          }
+
+          console.log(`🔄 [Patio DEBUG] Raw areaData:`, JSON.stringify(areaData, null, 2));
+          console.log(`🔄 [Patio] Final mapped state - includePatioAddon: ${areaState.includePatioAddon}, patioMode: ${areaState.patioMode}`);
+        } else if (storedAreaKey === 'backHouse' && areaData.plan?.value) {
+          areaState.kitchenSize = areaData.plan.value.toLowerCase().includes('large') ? 'large' : 'smallMedium';
+        }
+      }
+
+      if (areaData.customAmount !== undefined) {
+        areaState.customAmount = areaData.customAmount;
+      }
+      if (areaData.smallMediumCustomAmount !== undefined) {
+        areaState.smallMediumCustomAmount = areaData.smallMediumCustomAmount;
+      }
+      if (areaData.largeCustomAmount !== undefined) {
+        areaState.largeCustomAmount = areaData.largeCustomAmount;
+      }
+      const normalizedSmallMediumQty = normalizeStructuredValue(areaData.smallMediumQuantity);
+      if (normalizedSmallMediumQty !== undefined) {
+        areaState.smallMediumQuantity = normalizedSmallMediumQty;
+      }
+      const normalizedLargeQty = normalizeStructuredValue(areaData.largeQuantity);
+      if (normalizedLargeQty !== undefined) {
+        areaState.largeQuantity = normalizedLargeQty;
+      }
+      if (areaData.patioAddonRate !== undefined) {
+        areaState.patioAddonRate = areaData.patioAddonRate;
+      }
+      if (areaData.workerRateIsCustom !== undefined) {
+        areaState.workerRateIsCustom = areaData.workerRateIsCustom;
+      }
+      if (areaData.hourlyRateIsCustom !== undefined) {
+        areaState.hourlyRateIsCustom = areaData.hourlyRateIsCustom;
+      }
+      if (areaData.insideRateIsCustom !== undefined) {
+        areaState.insideRateIsCustom = areaData.insideRateIsCustom;
+      }
+      if (areaData.outsideRateIsCustom !== undefined) {
+        areaState.outsideRateIsCustom = areaData.outsideRateIsCustom;
+      }
+      if (areaData.sqFtFixedFeeIsCustom !== undefined) {
+        areaState.sqFtFixedFeeIsCustom = areaData.sqFtFixedFeeIsCustom;
+      }
+      if (areaData.presetRateIsCustom !== undefined) {
+        areaState.presetRateIsCustom = areaData.presetRateIsCustom;
+      }
+      if (areaData.smallMediumRateIsCustom !== undefined) {
+        areaState.smallMediumRateIsCustom = areaData.smallMediumRateIsCustom;
+      }
+      if (areaData.largeRateIsCustom !== undefined) {
+        areaState.largeRateIsCustom = areaData.largeRateIsCustom;
+      }
+      if (areaData.savedPresetRate !== undefined) {
+        areaState.presetRate = areaData.savedPresetRate;
+      }
+      if (areaData.savedPresetQuantity !== undefined) {
+        areaState.presetQuantity = areaData.savedPresetQuantity;
+      }
+      if (areaData.savedWorkerRate !== undefined) {
+        areaState.workerRate = areaData.savedWorkerRate;
+      }
+      if (areaData.savedHours !== undefined) {
+        areaState.hours = areaData.savedHours;
+      }
+      if (areaData.savedHourlyRate !== undefined) {
+        areaState.hourlyRate = areaData.savedHourlyRate;
+      }
+      if (areaData.savedInsideRate !== undefined) {
+        areaState.insideRate = areaData.savedInsideRate;
+      }
+      if (areaData.savedOutsideRate !== undefined) {
+        areaState.outsideRate = areaData.savedOutsideRate;
+      }
+      if (areaData.savedSqFtFixedFee !== undefined) {
+        areaState.sqFtFixedFee = areaData.savedSqFtFixedFee;
+      }
+      if (areaData.savedSmallMediumRate !== undefined) {
+        areaState.smallMediumRate = areaData.savedSmallMediumRate;
+      }
+      if (areaData.savedLargeRate !== undefined) {
+        areaState.largeRate = areaData.savedLargeRate;
+      }
+
+      formState[formAreaKey] = areaState;
+      console.log(`🔄 Mapped ${storedAreaKey} -> ${formAreaKey}:`, areaState);
+    });
+
+    formState.customFields = extractCustomFields(structuredData);
+
+    console.log('🔄 [transformRefreshPowerScrubData] Final form state:', formState);
+    return formState;
+  }
+
+  console.log('🔄 [transformRefreshPowerScrubData] Using LEGACY format');
+
+  if (structuredData.rateInfo && structuredData.rateInfo.value) {
+    const rateInfoStr = structuredData.rateInfo.value;
+    const hourlyMatch = rateInfoStr.match(/\$(\d+)\/hr/);
+    const tripMatch = rateInfoStr.match(/Trip: \$(\d+)/);
+    const minMatch = rateInfoStr.match(/Minimum: \$(\d+)/);
+
+    if (hourlyMatch) formState.hourlyRate = parseFloat(hourlyMatch[1]);
+    if (tripMatch) formState.tripCharge = parseFloat(tripMatch[1]);
+    if (minMatch) formState.minimumVisit = parseFloat(minMatch[1]);
+  }
+
+  if (structuredData.areaBreakdown && Array.isArray(structuredData.areaBreakdown)) {
+    structuredData.areaBreakdown.forEach((area: any) => {
+      const areaKey = area.label?.toLowerCase();
+      if (areaKey && structuredData.areaBreakdown) {
+
+        const valueStr = area.value || "";
+        const freqMatch = valueStr.match(/^(\w+(?:-\w+)?)\s*-/);
+        const hoursMatch = valueStr.match(/(\d+(?:\.\d+)?)\s*hrs/);
+
+        formState[areaKey] = {
+          enabled: true,
+          frequency: freqMatch ? freqMatch[1] : "",
+          hours: hoursMatch ? parseFloat(hoursMatch[1]) : 0,
+        };
+      }
+    });
+  }
+
+  if (structuredData.totals && structuredData.totals.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+const ELECTROSTATIC_ALLOWED_FREQUENCIES = electrostaticSprayPricingConfig.allowedFrequencies;
+
+function matchElectrostaticFrequencyCandidate(value: string | undefined): ElectrostaticSprayFrequency | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  const directMatch = ELECTROSTATIC_ALLOWED_FREQUENCIES.find(
+    (freq) => freq.toLowerCase() === trimmed.toLowerCase()
+  );
+  if (directMatch) {
+    return directMatch;
+  }
+  const sanitizedInput = trimmed.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const freq of ELECTROSTATIC_ALLOWED_FREQUENCIES) {
+    const normalizedFreq = freq.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!normalizedFreq) continue;
+    if (
+      sanitizedInput === normalizedFreq ||
+      sanitizedInput.includes(normalizedFreq)
+    ) {
+      return freq;
+    }
+  }
+  return undefined;
+}
+
+function normalizeElectrostaticFrequency(rawValue: any): ElectrostaticSprayFrequency | undefined {
+  if (rawValue === undefined || rawValue === null) return undefined;
+  if (typeof rawValue === "string") {
+    return matchElectrostaticFrequencyCandidate(rawValue);
+  }
+  if (typeof rawValue === "object") {
+    for (const key of ["frequencyKey", "value", "label"]) {
+      const result = normalizeElectrostaticFrequency(rawValue[key]);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return undefined;
+}
+
+export function transformElectrostaticSprayData(structuredData: any): any {
+  if (!structuredData || !structuredData.isActive) return undefined;
+
+  const formState: any = {
+    notes: structuredData.notes || "",
+  };
+
+  if (structuredData.ratePerRoom !== undefined) {
+    formState.ratePerRoom = structuredData.ratePerRoom;
+  }
+  if (structuredData.ratePerThousandSqFt !== undefined) {
+    formState.ratePerThousandSqFt = structuredData.ratePerThousandSqFt;
+  }
+  if (structuredData.tripChargePerVisit !== undefined) {
+    formState.tripChargePerVisit = structuredData.tripChargePerVisit;
+  }
+
+  if (structuredData.pricingMethod !== undefined) {
+    formState.pricingMethod = structuredData.pricingMethod;
+  }
+  if (structuredData.roomCount !== undefined) {
+    formState.roomCount = structuredData.roomCount;
+  }
+  if (structuredData.squareFeet !== undefined) {
+    formState.squareFeet = structuredData.squareFeet;
+  }
+  if (structuredData.useExactCalculation !== undefined) {
+    formState.useExactCalculation = structuredData.useExactCalculation;
+  }
+  if (structuredData.isCombinedWithSaniClean !== undefined) {
+    formState.isCombinedWithSaniClean = structuredData.isCombinedWithSaniClean;
+  }
+  if (structuredData.frequency !== undefined) {
+    const normalizedFrequency = normalizeElectrostaticFrequency(structuredData.frequency);
+    if (normalizedFrequency) {
+      formState.frequency = normalizedFrequency;
+    }
+  }
+  if (structuredData.contractMonths !== undefined) {
+    formState.contractMonths = structuredData.contractMonths;
+  }
+  if (structuredData.location !== undefined) {
+    formState.location = structuredData.location;
+  }
+
+  if (formState.pricingMethod === undefined) {
+    if (structuredData.pricingMethodDisplay?.value) {
+      formState.pricingMethod = structuredData.pricingMethodDisplay.value.includes("Room") ? "byRoom" : "bySqFt";
+    } else if (structuredData.pricingMethod?.value) {
+
+      formState.pricingMethod = structuredData.pricingMethod.value.includes("Room") ? "byRoom" : "bySqFt";
+    }
+  }
+
+  if (structuredData.service) {
+    if (formState.pricingMethod === "byRoom") {
+      if (formState.roomCount === undefined) {
+        formState.roomCount = structuredData.service.qty || 0;
+      }
+      if (formState.ratePerRoom === undefined && structuredData.service.rate != null) {
+        formState.ratePerRoom = structuredData.service.rate;
+      }
+    } else {
+      if (formState.squareFeet === undefined) {
+        formState.squareFeet = structuredData.service.qty || 0;
+      }
+      if (formState.ratePerThousandSqFt === undefined && structuredData.service.rate != null) {
+        formState.ratePerThousandSqFt = structuredData.service.rate;
+      }
+    }
+  }
+
+  if (formState.frequency === undefined) {
+    const fallbackFromDisplay = normalizeElectrostaticFrequency(structuredData.frequencyDisplay?.value);
+    if (fallbackFromDisplay) {
+      formState.frequency = fallbackFromDisplay;
+    } else {
+      const fallbackFromFrequencyValue = normalizeElectrostaticFrequency(structuredData.frequency?.value);
+      if (fallbackFromFrequencyValue) {
+        formState.frequency = fallbackFromFrequencyValue;
+      }
+    }
+  }
+
+  if (formState.location === undefined) {
+    if (structuredData.locationDisplay?.value) {
+      const loc = structuredData.locationDisplay.value.toLowerCase();
+      formState.location = loc.includes("inside") ? "insideBeltway" :
+                          loc.includes("outside") ? "outsideBeltway" : "standard";
+    } else if (structuredData.location) {
+      if (typeof structuredData.location === 'string') {
+
+        formState.location = structuredData.location;
+      } else if (structuredData.location.value) {
+
+        const loc = structuredData.location.value.toLowerCase();
+        formState.location = loc.includes("inside") ? "insideBeltway" :
+                            loc.includes("outside") ? "outsideBeltway" : "standard";
+      }
+    }
+  }
+
+  if (formState.isCombinedWithSaniClean === undefined && structuredData.combinedService) {
+    formState.isCombinedWithSaniClean = structuredData.combinedService.value?.includes("Sani-Clean");
+  }
+
+  if (formState.tripChargePerVisit === undefined && structuredData.tripCharge) {
+    formState.tripChargePerVisit = structuredData.tripCharge.amount || 0;
+  }
+
+  if (structuredData.totals?.contract) {
+    formState.contractMonths = structuredData.totals.contract.months || 12;
+  }
+
+  formState.customFields = extractCustomFields(structuredData);
+
+  return formState;
+}
+
+export function transformCustomServicesData(structuredData: any): any {
+  if (!structuredData || !Array.isArray(structuredData)) return [];
+
+  console.log('🔄 Transforming custom services data:', structuredData);
+
+  return structuredData.map((customService: any) => ({
+    id: customService.id || Date.now().toString(),
+    name: customService.name || customService.label || 'Custom Service',
+    fields: extractCustomFields({ customFields: customService.fields || [] })
+  }));
+}
+
+export function transformServiceData(serviceId: string, structuredData: any): any {
+  if (!structuredData) return undefined;
+
+  switch (serviceId) {
+    case "rpmWindows":
+      return transformRpmWindowsData(structuredData);
+    case "saniclean":
+      return transformSanicleanData(structuredData);
+    case "foamingDrain":
+      return transformFoamingDrainData(structuredData);
+    case "carpetclean":
+    case "carpetCleaning":
+      return transformCarpetCleanData(structuredData);
+    case "stripwax":
+    case "stripWax":
+      return transformStripWaxData(structuredData);
+    case "janitorial":
+      
+      if (structuredData?.serviceId === 'pureJanitorial') {
+        return transformPureJanitorialData(structuredData);
+      }
+      return transformJanitorialData(structuredData);
+    case "pureJanitorial":
+      return transformPureJanitorialData(structuredData);
+    case "saniscrub":
+      return transformSaniscrubData(structuredData);
+    case "microfiberMopping":
+      return transformMicrofiberMoppingData(structuredData);
+    case "sanipod":
+      return transformSanipodData(structuredData);
+    case "greaseTrap":
+      return transformGreaseTrapData(structuredData);
+    case "refreshPowerScrub":
+      return transformRefreshPowerScrubData(structuredData);
+    case "electrostaticSpray":
+      return transformElectrostaticSprayData(structuredData);
+    case "customServices":
+      return transformCustomServicesData(structuredData);
+    default:
+      console.warn(`No transformer found for service: ${serviceId}`);
+      return undefined;
+  }
+}

@@ -1,0 +1,2062 @@
+import React, { useEffect, useState, useRef, type ChangeEvent } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import "../ServicesSection.css";
+import { useSanicleanCalc } from "./useSanicleanCalc";
+import type { SanicleanFormState, SanicleanFrequency } from "./sanicleanTypes";
+import type { ServiceInitialData } from "../common/serviceTypes";
+import { useServicesContextOptional } from "../ServicesContext";
+import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+
+const formatMoney = (n: number): string => `$${(isNaN(n) ? 0 : n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+const safeNumber = (n: any): number => (typeof n === "number" && !isNaN(n)) ? n : 0;
+
+const sanicleanFrequencyLabels: Record<string, string> = {
+  oneTime: "One Time",
+  weekly: "Weekly",
+  biweekly: "Bi-Weekly",
+  twicePerMonth: "2× / Month (with SaniClean)",
+  monthly: "Monthly",
+  everyFourWeeks: "Every 4 Weeks",
+  bimonthly: "Bi-Monthly (Every 2 Months)",
+  quarterly: "Quarterly",
+  biannual: "Bi-Annual",
+  annual: "Annual",
+};
+
+const MONTHLY_OR_BELOW_FREQUENCIES = new Set(["weekly", "biweekly", "twicePerMonth", "monthly", "everyFourWeeks"]);
+const ABOVE_MONTHLY_FREQUENCIES = new Set(["bimonthly", "quarterly", "biannual", "annual"]);
+
+const FREQUENCY_MULTIPLIER_FALLBACK: Record<string, number> = {
+  weekly: 4.33,
+  biweekly: 2.165,
+  twicePerMonth: 2.0,
+  monthly: 1.0,
+  everyFourWeeks: 1.0833,
+  bimonthly: 0.5,
+  quarterly: 0.33,
+  biannual: 0.17,
+  annual: 1 / 12,
+};
+
+const FIELD_ORDER = {
+  frequency: 1,
+  pricingMode: 2,
+  location: 3,
+  sinks: 4,
+  urinals: 5,
+  maleToilets: 6,
+  femaleToilets: 7,
+
+  totalPrice: 200,
+  contractTotal: 100,
+};
+
+const EXTRA_ORDER = {
+  luxuryUpgrade: 21,
+  urinalScreens: 13,
+  urinalMats: 14,
+  toiletClips: 15,
+  seatCover: 16,
+  sanipods: 17,
+  warranty: 18,
+  microfiber: 19,
+  excessSoap: 20, 
+  baseServiceMonthly: 22,
+  facilityComponentsMonthly: 23,
+  facilityFrequency: 24,
+  includedItems: 25,
+  paperOverage: 26, 
+};
+
+function getSanicleanMonthlyMultiplier(frequency: string, backendConfig?: any): number {
+  if (backendConfig?.frequencyMetadata?.[frequency]) {
+    const metadata = backendConfig.frequencyMetadata[frequency];
+    if (typeof metadata.monthlyRecurringMultiplier === "number") {
+      return metadata.monthlyRecurringMultiplier;
+    }
+    if (typeof metadata.cycleMonths === "number") {
+      return metadata.cycleMonths === 0 ? 1 : 1 / metadata.cycleMonths;
+    }
+  }
+  return FREQUENCY_MULTIPLIER_FALLBACK[frequency] ?? FREQUENCY_MULTIPLIER_FALLBACK.weekly;
+}
+
+function IncludedItemsEditor({
+  items,
+  isCustomized,
+  onChange,
+  onReset,
+}: {
+  items: string[];
+  isCustomized: boolean;
+  onChange: (items: string[]) => void;
+  onReset: () => void;
+}) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [addingNew, setAddingNew] = useState(false);
+  const [newText, setNewText] = useState("");
+
+  const startEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditingText(items[index]);
+    setAddingNew(false);
+  };
+
+  const saveEdit = () => {
+    if (editingIndex === null) return;
+    const trimmed = editingText.trim();
+    if (!trimmed) return;
+    const next = [...items];
+    next[editingIndex] = trimmed;
+    onChange(next);
+    setEditingIndex(null);
+    setEditingText("");
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditingText("");
+  };
+
+  const removeItem = (index: number) => {
+    onChange(items.filter((_, i) => i !== index));
+    if (editingIndex === index) { setEditingIndex(null); setEditingText(""); }
+  };
+
+  const saveNew = () => {
+    const trimmed = newText.trim();
+    if (!trimmed) { setAddingNew(false); setNewText(""); return; }
+    onChange([...items, trimmed]);
+    setNewText("");
+    setAddingNew(false);
+  };
+
+  const cancelNew = () => { setAddingNew(false); setNewText(""); };
+
+  return (
+    <div style={{ width: "100%" }}>
+      {items.map((item, index) => (
+        <div key={index} style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 3 }}>
+          {editingIndex === index ? (
+            <>
+              <input
+                className="svc-in"
+                style={{ flex: 1, fontSize: 12 }}
+                value={editingText}
+                onChange={e => setEditingText(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
+                autoFocus
+              />
+              <button className="svc-btn svc-btn--small" onClick={saveEdit} title="Save">✓</button>
+              <button className="svc-btn svc-btn--small" onClick={cancelEdit} title="Cancel" style={{ opacity: 0.6 }}>✕</button>
+            </>
+          ) : (
+            <>
+              <span style={{ flex: 1, fontSize: 12 }}>• {item}</span>
+              <button
+                className="svc-btn svc-btn--small"
+                onClick={() => startEdit(index)}
+                title="Edit item"
+                style={{ opacity: 0.55, fontSize: 11 }}
+              >
+                ✎
+              </button>
+              <button
+                className="svc-btn svc-btn--small"
+                onClick={() => removeItem(index)}
+                title="Remove item"
+                style={{ opacity: 0.55, fontSize: 11 }}
+              >
+                ✕
+              </button>
+            </>
+          )}
+        </div>
+      ))}
+
+      {addingNew ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
+          <input
+            className="svc-in"
+            style={{ flex: 1, fontSize: 12 }}
+            value={newText}
+            onChange={e => setNewText(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") saveNew(); if (e.key === "Escape") cancelNew(); }}
+            placeholder="New item…"
+            autoFocus
+          />
+          <button className="svc-btn svc-btn--small" onClick={saveNew} title="Add">✓</button>
+          <button className="svc-btn svc-btn--small" onClick={cancelNew} title="Cancel" style={{ opacity: 0.6 }}>✕</button>
+        </div>
+      ) : (
+        <div style={{ marginTop: 4, display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            className="svc-btn svc-btn--small"
+            onClick={() => setAddingNew(true)}
+          >
+            + Add item
+          </button>
+          {isCustomized && (
+            <button
+              className="svc-btn svc-btn--small"
+              onClick={onReset}
+              style={{ opacity: 0.65 }}
+              title="Restore the default calculated list"
+            >
+              Reset to defaults
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export const SanicleanForm: React.FC<
+  ServiceInitialData<SanicleanFormState>
+> = ({ initialData, onRemove }) => {
+
+  const [customFields, setCustomFields] = useState<CustomField[]>(
+    initialData?.customFields || []
+  );
+
+  const {
+    form,
+    quote,
+    fetchPricing,
+    isLoadingConfig,
+    pricingOverrides,
+    updateForm,
+    setPricingMode,
+    setLocation,
+    setSoapType,
+    setRateTier,
+    setNotes,
+    backendConfig,
+
+    setMainServiceFrequency,
+    setFacilityComponentsFrequency,
+  } = useSanicleanCalc(initialData, customFields);
+
+  const servicesContext = useServicesContextOptional();
+
+  useEffect(() => {
+    if (servicesContext?.globalContractMonths && servicesContext.globalContractMonths !== form.contractMonths) {
+      updateForm({ contractMonths: servicesContext.globalContractMonths });
+    }
+  }, [servicesContext?.globalContractMonths]);
+
+  const [showAddDropdown, setShowAddDropdown] = useState(false);
+
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+
+  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
+
+  const prevDataRef = useRef<string>("");
+
+  const getOverrideStyle = (
+    isOverride: boolean,
+    baseStyle?: React.CSSProperties
+  ): React.CSSProperties => ({
+    ...(baseStyle || {}),
+    backgroundColor: isOverride ? "#fffacd" : (baseStyle?.backgroundColor ?? "white"),
+  });
+
+  const hasPricingOverride = (fieldName: string): boolean => {
+    return Boolean((pricingOverrides as Record<string, boolean> | undefined)?.[fieldName]);
+  };
+
+  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
+
+    if (editingValues[fieldName] !== undefined) {
+      return editingValues[fieldName];
+    }
+
+    if (calculatedValue === undefined) return '';
+    return formatted
+      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+      : calculatedValue.toFixed(2);
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setEditingValues(prev => ({ ...prev, [name]: value }));
+    setOriginalValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setEditingValues(prev => ({ ...prev, [name]: value }));
+
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      updateForm({ [name]: numValue });
+    } else if (value === '') {
+
+      updateForm({ [name]: undefined });
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    const originalValue = originalValues[name];
+
+    setEditingValues(prev => {
+      const newState = { ...prev };
+      delete newState[name];
+      return newState;
+    });
+
+    setOriginalValues(prev => {
+      const newState = { ...prev };
+      delete newState[name];
+      return newState;
+    });
+
+    const numValue = parseFloat(value);
+
+    if (originalValue !== value) {
+
+      if (value === '' || isNaN(numValue)) {
+        updateForm({ [name]: undefined });
+        return;
+      }
+
+      updateForm({ [name]: numValue });
+    }
+  };
+
+  const fixtures = form.sinks + form.urinals + form.maleToilets + form.femaleToilets;
+  const soapDispensers = form.sinks; 
+  const luxuryUpgradeQty = form.luxuryUpgradeQty ?? soapDispensers;
+
+  const isAllInclusive = form.pricingMode === "all_inclusive";
+  const fixtureRateFieldName = isAllInclusive
+    ? "allInclusiveWeeklyRatePerFixture"
+    : (form.location === "insideBeltway" ? "insideBeltwayRatePerFixture" : "outsideBeltwayRatePerFixture");
+  const fixtureRateOverride = hasPricingOverride(fixtureRateFieldName);
+  const excessSoapRateFieldName = form.soapType === "luxury" ? "excessLuxurySoapRate" : "excessStandardSoapRate";
+  const excessSoapRateOverride = hasPricingOverride(excessSoapRateFieldName);
+
+  console.log('🔍 [SaniClean Debug]', {
+    pricingMode: form.pricingMode,
+    isAllInclusive,
+    allInclusiveRate: form.allInclusiveWeeklyRatePerFixture,
+    insideBeltwayRate: form.insideBeltwayRatePerFixture
+  });
+
+  const luxuryUpgradeWeekly = form.soapType === "luxury" && luxuryUpgradeQty > 0
+    ? luxuryUpgradeQty * form.luxuryUpgradePerDispenser
+    : 0;
+
+  const extraSoapRatePerGallon = form.soapType === "luxury"
+    ? form.excessLuxurySoapRate
+    : form.excessStandardSoapRate;
+
+  const extraSoapWeekly = Math.max(0, form.excessSoapGallonsPerWeek) * extraSoapRatePerGallon;
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    let processedValue: any = value;
+
+    if (
+      name === "customBaseService" ||
+      name === "customTripCharge" ||
+      name === "customFacilityComponents" ||
+      name === "customSoapUpgrade" ||
+      name === "customExcessSoap" ||
+      name === "customMicrofiberMopping" ||
+      name === "customWarrantyFees" ||
+      name === "customPaperOverage" ||
+      name === "customWeeklyTotal" ||
+      name === "customMonthlyTotal" ||
+      name === "customContractTotal"
+    ) {
+      const numVal = value === '' ? undefined : parseFloat(value);
+      if (numVal === undefined || !isNaN(numVal)) {
+        updateForm({ [name]: numVal });
+      }
+      return;
+    }
+
+    if (type === "checkbox") {
+      processedValue = checked;
+    } else if (name === "luxuryUpgradeQty") {
+      processedValue = value === "" ? undefined : parseFloat(value);
+    } else if (type === "number") {
+      processedValue = parseFloat(value) || 0;
+    }
+
+    updateForm({ [name]: processedValue });
+  };
+
+  const sumBreakdown = Object.values(quote.breakdown || {}).reduce(
+    (acc, value) => acc + (typeof value === "number" ? value : 0),
+    0
+  );
+  const totalPriceValue =
+    form.mainServiceFrequency === "oneTime"
+      ? (quote.oneTimeTotal ?? sumBreakdown)
+      : undefined;
+
+  useEffect(() => {
+    if (servicesContext) {
+      const hasCustomFieldValues = customFields.some(f =>
+        (f.type === 'dollar' && !!f.value && parseFloat(f.value) > 0) ||
+        (f.type === 'calc' && !!f.calcValues?.right && parseFloat(f.calcValues.right) > 0)
+      );
+      const isActive = fixtures > 0 || hasCustomFieldValues;
+      const frequencyLabel =
+        sanicleanFrequencyLabels[form.mainServiceFrequency] ||
+        form.mainServiceFrequency ||
+        "TBD";
+      const facilityFrequencyLabel =
+        sanicleanFrequencyLabels[form.facilityComponentsFrequency] ||
+        form.facilityComponentsFrequency ||
+        "TBD";
+
+      const formatDollars = (amount: number) => `$${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      type PdfExtra = {
+        label: string;
+        type?: "line" | "bold" | "atCharge";
+        value?: string;
+        v1?: string | number;
+        v2?: string | number;
+        v3?: string | number;
+        orderNo?: number;
+        isDisplay?: boolean;
+        gap?: "wide";
+      };
+      const extras: PdfExtra[] = [];
+      const addLineExtra = (
+        label: string,
+        amount: number | string | undefined,
+        type: "line" | "bold" = "line",
+        orderNo?: number,
+        gap?: "wide"
+      ) => {
+        if (amount === undefined || amount === null) return;
+        if (typeof amount === "number" && amount === 0) return;
+        if (typeof amount === "string" && amount.trim() === "") return;
+        const displayValue = typeof amount === "number" ? formatDollars(amount) : amount;
+        extras.push({
+          label,
+          value: displayValue,
+          type,
+          isDisplay: true,
+          orderNo,
+          gap,
+        });
+        if (gap === "wide") {
+          console.debug("[Saniclean PDF extra] wide gap", {
+            label,
+            value: displayValue,
+            orderNo,
+          });
+        }
+      };
+      const addAtChargeExtra = (
+        label: string,
+        qty: number | undefined,
+        rate: number | undefined,
+        total: number,
+        orderNo?: number
+      ) => {
+        if (!qty || qty <= 0) return;
+        if (!rate || rate === 0) return;
+        extras.push({
+          label,
+          type: "atCharge",
+          v1: qty,
+          v2: `${formatDollars(rate)}/mo`,
+          v3: formatDollars(total),
+          isDisplay: true,
+          orderNo,
+        });
+      };
+
+      const urinalScreensTotal =
+        (form.urinalScreensQty || 0) * (form.urinalScreenMonthly || 0);
+      const urinalMatsTotal =
+        (form.urinalMatsQty || 0) * (form.urinalMatMonthly || 0);
+      const toiletClipsTotal =
+        (form.toiletClipsQty || 0) * (form.toiletClipsMonthly || 0);
+      const seatCoverTotal =
+        (form.seatCoverDispensersQty || 0) * (form.seatCoverDispenserMonthly || 0);
+      const sanipodsTotal =
+        (form.sanipodsQty || 0) * (form.sanipodServiceMonthly || 0);
+      const warrantyTotal =
+        (form.warrantyDispensers || 0) * (form.warrantyFeePerDispenserPerWeek || 0);
+      const microfiberTotal =
+        (form.microfiberBathrooms || 0) * (form.microfiberMoppingPerBathroom || 0);
+
+      addAtChargeExtra(
+        "Luxury Upgrade",
+        luxuryUpgradeQty,
+        form.luxuryUpgradePerDispenser,
+        luxuryUpgradeWeekly,
+        EXTRA_ORDER.luxuryUpgrade
+      );
+      addAtChargeExtra("Urinal Screens", form.urinalScreensQty, form.urinalScreenMonthly, urinalScreensTotal, EXTRA_ORDER.urinalScreens);
+      addAtChargeExtra("Urinal Mats", form.urinalMatsQty, form.urinalMatMonthly, urinalMatsTotal, EXTRA_ORDER.urinalMats);
+      addAtChargeExtra("Toilet Clips", form.toiletClipsQty, form.toiletClipsMonthly, toiletClipsTotal, EXTRA_ORDER.toiletClips);
+      addAtChargeExtra("Seat Cover Dispensers", form.seatCoverDispensersQty, form.seatCoverDispenserMonthly, seatCoverTotal, EXTRA_ORDER.seatCover);
+      addAtChargeExtra("SaniPods", form.sanipodsQty, form.sanipodServiceMonthly, sanipodsTotal, EXTRA_ORDER.sanipods);
+      addAtChargeExtra("Warranty", form.warrantyDispensers, form.warrantyFeePerDispenserPerWeek, warrantyTotal, EXTRA_ORDER.warranty);
+      addAtChargeExtra("Microfiber Mopping", form.microfiberBathrooms, form.microfiberMoppingPerBathroom, microfiberTotal, EXTRA_ORDER.microfiber);
+
+      if (form.pricingMode === "all_inclusive" && form.excessSoapGallonsPerWeek > 0 && extraSoapWeekly > 0) {
+        addAtChargeExtra(
+          "Excess Soap",
+          form.excessSoapGallonsPerWeek,
+          extraSoapRatePerGallon,
+          extraSoapWeekly,
+          EXTRA_ORDER.excessSoap
+        );
+      }
+
+      if (form.pricingMode === "all_inclusive" && paperOveragePerWeek > 0) {
+        addLineExtra(
+          "Paper Overage",
+          paperOveragePerWeek,
+          "line",
+          EXTRA_ORDER.paperOverage
+        );
+      }
+
+        if (form.mainServiceFrequency !== "oneTime") {
+
+          const hasFacilityComponents = form.addUrinalComponents || form.addMaleToiletComponents || form.addFemaleToiletComponents;
+
+          if (form.pricingMode === "per_item_charge" && hasFacilityComponents) {
+            addLineExtra("Facility Components Frequency", facilityFrequencyLabel, "line", EXTRA_ORDER.facilityFrequency, "wide");
+          }
+          addLineExtra("Base Service Monthly Total", quote.baseServiceMonthly, "bold", EXTRA_ORDER.baseServiceMonthly, "wide");
+
+          if (hasFacilityComponents) {
+            addLineExtra("Facility Components Monthly Total", quote.facilityComponentsMonthly, "bold", EXTRA_ORDER.facilityComponentsMonthly, "wide");
+          }
+        }
+
+      const includedItems = Array.isArray(quote.included)
+        ? quote.included.filter(Boolean)
+        : [];
+      includedItems.forEach((item, index) => {
+        addLineExtra("Included", item, "line", EXTRA_ORDER.includedItems + index * 0.1);
+      });
+      const totals: Record<string, any> = {};
+      if (totalPriceValue !== undefined) {
+        totals.totalPrice = {
+          isDisplay: true,
+          orderNo: FIELD_ORDER.totalPrice,
+          label: "Total Price",
+          type: "dollar" as const,
+          amount: totalPriceValue,
+        };
+      } else {
+        totals.contract = {
+          isDisplay: true,
+          orderNo: FIELD_ORDER.contractTotal,
+          label: "Contract Total",
+          type: "dollar" as const,
+          months: form.contractMonths,
+          amount: quote.contractTotal,
+        };
+      }
+
+      const data = isActive ? {
+        serviceId: "saniclean",
+        displayName: "SaniClean",
+        isActive: true,
+
+        pricingMode: form.pricingMode,
+        location: form.location,
+        rateTier: form.rateTier,
+        mainServiceFrequency: form.mainServiceFrequency,
+        facilityComponentsFrequency: form.facilityComponentsFrequency,
+        frequency: form.frequency, 
+        facilityComponentFrequency: form.facilityComponentFrequency, 
+        contractMonths: form.contractMonths,
+        originalContractTotal: quote.originalContractTotal ?? quote.contractTotal,
+
+        frequency: {
+          isDisplay: true,
+          orderNo: FIELD_ORDER.frequency,
+          label: "Frequency",
+          type: "text" as const,
+          value: frequencyLabel,
+        },
+
+        allInclusiveWeeklyRatePerFixture: form.allInclusiveWeeklyRatePerFixture,
+        luxuryUpgradePerDispenser: form.luxuryUpgradePerDispenser,
+        luxuryUpgradeQty: form.luxuryUpgradeQty,
+        excessStandardSoapRate: form.excessStandardSoapRate,
+        excessLuxurySoapRate: form.excessLuxurySoapRate,
+
+        excessSoapGallonsPerWeek: form.excessSoapGallonsPerWeek,
+        paperCreditPerFixture: form.paperCreditPerFixture,
+
+        estimatedPaperSpendPerWeek: form.estimatedPaperSpendPerWeek,
+        microfiberMoppingPerBathroom: form.microfiberMoppingPerBathroom,
+
+        insideBeltwayRatePerFixture: form.insideBeltwayRatePerFixture,
+        insideBeltwayMinimum: form.insideBeltwayMinimum,
+        insideBeltwayTripCharge: form.insideBeltwayTripCharge,
+        insideBeltwayParkingFee: form.insideBeltwayParkingFee,
+        outsideBeltwayRatePerFixture: form.outsideBeltwayRatePerFixture,
+        outsideBeltwayTripCharge: form.outsideBeltwayTripCharge,
+
+        smallFacilityThreshold: form.smallFacilityThreshold,
+        smallFacilityMinimum: form.smallFacilityMinimum,
+
+        urinalScreenMonthly: form.urinalScreenMonthly,
+        urinalMatMonthly: form.urinalMatMonthly,
+        toiletClipsMonthly: form.toiletClipsMonthly,
+        seatCoverDispenserMonthly: form.seatCoverDispenserMonthly,
+        sanipodServiceMonthly: form.sanipodServiceMonthly,
+
+        warrantyFeePerDispenserPerWeek: form.warrantyFeePerDispenserPerWeek,
+        weeklyToMonthlyMultiplier: form.weeklyToMonthlyMultiplier,
+        weeklyToAnnualMultiplier: form.weeklyToAnnualMultiplier,
+        redRateMultiplier: form.redRateMultiplier,
+        greenRateMultiplier: form.greenRateMultiplier,
+
+        customBaseService: form.customBaseService,
+        customTripCharge: form.customTripCharge,
+        customFacilityComponents: form.customFacilityComponents,
+        customSoapUpgrade: form.customSoapUpgrade,
+        customExcessSoap: form.customExcessSoap,
+        customMicrofiberMopping: form.customMicrofiberMopping,
+        customWarrantyFees: form.customWarrantyFees,
+        customPaperOverage: form.customPaperOverage,
+        customWeeklyTotal: form.customWeeklyTotal,
+        customMonthlyTotal: form.customMonthlyTotal,
+        customContractTotal: form.customContractTotal,
+        applyMinimum: form.applyMinimum !== false,
+
+        addUrinalComponents: form.addUrinalComponents,
+        urinalScreensQty: form.addUrinalComponents ? form.urinalScreensQty : 0,
+        urinalMatsQty: form.addUrinalComponents ? form.urinalMatsQty : 0,
+        addMaleToiletComponents: form.addMaleToiletComponents,
+        toiletClipsQty: form.addMaleToiletComponents ? form.toiletClipsQty : 0,
+        seatCoverDispensersQty: form.addMaleToiletComponents ? form.seatCoverDispensersQty : 0,
+        addFemaleToiletComponents: form.addFemaleToiletComponents,
+        sanipodsQty: form.addFemaleToiletComponents ? form.sanipodsQty : 0,
+        warrantyDispensers: form.warrantyDispensers,
+        addMicrofiberMopping: form.addMicrofiberMopping,
+        microfiberBathrooms: form.addMicrofiberMopping ? form.microfiberBathrooms : 0,
+
+        perVisitBase: quote.breakdown.baseService,  
+        perVisit: quote.weeklyTotal,  
+        minimumChargePerWeek: quote.minimumChargePerWeek,  
+
+        pricingMode: {
+          isDisplay: true,
+          orderNo: FIELD_ORDER.pricingMode,
+          label: "Pricing Mode",
+          type: "text" as const,
+          value: form.pricingMode === "all_inclusive" ? "All Inclusive" : "Per Item Charge",
+        },
+
+        location: {
+          isDisplay: true,
+          orderNo: FIELD_ORDER.location,
+          label: "Location",
+          type: "text" as const,
+          value: form.location === "insideBeltway" ? "Inside Beltway" : "Outside Beltway",
+        },
+
+        fixtureBreakdown: (() => {
+          const fixtureRate = form.pricingMode === "all_inclusive"
+            ? form.allInclusiveWeeklyRatePerFixture
+            : form.location === "insideBeltway"
+              ? form.insideBeltwayRatePerFixture
+              : form.outsideBeltwayRatePerFixture;
+          const createLine = (label: string, quantity: number, orderNo: number) => ({
+            isDisplay: true,
+            orderNo,
+            label,
+            type: "calc" as const,
+            qty: quantity,
+            rate: fixtureRate,
+            total: quantity * fixtureRate,
+          });
+          return [
+            ...(form.sinks > 0 ? [createLine("Sinks", form.sinks, FIELD_ORDER.sinks)] : []),
+            ...(form.urinals > 0 ? [createLine("Urinals", form.urinals, FIELD_ORDER.urinals)] : []),
+            ...(form.maleToilets > 0 ? [createLine("Male Toilets", form.maleToilets, FIELD_ORDER.maleToilets)] : []),
+            ...(form.femaleToilets > 0 ? [createLine("Female Toilets", form.femaleToilets, FIELD_ORDER.femaleToilets)] : []),
+          ];
+        })(),
+
+        facilityComponentsTotal: quote.breakdown.facilityComponents,
+        facilityComponentsMonthly: quote.facilityComponentsMonthly,
+
+        soapType: form.soapType,
+
+          totals,
+          ...(totalPriceValue !== undefined ? { totalPrice: totalPriceValue } : {}),
+          ...(totalPriceValue === undefined
+            ? {
+                contractTotal: {
+                  isDisplay: true,
+                  label: "Contract Total",
+                  type: "dollar" as const,
+                  amount: quote.contractTotal,
+                },
+              }
+            : {}),
+
+        notes: form.notes || "",
+        customFields: customFields,
+        pdfExtras: extras,
+      } : null;
+
+      const dataStr = JSON.stringify(data);
+
+      if (dataStr !== prevDataRef.current) {
+        prevDataRef.current = dataStr;
+        servicesContext.updateService("saniclean", data);
+      }
+    }
+  }, [form, quote, fixtures, customFields, soapDispensers, isAllInclusive, backendConfig]);
+
+  const paperCreditPerWeek = form.fixtureCount * form.paperCreditPerFixture;
+  const paperOveragePerWeek = Math.max(0, form.estimatedPaperSpendPerWeek - paperCreditPerWeek);
+
+  const contractMonths =
+    form.contractMonths && form.contractMonths >= 2 && form.contractMonths <= 36
+      ? form.contractMonths
+      : 12;
+
+  const contractTotal = quote.contractTotal;
+
+  return (
+    <div className="svc-card" style={{ position: 'relative' }}>
+      {}
+      {isLoadingConfig && (
+        <div className="svc-loading-overlay">
+          <div className="svc-loading-spinner">
+            <span className="svc-sr-only">Loading configuration...</span>
+          </div>
+          <p className="svc-loading-text">Loading configuration...</p>
+        </div>
+      )}
+
+      {}
+      <div className="svc-h-row">
+        <div className="svc-h">SANI CLEAN</div>
+        <div className="svc-h-actions">
+          <button
+            type="button"
+            className="svc-mini"
+            onClick={() => fetchPricing(true)}
+            disabled={isLoadingConfig}
+            title="Refresh config from database"
+          >
+            <FontAwesomeIcon
+              icon={isLoadingConfig ? faSpinner : faSync}
+              spin={isLoadingConfig}
+            />
+          </button>
+          <button
+            type="button"
+            className="svc-mini"
+            onClick={() => setShowAddDropdown(!showAddDropdown)}
+            title="Add custom field"
+          >
+            +
+          </button>
+          {onRemove && (
+            <button
+              type="button"
+              className="svc-mini svc-mini--neg"
+              onClick={onRemove}
+              title="Remove this service"
+            >
+              −
+            </button>
+          )}
+        </div>
+      </div>
+
+      {}
+      <CustomFieldManager
+        fields={customFields}
+        onFieldsChange={setCustomFields}
+        showAddDropdown={showAddDropdown}
+        onToggleAddDropdown={setShowAddDropdown}
+      />
+
+      <div className="svc-row">
+        <label>Pricing Mode</label>
+        <div className="svc-row-right">
+          <select
+            className="svc-in"
+            name="pricingMode"
+            value={form.pricingMode}
+            onChange={onChange}
+          >
+            <option value="all_inclusive">All Inclusive</option>
+            <option value="per_item_charge">Per Item Charge</option>
+          </select>
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Main Service Frequency</label>
+        <div className="svc-row-right">
+          <select
+            className="svc-in"
+            name="mainServiceFrequency"
+            value={form.mainServiceFrequency}
+            onChange={(e) => setMainServiceFrequency(e.target.value as SanicleanFrequency)}
+          >
+            {Object.entries(sanicleanFrequencyLabels).map(
+              ([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Restroom Fixtures</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in"
+            type="number"
+            min="0"
+            name="fixtureCount"
+            value={form.fixtureCount || ""}
+            readOnly
+          />
+        </div>
+      </div>
+
+      {}
+       {form.pricingMode === "per_item_charge" && (
+        <div className="svc-row">
+          <label>Location</label>
+          <div className="svc-row-right">
+            <select
+              className="svc-in"
+              name="location"
+              value={form.location}
+              onChange={onChange}
+            >
+              <option value="insideBeltway">Inside Beltway</option>
+              <option value="outsideBeltway">Outside Beltway</option>
+            </select>
+          </div>
+        </div>
+      )} 
+
+      {}
+      {}
+
+      {}
+      <div className="svc-h-sub" style={{ marginTop: 10 }}>
+        FIXTURE BREAKDOWN
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Sinks</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            name="sinks"
+            value={form.sinks || ""}
+            onChange={onChange}
+          />
+          <span>@</span>
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name={fixtureRateFieldName}
+            value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+                  (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
+            onChange={onChange}
+            title="Rate per sink - editable"
+            style={getOverrideStyle(fixtureRateOverride)}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="text"
+            readOnly
+            value={formatMoney(form.sinks *
+              (isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+               (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)))}
+          />
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Urinals</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            name="urinals"
+            value={form.urinals || ""}
+            onChange={onChange}
+          />
+          <span>@</span>
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name={fixtureRateFieldName}
+            value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+                  (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
+            onChange={onChange}
+            title="Rate per urinal - editable"
+            style={getOverrideStyle(fixtureRateOverride)}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="text"
+            readOnly
+            value={formatMoney(form.urinals *
+              (isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+               (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)))}
+          />
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Male Toilets</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            name="maleToilets"
+            value={form.maleToilets || ""}
+            onChange={onChange}
+          />
+          <span>@</span>
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name={fixtureRateFieldName}
+            value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+                  (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
+            onChange={onChange}
+            title="Rate per male toilet - editable"
+            style={getOverrideStyle(fixtureRateOverride)}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="text"
+            readOnly
+            value={formatMoney(form.maleToilets *
+              (isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+               (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)))}
+          />
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Female Toilets</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            name="femaleToilets"
+            value={form.femaleToilets || ""}
+            onChange={onChange}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name={fixtureRateFieldName}
+            value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+                  (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
+            onChange={onChange}
+            title="Rate per female toilet - editable"
+            style={getOverrideStyle(fixtureRateOverride)}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="text"
+            readOnly
+            value={formatMoney(form.femaleToilets *
+              (isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
+               (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)))}
+          />
+        </div>
+      </div>
+
+      {}
+      <div className="svc-h-sub" style={{ marginTop: 10 }}>
+        SOAP &amp; UPGRADES
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Soap Type</label>
+        <div className="svc-row-right">
+          <select
+            className="svc-in"
+            name="soapType"
+            value={form.soapType}
+            onChange={onChange}
+          >
+            <option value="standard">Standard (included)</option>
+            <option value="luxury">Luxury (+${form.luxuryUpgradePerDispenser}/disp/wk)</option>
+          </select>
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Luxury Upgrade</label>
+        <div className="svc-row-right">
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name="luxuryUpgradeQty"
+            value={luxuryUpgradeQty}
+            onChange={onChange}
+            disabled={form.soapType !== "luxury"}
+            style={{
+              ...getOverrideStyle(
+                Boolean(form.luxuryUpgradeQty),
+                { backgroundColor: form.soapType !== "luxury" ? "#f5f5f5" : "white" }
+              ),
+              color: form.soapType !== "luxury" ? "#999" : "black"
+            }}
+            title={form.soapType === "luxury"
+              ? "Override the number of dispensers used for the luxury upgrade"
+              : "Luxury soap upgrade quantity (enable luxury soap to edit)"}
+          />
+          <span>@</span>
+          <input
+            className="svc-in field-qty"
+            type="number"
+            min="0"
+            step="1"
+            name="luxuryUpgradePerDispenser"
+            value={form.luxuryUpgradePerDispenser || ""}
+            onChange={onChange}
+            disabled={form.soapType !== "luxury"}
+            style={{
+              ...getOverrideStyle(
+                hasPricingOverride("luxuryUpgradePerDispenser"),
+                { backgroundColor: form.soapType !== "luxury" ? "#f5f5f5" : "white" }
+              ),
+              color: form.soapType !== "luxury" ? "#999" : "black"
+            }}
+            title={form.soapType === "luxury"
+              ? "Luxury soap upgrade rate per dispenser per week - editable"
+              : "Luxury soap upgrade (disabled - select luxury soap type to edit)"}
+          />
+          <span>=</span>
+          <input
+            className="svc-in field-qty"
+            type="text"
+            readOnly
+            value={formatMoney(luxuryUpgradeWeekly)}
+          />
+        </div>
+      </div>
+
+      {}
+      {isAllInclusive && (
+        <div className="svc-row">
+          <label>Extra Soap</label>
+          <div className="svc-row-right">
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              name="excessSoapGallonsPerWeek"
+              value={form.excessSoapGallonsPerWeek || ""}
+              onChange={onChange}
+            />
+            <span>@</span>
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              step="1"
+              name={form.soapType === "luxury" ? "excessLuxurySoapRate" : "excessStandardSoapRate"}
+              value={extraSoapRatePerGallon}
+              onChange={onChange}
+              title={`Excess ${form.soapType} soap rate per gallon - editable`}
+              style={getOverrideStyle(excessSoapRateOverride)}
+            />
+            <span>=</span>
+            <input
+              className="svc-in field-qty"
+              type="text"
+              readOnly
+              value={formatMoney(extraSoapWeekly)}
+            />
+          </div>
+        </div>
+      )}
+
+      {}
+      {!isAllInclusive && (
+        <>
+          <div className="svc-h-sub" style={{ marginTop: 10 }}>
+            FACILITY COMPONENTS (Monthly Charges)
+          </div>
+
+          {}
+          {form.pricingMode === "per_item_charge" && form.mainServiceFrequency !== "oneTime" && (
+            <div className="svc-row">
+              <label>
+                Facility Components Frequency
+                <small style={{ display: 'block', fontSize: '11px', color: '#666', fontWeight: 'normal' }}>
+                  Independent of main service frequency
+                </small>
+              </label>
+              <div className="svc-row-right">
+          <select
+            className="svc-in"
+            name="facilityComponentsFrequency"
+            value={form.facilityComponentsFrequency}
+            onChange={(e) => setFacilityComponentsFrequency(e.target.value as SanicleanFrequency)}
+          >
+            <option value="weekly">Weekly</option>
+            <option value="biweekly">Bi Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+    )}
+
+          {}
+          {form.urinals > 0 && (
+            <>
+              <div className="svc-row">
+                <label>Urinal Components</label>
+                <div className="svc-row-right">
+                  <label className="svc-inline">
+                    <input
+                      type="checkbox"
+                      name="addUrinalComponents"
+                      checked={form.addUrinalComponents}
+                      onChange={onChange}
+                    />
+                    <span>Include screens & mats</span>
+                  </label>
+                </div>
+              </div>
+
+              {}
+              {form.addUrinalComponents && (
+                <>
+                  <div className="svc-row" style={{ paddingLeft: '20px' }}>
+                    <label>Urinal Screens</label>
+                    <div className="svc-row-right">
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        name="urinalScreensQty"
+                        value={form.urinalScreensQty || ""}
+                        onChange={onChange}
+                        placeholder="0"
+                        title="Number of urinal screens (manually entered by salesman)"
+                      />
+                      <span>@</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="urinalScreenMonthly"
+                        value={form.urinalScreenMonthly}
+                        onChange={onChange}
+                        title="Urinal screen rate per month - editable"
+                        style={getOverrideStyle(hasPricingOverride("urinalScreenMonthly"))}
+                      />
+                      <span>=</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="text"
+                        readOnly
+                        value={formatMoney(form.urinalScreensQty * form.urinalScreenMonthly)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="svc-row" style={{ paddingLeft: '20px' }}>
+                    <label>Urinal Mats</label>
+                    <div className="svc-row-right">
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        name="urinalMatsQty"
+                        value={form.urinalMatsQty || ""}
+                        onChange={onChange}
+                        placeholder="0"
+                        title="Number of urinal mats (manually entered by salesman)"
+                      />
+                      <span>@</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="urinalMatMonthly"
+                        value={form.urinalMatMonthly}
+                        onChange={onChange}
+                        title="Urinal mat rate per month - editable"
+                        style={getOverrideStyle(hasPricingOverride("urinalMatMonthly"))}
+                      />
+                      <span>=</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="text"
+                        readOnly
+                        value={formatMoney(form.urinalMatsQty * form.urinalMatMonthly)}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {}
+          {form.maleToilets > 0 && (
+            <>
+              <div className="svc-row">
+                <label>Male Toilet Components</label>
+                <div className="svc-row-right">
+                  <label className="svc-inline">
+                    <input
+                      type="checkbox"
+                      name="addMaleToiletComponents"
+                      checked={form.addMaleToiletComponents}
+                      onChange={onChange}
+                    />
+                    <span>Include clips & seat covers</span>
+                  </label>
+                </div>
+              </div>
+
+              {}
+              {form.addMaleToiletComponents && (
+                <>
+                  <div className="svc-row" style={{ paddingLeft: '20px' }}>
+                    <label>Toilet Clips</label>
+                    <div className="svc-row-right">
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        name="toiletClipsQty"
+                        value={form.toiletClipsQty || ""}
+                        onChange={onChange}
+                        placeholder="0"
+                        title="Number of toilet clips (manually entered by salesman)"
+                      />
+                      <span>@</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="toiletClipsMonthly"
+                        value={form.toiletClipsMonthly}
+                        onChange={onChange}
+                        title="Toilet clips rate per month - editable"
+                        style={getOverrideStyle(hasPricingOverride("toiletClipsMonthly"))}
+                      />
+                      <span>=</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="text"
+                        readOnly
+                        value={formatMoney(form.toiletClipsQty * form.toiletClipsMonthly)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="svc-row" style={{ paddingLeft: '20px' }}>
+                    <label>Seat Cover Dispensers</label>
+                    <div className="svc-row-right">
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        name="seatCoverDispensersQty"
+                        value={form.seatCoverDispensersQty || ""}
+                        onChange={onChange}
+                        placeholder="0"
+                        title="Number of seat cover dispensers (manually entered by salesman)"
+                      />
+                      <span>@</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="seatCoverDispenserMonthly"
+                        value={form.seatCoverDispenserMonthly}
+                        onChange={onChange}
+                        title="Seat cover dispenser rate per month - editable"
+                        style={getOverrideStyle(hasPricingOverride("seatCoverDispenserMonthly"))}
+                      />
+                      <span>=</span>
+                      <input
+                        className="svc-in field-qty"
+                        type="text"
+                        readOnly
+                        value={formatMoney(form.seatCoverDispensersQty * form.seatCoverDispenserMonthly)}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {}
+          {form.femaleToilets > 0 && (
+            <>
+              <div className="svc-row">
+                <label>Female Toilet Components</label>
+                <div className="svc-row-right">
+                  <label className="svc-inline">
+                    <input
+                      type="checkbox"
+                      name="addFemaleToiletComponents"
+                      checked={form.addFemaleToiletComponents}
+                      onChange={onChange}
+                    />
+                    <span>Include SaniPods</span>
+                  </label>
+                </div>
+              </div>
+
+              {}
+              {form.addFemaleToiletComponents && (
+                <div className="svc-row" style={{ paddingLeft: '20px' }}>
+                  <label>SaniPods</label>
+                  <div className="svc-row-right">
+                    <input
+                      className="svc-in field-qty"
+                      type="number"
+                      min="0"
+                      name="sanipodsQty"
+                      value={form.sanipodsQty || ""}
+                      onChange={onChange}
+                      placeholder="0"
+                      title="Number of SaniPods (manually entered by salesman)"
+                    />
+                    <span>@</span>
+                    <input
+                      className="svc-in field-qty"
+                      type="number"
+                      min="0"
+                      step="1"
+                      name="sanipodServiceMonthly"
+                      value={form.sanipodServiceMonthly}
+                      onChange={onChange}
+                      title="SaniPod service rate per month - editable"
+                      style={getOverrideStyle(hasPricingOverride("sanipodServiceMonthly"))}
+                    />
+                    <span>=</span>
+                    <input
+                      className="svc-in field-qty"
+                      type="text"
+                      readOnly
+                      value={formatMoney(form.sanipodsQty * form.sanipodServiceMonthly)}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {}
+
+          {}
+          {(form.addUrinalComponents || form.addMaleToiletComponents || form.addFemaleToiletComponents) && (
+            <>
+              <div className="svc-row">
+                <label>
+                  Total Facility Components
+                  {form.mainServiceFrequency !== "oneTime" ? ` (at ${form.facilityComponentsFrequency} frequency)` : ""}
+                </label>
+                <div className="svc-row-right">
+                  <input
+                    className="svc-in-box"
+                    type="text"
+                    readOnly
+                    value={formatMoney(
+                      (form.addUrinalComponents ? (form.urinalScreensQty * form.urinalScreenMonthly + form.urinalMatsQty * form.urinalMatMonthly) : 0) +
+                      (form.addMaleToiletComponents ? (form.toiletClipsQty * form.toiletClipsMonthly + form.seatCoverDispensersQty * form.seatCoverDispenserMonthly) : 0) +
+                      (form.addFemaleToiletComponents ? form.sanipodsQty * form.sanipodServiceMonthly : 0)
+                    )}
+                    title={`Component rates treated as ${form.facilityComponentsFrequency} rates - no conversion applied`}
+                  />
+                </div>
+              </div>
+
+              {}
+              {form.mainServiceFrequency !== "oneTime" && (
+                <div className="svc-row">
+                  <label>Facility Component Monthly Total</label>
+                  <div className="svc-row-right">
+                    <input
+                      className="svc-in-box"
+                      type="text"
+                      readOnly
+                      value={formatMoney(quote.breakdown.facilityComponents)}
+                      title="Facility components monthly recurring cost (includes frequency multiplier)"
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {}
+      {!isAllInclusive && form.sinks > 0 && (
+        <div className="svc-row">
+          <label>Warranty</label>
+          <div className="svc-row-right">
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              name="warrantyDispensers"
+              value={form.warrantyDispensers || ""}
+              onChange={onChange}
+              placeholder="0"
+              title="Number of dispensers for warranty (manually entered by salesman)"
+            />
+            <span>@</span>
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              step="1"
+              name="warrantyFeePerDispenserPerWeek"
+              value={form.warrantyFeePerDispenserPerWeek}
+              onChange={onChange}
+              title="Warranty rate per dispenser per week - editable"
+              style={getOverrideStyle(hasPricingOverride("warrantyFeePerDispenserPerWeek"))}
+            />
+            <span>=</span>
+            <input
+              className="svc-in field-qty"
+              type="text"
+              readOnly
+              value={formatMoney(form.warrantyDispensers * form.warrantyFeePerDispenserPerWeek)}
+            />
+            <span className="svc-note" style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+              Suggested: {Math.ceil(form.sinks * 1.5)} dispensers (soap + air freshener)
+            </span>
+          </div>
+        </div>
+      )}
+
+      {}
+      {}
+
+      {}
+      <div className="svc-h-sub" style={{ marginTop: 10 }}>
+        MICROFIBER MOPPING
+      </div>
+
+      {isAllInclusive ? (
+        <div className="svc-row">
+          <label>Microfiber Mopping</label>
+          <div className="svc-row-right">
+            <input
+              className="svc-in field-qty"
+              type="text"
+              readOnly
+              value="Included in All-Inclusive bundle"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="svc-row">
+          <label>Microfiber Mopping</label>
+          <div className="svc-row-right">
+            <label className="svc-inline">
+              <input
+                type="checkbox"
+                name="addMicrofiberMopping"
+                checked={form.addMicrofiberMopping}
+                onChange={onChange}
+              />
+              <span>Include</span>
+            </label>
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              name="microfiberBathrooms"
+              disabled={!form.addMicrofiberMopping}
+              value={form.microfiberBathrooms || ""}
+              onChange={onChange}
+            />
+            <span>@</span>
+            <input
+              className="svc-in field-qty"
+              type="number"
+              min="0"
+              step="1"
+              name="microfiberMoppingPerBathroom"
+              value={form.addMicrofiberMopping ? form.microfiberMoppingPerBathroom : 0}
+              onChange={onChange}
+              title="Microfiber mopping rate per bathroom per week - editable"
+              style={getOverrideStyle(hasPricingOverride("microfiberMoppingPerBathroom"))}
+            />
+            <span>=</span>
+            <input
+              className="svc-in field-qty"
+              type="text"
+              readOnly
+              value={formatMoney(
+                form.addMicrofiberMopping
+                  ? form.microfiberBathrooms * form.microfiberMoppingPerBathroom
+                  : 0
+              )}
+            />
+          </div>
+        </div>
+      )}
+
+      {}
+      {isAllInclusive && (
+        <>
+          <div className="svc-h-sub" style={{ marginTop: 10 }}>
+            PAPER
+          </div>
+
+          <div className="svc-row">
+            <label>Paper Spend - Credit = Overage</label>
+            <div className="svc-row-right">
+              <input
+                className="svc-in"
+                type="number"
+                min="0"
+                name="estimatedPaperSpendPerWeek"
+                value={form.estimatedPaperSpendPerWeek || ""}
+                onChange={onChange}
+              />
+              <span>-</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                value={formatMoney(paperCreditPerWeek)}
+              />
+              <span>=</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                value={formatMoney(paperOveragePerWeek)}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {}
+      <div className="svc-h-sub" style={{ marginTop: 10 }}>
+        WHAT&apos;S INCLUDED
+      </div>
+
+      <div className="svc-row">
+        <label>{isAllInclusive ? "All-Inclusive Bundle" : "Standard Package"}</label>
+        <div className="svc-row-right">
+          <IncludedItemsEditor
+            items={quote.included}
+            isCustomized={form.includedItems != null}
+            onChange={(items) => updateForm({ includedItems: items })}
+            onReset={() => updateForm({ includedItems: null })}
+          />
+        </div>
+      </div>
+
+      {}
+      {}
+
+      {}
+      {}
+
+      {}
+      <div className="svc-h-sub" style={{ marginTop: 16 }}>
+        PRICE BREAKDOWN
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Minimum Per Visit</label>
+        <div className="svc-row-right">
+          <span className="svc-small">${quote.minimumChargePerWeek != null ? quote.minimumChargePerWeek.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00"}</span>
+          <label className="svc-inline" style={{ marginLeft: '10px' }}>
+            <input
+              type="checkbox"
+              name="applyMinimum"
+              checked={form.applyMinimum !== false}
+              onChange={onChange}
+            />
+            <span>Apply Minimum</span>
+          </label>
+        </div>
+      </div>
+
+      {}
+      <div className="svc-row">
+        <label>Base Service</label>
+        <div className="svc-row-right">
+          <div className="svc-dollar">
+            <span>$</span>
+            <input
+              className="svc-in"
+              type="text"
+              readOnly
+              min="0"
+              step="1"
+              name="customBaseService"
+              value={getDisplayValue(
+                'customBaseService',
+                form.customBaseService !== undefined
+                  ? form.customBaseService
+                  : quote.breakdown.baseService,
+                true
+              )}
+              onChange={handleLocalChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              style={{
+                backgroundColor: form.customBaseService !== undefined ? '#fffacd' : 'white',
+                width: '100px'
+              }}
+              title=""
+            />
+          </div>
+        </div>
+      </div>
+
+      {}
+      {}
+
+      {}
+      {form.pricingMode === "per_item_charge" && quote.breakdown.facilityComponents > 0 && (
+        <div className="svc-row">
+          <label>Facility Components</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                min="0"
+                step="1"
+                name="customFacilityComponents"
+                value={getDisplayValue(
+                  'customFacilityComponents',
+                  form.customFacilityComponents !== undefined
+                    ? form.customFacilityComponents
+                    : quote.breakdown.facilityComponents,
+                  true
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customFacilityComponents !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Facility components (urinals, toilets, sanipods) - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {quote.breakdown.soapUpgrade > 0 && (
+        <div className="svc-row">
+          <label>Soap Upgrade</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                min="0"
+                step="1"
+                name="customSoapUpgrade"
+                value={getDisplayValue(
+                  'customSoapUpgrade',
+                  form.customSoapUpgrade !== undefined
+                    ? form.customSoapUpgrade
+                    : quote.breakdown.soapUpgrade,
+                  true
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customSoapUpgrade !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Soap upgrade (luxury) - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {quote.breakdown.excessSoap > 0 && (
+        <div className="svc-row">
+          <label>Excess Soap</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="number"
+                min="0"
+                step="1"
+                name="customExcessSoap"
+                value={getDisplayValue(
+                  'customExcessSoap',
+                  form.customExcessSoap !== undefined
+                    ? form.customExcessSoap
+                    : quote.breakdown.excessSoap
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customExcessSoap !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Excess soap charges - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {quote.breakdown.microfiberMopping > 0 && (
+        <div className="svc-row">
+          <label>Microfiber Mopping</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                min="0"
+                step="1"
+                name="customMicrofiberMopping"
+                value={getDisplayValue(
+                  'customMicrofiberMopping',
+                  form.customMicrofiberMopping !== undefined
+                    ? form.customMicrofiberMopping
+                    : quote.breakdown.microfiberMopping,
+                  true
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customMicrofiberMopping !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Microfiber mopping - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {form.pricingMode === "per_item_charge" && quote.breakdown.warrantyFees > 0 && (
+        <div className="svc-row">
+          <label>Warranty Fees</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                min="0"
+                step="1"
+                name="customWarrantyFees"
+                value={getDisplayValue(
+                  'customWarrantyFees',
+                  form.customWarrantyFees !== undefined
+                    ? form.customWarrantyFees
+                    : quote.breakdown.warrantyFees,
+                  true
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customWarrantyFees !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Warranty fees - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {form.pricingMode === "all_inclusive" && quote.breakdown.paperOverage > 0 && (
+        <div className="svc-row">
+          <label>Paper Overage</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="number"
+                min="0"
+                step="1"
+                name="customPaperOverage"
+                value={getDisplayValue(
+                  'customPaperOverage',
+                  form.customPaperOverage !== undefined
+                    ? form.customPaperOverage
+                    : quote.breakdown.paperOverage
+                )}
+                onChange={handleLocalChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                style={{
+                  backgroundColor: form.customPaperOverage !== undefined ? '#fffacd' : 'white',
+                  width: '100px'
+                }}
+                title="Paper overage - editable"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {}
+
+      {}
+      {}
+
+      {}
+      {fixtures > 0 && (
+        <div className="svc-row" style={{ paddingTop: '5px' }}>
+          <label></label>
+          <div className="svc-row-right">
+            {quote.contractTotal > (quote.originalContractTotal ?? quote.contractTotal) * 1.30 ? (
+              <span style={{
+                color: '#388e3c',
+                fontSize: '13px',
+                fontWeight: '600',
+                padding: '4px 8px',
+                backgroundColor: '#e8f5e9',
+                borderRadius: '4px',
+                display: 'inline-block'
+              }}>
+                🟢 Greenline Pricing
+              </span>
+            ) : (
+              <span style={{
+                color: '#d32f2f',
+                fontSize: '13px',
+                fontWeight: '600',
+                padding: '4px 8px',
+                backgroundColor: '#ffebee',
+                borderRadius: '4px',
+                display: 'inline-block'
+              }}>
+                🔴 Redline Pricing
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {}
+      {['weekly', 'biweekly', 'twicePerMonth', 'monthly', 'everyFourWeeks'].includes(form.mainServiceFrequency) && (
+        <div className="svc-row">
+          <label>Base Service Monthly Total</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                value={quote.baseServiceMonthly != null ? quote.baseServiceMonthly.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}
+                style={{
+                  backgroundColor: 'white',
+                  width: '100px'
+                }}
+                title="Base service monthly total (service × frequency)"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {form.pricingMode === "per_item_charge" &&
+       (form.addUrinalComponents || form.addMaleToiletComponents || form.addFemaleToiletComponents) &&
+       ['weekly', 'biweekly', 'twicePerMonth', 'monthly', 'everyFourWeeks'].includes(form.mainServiceFrequency) && (
+        <div className="svc-row">
+          <label>Facility Component Monthly Total</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                value={quote.facilityComponentsMonthly != null ? quote.facilityComponentsMonthly.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}
+                style={{
+                  backgroundColor: 'white',
+                  width: '100px'
+                }}
+                title="Facility components monthly total (components × facility frequency)"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {form.mainServiceFrequency !== "oneTime" && (
+        <div className="svc-row">
+          <label>Contract Total</label>
+          <div className="svc-row-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <select
+              className="svc-in"
+              name="contractMonths"
+              value={contractMonths}
+              disabled
+            >
+              {Array.from({ length: 35 }, (_, i) => i + 2).map((m) => (
+                <option key={m} value={m}>
+                  {m} mo
+                </option>
+              ))}
+            </select>
+            <span style={{ fontSize: '18px', fontWeight: 'bold' }}>$</span>
+            <input
+              type="text"
+              min="0"
+              step="1"
+              name="customContractTotal"
+              className="svc-in"
+              value={getDisplayValue(
+                'customContractTotal',
+                form.customContractTotal !== undefined
+                  ? form.customContractTotal
+                  : contractTotal,
+                true
+              )}
+              onChange={handleLocalChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              style={{
+                borderBottom: '2px solid #ff0000',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                backgroundColor: form.customContractTotal !== undefined ? '#fffacd' : 'transparent',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                padding: '4px',
+                width: '140px'
+              }}
+              title="Contract total - editable"
+            />
+          </div>
+        </div>
+      )}
+      {totalPriceValue !== undefined && (
+        <div className="svc-row svc-row-charge">
+          <label>Total Price</label>
+          <div className="svc-row-right">
+            <div className="svc-dollar">
+              <span>$</span>
+              <input
+                className="svc-in"
+                type="text"
+                readOnly
+                value={totalPriceValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                style={{ width: "100px" }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      <div className="svc-row">
+        <label>Notes</label>
+        <div className="svc-row-right">
+          <textarea
+            className="svc-in"
+            name="notes"
+            value={form.notes}
+            onChange={onChange}
+            rows={3}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SanicleanForm;

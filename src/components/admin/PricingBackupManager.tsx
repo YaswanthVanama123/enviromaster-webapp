@@ -1,0 +1,645 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { usePricingBackups } from '../../backendservice/hooks/usePricingBackups';
+import { backupUtils } from '../../backendservice/api/pricingBackupApi';
+import type { PricingBackup, BackupViewMode } from '../../backendservice/types/pricingBackup.types';
+import { Toast } from './Toast';
+import { BackupListView } from './BackupListView';
+import { BackupStatisticsView } from './BackupStatisticsView';
+import { BackupHealthView } from './BackupHealthView';
+import { CreateBackupModal } from './CreateBackupModal';
+import { RestoreBackupModal } from './RestoreBackupModal';
+import { TextConfirmationModal } from './TextConfirmationModal';
+import { ConfirmationModal } from './ConfirmationModal';
+
+type ToastMessage = {
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+};
+
+interface PricingBackupManagerProps {
+  isEmbedded?: boolean;
+  parentPath?: string;
+  initialView?: BackupViewMode;
+}
+
+export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
+  isEmbedded = false,
+  parentPath = '/admin-panel/pricing-backup',
+  initialView = 'list'
+}) => {
+  const navigate = useNavigate();
+  const { modalType, itemId } = useParams();
+  const location = useLocation();
+
+  const {
+    backups,
+    health,
+    statistics,
+    loading,
+    healthLoading,
+    statisticsLoading,
+    error,
+    healthError,
+    statisticsError,
+    fetchBackups,
+    fetchHealth,
+    fetchStatistics,
+    createBackup,
+    restoreBackup,
+    deleteBackups,
+    enforceRetentionPolicy,
+    refreshAll,
+    clearErrors
+  } = usePricingBackups('none');
+
+  const [selectedBackups, setSelectedBackups] = useState<string[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [restoreCandidate, setRestoreCandidate] = useState<PricingBackup | null>(null);
+  const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+    type: 'danger' | 'warning' | 'info' | 'success';
+    onConfirm: () => void;
+    confirmText?: string;
+    cancelText?: string;
+    textConfirmation: {
+      required: boolean;
+      placeholder: string;
+      expectedText?: string;
+      label: string;
+      description?: string;
+    };
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    onConfirm: () => {},
+    textConfirmation: {
+      required: false,
+      placeholder: '',
+      label: ''
+    }
+  });
+
+  const [pendingBackupCreation, setPendingBackupCreation] = useState<{
+    description?: string;
+    existingBackup?: any;
+  } | null>(null);
+
+  const [activeView, setActiveView] = useState<BackupViewMode>(() => {
+    const pathSegments = location.pathname.split('/');
+    const viewFromUrl = pathSegments[pathSegments.length - 1] as BackupViewMode;
+
+    if (['list', 'statistics', 'health', 'compare'].includes(viewFromUrl)) {
+      console.log(`📋 [BACKUP-MANAGER] Initializing with view from URL: ${viewFromUrl}`);
+      return viewFromUrl;
+    }
+
+    console.log(`📋 [BACKUP-MANAGER] Initializing with default view: list`);
+    return initialView;
+  });
+
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    const viewFromUrl = pathSegments[pathSegments.length - 1] as BackupViewMode;
+
+    if (['list', 'statistics', 'health', 'compare'].includes(viewFromUrl)) {
+      setActiveView(prevView => {
+        if (viewFromUrl !== prevView) {
+          console.log(`📋 [BACKUP-MANAGER] URL changed - updating view from ${prevView} to ${viewFromUrl}`);
+          return viewFromUrl;
+        }
+        return prevView;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  useEffect(() => {
+    console.log(`📋 [BACKUP-MANAGER] Active view changed to: ${activeView} - triggering fetch`);
+
+    switch (activeView) {
+      case 'list':
+        console.log('📋 [BACKUP-MANAGER] Calling fetchBackups()...');
+        fetchBackups();
+        break;
+
+      case 'health':
+        console.log('🏥 [BACKUP-MANAGER] Calling fetchHealth()...');
+        fetchHealth();
+        break;
+
+      case 'statistics':
+        console.log('📊 [BACKUP-MANAGER] Calling fetchStatistics()...');
+        fetchStatistics();
+        break;
+
+      default:
+        console.log(`⏭️ [BACKUP-MANAGER] No data fetch needed for view: ${activeView}`);
+        break;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeView]);
+
+  useEffect(() => {
+    if (modalType === 'restore' && itemId && backups.length > 0) {
+      const backup = backups.find(b => b.changeDayId === itemId);
+      if (backup) {
+        setRestoreCandidate(backup);
+        setShowRestoreModal(true);
+      }
+    } else if (modalType === 'create') {
+      setShowCreateModal(true);
+    }
+  }, [modalType, itemId, backups]);
+
+  const handleViewChange = (newView: BackupViewMode) => {
+    setActiveView(newView);
+    const newPath = newView === 'list' ? parentPath : `${parentPath}/${newView}`;
+    navigate(newPath, { replace: true });
+  };
+
+  const handleCreateBackup = async (description?: string, forceReplace?: boolean) => {
+    setActionLoading(true);
+    clearErrors();
+
+    try {
+      const result = await createBackup({
+        changeDescription: description,
+        forceReplace
+      });
+
+      if (result.success) {
+        setToastMessage({
+          message: result.data?.created
+            ? (result.data?.replaced ? 'Manual backup replaced successfully!' : 'Manual backup created successfully!')
+            : 'Backup skipped (already exists for today)',
+          type: result.data?.created ? 'success' : 'info'
+        });
+        setShowCreateModal(false);
+        setPendingBackupCreation(null);
+      } else if (result.requiresConfirmation) {
+        const existingBackup = result.existingBackup;
+        setPendingBackupCreation({ description, existingBackup });
+
+        setConfirmationModal({
+          isOpen: true,
+          title: 'Replace Manual Backup',
+          message: 'A manual backup already exists for today. This action will permanently replace the existing backup.',
+          details: `Existing backup created: ${new Date(existingBackup?.createdAt || '').toLocaleString()}\nDescription: ${existingBackup?.changeDescription || 'No description'}`,
+          type: 'warning',
+          confirmText: 'Replace Backup',
+          cancelText: 'Keep Existing',
+          onConfirm: () => handleConfirmBackupReplace(),
+          textConfirmation: {
+            required: true,
+            placeholder: 'Type REPLACE to confirm',
+            expectedText: 'REPLACE',
+            label: 'Type REPLACE to confirm backup replacement',
+            description: 'This action cannot be undone. The previous manual backup will be permanently deleted.'
+          }
+        });
+      } else {
+        setToastMessage({
+          message: result.error || 'Failed to create backup',
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      setToastMessage({
+        message: 'An unexpected error occurred',
+        type: 'error'
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleConfirmBackupReplace = async () => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+
+    if (pendingBackupCreation) {
+      await handleCreateBackup(pendingBackupCreation.description, true);
+    }
+  };
+
+  const handleRestoreBackup = async (changeDayId: string, notes?: string) => {
+    if (!restoreCandidate) return;
+
+    setActionLoading(true);
+    clearErrors();
+
+    try {
+      const result = await restoreBackup({
+        changeDayId,
+        restorationNotes: notes
+      });
+
+      if (result.success) {
+        setToastMessage({
+          message: `Successfully restored ${result.data?.totalRestored} documents from ${restoreCandidate.changeDay}`,
+          type: 'success'
+        });
+        setShowRestoreModal(false);
+        setRestoreCandidate(null);
+      } else {
+        setToastMessage({
+          message: result.error || 'Failed to restore backup',
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      setToastMessage({
+        message: 'An unexpected error occurred during restoration',
+        type: 'error'
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteBackups = async (changeDayIds: string[]) => {
+    if (changeDayIds.length === 0) return;
+
+    const backupText = changeDayIds.length === 1 ? 'backup' : 'backups';
+    const backupList = changeDayIds.join(', ');
+
+    setConfirmationModal({
+      isOpen: true,
+      title: `Delete ${changeDayIds.length} ${backupText.charAt(0).toUpperCase() + backupText.slice(1)}`,
+      message: `Are you sure you want to delete ${changeDayIds.length} ${backupText}? This action cannot be undone.`,
+      details: `Selected ${backupText}:\n${backupList}`,
+      type: 'danger',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => handleConfirmDelete(changeDayIds),
+      textConfirmation: {
+        required: false,
+        placeholder: '',
+        label: ''
+      }
+    });
+  };
+
+  const handleConfirmDelete = async (changeDayIds: string[]) => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+    setActionLoading(true);
+    clearErrors();
+
+    try {
+      const result = await deleteBackups(changeDayIds);
+
+      if (result.success) {
+        setToastMessage({
+          message: `Successfully deleted ${result.data?.deletedCount} backup(s)`,
+          type: 'success'
+        });
+        setSelectedBackups([]);
+      } else {
+        setToastMessage({
+          message: result.error || 'Failed to delete backups',
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      setToastMessage({
+        message: 'An unexpected error occurred during deletion',
+        type: 'error'
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEnforceRetention = async () => {
+    setActionLoading(true);
+    clearErrors();
+
+    try {
+      const result = await enforceRetentionPolicy();
+
+      if (result.success) {
+        setToastMessage({
+          message: result.data?.message || 'Retention policy enforced',
+          type: 'success'
+        });
+      } else {
+        setToastMessage({
+          message: result.error || 'Failed to enforce retention policy',
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      setToastMessage({
+        message: 'An unexpected error occurred',
+        type: 'error'
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const closeModals = () => {
+    setShowCreateModal(false);
+    setShowRestoreModal(false);
+    setRestoreCandidate(null);
+    navigate(parentPath, { replace: true });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+    setPendingBackupCreation(null);
+
+    if (pendingBackupCreation) {
+      setToastMessage({
+        message: 'Manual backup creation cancelled',
+        type: 'info'
+      });
+    }
+  };
+
+  const styles: Record<string, React.CSSProperties> = {
+    container: {
+      minHeight: '100vh',
+      backgroundColor: '#f5f7fa',
+      padding: '20px'
+    },
+    header: {
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      padding: '24px',
+      marginBottom: '24px',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #e5e7eb'
+    },
+    title: {
+      fontSize: '24px',
+      fontWeight: '600',
+      color: '#1f2937',
+      margin: '0 0 8px 0'
+    },
+    subtitle: {
+      fontSize: '14px',
+      color: '#6b7280',
+      margin: '0 0 24px 0'
+    },
+    tabContainer: {
+      display: 'flex',
+      gap: '4px',
+      borderBottom: '2px solid #f3f4f6',
+      paddingBottom: '0'
+    },
+    tab: {
+      padding: '12px 24px',
+      fontSize: '14px',
+      fontWeight: '500',
+      backgroundColor: 'transparent',
+      border: 'none',
+      borderBottom: '2px solid transparent',
+      cursor: 'pointer',
+      borderRadius: '6px 6px 0 0',
+      transition: 'all 0.2s ease'
+    },
+    activeTab: {
+      color: '#3b82f6',
+      borderBottomColor: '#3b82f6',
+      backgroundColor: '#f8fafc'
+    },
+    inactiveTab: {
+      color: '#6b7280',
+      borderBottomColor: 'transparent'
+    },
+    content: {
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      padding: '24px',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #e5e7eb'
+    },
+    actionBar: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '24px',
+      flexWrap: 'wrap',
+      gap: '12px'
+    },
+    actionButtons: {
+      display: 'flex',
+      gap: '12px',
+      alignItems: 'center'
+    },
+    button: {
+      padding: '8px 16px',
+      fontSize: '14px',
+      fontWeight: '500',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    },
+    primaryButton: {
+      backgroundColor: '#3b82f6',
+      color: 'white'
+    },
+    secondaryButton: {
+      backgroundColor: '#f3f4f6',
+      color: '#374151',
+      border: '1px solid #d1d5db'
+    },
+    dangerButton: {
+      backgroundColor: '#ef4444',
+      color: 'white'
+    },
+    refreshButton: {
+      backgroundColor: '#10b981',
+      color: 'white'
+    }
+  };
+
+  useEffect(() => {
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      .backup-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .backup-tab:hover:not(.active) {
+        background-color: #f9fafb;
+        color: #374151;
+      }
+      .backup-danger:hover {
+        background-color: #dc2626;
+      }
+      .backup-primary:hover {
+        background-color: #2563eb;
+      }
+      .backup-secondary:hover {
+        background-color: #e5e7eb;
+      }
+      .backup-refresh:hover {
+        background-color: #059669;
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Pricing Backup Management</h1>
+        <p style={styles.subtitle}>
+          Manage and restore pricing data backups. The system automatically maintains backups of the last 10 days with pricing changes.
+        </p>
+
+        <div style={styles.tabContainer}>
+          {[
+            { key: 'list', label: 'Backup List' },
+            { key: 'statistics', label: 'Statistics' },
+            { key: 'health', label: 'System Health' }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              className={`backup-tab ${activeView === tab.key ? 'active' : ''}`}
+              style={{
+                ...styles.tab,
+                ...(activeView === tab.key ? styles.activeTab : styles.inactiveTab)
+              }}
+              onClick={() => handleViewChange(tab.key as BackupViewMode)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.content}>
+        <div style={styles.actionBar}>
+          <div style={styles.actionButtons}>
+            <button
+              className="backup-button backup-primary"
+              style={{ ...styles.button, ...styles.primaryButton }}
+              onClick={() => setShowCreateModal(true)}
+              disabled={actionLoading}
+            >
+              Create Manual Backup
+            </button>
+
+            <button
+              className="backup-button backup-refresh"
+              style={{ ...styles.button, ...styles.refreshButton }}
+              onClick={refreshAll}
+              disabled={loading || healthLoading || statisticsLoading}
+            >
+              {loading || healthLoading || statisticsLoading ? 'Refreshing...' : 'Refresh All'}
+            </button>
+
+            {selectedBackups.length > 0 && (
+              <button
+                className="backup-button backup-danger"
+                style={{ ...styles.button, ...styles.dangerButton }}
+                onClick={() => handleDeleteBackups(selectedBackups)}
+                disabled={actionLoading}
+              >
+                Delete Selected ({selectedBackups.length})
+              </button>
+            )}
+          </div>
+
+          <div style={styles.actionButtons}>
+            <button
+              className="backup-button backup-secondary"
+              style={{ ...styles.button, ...styles.secondaryButton }}
+              onClick={handleEnforceRetention}
+              disabled={actionLoading}
+            >
+              Enforce Retention Policy
+            </button>
+          </div>
+        </div>
+
+        {activeView === 'list' && (
+          <BackupListView
+            backups={backups}
+            loading={loading}
+            error={error}
+            selectedBackups={selectedBackups}
+            onSelectionChange={setSelectedBackups}
+            onRestoreClick={(backup) => {
+              setRestoreCandidate(backup);
+              setShowRestoreModal(true);
+            }}
+            onRefresh={() => fetchBackups()}
+          />
+        )}
+
+        {activeView === 'statistics' && (
+          <BackupStatisticsView
+            statistics={statistics}
+            loading={statisticsLoading}
+            error={statisticsError}
+            onRefresh={() => fetchStatistics()}
+          />
+        )}
+
+        {activeView === 'health' && (
+          <BackupHealthView
+            health={health}
+            loading={healthLoading}
+            error={healthError}
+            onRefresh={() => fetchHealth()}
+          />
+        )}
+      </div>
+
+      {showCreateModal && (
+        <CreateBackupModal
+          onClose={closeModals}
+          onCreate={handleCreateBackup}
+          loading={actionLoading}
+        />
+      )}
+
+      {showRestoreModal && restoreCandidate && (
+        <RestoreBackupModal
+          backup={restoreCandidate}
+          onClose={closeModals}
+          onRestore={handleRestoreBackup}
+          loading={actionLoading}
+        />
+      )}
+
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        title={confirmationModal.title}
+        message={confirmationModal.message}
+        details={confirmationModal.details}
+        type={confirmationModal.type}
+        confirmText={confirmationModal.confirmText}
+        cancelText={confirmationModal.cancelText}
+        onConfirm={confirmationModal.onConfirm}
+        onCancel={closeConfirmationModal}
+        loading={actionLoading}
+      />
+      {toastMessage && (
+        <Toast
+          message={toastMessage.message}
+          type={toastMessage.type}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
+    </div>
+  );
+};

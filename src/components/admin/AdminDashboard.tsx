@@ -1,0 +1,534 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useAdminAuth } from "../../backendservice/hooks";
+import { PricingTablesView } from "./PricingTablesView";
+import { ServiceConfigManager } from "./ServiceConfigManager";
+import { ProductCatalogManager } from "./ProductCatalogManager";
+import { PricingBackupManager } from "./PricingBackupManager";
+import { ApprovalTaskSettings } from "./ApprovalTaskSettings";
+import { CommissionsTab } from "./commissions";
+import { QuotaTab } from "./quota";
+import { RouteStarCustomersTab } from "./routestar/RouteStarCustomersTab";
+import { BiginAuditTab } from "./bigin/BiginAuditTab";
+import { BiginCompaniesTab } from "./bigin/BiginCompaniesTab";
+import { CompanyMappingTab } from "./company-mapping/CompanyMappingTab";
+import { MapDistanceTab } from "./map-distance/MapDistanceTab";
+import { MapDistanceUpdateTab } from "./map-distance/MapDistanceUpdateTab";
+import { InsideSalesCheckTab } from "./inside-sales/InsideSalesCheckTab";
+import { AccountTypeDetectorTab } from "./account-type/AccountTypeDetectorTab";
+import { PayrollTab } from "./payroll/PayrollTab";
+import { pdfApi } from "../../backendservice/api/pdfApi";
+import { MdAttachMoney, MdSettings, MdInventory, MdBackup, MdWorkspaces, MdCalculate, MdTrendingUp, MdPeople, MdHistory, MdBusiness, MdLink, MdMap, MdRefresh, MdVerifiedUser, MdCategory, MdPayment } from "react-icons/md";
+import "./AdminDashboard.css";
+
+type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll";
+
+interface AdminDashboardProps {
+  isEmbedded?: boolean;
+  parentPath?: string;
+  initialSubtab?: string;
+  modalType?: string;
+  itemId?: string;
+}
+
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  isEmbedded = false,
+  parentPath,
+  initialSubtab,
+  modalType: propModalType,
+  itemId: propItemId
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { subtab, modalType, itemId } = useParams<{ subtab: string; modalType: string; itemId: string }>();
+  const { user, isAuthenticated, logout } = useAdminAuth();
+
+  const currentSubtab = isEmbedded ? initialSubtab : subtab;
+  const currentModalType = isEmbedded ? propModalType : modalType;
+  const currentItemId = isEmbedded ? propItemId : itemId;
+
+  const getActiveTabFromUrl = (): TabType => {
+    const path = window.location.pathname;
+
+    if (isEmbedded) {
+      if (path.includes('/admin-panel/') && (path.includes('/services') || path.includes('/services/'))) {
+        return "services";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/products') || path.includes('/products/'))) {
+        return "products";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/backup') || path.includes('/backup/'))) {
+        return "backup";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/workflow') || path.includes('/workflow/'))) {
+        return "workflow";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/commissions') || path.includes('/commissions/'))) {
+        return "commissions";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/quota') || path.includes('/quota/'))) {
+        return "quota";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/customers') || path.includes('/customers/'))) {
+        return "customers";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/audit') || path.includes('/audit/'))) {
+        return "audit";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/bigin-companies') || path.includes('/bigin-companies/'))) {
+        return "bigin-companies";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/company-mapping') || path.includes('/company-mapping/'))) {
+        return "company-mapping";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/map-distance-update') || path.includes('/map-distance-update/'))) {
+        return "map-distance-update";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/map-distance') || path.includes('/map-distance/'))) {
+        return "map-distance";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/inside-sales') || path.includes('/inside-sales/'))) {
+        return "inside-sales";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/account-type-detector') || path.includes('/account-type-detector/'))) {
+        return "account-type-detector";
+      }
+      if (path.includes('/admin-panel/') && (path.includes('/payroll') || path.includes('/payroll/'))) {
+        return "payroll";
+      }
+
+      if (!currentSubtab) return "pricing";
+      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+      return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
+    }
+
+    if (path.includes('/pricing-tables/services')) {
+      return "services";
+    }
+    if (path.includes('/pricing-tables/products')) {
+      return "products";
+    }
+    if (path.includes('/pricing-tables/backup')) {
+      return "backup";
+    }
+    if (path.includes('/pricing-tables/workflow')) {
+      return "workflow";
+    }
+    if (path.includes('/pricing-tables/commissions')) {
+      return "commissions";
+    }
+    if (path.includes('/pricing-tables/quota')) {
+      return "quota";
+    }
+    if (path.includes('/pricing-tables/customers')) {
+      return "customers";
+    }
+    if (path.includes('/pricing-tables/audit')) {
+      return "audit";
+    }
+    if (path.includes('/pricing-tables/bigin-companies')) {
+      return "bigin-companies";
+    }
+    if (path.includes('/pricing-tables/company-mapping')) {
+      return "company-mapping";
+    }
+    if (path.includes('/pricing-tables/map-distance-update')) {
+      return "map-distance-update";
+    }
+    if (path.includes('/pricing-tables/map-distance')) {
+      return "map-distance";
+    }
+    if (path.includes('/pricing-tables/inside-sales')) {
+      return "inside-sales";
+    }
+    if (path.includes('/pricing-tables/account-type-detector')) {
+      return "account-type-detector";
+    }
+    if (path.includes('/pricing-tables/payroll')) {
+      return "payroll";
+    }
+
+    if (!currentSubtab) return "pricing";
+    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+    return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
+  };
+
+  const [activeTab, setActiveTab] = useState<TabType>(getActiveTabFromUrl());
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  const handleExportPdf = async () => {
+    setExportingPdf(true);
+    try {
+      const blob = await pdfApi.exportPricingCatalogFromDb();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `pricing-catalog-${new Date().toISOString().slice(0, 10)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export PDF failed:", err);
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
+  useEffect(() => {
+    const urlTab = getActiveTabFromUrl();
+    if (urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [currentSubtab, isEmbedded, location.pathname]);
+
+  const handleTabChange = (newTab: TabType) => {
+    setActiveTab(newTab);
+
+    if (isEmbedded && parentPath) {
+      navigate(`${parentPath}/${newTab}`, { replace: true });
+    } else {
+      navigate(`/pricing-tables/${newTab}`, { replace: true });
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/admin-login", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
+  return (
+    <div style={styles.container}>
+      {!isEmbedded && (
+        <div className="admin-dashboard-top-bar" style={styles.topBar}>
+          <div className="admin-dashboard-top-bar-left" style={styles.topBarLeft}>
+            <h1 className="admin-dashboard-logo" style={styles.logo}>Enviro-Master Admin</h1>
+            <div style={styles.userInfo}>
+              <span className="admin-dashboard-user-name" style={styles.userName}>{user.username}</span>
+            </div>
+          </div>
+          <button className="admin-dashboard-logout-button" style={styles.logoutButton} onClick={logout}>
+            Logout
+          </button>
+        </div>
+      )}
+
+      <div className="admin-dashboard-navigation" style={styles.navigation}>
+        <div style={styles.navTabs}>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "pricing" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("pricing")}
+          >
+            <MdAttachMoney size={20} style={{ marginRight: "8px" }} /> Pricing Tables
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "services" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("services")}
+          >
+            <MdSettings size={20} style={{ marginRight: "8px" }} /> Service Configs
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "products" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("products")}
+          >
+            <MdInventory size={20} style={{ marginRight: "8px" }} /> Product Catalog
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "backup" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("backup")}
+          >
+            <MdBackup size={20} style={{ marginRight: "8px" }} /> Backup Management
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "workflow" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("workflow")}
+          >
+            <MdWorkspaces size={20} style={{ marginRight: "8px" }} /> Workflow
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "commissions" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("commissions")}
+          >
+            <MdCalculate size={20} style={{ marginRight: "8px" }} /> Commissions
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "quota" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("quota")}
+          >
+            <MdTrendingUp size={20} style={{ marginRight: "8px" }} /> Quota Tracking
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "customers" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("customers")}
+          >
+            <MdPeople size={20} style={{ marginRight: "8px" }} /> Customers
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "audit" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("audit")}
+          >
+            <MdHistory size={20} style={{ marginRight: "8px" }} /> Audit History
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "bigin-companies" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("bigin-companies")}
+          >
+            <MdBusiness size={20} style={{ marginRight: "8px" }} /> Bigin Companies
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "company-mapping" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("company-mapping")}
+          >
+            <MdLink size={20} style={{ marginRight: "8px" }} /> Company Mapping
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "map-distance" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("map-distance")}
+          >
+            <MdMap size={20} style={{ marginRight: "8px" }} /> Map Distance
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "map-distance-update" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("map-distance-update")}
+          >
+            <MdRefresh size={20} style={{ marginRight: "8px" }} /> Update Distance
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "inside-sales" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("inside-sales")}
+          >
+            <MdVerifiedUser size={20} style={{ marginRight: "8px" }} /> Inside Sales
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "account-type-detector" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("account-type-detector")}
+          >
+            <MdCategory size={20} style={{ marginRight: "8px" }} /> Account Type
+          </button>
+          <button
+            className="admin-dashboard-nav-button"
+            style={{
+              ...styles.navButton,
+              ...(activeTab === "payroll" ? styles.navButtonActive : {}),
+            }}
+            onClick={() => handleTabChange("payroll")}
+          >
+            <MdPayment size={20} style={{ marginRight: "8px" }} /> Payroll
+          </button>
+        </div>
+        <button
+          style={{ ...styles.exportPdfButton, opacity: exportingPdf ? 0.7 : 1 }}
+          onClick={handleExportPdf}
+          disabled={exportingPdf}
+        >
+          {exportingPdf ? "⏳ Generating..." : "⬇ Export Pricing PDF"}
+        </button>
+      </div>
+
+      <div style={styles.content}>
+        {activeTab === "pricing" && <PricingTablesView />}
+        {activeTab === "services" && (
+          <ServiceConfigManager
+            modalType={currentModalType}
+            itemId={currentItemId}
+            isEmbedded={isEmbedded}
+            parentPath={parentPath}
+          />
+        )}
+        {activeTab === "products" && (
+          <ProductCatalogManager
+            modalType={currentModalType}
+            itemId={currentItemId}
+            isEmbedded={isEmbedded}
+            parentPath={parentPath}
+          />
+        )}
+        {activeTab === "backup" && (
+          <PricingBackupManager
+            isEmbedded={isEmbedded}
+            parentPath={parentPath ? `${parentPath}/backup` : '/pricing-tables/backup'}
+          />
+        )}
+        {activeTab === "workflow" && <ApprovalTaskSettings />}
+        {activeTab === "commissions" && <CommissionsTab />}
+        {activeTab === "quota" && <QuotaTab />}
+        {activeTab === "customers" && <RouteStarCustomersTab />}
+        {activeTab === "audit" && <BiginAuditTab />}
+        {activeTab === "bigin-companies" && <BiginCompaniesTab />}
+        {activeTab === "company-mapping" && <CompanyMappingTab />}
+        {activeTab === "map-distance" && <MapDistanceTab />}
+        {activeTab === "map-distance-update" && <MapDistanceUpdateTab />}
+        {activeTab === "inside-sales" && <InsideSalesCheckTab />}
+        {activeTab === "account-type-detector" && <AccountTypeDetectorTab />}
+        {activeTab === "payroll" && <PayrollTab />}
+      </div>
+    </div>
+  );
+};
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    minHeight: "100%",
+    backgroundColor: "transparent",
+    width: "100%",
+    maxWidth: "100%",
+    borderRadius:"20px",
+    overflow: "hidden"
+  },
+  topBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "16px 24px",
+    backgroundColor: "white",
+    borderBottom: "1px solid #e5e5e5",
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+  },
+  topBarLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "24px",
+  },
+  logo: {
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#111",
+    margin: 0,
+  },
+  userInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  userName: {
+    fontSize: "14px",
+    color: "#666",
+  },
+  logoutButton: {
+    padding: "8px 16px",
+    backgroundColor: "#fee2e2",
+    color: "#dc2626",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+  },
+  navigation: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "8px",
+    padding: "16px 24px",
+    backgroundColor: "white",
+    borderBottom: "1px solid #e5e5e5",
+    overflowX: "auto",
+  },
+  navTabs: {
+    display: "flex",
+    gap: "8px",
+    flexWrap: "nowrap" as const,
+  },
+  navButton: {
+    padding: "10px 20px",
+    border: "none",
+    backgroundColor: "transparent",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    color: "#666",
+    transition: "all 0.2s",
+    whiteSpace: "nowrap",
+    display: "flex",
+    alignItems: "center",
+  },
+  navButtonActive: {
+    backgroundColor: "#2563eb",
+    color: "white",
+  },
+  exportPdfButton: {
+    padding: "10px 18px",
+    backgroundColor: "#8B1A1A",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    whiteSpace: "nowrap" as const,
+    flexShrink: 0,
+  },
+  content: {
+    padding: "0",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box",
+  },
+};
