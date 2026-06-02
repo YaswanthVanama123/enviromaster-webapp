@@ -1,28 +1,12 @@
-
+import { FREQUENCIES, annualFromPerVisit as libAnnualFromPerVisit, toNumber } from "../../../lib/pricing";
 import type { BillingFrequency } from "./serviceTypes";
 
 export function frequencyToAnnualMultiplier(f: BillingFrequency): number {
-  switch (f) {
-    case "weekly":
-      return 50; 
-    case "biweekly":
-      return 25;
-    case "monthly":
-      return 12;
-    case "bimonthly":
-      return 6;
-    case "quarterly":
-      return 4;
-    default:
-      return 0;
-  }
+  return FREQUENCIES[f as keyof typeof FREQUENCIES]?.visitsPerYear ?? 0;
 }
 
-export function annualFromPerVisit(perVisit: number, f: BillingFrequency) {
-  return perVisit * frequencyToAnnualMultiplier(f);
+export function annualFromPerVisit(perVisit: number, f: BillingFrequency): number {
+  return libAnnualFromPerVisit(perVisit, f as keyof typeof FREQUENCIES);
 }
 
-export function n(v: unknown, fallback = 0): number {
-  const num = Number(v);
-  return Number.isFinite(num) ? num : fallback;
-}
+export const n = toNumber;

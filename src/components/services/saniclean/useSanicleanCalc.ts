@@ -1,5 +1,6 @@
 
 import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { VISITS_PER_YEAR_MAP } from "../../../lib/pricing";
 import type {
   SanicleanFormState,
   SanicleanPricingConfig,
@@ -258,19 +259,7 @@ const calculateVisitsInContract = (
     visitsPerYear = cycleMonths > 0 ? 12 / cycleMonths : 12;
     console.log(`✅ [SaniClean] Calculated visitsPerYear from cycleMonths for ${frequency}: 12/${cycleMonths} = ${visitsPerYear}`);
   } else {
-
-    const visitsPerYearMap: Record<string, number> = {
-      weekly: 52,
-      biweekly: 26,
-      twicePerMonth: 24,
-      monthly: 12,
-      everyFourWeeks: 13,
-      bimonthly: 6,
-      quarterly: 4,
-      biannual: 2,
-      annual: 1,
-    };
-    visitsPerYear = visitsPerYearMap[frequency] || 12;
+    visitsPerYear = VISITS_PER_YEAR_MAP[frequency as keyof typeof VISITS_PER_YEAR_MAP] || 12;
   }
 
   return Math.round((visitsPerYear * contractMonths) / 12);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthContext } from './AuthProvider';
+import { Spinner } from '../atoms/Spinner';
 
 interface AuthGuardProps {
   requireAdmin?: boolean;
@@ -13,9 +14,9 @@ export function AuthGuard({ requireAdmin = false, children }: AuthGuardProps) {
 
   if (loading) {
     return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.spinner}></div>
-        <p style={styles.loadingText}>Loading...</p>
+      <div className="em-auth-loading">
+        <Spinner size="lg" />
+        <p className="em-auth-loading__text">Loading...</p>
       </div>
     );
   }
@@ -41,41 +42,6 @@ export function AuthGuard({ requireAdmin = false, children }: AuthGuardProps) {
   }
 
   return children ? <>{children}</> : <Outlet />;
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  loadingContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-  },
-  spinner: {
-    width: '40px',
-    height: '40px',
-    border: '3px solid #e5e7eb',
-    borderTopColor: '#c00000',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-  },
-  loadingText: {
-    marginTop: '16px',
-    fontSize: '14px',
-    color: '#6b7280',
-  },
-};
-
-if (!document.getElementById('auth-guard-styles')) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'auth-guard-styles';
-  styleSheet.textContent = `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(styleSheet);
 }
 
 export default AuthGuard;

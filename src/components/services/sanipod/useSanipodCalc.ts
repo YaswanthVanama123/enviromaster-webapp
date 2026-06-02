@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { sanipodPricingConfig as cfg } from "./sanipodConfig";
+import { VISITS_PER_YEAR_MAP } from "../../../lib/pricing";
 import type {
   SanipodFrequencyKey,
   SanipodRateCategory,
@@ -95,18 +96,7 @@ function buildActiveConfig(backendConfig: BackendSanipodConfig | null) {
         biannual: 0,
         annual: 0,
       },
-      annualFrequencies: {
-        oneTime: 1,
-        weekly: 52,
-        biweekly: 26,
-        twicePerMonth: 24,
-        monthly: 12,
-        everyFourWeeks: 13,
-        bimonthly: 6,
-        quarterly: 4,
-        biannual: 2,
-        annual: 1,
-      }
+      annualFrequencies: { ...VISITS_PER_YEAR_MAP }
     };
   }
 
@@ -145,12 +135,7 @@ function buildActiveConfig(backendConfig: BackendSanipodConfig | null) {
     },
 
     annualFrequencies: {
-      oneTime: 1,
-      weekly: 52,
-      biweekly: 26,
-      twicePerMonth: 24,
-      monthly: 12,
-      everyFourWeeks: 13,
+      ...VISITS_PER_YEAR_MAP,
       bimonthly: backendConfig.frequencyMetadata?.bimonthly?.cycleMonths ? 12 / backendConfig.frequencyMetadata.bimonthly.cycleMonths : 6,
       quarterly: backendConfig.frequencyMetadata?.quarterly?.cycleMonths ? 12 / backendConfig.frequencyMetadata.quarterly.cycleMonths : 4,
       biannual: backendConfig.frequencyMetadata?.biannual?.cycleMonths ? 12 / backendConfig.frequencyMetadata.biannual.cycleMonths : 2,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "./auth";
+import { Spinner } from "./atoms/Spinner";
 import type { UserRole } from "../backendservice/types/api.types";
 import logo from "../assets/em-logo.png";
 
@@ -142,7 +143,7 @@ export const LoginPage: React.FC = () => {
           >
             {loading ? (
               <span style={styles.buttonContent}>
-                <span style={styles.spinner}></span>
+                <Spinner size="sm" className="em-spinner--inline" />
                 Signing in...
               </span>
             ) : (
@@ -308,14 +309,6 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     gap: "8px",
   },
-  spinner: {
-    width: "16px",
-    height: "16px",
-    border: "2px solid rgba(255,255,255,0.3)",
-    borderTopColor: "white",
-    borderRadius: "50%",
-    animation: "spin 0.8s linear infinite",
-  },
   error: {
     padding: "12px",
     backgroundColor: "#fef2f2",
@@ -332,21 +325,5 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: "1.5",
   },
 };
-
-if (!document.getElementById("login-page-styles")) {
-  const styleSheet = document.createElement("style");
-  styleSheet.id = "login-page-styles";
-  styleSheet.textContent = `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .login-input:focus {
-      border-color: #c00000 !important;
-      box-shadow: 0 0 0 3px rgba(192,0,0,0.1) !important;
-    }
-  `;
-  document.head.appendChild(styleSheet);
-}
 
 export default LoginPage;

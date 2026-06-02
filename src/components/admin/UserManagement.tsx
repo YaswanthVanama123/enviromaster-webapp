@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { userManagementApi } from '../../backendservice/api/userManagementApi';
+import { Spinner } from '../atoms/Spinner';
 import type { UserListItem, UserRole, CreateAdminPayload, CreateEmployeePayload } from '../../backendservice/types/api.types';
 
 interface UserManagementProps {}
@@ -268,7 +269,7 @@ export function UserManagement({}: UserManagementProps) {
       <div style={styles.tableContainer}>
         {loading ? (
           <div style={styles.loadingContainer}>
-            <div style={styles.spinner}></div>
+            <Spinner size="md" />
             <p>Loading users...</p>
           </div>
         ) : users.length === 0 ? (
@@ -730,15 +731,6 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     color: '#64748b',
   },
-  spinner: {
-    width: '32px',
-    height: '32px',
-    border: '3px solid #e5e7eb',
-    borderTopColor: '#c00000',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-    margin: '0 auto 16px',
-  },
   emptyState: {
     padding: '48px',
     textAlign: 'center',
@@ -929,16 +921,5 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
 };
-
-if (!document.getElementById('user-management-styles')) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'user-management-styles';
-  styleSheet.textContent = `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(styleSheet);
-}
 
 export default UserManagement;

@@ -1,98 +1,53 @@
-import type { AuthUser, UserRole } from '../types/api.types';
-
-const STORAGE_KEYS = {
-  AUTH_TOKEN: "auth_token",
-  AUTH_USER: "auth_user",
-  USER_ROLE: "user_role",
-  
-  ADMIN_TOKEN: "admin_token",
-  ADMIN_USER: "admin_user",
-} as const;
+import { tokenStore } from "../../lib/auth/tokenStore";
+import type { AuthUser, UserRole } from "../types/api.types";
 
 export const storage = {
   getToken(): string | null {
-    
-    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) ||
-           localStorage.getItem(STORAGE_KEYS.ADMIN_TOKEN);
+    return tokenStore.getToken();
   },
-
   setToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-    
-    localStorage.setItem(STORAGE_KEYS.ADMIN_TOKEN, token);
+    tokenStore.setToken(token);
   },
-
   removeToken(): void {
-    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.ADMIN_TOKEN);
+    tokenStore.clear();
   },
 
   getUser(): AuthUser | null {
-    const user = localStorage.getItem(STORAGE_KEYS.AUTH_USER);
-    if (user) {
-      return JSON.parse(user);
-    }
-    
-    const adminUser = localStorage.getItem(STORAGE_KEYS.ADMIN_USER);
-    if (adminUser) {
-      const parsed = JSON.parse(adminUser);
-      return { ...parsed, role: 'admin' as UserRole };
-    }
-    return null;
+    return tokenStore.getUser() as AuthUser | null;
   },
-
   setUser(user: AuthUser): void {
-    localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user));
-    
-    if (user.role === 'admin') {
-      localStorage.setItem(STORAGE_KEYS.ADMIN_USER, JSON.stringify(user));
-    }
+    tokenStore.setUser(user);
   },
-
   removeUser(): void {
-    localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
-    localStorage.removeItem(STORAGE_KEYS.ADMIN_USER);
+    tokenStore.clear();
   },
 
   getRole(): UserRole | null {
-    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) as UserRole | null;
-    if (role) return role;
-    
-    const user = this.getUser();
-    return user?.role || null;
+    return tokenStore.getRole();
   },
-
   setRole(role: UserRole): void {
-    localStorage.setItem(STORAGE_KEYS.USER_ROLE, role);
+    const user = tokenStore.getUser();
+    if (user) tokenStore.setUser({ ...user, role });
   },
-
   removeRole(): void {
-    localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
+    tokenStore.clear();
   },
 
   getAdminUser(): AuthUser | null {
-    return this.getUser();
+    return tokenStore.getUser() as AuthUser | null;
   },
-
-  setAdminUser(user: any): void {
-    const authUser: AuthUser = {
-      ...user,
-      role: 'admin' as UserRole,
-    };
-    this.setUser(authUser);
+  setAdminUser(user: AuthUser): void {
+    tokenStore.setUser({ ...user, role: "admin" });
   },
-
   removeAdminUser(): void {
-    this.removeUser();
+    tokenStore.clear();
   },
 
   clearAuth(): void {
-    this.removeToken();
-    this.removeUser();
-    this.removeRole();
+    tokenStore.clear();
   },
 
   isAuthenticated(): boolean {
-    return !!this.getToken() && !!this.getUser();
+    return tokenStore.isAuthenticated();
   },
 };

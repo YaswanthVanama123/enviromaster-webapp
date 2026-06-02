@@ -6,6 +6,7 @@ import type { ServiceConfig } from "../../backendservice/types/serviceConfig.typ
 import type { Product } from "../../backendservice/types/productCatalog.types";
 import { Toast } from "./Toast";
 import { ServicePricingDetailedView } from "./ServicePricingDetailedView";
+import { Spinner } from "../atoms/Spinner";
 import "./PricingTablesView.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
@@ -608,7 +609,7 @@ export const PricingTablesView: React.FC = () => {
   if (catalogLoading || servicesLoading) {
     return (
       <div style={styles.loadingContainer} className="pricing-loading-container">
-        <div style={styles.spinner} className="pricing-spinner"></div>
+        <Spinner size="md" />
         <p style={styles.loadingText} className="pricing-loading-text">Loading pricing data...</p>
       </div>
     );
@@ -1136,14 +1137,6 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: "400px",
     width: "100%",
   },
-  spinner: {
-    width: "48px",
-    height: "48px",
-    border: "4px solid #e5e7eb",
-    borderTopColor: "#3b82f6",
-    borderRadius: "50%",
-    animation: "spin 0.8s linear infinite",
-  },
   loadingText: {
     marginTop: "16px",
     fontSize: "16px",
@@ -1166,9 +1159,6 @@ const styles: Record<string, React.CSSProperties> = {
 
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
   @media (max-width: 768px) {
     table { font-size: 12px; }
     th, td { padding: 10px 8px !important; }

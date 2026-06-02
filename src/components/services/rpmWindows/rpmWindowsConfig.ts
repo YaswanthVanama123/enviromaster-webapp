@@ -1,5 +1,6 @@
 
 import type { RpmWindowPricingConfig } from "./rpmWindowsTypes";
+import { VISITS_PER_YEAR_MAP } from "../../../lib/pricing";
 
 export const rpmWindowPricingConfig: RpmWindowPricingConfig = {
   smallWindowRate: 1.5,
@@ -24,18 +25,7 @@ export const rpmWindowPricingConfig: RpmWindowPricingConfig = {
     quarterlyFirstTime: 3.0,
   },
 
-  annualFrequencies: {
-    oneTime: 1,
-    weekly: 52,
-    biweekly: 26,
-    twicePerMonth: 24,
-    monthly: 12,
-    everyFourWeeks: 13,
-    bimonthly: 6,
-    quarterly: 4,
-    biannual: 2,
-    annual: 1,
-  },
+  annualFrequencies: { ...VISITS_PER_YEAR_MAP },
 
   monthlyConversions: {
     weekly: 4.33,          

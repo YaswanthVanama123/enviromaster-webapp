@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { authApi } from '../../backendservice/api/authApi';
+import { apiClient } from '../../lib/api/client';
 import type { AuthUser, UserRole, LoginPayload } from '../../backendservice/types/api.types';
 
 interface AuthContextType {
@@ -51,6 +52,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     authApi.logout();
     setUser(null);
     setIsAuthenticated(false);
+  }, []);
+
+  useEffect(() => {
+    apiClient.setUnauthorizedHandler(() => {
+      authApi.logout();
+      setUser(null);
+      setIsAuthenticated(false);
+    });
+    return () => apiClient.setUnauthorizedHandler(null);
   }, []);
 
   const refreshProfile = useCallback(async () => {

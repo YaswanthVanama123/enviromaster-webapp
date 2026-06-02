@@ -1,30 +1,20 @@
 
 import type { SanipodPricingConfig } from "./sanipodTypes";
+import { VISITS_PER_YEAR_MAP } from "../../../lib/pricing";
 
 export const sanipodPricingConfig: SanipodPricingConfig = {
-  weeklyRatePerUnit: 3.0,             
-  altWeeklyRatePerUnit: 8.0,          
-  extraBagPrice: 2.0,                 
-  installChargePerUnit: 25.0,         
-  standaloneExtraWeeklyCharge: 40.0,  
+  weeklyRatePerUnit: 3.0,
+  altWeeklyRatePerUnit: 8.0,
+  extraBagPrice: 2.0,
+  installChargePerUnit: 25.0,
+  standaloneExtraWeeklyCharge: 40.0,
 
   tripChargePerVisit: 0.0,
 
   defaultFrequency: "weekly",
   allowedFrequencies: ["oneTime", "weekly", "biweekly", "twicePerMonth", "monthly", "everyFourWeeks", "bimonthly", "quarterly", "biannual", "annual"],
 
-  annualFrequencies: {
-    oneTime: 1,
-    weekly: 52,
-    biweekly: 26,
-    twicePerMonth: 24,
-    monthly: 12,
-    everyFourWeeks: 13,
-    bimonthly: 6,
-    quarterly: 4,
-    biannual: 2,
-    annual: 1,
-  },
+  annualFrequencies: { ...VISITS_PER_YEAR_MAP },
 
   frequencyMultipliers: {
     oneTime: 0,      
