@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState, useRef } from "react";
 import "../ServicesSection.css";
 import { useSanicleanCalc } from "./useSanicleanCalc";
+import { useEditableCurrency } from "../../../features/services/engine";
 import type { SanicleanFormState, SanicleanFrequency } from "./sanicleanTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
 
 const formatMoney = (n: number): string => `$${(isNaN(n) ? 0 : n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 const safeNumber = (n: any): number => (typeof n === "number" && !isNaN(n)) ? n : 0;
@@ -250,10 +250,6 @@ export const SanicleanForm: React.FC<
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
   const prevDataRef = useRef<string>("");
 
   const getOverrideStyle = (
@@ -268,68 +264,21 @@ export const SanicleanForm: React.FC<
     return Boolean((pricingOverrides as Record<string, boolean> | undefined)?.[fieldName]);
   };
 
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const commitEdit = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      updateForm({ [name]: numValue });
-    } else if (value === '') {
-
+    if (value === "") {
       updateForm({ [name]: undefined });
+      return;
     }
+    const num = parseFloat(value);
+    if (!isNaN(num)) updateForm({ [name]: num });
   };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        updateForm({ [name]: undefined });
-        return;
-      }
-
-      updateForm({ [name]: numValue });
-    }
-  };
+  const {
+    onFocus: handleFocus,
+    onChange: handleLocalChange,
+    onBlur: handleBlur,
+    getDisplayValue,
+  } = useEditableCurrency(commitEdit);
 
   const fixtures = form.sinks + form.urinals + form.maleToilets + form.femaleToilets;
   const soapDispensers = form.sinks; 
@@ -739,8 +688,14 @@ export const SanicleanForm: React.FC<
   const contractTotal = quote.contractTotal;
 
   return (
-    <div className="svc-card" style={{ position: 'relative' }}>
-      {}
+    <ServiceCardShell
+      title="SANI CLEAN"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={() => fetchPricing(true)} loading={isLoadingConfig} />
+      }
+    >
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
@@ -749,43 +704,6 @@ export const SanicleanForm: React.FC<
           <p className="svc-loading-text">Loading configuration...</p>
         </div>
       )}
-
-      {}
-      <div className="svc-h-row">
-        <div className="svc-h">SANI CLEAN</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => fetchPricing(true)}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
 
       {}
       <CustomFieldManager
@@ -2055,7 +1973,7 @@ export const SanicleanForm: React.FC<
           />
         </div>
       </div>
-    </div>
+    </ServiceCardShell>
   );
 };
 
