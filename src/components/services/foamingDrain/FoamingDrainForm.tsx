@@ -1,7 +1,5 @@
 
-import React, { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useFoamingDrainCalc } from "./useFoamingDrainCalc";
 import type {
   FoamingDrainFormState,
@@ -12,6 +10,8 @@ import type {
 import { FOAMING_DRAIN_CONFIG as cfg } from "./foamingDrainConfig";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -61,7 +61,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
     initialData?.customFields || []
   );
 
-  const { state, quote, updateField, reset, refreshConfig, isLoadingConfig, backendConfig } =
+  const { state, quote, updateField, refreshConfig, isLoadingConfig, backendConfig } =
     useFoamingDrainCalc(initialData, customFields);
   const servicesContext = useServicesContextOptional();
 
@@ -73,72 +73,20 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const editable = useEditableCurrency(((e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      updateField(name as keyof FoamingDrainFormState, numValue as any);
-    } else if (value === '') {
-
+    if (value === "") {
       updateField(name as keyof FoamingDrainFormState, undefined as any);
+    } else {
+      const num = parseFloat(value);
+      if (!isNaN(num)) updateField(name as keyof FoamingDrainFormState, num as any);
     }
-  };
+  }) as any);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        updateField(name as keyof FoamingDrainFormState, undefined as any);
-        return;
-      }
-
-      updateField(name as keyof FoamingDrainFormState, numValue as any);
-    }
-  };
+  const getDisplayValue = editable.getDisplayValue;
+  const handleFocus = editable.onFocus;
+  const handleLocalChange = editable.onChange;
+  const handleBlur = editable.onBlur;
 
   const prevDataRef = useRef<string>("");
 
@@ -568,44 +516,15 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
       : breakdown.tripCharge;
 
   return (
-    <div className="svc-card">
+    <ServiceCardShell
+      title="FOAMING DRAIN SERVICE"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+      }
+    >
       <div className="svc-card__inner">
-        <div className="svc-h-row">
-          <div className="svc-h">FOAMING DRAIN SERVICE</div>
-          <div className="svc-h-actions">
-            <button
-              type="button"
-              className="svc-mini"
-              onClick={refreshConfig}
-              disabled={isLoadingConfig}
-              title="Refresh config from database"
-            >
-              <FontAwesomeIcon
-                icon={isLoadingConfig ? faSpinner : faSync}
-                spin={isLoadingConfig}
-              />
-            </button>
-            <button
-              type="button"
-              className="svc-mini"
-              onClick={() => setShowAddDropdown(!showAddDropdown)}
-              title="Add custom field"
-            >
-              +
-            </button>
-            {onRemove && (
-              <button
-                type="button"
-                className="svc-mini svc-mini--neg"
-                onClick={onRemove}
-                title="Remove this service"
-              >
-                −
-              </button>
-            )}
-          </div>
-        </div>
-
         {}
         <CustomFieldManager
           fields={customFields}
@@ -1333,27 +1252,11 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
               <div className="svc-label"></div>
               <div className="svc-field">
                 {quote.annualRecurring > quote.originalContractTotal * 1.30 ? (
-                  <span style={{
-                    color: '#388e3c',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '4px 8px',
-                    backgroundColor: '#e8f5e9',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}>
+                  <span className="em-pricing-tier em-pricing-tier--green">
                     🟢 Greenline Pricing
                   </span>
                 ) : (
-                  <span style={{
-                    color: '#d32f2f',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '4px 8px',
-                    backgroundColor: '#ffebee',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}>
+                  <span className="em-pricing-tier em-pricing-tier--red">
                     🔴 Redline Pricing
                   </span>
                 )}
@@ -1537,6 +1440,6 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </ServiceCardShell>
   );
 };
