@@ -16,16 +16,6 @@ import type {
   ElectrostaticSprayCalcResult,
 } from "./electrostaticSprayTypes";
 
-export {
-  buildElectrostaticActiveConfig,
-  computeElectrostaticSprayCalc,
-  transformBackendFrequencyMeta,
-} from "../../../features/services/kinds/electrostaticSpray";
-export type {
-  BackendElectrostaticSprayConfig,
-  ElectrostaticActiveConfig,
-} from "../../../features/services/kinds/electrostaticSpray";
-
 const CUSTOM_OVERRIDE_FIELDS = new Set([
   "customRatePerRoom",
   "customRatePerThousandSqFt",

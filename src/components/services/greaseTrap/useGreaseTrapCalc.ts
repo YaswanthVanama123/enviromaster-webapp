@@ -5,12 +5,6 @@ import { greaseTrapModule } from "../../../features/services/kinds/greaseTrap";
 import { logServiceFieldChanges } from "../../../utils/serviceLogger";
 import type { GreaseTrapFormState } from "./greaseTrapTypes";
 
-export {
-  GREASE_TRAP_DEFAULT_CONFIG,
-  computeGreaseTrapQuote,
-} from "../../../features/services/kinds/greaseTrap";
-export type { GreaseTrapConfig } from "../../../features/services/kinds/greaseTrap";
-
 export function useGreaseTrapCalc(initialData: GreaseTrapFormState) {
   const {
     form,

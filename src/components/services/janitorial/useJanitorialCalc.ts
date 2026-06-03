@@ -8,16 +8,6 @@ import type {
   JanitorialQuoteResult,
 } from "./janitorialTypes";
 
-export {
-  computeJanitorialCalc,
-  buildJanitorialActiveConfig,
-} from "../../../features/services/kinds/janitorial";
-export type {
-  BackendJanitorialConfig,
-  JanitorialActiveConfig,
-  JanitorialCalc,
-} from "../../../features/services/kinds/janitorial";
-
 const LOG_TRIGGER_FIELDS = new Set([
   "hoursPerWeek",
   "weeksPerMonth",

@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useCarpetCalc } from "./useCarpetCalc";
 import type { CarpetFormState, CarpetFrequency } from "./carpetTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
@@ -12,315 +10,248 @@ import {
 } from "./carpetConfig";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import {
+  ServiceCardShell,
+  RefreshButton,
+  Checkbox,
+  SelectField,
+} from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
-export const CarpetForm: React.FC<
-  ServiceInitialData<CarpetFormState>
-> = ({ initialData, onQuoteChange, onRemove }) => {
+const FIELD_ORDER = {
+  frequency: 1,
+  location: 2,
+  service: 3,
+  installation: 4,
+  perVisit: 5,
+  firstMonth: 6,
+  recurringVisit: 7,
+  recurringMonth: 8,
+  contract: 9,
+  totalPrice: 10,
+};
 
+const MONTHLY_RECURRING_FREQS: CarpetFrequency[] = [
+  "weekly",
+  "biweekly",
+  "twicePerMonth",
+  "monthly",
+];
+const VISIT_BASED_RECURRING_FREQS: CarpetFrequency[] = [
+  "bimonthly",
+  "quarterly",
+  "biannual",
+  "annual",
+  "everyFourWeeks",
+];
+
+const resolveCarpetFrequency = (value: string): CarpetFrequency => {
+  if (carpetFrequencyList.includes(value as CarpetFrequency)) {
+    return value as CarpetFrequency;
+  }
+  const normalized = value?.trim().toLowerCase() || "";
+  const match = carpetFrequencyList.find(
+    (freq) => carpetFrequencyLabels[freq].toLowerCase() === normalized
+  );
+  return match || "monthly";
+};
+
+const overrideStyle = (overridden: boolean): React.CSSProperties => ({
+  backgroundColor: overridden ? "#fffacd" : "white",
+});
+
+export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
+  initialData,
+  onQuoteChange,
+  onRemove,
+}) => {
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
   );
 
-  const { form, setForm, onChange, quote, calc, refreshConfig, isLoadingConfig } = useCarpetCalc(initialData, customFields);
+  const { form, setForm, onChange, quote, calc, refreshConfig, isLoadingConfig } =
+    useCarpetCalc(initialData, customFields);
   const servicesContext = useServicesContextOptional();
+  const editable = useEditableCurrency(onChange as any);
 
   useEffect(() => {
-    if (servicesContext?.globalContractMonths && servicesContext.globalContractMonths !== form.contractMonths) {
+    if (
+      servicesContext?.globalContractMonths &&
+      servicesContext.globalContractMonths !== form.contractMonths
+    ) {
       setForm({ ...form, contractMonths: servicesContext.globalContractMonths });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [servicesContext?.globalContractMonths]);
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
-
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      onChange({ target: { name, value: String(numValue) } } as any);
-    } else if (value === '') {
-
-      onChange({ target: { name, value: '' } } as any);
-    }
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        onChange({ target: { name, value: '' } } as any);
-        return;
-      }
-
-      onChange({ target: { name, value: String(numValue) } } as any);
-    }
-  };
-
   const prevDataRef = useRef<string>("");
 
-  const monthlyRecurringFrequencies: CarpetFrequency[] = [
-    "weekly",
-    "biweekly",
-    "twicePerMonth",
-    "monthly",
-  ];
-  const visitBasedRecurringFrequencies: CarpetFrequency[] = [
-    "bimonthly",
-    "quarterly",
-    "biannual",
-    "annual",
-    "everyFourWeeks",
-  ];
-
-  const resolveCarpetFrequency = (value: string): CarpetFrequency => {
-    if (carpetFrequencyList.includes(value as CarpetFrequency)) {
-      return value as CarpetFrequency;
-    }
-    const normalized = value?.trim().toLowerCase() || "";
-    const match = carpetFrequencyList.find(
-      (freq) => carpetFrequencyLabels[freq].toLowerCase() === normalized
-    );
-    return match || "monthly";
-  };
-  const FIELD_ORDER = {
-    frequency: 1,
-    location: 2,
-    service: 3,
-    installation: 4,
-    perVisit: 5,
-    firstMonth: 6,
-    recurringVisit: 7,
-    recurringMonth: 8,
-    contract: 9,
-    totalPrice: 10,
-  };
-
   useEffect(() => {
-    if (servicesContext) {
-      const resolvedFrequency = resolveCarpetFrequency(form.frequency);
-      const hasCustomFieldValues = customFields.some(f =>
-        (f.type === 'dollar' && !!f.value && parseFloat(f.value) > 0) ||
-        (f.type === 'calc' && !!f.calcValues?.right && parseFloat(f.calcValues.right) > 0)
-      );
-      const isActive = (form.areaSqFt ?? 0) > 0 || hasCustomFieldValues;
-      const shouldShowMonthlyRecurring = monthlyRecurringFrequencies.includes(resolvedFrequency);
-      const shouldShowVisitRecurring = visitBasedRecurringFrequencies.includes(resolvedFrequency);
-      const displayFrequencyLabel =
-        carpetFrequencyLabels[resolvedFrequency] || resolvedFrequency;
-      const shouldShowRecurringGap =
-        resolvedFrequency !== "oneTime" &&
-        (shouldShowMonthlyRecurring || shouldShowVisitRecurring);
+    if (!servicesContext) return;
+    const resolvedFrequency = resolveCarpetFrequency(form.frequency);
+    const hasCustomFieldValues = customFields.some(
+      (f) =>
+        (f.type === "dollar" && !!f.value && parseFloat(f.value) > 0) ||
+        (f.type === "calc" &&
+          !!f.calcValues?.right &&
+          parseFloat(f.calcValues.right) > 0)
+    );
+    const isActive = (form.areaSqFt ?? 0) > 0 || hasCustomFieldValues;
+    const shouldShowMonthlyRecurring = MONTHLY_RECURRING_FREQS.includes(resolvedFrequency);
+    const shouldShowVisitRecurring = VISIT_BASED_RECURRING_FREQS.includes(resolvedFrequency);
+    const displayFrequencyLabel =
+      carpetFrequencyLabels[resolvedFrequency] || resolvedFrequency;
 
-      const totalLabel =
-        resolvedFrequency === "oneTime"
-          ? "Total Price"
-          : shouldShowVisitRecurring
-            ? "First Visit Total"
-            : "First Month Total";
-      const totalAmount =
-        resolvedFrequency === "oneTime"
-          ? form.customFirstMonthPrice !== undefined
-            ? form.customFirstMonthPrice
-            : calc.contractTotal
-          : calc.firstMonthTotal;
+    const totalLabel =
+      resolvedFrequency === "oneTime"
+        ? "Total Price"
+        : shouldShowVisitRecurring
+        ? "First Visit Total"
+        : "First Month Total";
+    const totalAmount =
+      resolvedFrequency === "oneTime"
+        ? form.customFirstMonthPrice !== undefined
+          ? form.customFirstMonthPrice
+          : calc.contractTotal
+        : calc.firstMonthTotal;
 
-      const totals: any = {
-        perVisit: {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.perVisit,
-          label: "Per Visit Total",
-          type: "dollar" as const,
-          amount: calc.perVisitCharge,
-        },
-        firstMonth: {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.firstMonth,
-          label: totalLabel,
-          type: "dollar" as const,
-          amount: totalAmount,
-        },
+    const totals: any = {
+      perVisit: {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.perVisit,
+        label: "Per Visit Total",
+        type: "dollar" as const,
+        amount: calc.perVisitCharge,
+      },
+      firstMonth: {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.firstMonth,
+        label: totalLabel,
+        type: "dollar" as const,
+        amount: totalAmount,
+      },
+    };
+    if (resolvedFrequency === "oneTime") {
+      totals.totalPrice = {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.totalPrice,
+        label: "Total Price",
+        type: "dollar" as const,
+        amount: totalAmount,
       };
+    }
+    if (shouldShowMonthlyRecurring) {
+      totals.monthlyRecurring = {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.recurringMonth,
+        label: "Monthly Recurring",
+        type: "dollar" as const,
+        amount: calc.monthlyTotal,
+        gap: "normal",
+      };
+    }
+    if (shouldShowVisitRecurring) {
+      totals.recurringVisit = {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.recurringVisit,
+        label: "Recurring Visit Total",
+        type: "dollar" as const,
+        amount: calc.perVisitCharge,
+        gap: "normal",
+      };
+    }
+    if (resolvedFrequency !== "oneTime") {
+      totals.contract = {
+        isDisplay: true,
+        orderNo: FIELD_ORDER.contract,
+        label: "Contract Total",
+        type: "dollar" as const,
+        months: form.contractMonths,
+        amount: calc.contractTotal,
+      };
+    }
 
-      if (resolvedFrequency === "oneTime") {
-        totals.totalPrice = {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.totalPrice,
-          label: "Total Price",
-          type: "dollar" as const,
-          amount: totalAmount,
-        };
-      }
-
-      if (shouldShowMonthlyRecurring) {
-        totals.monthlyRecurring = {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.recurringMonth,
-          label: "Monthly Recurring",
-          type: "dollar" as const,
-          amount: calc.monthlyTotal,
-          gap: "normal",
-        };
-        }
-
-        if (shouldShowVisitRecurring) {
-          totals.recurringVisit = {
-            isDisplay: true,
-            orderNo: FIELD_ORDER.recurringVisit,
-            label: "Recurring Visit Total",
-            type: "dollar" as const,
-            amount: calc.perVisitCharge,
-            gap: "normal",
-          };
-        }
-
-        if (resolvedFrequency !== "oneTime") {
-        totals.contract = {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.contract,
-          label: "Contract Total",
-          type: "dollar" as const,
-          months: form.contractMonths,
-          amount: calc.contractTotal,
-        };
-      }
-
-      const data = isActive ? {
-        serviceId: "carpetclean",
-      displayName: "Carpet Cleaning",
-      isActive: true,
-
-      firstUnitRate: form.customFirstUnitRate ?? form.firstUnitRate,
-      additionalUnitRate: form.customAdditionalUnitRate ?? form.additionalUnitRate,
-      perVisitMinimum: form.customPerVisitMinimum ?? form.perVisitMinimum,
-      installMultiplierDirty: form.installMultiplierDirty,
-      installMultiplierClean: form.installMultiplierClean,
-      unitSqFt: form.unitSqFt,
-      useExactSqft: form.useExactSqft,
-      applyMinimum: form.applyMinimum !== false,
-
-      areaSqFt: form.areaSqFt,
-      frequency: form.frequency,
-      contractMonths: form.contractMonths,
-      includeInstall: form.includeInstall,
-      isDirtyInstall: form.isDirtyInstall,
-      location: form.location,
-
-      contractTotal: calc.contractTotal,
-      originalContractTotal: calc.originalContractTotal,
-
-        perVisitBase: calc.perVisitBase,  
-        perVisitCharge: calc.perVisitCharge,  
-
-        frequency: {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.frequency,
-          label: "Frequency",
-          type: "text" as const,
-          value: displayFrequencyLabel,
-          frequencyKey: resolvedFrequency,
-        },
-
-        location: {
-          isDisplay: false,
-          orderNo: FIELD_ORDER.location,
-          label: "Location",
-          type: "text" as const,
-          value: form.location === "insideBeltway" ? "Inside Beltway" : "Outside Beltway",
-        },
-
-        service: {
-          isDisplay: true,
-          orderNo: FIELD_ORDER.service,
-          label: "Carpet Area",
-          type: "calc" as const,
-          qty: form.areaSqFt,
-          rate: form.customFirstUnitRate ?? form.firstUnitRate,  
-          total: calc.perVisitCharge,
-          unit: "sq ft",
-        },
-
-        ...(form.includeInstall ? {
-          installation: {
-            isDisplay: true,
-             orderNo: FIELD_ORDER.installation,
-
-           label: form.isDirtyInstall ? "Installation" : "Installation",
-            type: "calc" as const,
-            qty: 1,
-            rate: calc.installOneTime,
-            total: calc.installOneTime,
-            multiplier: form.isDirtyInstall ? form.installMultiplierDirty : form.installMultiplierClean,
-            isDirty: form.isDirtyInstall,
+    const data = isActive
+      ? {
+          serviceId: "carpetclean",
+          displayName: "Carpet Cleaning",
+          isActive: true,
+          firstUnitRate: form.customFirstUnitRate ?? form.firstUnitRate,
+          additionalUnitRate: form.customAdditionalUnitRate ?? form.additionalUnitRate,
+          perVisitMinimum: form.customPerVisitMinimum ?? form.perVisitMinimum,
+          installMultiplierDirty: form.installMultiplierDirty,
+          installMultiplierClean: form.installMultiplierClean,
+          unitSqFt: form.unitSqFt,
+          useExactSqft: form.useExactSqft,
+          applyMinimum: form.applyMinimum !== false,
+          areaSqFt: form.areaSqFt,
+          contractMonths: form.contractMonths,
+          includeInstall: form.includeInstall,
+          isDirtyInstall: form.isDirtyInstall,
+          location: {
+            isDisplay: false,
+            orderNo: FIELD_ORDER.location,
+            label: "Location",
+            type: "text" as const,
+            value:
+              form.location === "insideBeltway" ? "Inside Beltway" : "Outside Beltway",
           },
-        } : {}),
+          contractTotal: calc.contractTotal,
+          originalContractTotal: calc.originalContractTotal,
+          perVisitBase: calc.perVisitBase,
+          perVisitCharge: calc.perVisitCharge,
+          frequency: {
+            isDisplay: true,
+            orderNo: FIELD_ORDER.frequency,
+            label: "Frequency",
+            type: "text" as const,
+            value: displayFrequencyLabel,
+            frequencyKey: resolvedFrequency,
+          },
+          service: {
+            isDisplay: true,
+            orderNo: FIELD_ORDER.service,
+            label: "Carpet Area",
+            type: "calc" as const,
+            qty: form.areaSqFt,
+            rate: form.customFirstUnitRate ?? form.firstUnitRate,
+            total: calc.perVisitCharge,
+            unit: "sq ft",
+          },
+          ...(form.includeInstall
+            ? {
+                installation: {
+                  isDisplay: true,
+                  orderNo: FIELD_ORDER.installation,
+                  label: form.isDirtyInstall ? "Installation" : "Installation",
+                  type: "calc" as const,
+                  qty: 1,
+                  rate: calc.installOneTime,
+                  total: calc.installOneTime,
+                  multiplier: form.isDirtyInstall
+                    ? form.installMultiplierDirty
+                    : form.installMultiplierClean,
+                  isDirty: form.isDirtyInstall,
+                },
+              }
+            : {}),
+          totals,
+          notes: form.notes || "",
+          customFields,
+          pdfFieldVisibility: {
+            location: false,
+            useExactSqft: false,
+            includeInstall: false,
+            isDirtyInstall: false,
+          },
+        }
+      : null;
 
-        totals,
-
-        notes: form.notes || "",
-        customFields: customFields,
-        pdfFieldVisibility: {
-          location: false,
-          useExactSqft: false,
-          includeInstall: false,
-          isDirtyInstall: false,
-        },
-      } : null;
-
-      const dataStr = JSON.stringify(data);
-
-      if (dataStr !== prevDataRef.current) {
-        prevDataRef.current = dataStr;
-        console.log('🔧 [CarpetForm] Sending data to context with pricing fields:', {
-          firstUnitRate: data?.firstUnitRate,
-          additionalUnitRate: data?.additionalUnitRate,
-          perVisitMinimum: data?.perVisitMinimum,
-          fullData: JSON.stringify(data, null, 2)
-        });
-        servicesContext.updateService("carpetclean", data);
-      }
+    const dataStr = JSON.stringify(data);
+    if (dataStr !== prevDataRef.current) {
+      prevDataRef.current = dataStr;
+      servicesContext.updateService("carpetclean" as any, data);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, calc, customFields]);
@@ -333,26 +264,30 @@ export const CarpetForm: React.FC<
     setForm((prev: any) => ({
       ...prev,
       customPerVisitPrice: undefined,
-      customInstallationFee: undefined,  
+      customInstallationFee: undefined,
       customMonthlyRecurring: undefined,
       customFirstMonthPrice: undefined,
       customContractTotal: undefined,
     }));
   }, [
-
-    form.areaSqFt,           
-    form.useExactSqft,       
-    form.frequency,          
-    form.contractMonths,     
-    form.includeInstall,     
-    form.isDirtyInstall,     
-
+    form.areaSqFt,
+    form.useExactSqft,
+    form.frequency,
+    form.contractMonths,
+    form.includeInstall,
+    form.isDirtyInstall,
     setForm,
   ]);
 
   return (
-    <div className="svc-card" style={{ position: 'relative' }}>
-      {}
+    <ServiceCardShell
+      title="CARPET CLEANING"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+      }
+    >
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
@@ -362,44 +297,6 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      <div className="svc-h-row">
-        <div className="svc-h">CARPET CLEANING</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={refreshConfig}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-
-        </div>
-      </div>
-
-      {}
       <CustomFieldManager
         fields={customFields}
         onFieldsChange={setCustomFields}
@@ -407,28 +304,23 @@ export const CarpetForm: React.FC<
         onToggleAddDropdown={setShowAddDropdown}
       />
 
-      {}
       <div className="svc-row">
         <label>Frequency</label>
         <div className="svc-row-right">
-          <select
-            className="svc-in"
+          <SelectField
+            label=""
             name="frequency"
             value={form.frequency}
-            onChange={onChange}
-          >
-            {Object.entries(carpetFrequencyLabels).map(
-              ([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              )
-            )}
-          </select>
+            options={Object.entries(carpetFrequencyLabels).map(([value, label]) => ({
+              value,
+              label: label as string,
+            }))}
+            onChange={onChange as any}
+            className=""
+          />
         </div>
       </div>
 
-      {}
       <div className="svc-row">
         <label>First {form.unitSqFt || 500} sq ft Rate</label>
         <div className="svc-row-right">
@@ -440,20 +332,30 @@ export const CarpetForm: React.FC<
               min="0"
               step="1"
               name="customFirstUnitRate"
-              value={getDisplayValue(
-                'customFirstUnitRate',
+              value={editable.getDisplayValue(
+                "customFirstUnitRate",
                 form.customFirstUnitRate !== undefined
                   ? form.customFirstUnitRate
                   : form.firstUnitRate
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              style={{ backgroundColor: form.customFirstUnitRate !== undefined ? '#fffacd' : 'white' }}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
+              style={overrideStyle(form.customFirstUnitRate !== undefined)}
               title={`Rate for first ${form.unitSqFt || 500} sq ft (from backend, editable)`}
             />
           </div>
-          <span className="svc-small">/ {form.unitSqFt || 500} sq ft (${(((form.customFirstUnitRate ?? form.firstUnitRate) || 250) / (form.unitSqFt || 500)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)</span>
+          <span className="svc-small">
+            / {form.unitSqFt || 500} sq ft ($
+            {(
+              ((form.customFirstUnitRate ?? form.firstUnitRate) || 250) /
+              (form.unitSqFt || 500)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            /sq ft)
+          </span>
         </div>
       </div>
 
@@ -468,20 +370,30 @@ export const CarpetForm: React.FC<
               min="0"
               step="1"
               name="customAdditionalUnitRate"
-              value={getDisplayValue(
-                'customAdditionalUnitRate',
+              value={editable.getDisplayValue(
+                "customAdditionalUnitRate",
                 form.customAdditionalUnitRate !== undefined
                   ? form.customAdditionalUnitRate
                   : form.additionalUnitRate
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              style={{ backgroundColor: form.customAdditionalUnitRate !== undefined ? '#fffacd' : 'white' }}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
+              style={overrideStyle(form.customAdditionalUnitRate !== undefined)}
               title={`Rate per additional ${form.unitSqFt || 500} sq ft block (from backend, editable)`}
             />
           </div>
-          <span className="svc-small">/ {form.unitSqFt || 500} sq ft (${(((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) / (form.unitSqFt || 500)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)</span>
+          <span className="svc-small">
+            / {form.unitSqFt || 500} sq ft ($
+            {(
+              ((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) /
+              (form.unitSqFt || 500)
+            ).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            /sq ft)
+          </span>
         </div>
       </div>
 
@@ -496,33 +408,31 @@ export const CarpetForm: React.FC<
               min="0"
               step="1"
               name="customPerVisitMinimum"
-              value={getDisplayValue(
-                'customPerVisitMinimum',
+              value={editable.getDisplayValue(
+                "customPerVisitMinimum",
                 form.customPerVisitMinimum !== undefined
                   ? form.customPerVisitMinimum
                   : form.perVisitMinimum
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              style={{ backgroundColor: form.customPerVisitMinimum !== undefined ? '#fffacd' : 'white' }}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
+              style={overrideStyle(form.customPerVisitMinimum !== undefined)}
               title="Minimum charge per visit (from backend, editable)"
             />
           </div>
           <span className="svc-small">/ visit</span>
-          <label className="svc-inline" style={{ marginLeft: '10px' }}>
-            <input
-              type="checkbox"
+          <span style={{ marginLeft: "10px" }}>
+            <Checkbox
               name="applyMinimum"
               checked={form.applyMinimum !== false}
-              onChange={onChange}
+              onChange={onChange as any}
+              label="Apply Minimum"
             />
-            <span>Apply Minimum</span>
-          </label>
+          </span>
         </div>
       </div>
 
-      {}
       <div className="svc-row">
         <label>Carpet Area</label>
         <div className="svc-row-right">
@@ -532,7 +442,7 @@ export const CarpetForm: React.FC<
             min="0"
             name="areaSqFt"
             value={form.areaSqFt || ""}
-            onChange={onChange}
+            onChange={onChange as any}
           />
           <span className="svc-small">sq ft</span>
           <span>@</span>
@@ -548,78 +458,66 @@ export const CarpetForm: React.FC<
               className="svc-in-box"
               type="text"
               readOnly
-              min="0"
-              step="1"
               name="customPerVisitPrice"
-              value={getDisplayValue(
-                'customPerVisitPrice',
+              value={editable.getDisplayValue(
+                "customPerVisitPrice",
                 form.customPerVisitPrice !== undefined
                   ? form.customPerVisitPrice
                   : calc.perVisitCharge,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              style={{ backgroundColor: form.customPerVisitPrice !== undefined ? '#fffacd' : 'white' }}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
+              style={overrideStyle(form.customPerVisitPrice !== undefined)}
               title="Per visit total (editable)"
             />
           </div>
         </div>
       </div>
 
-      {}
       <div className="svc-row">
         <label>Calculation Method</label>
         <div className="svc-row-right">
-          <label className="svc-inline">
-            <input
-              type="checkbox"
-              name="useExactSqft"
-              checked={form.useExactSqft}
-              onChange={onChange}
-            />
-            <span>Exact sq ft calculation</span>
-          </label>
+          <Checkbox
+            name="useExactSqft"
+            checked={form.useExactSqft}
+            onChange={onChange as any}
+            label="Exact sq ft calculation"
+          />
           <small style={{ color: "#666", fontSize: "11px", marginLeft: "10px" }}>
             {form.useExactSqft
-              ? `(Excess × $${(((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) / (form.unitSqFt || 500)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)`
-              : `(Excess in ${form.unitSqFt || 500} sq ft blocks × $${(form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125})`}
+              ? `(Excess × $${(
+                  ((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) /
+                  (form.unitSqFt || 500)
+                ).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}/sq ft)`
+              : `(Excess in ${form.unitSqFt || 500} sq ft blocks × $${
+                  (form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125
+                })`}
           </small>
         </div>
       </div>
 
-      {}
-      {}
-
-      {}
-      {}
-
-      {}
       <div className="svc-row">
         <label>Installation</label>
         <div className="svc-row-right">
-          <label className="svc-inline">
-            <input
-              type="checkbox"
-              name="includeInstall"
-              checked={form.includeInstall}
-              onChange={onChange}
-            />
-            <span>Include Install</span>
-          </label>
-
+          <Checkbox
+            name="includeInstall"
+            checked={form.includeInstall}
+            onChange={onChange as any}
+            label="Include Install"
+          />
           {form.includeInstall && (
             <>
-              <label className="svc-inline">
-                <input
-                  type="checkbox"
-                  name="isDirtyInstall"
-                  checked={form.isDirtyInstall}
-                  onChange={onChange}
-                />
-                <span>Dirty</span>
-              </label>
+              <Checkbox
+                name="isDirtyInstall"
+                checked={form.isDirtyInstall}
+                onChange={onChange as any}
+                label="Dirty"
+              />
               <div className="svc-dollar">
                 <span>×</span>
                 <input
@@ -627,10 +525,18 @@ export const CarpetForm: React.FC<
                   type="number"
                   min="0"
                   step={1}
-                  name={form.isDirtyInstall ? "installMultiplierDirty" : "installMultiplierClean"}
-                  value={form.isDirtyInstall ? (form.installMultiplierDirty || "") : (form.installMultiplierClean || "")}
-                  onChange={onChange}
-                  title={`${form.isDirtyInstall ? 'Dirty' : 'Clean'} install multiplier (from backend)`}
+                  name={
+                    form.isDirtyInstall
+                      ? "installMultiplierDirty"
+                      : "installMultiplierClean"
+                  }
+                  value={
+                    form.isDirtyInstall
+                      ? form.installMultiplierDirty || ""
+                      : form.installMultiplierClean || ""
+                  }
+                  onChange={onChange as any}
+                  title={`${form.isDirtyInstall ? "Dirty" : "Clean"} install multiplier (from backend)`}
                 />
               </div>
               <span className="svc-small">monthly base</span>
@@ -639,7 +545,6 @@ export const CarpetForm: React.FC<
         </div>
       </div>
 
-      {}
       {form.includeInstall && calc.installOneTime > 0 && (
         <div className="svc-row svc-row-charge">
           <label>Installation Total</label>
@@ -649,21 +554,19 @@ export const CarpetForm: React.FC<
               <input
                 className="svc-in"
                 type="text"
-                min="0"
                 readOnly
-                step="1"
                 name="customInstallationFee"
-                value={getDisplayValue(
-                  'customInstallationFee',
+                value={editable.getDisplayValue(
+                  "customInstallationFee",
                   form.customInstallationFee !== undefined
                     ? form.customInstallationFee
                     : calc.installOneTime,
                   true
                 )}
-                onChange={handleLocalChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                style={{ backgroundColor: form.customInstallationFee !== undefined ? '#fffacd' : 'white' }}
+                onChange={editable.onChange}
+                onFocus={editable.onFocus}
+                onBlur={editable.onBlur}
+                style={overrideStyle(form.customInstallationFee !== undefined)}
                 title="Installation fee total (editable)"
               />
             </div>
@@ -671,77 +574,59 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      {}
       <div className="svc-row svc-row-total">
         <label>
-          {}
           {form.frequency === "bimonthly" ||
-           form.frequency === "quarterly" ||
-           form.frequency === "biannual" ||
-           form.frequency === "annual"
+          form.frequency === "quarterly" ||
+          form.frequency === "biannual" ||
+          form.frequency === "annual"
             ? "Recurring Visit Total"
             : "Per Visit Total"}
         </label>
         <div className="svc-dollar">
-          $<input
+          $
+          <input
             type="text"
-            min="0"
-            step="1"
             readOnly
             name="customPerVisitPrice"
             className="svc-in svc-in-small"
-            value={getDisplayValue(
-              'customPerVisitPrice',
+            value={editable.getDisplayValue(
+              "customPerVisitPrice",
               form.customPerVisitPrice !== undefined
                 ? form.customPerVisitPrice
                 : calc.perVisitCharge,
               true
             )}
-            onChange={handleLocalChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onChange={editable.onChange}
+            onFocus={editable.onFocus}
+            onBlur={editable.onBlur}
             style={{
-              backgroundColor: form.customPerVisitPrice !== undefined ? '#fffacd' : 'white',
-              border: 'none',
-              width: '100px'
+              ...overrideStyle(form.customPerVisitPrice !== undefined),
+              border: "none",
+              width: "100px",
             }}
-            title={form.frequency === "bimonthly" ||
-                   form.frequency === "quarterly" ||
-                   form.frequency === "biannual" ||
-                   form.frequency === "annual"
-                    ? "Recurring visit total - editable"
-                    : "Per visit total - editable"}
+            title={
+              form.frequency === "bimonthly" ||
+              form.frequency === "quarterly" ||
+              form.frequency === "biannual" ||
+              form.frequency === "annual"
+                ? "Recurring visit total - editable"
+                : "Per visit total - editable"
+            }
           />
         </div>
       </div>
 
-            {}
       {form.areaSqFt > 0 && (
-        <div className="svc-row" style={{ marginTop: '-10px', paddingTop: '5px' }}>
+        <div className="svc-row" style={{ marginTop: "-10px", paddingTop: "5px" }}>
           <label></label>
           <div className="svc-row-right">
-            {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
-              <span style={{
-                color: '#388e3c',
-                fontSize: '13px',
-                fontWeight: '600',
-                padding: '4px 8px',
-                backgroundColor: '#e8f5e9',
-                borderRadius: '4px',
-                display: 'inline-block'
-              }}>
+            {calc.contractTotal > calc.originalContractTotal * 1.3 ? (
+              <span className="em-pricing-tier em-pricing-tier--green">
                 🟢 Greenline Pricing
               </span>
             ) : (
-              <span style={{
-                color: '#d32f2f',
-                fontSize: '13px',
-                fontWeight: '600',
-                padding: '4px 8px',
-                backgroundColor: '#ffebee',
-                borderRadius: '4px',
-                display: 'inline-block'
-              }}>
+              <span className="em-pricing-tier em-pricing-tier--red">
                 🔴 Redline Pricing
               </span>
             )}
@@ -749,65 +634,60 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      {}
       {form.frequency === "oneTime" && (
         <div className="svc-row svc-row-total">
           <label>Total Price</label>
           <div className="svc-dollar">
-            $<input
+            $
+            <input
               type="text"
-              min="0"
               readOnly
-              step="1"
               name="customFirstMonthPrice"
               className="svc-in svc-in-small"
-              value={getDisplayValue(
-                'customFirstMonthPrice',
+              value={editable.getDisplayValue(
+                "customFirstMonthPrice",
                 form.customFirstMonthPrice !== undefined
                   ? form.customFirstMonthPrice
                   : calc.contractTotal,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
               style={{
-                backgroundColor: form.customFirstMonthPrice !== undefined ? '#fffacd' : 'white',
-                border: 'none',
-                width: '100px'
+                ...overrideStyle(form.customFirstMonthPrice !== undefined),
+                border: "none",
+                width: "100px",
               }}
-              title="Total price for one-time service - editable"
             />
           </div>
         </div>
       )}
 
-      {}
       {calc.isVisitBasedFrequency && form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
           <label>First Visit Total</label>
           <div className="svc-dollar">
-            $<input
+            $
+            <input
               type="text"
-              min="0"
               readOnly
-              step="1"
               name="customFirstMonthPrice"
               className="svc-in svc-in-small"
-              value={getDisplayValue(
-                'customFirstMonthPrice',
+              value={editable.getDisplayValue(
+                "customFirstMonthPrice",
                 form.customFirstMonthPrice !== undefined
                   ? form.customFirstMonthPrice
                   : calc.firstMonthTotal,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
               style={{
-                backgroundColor: form.customFirstMonthPrice !== undefined ? '#fffacd' : 'white',
-                border: 'none',
-                width: '100px'
+                ...overrideStyle(form.customFirstMonthPrice !== undefined),
+                border: "none",
+                width: "100px",
               }}
               title="First visit total - editable"
             />
@@ -815,32 +695,30 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      {}
       {!calc.isVisitBasedFrequency && form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
           <label>First Month Total</label>
           <div className="svc-dollar">
-            $<input
+            $
+            <input
               type="text"
-              min="0"
               readOnly
-              step="1"
               name="customFirstMonthPrice"
               className="svc-in svc-in-small"
-              value={getDisplayValue(
-                'customFirstMonthPrice',
+              value={editable.getDisplayValue(
+                "customFirstMonthPrice",
                 form.customFirstMonthPrice !== undefined
                   ? form.customFirstMonthPrice
                   : calc.firstMonthTotal,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
               style={{
-                backgroundColor: form.customFirstMonthPrice !== undefined ? '#fffacd' : 'white',
-                border: 'none',
-                width: '100px'
+                ...overrideStyle(form.customFirstMonthPrice !== undefined),
+                border: "none",
+                width: "100px",
               }}
               title="First month total - editable"
             />
@@ -848,32 +726,33 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      {}
-      {(form.frequency === "weekly" || form.frequency === "biweekly" || form.frequency === "monthly" || form.frequency === "twicePerMonth") && (
+      {(form.frequency === "weekly" ||
+        form.frequency === "biweekly" ||
+        form.frequency === "monthly" ||
+        form.frequency === "twicePerMonth") && (
         <div className="svc-row svc-row-total">
           <label>Recurring Month Total</label>
           <div className="svc-dollar">
-            $<input
+            $
+            <input
               type="text"
-              min="0"
               readOnly
-              step="1"
               name="customMonthlyRecurring"
               className="svc-in svc-in-small"
-              value={getDisplayValue(
-                'customMonthlyRecurring',
+              value={editable.getDisplayValue(
+                "customMonthlyRecurring",
                 form.customMonthlyRecurring !== undefined
                   ? form.customMonthlyRecurring
                   : calc.monthlyTotal,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
               style={{
-                backgroundColor: form.customMonthlyRecurring !== undefined ? '#fffacd' : 'white',
-                border: 'none',
-                width: '100px'
+                ...overrideStyle(form.customMonthlyRecurring !== undefined),
+                border: "none",
+                width: "100px",
               }}
               title="Recurring month total - editable"
             />
@@ -881,11 +760,13 @@ export const CarpetForm: React.FC<
         </div>
       )}
 
-      {}
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
           <label>Contract Total</label>
-          <div className="svc-row-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div
+            className="svc-row-right"
+            style={{ display: "flex", alignItems: "center", gap: "10px" }}
+          >
             <select
               className="svc-in"
               name="contractMonths"
@@ -898,40 +779,39 @@ export const CarpetForm: React.FC<
                 </option>
               ))}
             </select>
-            <span style={{ fontSize: '18px', fontWeight: 'bold' }}>$</span>
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>$</span>
             <input
               type="text"
-              min="0"
               readOnly
-              step="1"
               name="customContractTotal"
               className="svc-in"
-              value={getDisplayValue(
-                'customContractTotal',
+              value={editable.getDisplayValue(
+                "customContractTotal",
                 form.customContractTotal !== undefined
                   ? form.customContractTotal
                   : calc.contractTotal,
                 true
               )}
-              onChange={handleLocalChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
+              onChange={editable.onChange}
+              onFocus={editable.onFocus}
+              onBlur={editable.onBlur}
               style={{
-                borderBottom: '2px solid #ff0000',
-                borderTop: 'none',
-                borderLeft: 'none',
-                borderRight: 'none',
-                backgroundColor: form.customContractTotal !== undefined ? '#fffacd' : 'transparent',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                padding: '4px',
-                width: '140px'
+                borderBottom: "2px solid #ff0000",
+                borderTop: "none",
+                borderLeft: "none",
+                borderRight: "none",
+                backgroundColor:
+                  form.customContractTotal !== undefined ? "#fffacd" : "transparent",
+                fontSize: "16px",
+                fontWeight: "bold",
+                padding: "4px",
+                width: "140px",
               }}
               title="Contract total - editable"
             />
           </div>
         </div>
       )}
-    </div>
+    </ServiceCardShell>
   );
 };

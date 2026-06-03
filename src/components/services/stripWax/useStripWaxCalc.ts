@@ -16,17 +16,6 @@ import type {
 } from "./stripWaxTypes";
 import type { StripWaxCalcResult } from "../../../features/services/kinds/stripWax";
 
-export {
-  buildStripWaxActiveConfig,
-  computeStripWaxCalc,
-  getStripWaxVariantConfigFromState,
-} from "../../../features/services/kinds/stripWax";
-export type {
-  BackendStripWaxConfig,
-  StripWaxActiveConfig,
-  StripWaxCalcResult,
-} from "../../../features/services/kinds/stripWax";
-
 const CUSTOM_OVERRIDE_FIELDS = new Set([
   "customPerVisit",
   "customMonthly",

@@ -1,4 +1,3 @@
-export { AdminLogin } from "./AdminLogin";
 export { PricingTables } from "./PricingTables";
 export { PricingTablesView } from "./PricingTablesView";
 export { AdminPricingManager } from "./AdminPricingManager";
