@@ -90,6 +90,22 @@ export function useServiceCalc<Form extends object, Config, Quote>(
     [form, config, module]
   );
 
+  const refreshConfig = useCallback(
+    (force: boolean = false) => {
+      refresh(force);
+      if (force && module.customOverrideFields && module.customOverrideFields.length > 0) {
+        setForm((prev) => {
+          const next = { ...prev } as Form;
+          for (const f of module.customOverrideFields!) {
+            (next as Record<string, unknown>)[f as string] = undefined;
+          }
+          return next;
+        });
+      }
+    },
+    [refresh, module]
+  );
+
   return {
     form,
     setForm,
@@ -98,7 +114,7 @@ export function useServiceCalc<Form extends object, Config, Quote>(
     quote,
     config,
     isLoadingConfig,
-    refreshConfig: refresh,
+    refreshConfig,
     setContractMonths,
   };
 }

@@ -1,13 +1,13 @@
 
-import React, { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useStripWaxCalc } from "./useStripWaxCalc";
 import type { StripWaxFormState } from "./stripWaxTypes";
 import { stripWaxPricingConfig as cfg } from "./stripWaxConfig";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -42,72 +42,20 @@ export const StripWaxForm: React.FC<
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const editable = useEditableCurrency(((e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      onChange({ target: { name, value: numValue, type: "number" } } as any);
-    } else if (value === '') {
-
-      onChange({ target: { name, value: '', type: "number" } } as any);
+    if (value === "") {
+      onChange({ target: { name, value: "", type: "number" } } as any);
+    } else {
+      const num = parseFloat(value);
+      if (!isNaN(num)) onChange({ target: { name, value: num, type: "number" } } as any);
     }
-  };
+  }) as any);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        onChange({ target: { name, value: '', type: "number" } } as any);
-        return;
-      }
-
-      onChange({ target: { name, value: numValue, type: "number" } } as any);
-    }
-  };
+  const getDisplayValue = editable.getDisplayValue;
+  const handleFocus = editable.onFocus;
+  const handleLocalChange = editable.onChange;
+  const handleBlur = editable.onBlur;
 
   const prevDataRef = useRef<string>("");
 
@@ -316,7 +264,14 @@ export const StripWaxForm: React.FC<
   const variantOptions = cfg.variants;
 
   return (
-    <div className="svc-card" style={{ position: 'relative' }}>
+    <ServiceCardShell
+      title="STRIP & WAX FLOOR"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={() => refreshConfig(true)} loading={isLoadingConfig} />
+      }
+    >
       {}
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
@@ -326,43 +281,6 @@ export const StripWaxForm: React.FC<
           <p className="svc-loading-text">Loading configuration...</p>
         </div>
       )}
-
-      {}
-      <div className="svc-h-row">
-        <div className="svc-h">STRIP &amp; WAX FLOOR</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => refreshConfig(true)}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
 
       {}
       <CustomFieldManager
@@ -578,27 +496,11 @@ export const StripWaxForm: React.FC<
           <label></label>
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
-              <span style={{
-                color: '#388e3c',
-                fontSize: '13px',
-                fontWeight: '600',
-                padding: '4px 8px',
-                backgroundColor: '#e8f5e9',
-                borderRadius: '4px',
-                display: 'inline-block'
-              }}>
+              <span className="em-pricing-tier em-pricing-tier--green">
                 🟢 Greenline Pricing
               </span>
             ) : (
-              <span style={{
-                color: '#d32f2f',
-                fontSize: '13px',
-                fontWeight: '600',
-                padding: '4px 8px',
-                backgroundColor: '#ffebee',
-                borderRadius: '4px',
-                display: 'inline-block'
-              }}>
+              <span className="em-pricing-tier em-pricing-tier--red">
                 🔴 Redline Pricing
               </span>
             )}
@@ -765,6 +667,6 @@ export const StripWaxForm: React.FC<
           </div>
         </div>
       )}
-    </div>
+    </ServiceCardShell>
   );
 };

@@ -68,7 +68,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
   const handleBlur = editable.onBlur;
 
   const handleRefresh = () => {
-    refreshConfig();
+    refreshConfig(true);
   };
 
   const prevDataRef = useRef<string>("");

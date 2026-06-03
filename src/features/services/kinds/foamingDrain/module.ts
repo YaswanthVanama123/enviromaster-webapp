@@ -93,6 +93,25 @@ export const foamingDrainModule: ServiceModule<
       (form.greenDrainCount || 0) +
       (form.plumbingDrainCount || 0) >
     0,
+
+  customOverrideFields: [
+    "customRatePerDrain",
+    "customAltBaseCharge",
+    "customAltExtraPerDrain",
+    "customVolumeWeeklyRate",
+    "customVolumeBimonthlyRate",
+    "customGreaseWeeklyRate",
+    "customGreaseInstallRate",
+    "customGreenWeeklyRate",
+    "customGreenInstallRate",
+    "customPlumbingAddonRate",
+    "customFilthyMultiplier",
+    "customWeeklyService",
+    "customInstallationTotal",
+    "customMonthlyRecurring",
+    "customFirstMonthPrice",
+    "customContractTotal",
+  ] as const,
 });
 
 export {

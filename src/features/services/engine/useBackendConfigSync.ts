@@ -9,28 +9,28 @@ export function useBackendConfigSync<Form, Config, Quote>(
 ): {
   config: Config;
   isLoadingConfig: boolean;
-  refresh: () => void;
+  refresh: (force?: boolean) => void;
 } {
   const ctx = useServicesContextOptional();
   const [config, setConfig] = useState<Config>(module.staticConfig);
   const [isLoadingConfig, setIsLoadingConfig] = useState(false);
 
-  const apply = (rawBackend: unknown) => {
+  const apply = (rawBackend: unknown, force: boolean = false) => {
     const partial = module.mapBackendConfig?.(rawBackend);
     if (!partial) return;
     const merged = { ...module.staticConfig, ...partial } as Config;
     setConfig(merged);
-    if (!hasInitialData && module.applyConfigToForm) {
+    if ((!hasInitialData || force) && module.applyConfigToForm) {
       setForm((prev) => ({ ...prev, ...module.applyConfigToForm!(merged, prev) }));
     }
   };
 
-  const refresh = () => {
+  const refresh = (force: boolean = false) => {
     if (!ctx?.getBackendPricingForService) return;
     setIsLoadingConfig(true);
     try {
       const data = ctx.getBackendPricingForService(module.id);
-      if (data?.config) apply(data.config);
+      if (data?.config) apply(data.config, force);
     } finally {
       setIsLoadingConfig(false);
     }

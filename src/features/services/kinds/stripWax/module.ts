@@ -43,21 +43,37 @@ export const stripWaxModule: ServiceModule<
 
   mapBackendConfig: (raw) => buildStripWaxActiveConfig(raw as BackendStripWaxConfig | null),
 
-  applyConfigToForm: (active) => ({
-    weeksPerMonth: active.frequencyMultipliers?.weekly,
-    standardFullRatePerSqFt: active.variants.standardFull.ratePerSqFt,
-    standardFullMinCharge: active.variants.standardFull.minCharge,
-    noSealantRatePerSqFt: active.variants.noSealant.ratePerSqFt,
-    noSealantMinCharge: active.variants.noSealant.minCharge,
-    wellMaintainedRatePerSqFt: active.variants.wellMaintained.ratePerSqFt,
-    wellMaintainedMinCharge: active.variants.wellMaintained.minCharge,
-    redRateMultiplier: active.rateCategories.redRate.multiplier,
-    greenRateMultiplier: active.rateCategories.greenRate.multiplier,
-  }),
+  applyConfigToForm: (active, form) => {
+    const variantDefaults =
+      active.variants[form.serviceVariant] ??
+      active.variants[active.defaultVariant];
+    return {
+      weeksPerMonth: active.frequencyMultipliers?.weekly,
+      standardFullRatePerSqFt: active.variants.standardFull.ratePerSqFt,
+      standardFullMinCharge: active.variants.standardFull.minCharge,
+      noSealantRatePerSqFt: active.variants.noSealant.ratePerSqFt,
+      noSealantMinCharge: active.variants.noSealant.minCharge,
+      wellMaintainedRatePerSqFt: active.variants.wellMaintained.ratePerSqFt,
+      wellMaintainedMinCharge: active.variants.wellMaintained.minCharge,
+      redRateMultiplier: active.rateCategories.redRate.multiplier,
+      greenRateMultiplier: active.rateCategories.greenRate.multiplier,
+      ratePerSqFt: variantDefaults.ratePerSqFt,
+      minCharge: variantDefaults.minCharge,
+    };
+  },
 
   computeQuote: (form, active) => computeStripWaxCalc(form, active, 0),
 
   isActive: (form) => (form.floorAreaSqFt || 0) > 0,
+
+  customOverrideFields: [
+    "customRatePerSqFt",
+    "customMinCharge",
+    "customPerVisit",
+    "customMonthly",
+    "customOngoingMonthly",
+    "customContractTotal",
+  ] as const,
 });
 
 export {

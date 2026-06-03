@@ -83,6 +83,16 @@ export const sanipodModule: ServiceModule<
     computeSanipodCalc(form, cfgIn.active, DEFAULT_BASELINE_RATES, 0),
 
   isActive: (form) => (form.podQuantity || 0) > 0,
+
+  customOverrideFields: [
+    "customInstallationFee",
+    "customPerVisitPrice",
+    "customMonthlyPrice",
+    "customAnnualPrice",
+    "customWeeklyPodRate",
+    "customPodServiceTotal",
+    "customExtraBagsTotal",
+  ] as const,
 });
 
 export {

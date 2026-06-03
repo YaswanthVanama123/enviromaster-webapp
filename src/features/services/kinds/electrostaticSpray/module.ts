@@ -47,6 +47,17 @@ export const electrostaticSprayModule: ServiceModule<
 
   isActive: (form) => (form.roomCount || 0) > 0 || (form.squareFeet || 0) > 0,
 
+  customOverrideFields: [
+    "customRatePerRoom",
+    "customRatePerThousandSqFt",
+    "customTripChargePerVisit",
+    "customServiceCharge",
+    "customPerVisitPrice",
+    "customMonthlyRecurring",
+    "customContractTotal",
+    "customFirstMonthTotal",
+  ] as const,
+
   pricingFields: [
     "ratePerRoom",
     "ratePerThousandSqFt",

@@ -521,7 +521,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
-        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+        <RefreshButton onClick={() => refreshConfig(true)} loading={isLoadingConfig} />
       }
     >
       <div className="svc-card__inner">

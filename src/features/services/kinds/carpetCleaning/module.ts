@@ -65,6 +65,17 @@ export const carpetCleaningModule: ServiceModule<
     computeCarpetCalc(form, cfgIn.base, cfgIn.backend, 0),
 
   isActive: (form) => (form.areaSqFt || 0) > 0,
+
+  customOverrideFields: [
+    "customFirstUnitRate",
+    "customAdditionalUnitRate",
+    "customPerVisitMinimum",
+    "customPerVisitPrice",
+    "customMonthlyRecurring",
+    "customFirstMonthPrice",
+    "customContractTotal",
+    "customInstallationFee",
+  ] as const,
 });
 
 export {

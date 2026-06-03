@@ -332,7 +332,7 @@ export const ElectrostaticSprayForm: React.FC<
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
-        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+        <RefreshButton onClick={() => refreshConfig(true)} loading={isLoadingConfig} />
       }
     >
       <div className="svc-card__inner">

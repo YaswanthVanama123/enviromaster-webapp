@@ -285,7 +285,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
-        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+        <RefreshButton onClick={() => refreshConfig(true)} loading={isLoadingConfig} />
       }
     >
       {isLoadingConfig && (

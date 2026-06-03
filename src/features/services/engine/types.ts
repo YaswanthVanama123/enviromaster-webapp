@@ -36,6 +36,6 @@ export interface ServiceCalcResult<Form, Config, Quote> {
   quote: Quote;
   config: Config;
   isLoadingConfig: boolean;
-  refreshConfig: () => void;
+  refreshConfig: (force?: boolean) => void;
   setContractMonths: (months: number) => void;
 }
