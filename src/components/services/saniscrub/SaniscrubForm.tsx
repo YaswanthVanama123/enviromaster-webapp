@@ -1,12 +1,12 @@
-import React, { useRef, useState, useEffect, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useRef, useState, useEffect } from "react";
 import { useSaniscrubCalc } from "./useSaniscrubCalc";
 import type { SaniscrubFormState } from "./saniscrubTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { saniscrubFrequencyLabels } from "./saniscrubConfig";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -47,72 +47,20 @@ export const SaniscrubForm: React.FC<
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const editable = useEditableCurrency(((e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      onChange({ target: { name, value: String(numValue) } } as any);
-    } else if (value === '') {
-
-      onChange({ target: { name, value: '' } } as any);
+    if (value === "") {
+      onChange({ target: { name, value: "" } } as any);
+    } else {
+      const num = parseFloat(value);
+      if (!isNaN(num)) onChange({ target: { name, value: String(num) } } as any);
     }
-  };
+  }) as any);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        onChange({ target: { name, value: '' } } as any);
-        return;
-      }
-
-      onChange({ target: { name, value: String(numValue) } } as any);
-    }
-  };
+  const getDisplayValue = editable.getDisplayValue;
+  const handleFocus = editable.onFocus;
+  const handleLocalChange = editable.onChange;
+  const handleBlur = editable.onBlur;
 
   const isSanicleanAllInclusive =
     servicesContext?.isSanicleanAllInclusive ?? false;
@@ -338,7 +286,14 @@ export const SaniscrubForm: React.FC<
         : pricingOverrides?.fixtureRateQuarterly;
 
   return (
-    <div className="svc-card" style={{ position: 'relative' }}>
+    <ServiceCardShell
+      title="SANISCRUB"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={() => refreshConfig(true)} loading={isLoadingConfig} />
+      }
+    >
       {}
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
@@ -348,43 +303,6 @@ export const SaniscrubForm: React.FC<
           <p className="svc-loading-text">Loading configuration...</p>
         </div>
       )}
-
-      {}
-      <div className="svc-h-row">
-        <div className="svc-h">SANISCRUB</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={refreshConfig}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
 
       {}
       <CustomFieldManager
@@ -722,13 +640,13 @@ export const SaniscrubForm: React.FC<
               min="0"
               readOnly
               step="1"
-              value={
-                editingValues['customFirstMonthPrice'] !== undefined
-                  ? editingValues['customFirstMonthPrice']
-                  : (form.customFirstMonthPrice !== undefined
-                      ? form.customFirstMonthPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                      : calc.firstMonthTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
-              }
+              value={getDisplayValue(
+                'customFirstMonthPrice',
+                form.customFirstMonthPrice !== undefined
+                  ? form.customFirstMonthPrice
+                  : calc.firstMonthTotal,
+                true
+              )}
               onChange={handleLocalChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -748,27 +666,11 @@ export const SaniscrubForm: React.FC<
           <label></label>
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
-                <span style={{
-                  color: '#388e3c',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  padding: '4px 8px',
-                  backgroundColor: '#e8f5e9',
-                  borderRadius: '4px',
-                  display: 'inline-block'
-                }}>
+                <span className="em-pricing-tier em-pricing-tier--green">
                   🟢 Greenline Pricing
                 </span>
               ) : (
-                <span style={{
-                  color: '#d32f2f',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  padding: '4px 8px',
-                  backgroundColor: '#ffebee',
-                  borderRadius: '4px',
-                  display: 'inline-block'
-                }}>
+                <span className="em-pricing-tier em-pricing-tier--red">
                   🔴 Redline Pricing
                 </span>
               )}
@@ -927,6 +829,6 @@ export const SaniscrubForm: React.FC<
         </div>
       )}
 
-    </div>
+    </ServiceCardShell>
   );
 };
