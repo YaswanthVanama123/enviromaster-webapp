@@ -664,22 +664,22 @@ export function computeRefreshPowerScrub(
     monthlyTotals[area] = monthlyRecurring;
 
     if (effectiveFrequency === "quarterly") {
-      const quarterlyVisits = (form[area].contractMonths || 12) / 3;
+      const quarterlyVisits = (form.contractMonths || 12) / 3;
       contractTotals[area] = cost * quarterlyVisits;
     } else if (effectiveFrequency === "bi-annual" || effectiveFrequency === "biannual") {
-      const biannualVisits = (form[area].contractMonths || 12) / 6;
+      const biannualVisits = (form.contractMonths || 12) / 6;
       contractTotals[area] = cost * biannualVisits;
     } else if (effectiveFrequency === "annual") {
-      const annualVisits = (form[area].contractMonths || 12) / 12;
+      const annualVisits = (form.contractMonths || 12) / 12;
       contractTotals[area] = cost * annualVisits;
     } else if (
       effectiveFrequency === "every 4 weeks" ||
       effectiveFrequency === "everyfourweeks"
     ) {
-      const totalVisits = Math.round((form[area].contractMonths || 12) * 1.0833);
+      const totalVisits = Math.round((form.contractMonths || 12) * 1.0833);
       contractTotals[area] = cost * totalVisits;
     } else {
-      contractTotals[area] = monthlyRecurring * (form[area].contractMonths || 12);
+      contractTotals[area] = monthlyRecurring * (form.contractMonths || 12);
     }
 
     if (isPackage && cost > 0) {
@@ -757,19 +757,19 @@ export function computeRefreshPowerScrub(
     const multiplier = getBillingMultiplier(effectiveFrequency, backendConfig);
     const monthlyRecurringBaseline = baselineCost * multiplier;
     if (effectiveFrequency === "quarterly") {
-      bAreaContractTotals[area] = baselineCost * ((form[area].contractMonths || 12) / 3);
+      bAreaContractTotals[area] = baselineCost * ((form.contractMonths || 12) / 3);
     } else if (effectiveFrequency === "bi-annual" || effectiveFrequency === "biannual") {
-      bAreaContractTotals[area] = baselineCost * ((form[area].contractMonths || 12) / 6);
+      bAreaContractTotals[area] = baselineCost * ((form.contractMonths || 12) / 6);
     } else if (effectiveFrequency === "annual") {
-      bAreaContractTotals[area] = baselineCost * ((form[area].contractMonths || 12) / 12);
+      bAreaContractTotals[area] = baselineCost * ((form.contractMonths || 12) / 12);
     } else if (
       effectiveFrequency === "every 4 weeks" ||
       effectiveFrequency === "everyfourweeks"
     ) {
       bAreaContractTotals[area] =
-        baselineCost * Math.round((form[area].contractMonths || 12) * 1.0833);
+        baselineCost * Math.round((form.contractMonths || 12) * 1.0833);
     } else {
-      bAreaContractTotals[area] = monthlyRecurringBaseline * (form[area].contractMonths || 12);
+      bAreaContractTotals[area] = monthlyRecurringBaseline * (form.contractMonths || 12);
     }
   }
 

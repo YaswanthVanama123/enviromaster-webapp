@@ -94,10 +94,10 @@ export const RefreshPowerScrubForm: React.FC<
   const servicesContext = useServicesContextOptional();
 
   useEffect(() => {
-    if (servicesContext?.globalContractMonths && servicesContext.globalContractMonths !== form.contractMonths) {
+    if (servicesContext?.globalContractMonths != null && servicesContext.globalContractMonths !== form.contractMonths) {
       setContractMonths(servicesContext.globalContractMonths);
     }
-  }, [servicesContext?.globalContractMonths]);
+  }, [servicesContext?.globalContractMonths, form.contractMonths, setContractMonths]);
 
   const prevDataRef = useRef<string>("");
 

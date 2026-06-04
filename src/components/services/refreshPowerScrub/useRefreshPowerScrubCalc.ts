@@ -322,7 +322,7 @@ export function useRefreshPowerScrubCalc(
       for (const area of AREA_KEYS) {
         updatedAreas[area] = { ...prev[area], contractMonths: months };
       }
-      return { ...prev, ...updatedAreas };
+      return { ...prev, contractMonths: months, ...updatedAreas };
     });
   };
 
