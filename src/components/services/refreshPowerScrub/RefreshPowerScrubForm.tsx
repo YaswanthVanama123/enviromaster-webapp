@@ -9,6 +9,7 @@ import "./refreshPowerScrub.css";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { buildRefreshPowerScrubDraftPayload } from "./refreshPowerScrubDraftPayload";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
 
 const formatNumber = (num: number | undefined): string => {
   if (num === undefined || num === null || isNaN(num)) {
@@ -878,8 +879,19 @@ const getKitchenLarge = (): number => {
   };
 
   return (
-    <div className="svc-card svc-card-wide refresh-rps" style={{ position: 'relative' }}>
-      {}
+    <ServiceCardShell
+      title="REFRESH POWER SCRUB"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      className="svc-card svc-card-wide refresh-rps"
+      headerActions={
+        <RefreshButton
+          onClick={() => refreshConfig(true)}
+          loading={isLoadingConfig}
+          title={isLoadingConfig ? "Loading config..." : "Refresh pricing config from backend"}
+        />
+      }
+    >
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
@@ -888,39 +900,6 @@ const getKitchenLarge = (): number => {
           <p className="svc-loading-text">Loading configuration...</p>
         </div>
       )}
-
-      <div className="svc-h-row">
-        <div className="svc-h">REFRESH POWER SCRUB</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={refreshConfig}
-            disabled={isLoadingConfig}
-            title={isLoadingConfig ? "Loading config..." : "Refresh pricing config from backend"}
-          >
-            {isLoadingConfig ? "..." : "⟳"}
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
 
       {}
       <CustomFieldManager
@@ -1129,6 +1108,6 @@ const getKitchenLarge = (): number => {
 
       {}
       {}
-    </div>
+    </ServiceCardShell>
   );
 };

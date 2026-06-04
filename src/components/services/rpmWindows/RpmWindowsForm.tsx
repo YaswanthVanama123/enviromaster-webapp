@@ -1,12 +1,12 @@
 
-import React, { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useRef, useState } from "react";
 import { RPM_OVERRIDE_TOLERANCE, useRpmWindowsCalc } from "./useRpmWindowsCalc";
 import type { RpmWindowsFormState } from "./rpmWindowsTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
 const formatNumber = (num: number | undefined): string => {
   if (num === undefined || num === null || isNaN(num)) {
@@ -73,10 +73,6 @@ export const RpmWindowsForm: React.FC<
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
   const getOverrideStyle = (
     isOverride: boolean,
     baseStyle?: React.CSSProperties
@@ -104,68 +100,12 @@ export const RpmWindowsForm: React.FC<
     return false;
   };
 
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      onChange({ target: { name, value: String(numValue) } } as any);
-    } else if (value === '') {
-
-      onChange({ target: { name, value: '' } } as any);
-    }
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        onChange({ target: { name, value: '' } } as any);
-        return;
-      }
-
-      onChange({ target: { name, value: String(numValue) } } as any);
-    }
-  };
+  const {
+    onFocus: handleFocus,
+    onChange: handleLocalChange,
+    onBlur: handleBlur,
+    getDisplayValue,
+  } = useEditableCurrency((e) => onChange({ target: { name: e.target.name, value: e.target.value } } as any));
 
   const prevDataRef = useRef<string>("");
 
@@ -424,30 +364,13 @@ export const RpmWindowsForm: React.FC<
     : 0;
 
   return (
-    <div className="svc-card">
-      <div className="svc-h-row">
-        <div className="svc-h">RPM WINDOW</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={refreshConfig}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
+    <ServiceCardShell
+      title="RPM WINDOW"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <>
+          <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
           <button
             type="button"
             className="svc-mini"
@@ -457,18 +380,9 @@ export const RpmWindowsForm: React.FC<
           >
             $
           </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
+        </>
+      }
+    >
 
       {}
       <CustomFieldManager
@@ -1028,6 +942,6 @@ export const RpmWindowsForm: React.FC<
           </div>
         </div>
       )}
-    </div>
+    </ServiceCardShell>
   );
 };

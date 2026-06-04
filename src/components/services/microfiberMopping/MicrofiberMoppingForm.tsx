@@ -1,13 +1,13 @@
 
-import React, { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useMicrofiberMoppingCalc } from "./useMicrofiberMoppingCalc";
 import type { MicrofiberMoppingFormState } from "./microfiberMoppingTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { microfiberMoppingPricingConfig as cfg } from "./microfiberMoppingConfig";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
+import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { useEditableCurrency } from "../../../features/services/engine";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -50,72 +50,12 @@ export const MicrofiberMoppingForm: React.FC<
 
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
-
-  const getDisplayValue = (fieldName: string, calculatedValue: number | undefined, formatted = false): string => {
-
-    if (editingValues[fieldName] !== undefined) {
-      return editingValues[fieldName];
-    }
-
-    if (calculatedValue === undefined) return '';
-    return formatted
-      ? calculatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-      : calculatedValue.toFixed(2);
-  };
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-    setOriginalValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleLocalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setEditingValues(prev => ({ ...prev, [name]: value }));
-
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      onChange({ target: { name, value: String(numValue) } } as any);
-    } else if (value === '') {
-
-      onChange({ target: { name, value: '' } } as any);
-    }
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    const originalValue = originalValues[name];
-
-    setEditingValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    setOriginalValues(prev => {
-      const newState = { ...prev };
-      delete newState[name];
-      return newState;
-    });
-
-    const numValue = parseFloat(value);
-
-    if (originalValue !== value) {
-
-      if (value === '' || isNaN(numValue)) {
-        onChange({ target: { name, value: '' } } as any);
-        return;
-      }
-
-      onChange({ target: { name, value: String(numValue) } } as any);
-    }
-  };
+  const {
+    onFocus: handleFocus,
+    onChange: handleLocalChange,
+    onBlur: handleBlur,
+    getDisplayValue,
+  } = useEditableCurrency((e) => onChange({ target: { name: e.target.name, value: e.target.value } } as any));
 
   const isSanicleanAllInclusive =
     servicesContext?.isSanicleanAllInclusive ?? false;
@@ -432,43 +372,14 @@ export const MicrofiberMoppingForm: React.FC<
     form.isHugeBathroom || (form.hugeBathroomSqFt ?? 0) > 0;
 
   return (
-    <div className="svc-card">
-      {}
-      <div className="svc-h-row">
-        <div className="svc-h">MICROFIBER MOPPING</div>
-        <div className="svc-h-actions">
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={refreshConfig}
-            disabled={isLoadingConfig}
-            title="Refresh config from database"
-          >
-            <FontAwesomeIcon
-              icon={isLoadingConfig ? faSpinner : faSync}
-              spin={isLoadingConfig}
-            />
-          </button>
-          <button
-            type="button"
-            className="svc-mini"
-            onClick={() => setShowAddDropdown(!showAddDropdown)}
-            title="Add custom field"
-          >
-            +
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              className="svc-mini svc-mini--neg"
-              onClick={onRemove}
-              title="Remove this service"
-            >
-              −
-            </button>
-          )}
-        </div>
-      </div>
+    <ServiceCardShell
+      title="MICROFIBER MOPPING"
+      onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
+      onRemove={onRemove}
+      headerActions={
+        <RefreshButton onClick={refreshConfig} loading={isLoadingConfig} />
+      }
+    >
 
       {}
       <CustomFieldManager
@@ -1129,6 +1040,6 @@ export const MicrofiberMoppingForm: React.FC<
           </div>
         )}
       </div>
-    </div>
+    </ServiceCardShell>
   );
 };
