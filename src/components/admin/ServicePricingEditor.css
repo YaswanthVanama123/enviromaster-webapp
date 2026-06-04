@@ -205,12 +205,8 @@
 
 .spe__description {
   margin-bottom: 24px;
-}
-
-.spe__description p {
-  margin: 8px 0 0 0;
-  color: #374151;
-  line-height: 1.6;
+  width: 200px;
+  min-width: 200px;
 }
 
 .spe__tags {
@@ -296,6 +292,7 @@
 .spe__description {
   width: 200px;
   min-width: 200px;
+  margin-bottom: 24px;
 }
 
 .spe__description input {

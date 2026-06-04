@@ -142,17 +142,6 @@
 
 .agreement-header td {
   background-color: #fff !important;
-}
-
-.agreement-header:hover {
-  background-color: #f9fafb !important;
-}
-
-.agreement-header:hover td {
-  background-color: #f9fafb !important;
-}
-
-.agreement-header td {
   font-weight: 400;
   color: #1e293b;
   padding: 16px !important;

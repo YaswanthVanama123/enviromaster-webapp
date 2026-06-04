@@ -700,27 +700,6 @@
   .admin-commissions__agreement-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .admin-commissions__agreement-amounts {
-    width: 100%;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #f1f5f9;
-  }
-
-  .admin-commissions__amount-item {
-    align-items: flex-start;
-  }
-
-  .admin-commissions__expand-icon {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-  }
-
-  .admin-commissions__agreement-header {
     position: relative;
     padding-right: 50px;
   }

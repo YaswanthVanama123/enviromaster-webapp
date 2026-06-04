@@ -624,27 +624,6 @@
   .my-commissions__agreement-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .my-commissions__agreement-amounts {
-    width: 100%;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px dashed #e5e7eb;
-  }
-
-  .my-commissions__amount-item {
-    align-items: flex-start;
-  }
-
-  .my-commissions__expand-icon {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-  }
-
-  .my-commissions__agreement-header {
     position: relative;
   }
 
