@@ -106,8 +106,8 @@ export function useRpmWindowsCalc(
   useEffect(() => {
     if (!backendConfig) return;
     const newBaseRates = getBackendBaseRates(backendConfig);
-    setBaseWeeklyRates(newBaseRates);
     if (!isEditMode.current || forceRefreshRef.current) {
+      setBaseWeeklyRates(newBaseRates);
       setForm((prev) => ({
         ...prev,
         smallWindowRate: newBaseRates.small,
@@ -134,8 +134,8 @@ export function useRpmWindowsCalc(
         large: (form.largeWindowRate || 0) / freqMult,
         trip: (form.tripCharge || 0) / freqMult,
       });
+      baseRatesInitialized.current = true;
     }
-    baseRatesInitialized.current = true;
   }, [
     initial,
     form.frequency,
