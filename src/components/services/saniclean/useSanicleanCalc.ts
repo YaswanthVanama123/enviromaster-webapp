@@ -301,6 +301,14 @@ export function useSanicleanCalc(
     if (hasInitialized.current) return;
     hasInitialized.current = true;
     const updates: Partial<SanicleanFormState> = {};
+    const recomputedFixtureCount =
+      Math.max(0, form.sinks ?? 0) +
+      Math.max(0, form.urinals ?? 0) +
+      Math.max(0, form.maleToilets ?? 0) +
+      Math.max(0, form.femaleToilets ?? 0);
+    if (recomputedFixtureCount !== form.fixtureCount) {
+      updates.fixtureCount = recomputedFixtureCount;
+    }
     if (!form.addUrinalComponents && (form.urinalScreensQty > 0 || form.urinalMatsQty > 0)) {
       updates.urinalScreensQty = 0;
       updates.urinalMatsQty = 0;

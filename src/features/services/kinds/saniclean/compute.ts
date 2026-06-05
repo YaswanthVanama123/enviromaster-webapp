@@ -578,8 +578,15 @@ export function computeSanicleanQuote(
   const config: any = backendConfig || SANICLEAN_CONFIG;
   const legacyFreq = (form as any).frequency as SanicleanFrequency | undefined;
 
+  const recomputedFixtureCount =
+    Math.max(0, form.sinks ?? 0) +
+    Math.max(0, form.urinals ?? 0) +
+    Math.max(0, form.maleToilets ?? 0) +
+    Math.max(0, form.femaleToilets ?? 0);
+
   const mappedForm: SanicleanFormState = {
     ...form,
+    fixtureCount: recomputedFixtureCount,
     mainServiceFrequency:
       form.mainServiceFrequency || legacyFreq || "weekly",
     facilityComponentsFrequency:
