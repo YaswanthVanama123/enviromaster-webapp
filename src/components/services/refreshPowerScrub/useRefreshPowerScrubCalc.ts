@@ -123,10 +123,17 @@ export function useRefreshPowerScrubCalc(
   );
 
   const toggleAreaEnabled = (area: RefreshAreaKey, enabled: boolean) => {
-    setForm((prev) => ({
-      ...prev,
-      [area]: { ...(prev as any)[area], enabled } as RefreshAreaCalcState,
-    }));
+    setForm((prev) => {
+      const current = (prev as any)[area] as RefreshAreaCalcState;
+      const updatedArea = { ...current, enabled } as RefreshAreaCalcState;
+      if (enabled) {
+        if (updatedArea.presetRate === null) updatedArea.presetRate = undefined;
+        if (updatedArea.smallMediumRate === null) updatedArea.smallMediumRate = undefined;
+        if (updatedArea.largeRate === null) updatedArea.largeRate = undefined;
+        if (updatedArea.patioAddonRate === null) updatedArea.patioAddonRate = undefined;
+      }
+      return { ...prev, [area]: updatedArea };
+    });
   };
 
   const getPresetBaselineForArea = (

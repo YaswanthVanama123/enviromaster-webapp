@@ -51,7 +51,7 @@ export const refreshPowerScrubModule: ServiceModule<
 
   mapBackendConfig: (raw) => (raw as BackendRefreshPowerScrubConfig | null) ?? null,
 
-  applyConfigToForm: (config) => {
+  applyConfigToForm: (config, form) => {
     if (!config) return {};
     const updatedDefaultArea = createDefaultArea(config);
     const patch: Partial<RefreshPowerScrubFormState> = {
@@ -70,7 +70,8 @@ export const refreshPowerScrubModule: ServiceModule<
       sqFtFixedFee: config.squareFootagePricing?.fixedFee ?? updatedDefaultArea.sqFtFixedFee,
     };
     for (const area of AREA_KEYS) {
-      (patch as any)[area] = { ...areaPatch };
+      const existingArea = (form as any)?.[area] ?? DEFAULT_AREA;
+      (patch as any)[area] = { ...existingArea, ...areaPatch };
     }
     return patch;
   },
