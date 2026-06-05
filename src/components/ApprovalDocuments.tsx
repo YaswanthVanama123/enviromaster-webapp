@@ -17,10 +17,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import AgreementTimelineBadge from "./AgreementTimelineBadge";
 import DocumentSidebar from "./DocumentSidebar";
+import { AgreementRow } from "./SavedFiles/AgreementRow";
+import "./SavedFiles.css";
 import "./ApprovalDocuments.css";
 import { getDocumentTypeForSavedFile } from "../utils/savedFileDocumentType";
 
 const EmailComposer = lazy(() => import("./EmailComposer"));
+
+const noop = () => {};
+const EMPTY_WATERMARK_STATES = new Map<string, boolean>();
 
 import type { EmailData } from "./EmailComposer";
 
@@ -273,6 +278,26 @@ export default function ApprovalDocuments() {
     });
   }
 
+  function getAgreementSelectionState(agreement: SavedFileGroup): 'none' | 'partial' | 'all' {
+    const files = agreement.files;
+    if (files.length === 0) return 'none';
+    const selectedCount = files.filter(f => selected[f.id]).length;
+    if (selectedCount === 0) return 'none';
+    if (selectedCount === files.length) return 'all';
+    return 'partial';
+  }
+
+  function toggleAgreementSelection(agreementId: string) {
+    const agreement = paginatedAgreements.find(a => a.id === agreementId);
+    if (!agreement) return;
+    const allSelected = agreement.files.every(f => selected[f.id]);
+    setSelected(prev => {
+      const next = { ...prev };
+      agreement.files.forEach(f => { next[f.id] = !allSelected; });
+      return next;
+    });
+  }
+
   async function changeFileStatus(file: SavedFileListItem, newStatus: string) {
     try {
       setSavingStatusId(file.id);
@@ -497,24 +522,25 @@ export default function ApprovalDocuments() {
 
   return (
     <div style={{ display: 'flex', gap: '24px' }}>
-      <section className="ad" style={{ flex: 1, minWidth: 0 }}>
+      <section className="sf" style={{ flex: 1, minWidth: 0 }}>
 
-      <div className="ad__toolbar">
-        <input
-          type="text"
-          className="ad__search"
-          placeholder="🔍 Search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="sf__toolbar">
+        <div className="sf__search">
+          <input
+            type="text"
+            placeholder="🔍 Search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
 
-        <div className="ad__actions">
-          <div className="ad__stats">
+        <div className="sf__actions">
+          <div className="sf__stats">
             <span>{totalAgreements} agreements</span>
             <span>{totalFiles} files pending approval</span>
           </div>
           <button
-            className="ad__btn ad__btn--primary"
+            className="sf__btn sf__btn--light"
             disabled={!anySelected}
             onClick={approveSelected}
           >
@@ -523,236 +549,67 @@ export default function ApprovalDocuments() {
         </div>
       </div>
 
-      <div className="ad__tablewrap">
-        <table className="ad__table">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={toggleSelectAll}
-                />
-              </th>
-              <th>Agreement / File Name</th>
-              <th>Type</th>
-              <th>Updated</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <>
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <tr key={`skeleton-${idx}`} className="skeleton-row">
-                    <td>
-                      <div className="skeleton skeleton-checkbox"></div>
-                    </td>
-                    <td>
-                      <div className="skeleton skeleton-text" style={{ width: '70%' }}></div>
-                    </td>
-                    <td>
-                      <div className="skeleton skeleton-text" style={{ width: '100px' }}></div>
-                    </td>
-                    <td>
-                      <div className="skeleton skeleton-text" style={{ width: '80px' }}></div>
-                    </td>
-                    <td>
-                      <div className="skeleton skeleton-text" style={{ width: '140px' }}></div>
-                    </td>
-                    <td>
-                      <div className="skeleton skeleton-actions"></div>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
+      <div className="sf__groups">
+        {loading && (
+          <div className="sf__empty">Loading approval documents…</div>
+        )}
 
-            {!loading && error && (
-              <tr>
-                <td colSpan={6} className="empty error">
-                  {error}
-                </td>
-              </tr>
-            )}
+        {!loading && error && (
+          <div className="sf__error">{error}</div>
+        )}
 
-            {!loading && !error && filteredAgreements.length === 0 && (
-              <tr>
-                <td colSpan={6} className="empty">
-                  No documents pending approval found.
-                </td>
-              </tr>
-            )}
+        {!loading && !error && filteredAgreements.length === 0 && (
+          <div className="sf__empty">No documents pending approval found.</div>
+        )}
 
-            {!loading && !error && paginatedAgreements.map((agreement) => (
-              <React.Fragment key={agreement.id}>
-                <tr className="agreement-header">
-                  <td style={{ width: '50px', textAlign: 'center' }}>
-                    <input
-                      type="checkbox"
-                      checked={agreement.files.every(f => selected[f.id])}
-                      onChange={() => {
-                        const allSelected = agreement.files.every(f => selected[f.id]);
-                        const next = { ...selected };
-                        agreement.files.forEach(f => next[f.id] = !allSelected);
-                        setSelected(next);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-                         onClick={() => toggleAgreement(agreement.id)}>
-                      <FontAwesomeIcon
-                        icon={expandedAgreements.has(agreement.id) ? faFolderOpen : faFolder}
-                        style={{ color: '#f59e0b', fontSize: '18px' }}
-                      />
-                      <FontAwesomeIcon
-                        icon={expandedAgreements.has(agreement.id) ? faChevronDown : faChevronRight}
-                        style={{ fontSize: '12px', color: '#6b7280' }}
-                      />
-                      <strong style={{ color: '#374151' }}>{agreement.agreementTitle}</strong>
-                      <span style={{ color: '#6b7280', fontSize: '14px' }}>
-                        ({agreement.fileCount} file{agreement.fileCount !== 1 ? 's' : ''})
-                      </span>
-                      <span style={{ color: '#9ca3af', fontSize: '13px', marginLeft: '8px' }}>
-                        {timeAgo(agreement.latestUpdate)}
-                      </span>
-                      {agreement.startDate && agreement.contractMonths && (
-                        <AgreementTimelineBadge
-                          startDate={agreement.startDate}
-                          contractMonths={agreement.contractMonths}
-                          compact={true}
-                          showCalendarIcon={false}
-                          agreementId={agreement.id}
-                        />
-                      )}
-                    </div>
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-
-                {expandedAgreements.has(agreement.id) && agreement.files.map((file) => (
-                  <tr key={file.id} className="file-row">
-                    <td style={{ paddingLeft: '40px' }}>
-                      <input
-                        type="checkbox"
-                        checked={!!selected[file.id]}
-                        onChange={() => toggleRow(file.id)}
-                      />
-                    </td>
-                    <td style={{ paddingLeft: '40px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <FontAwesomeIcon
-                          icon={faFileAlt}
-                          style={{
-                            color: file.fileType === 'version_pdf' ? '#8b5cf6' :
-                                   file.fileType === 'attached_pdf' ? '#10b981' : '#2563eb',
-                            fontSize: '16px'
-                          }}
-                        />
-                        <span>{file.fileName}</span>
-                        {file.description && (
-                          <span style={{ color: '#6b7280', fontSize: '12px' }}>
-                            - {file.description}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      <span style={{
-                        fontSize: '12px',
-                        color: file.fileType === 'version_pdf' ? '#8b5cf6' :
-                               file.fileType === 'attached_pdf' ? '#10b981' : '#2563eb'
-                      }}>
-                        {file.fileType === 'main_pdf' ? 'Main PDF' :
-                         file.fileType === 'version_pdf' ? `Version ${file.versionNumber || ''}` :
-                         file.fileType === 'attached_pdf' ? 'Attached' :
-                         file.fileType}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: "11px" }}>{timeAgo(file.updatedAt)}</td>
-                    <td>
-                      <select
-                        className="dropdown"
-                        value={file.status}
-                        onChange={(e) => changeFileStatus(file, e.target.value)}
-                        style={{ fontSize: "11px" }}
-                        disabled={savingStatusId === file.id}
-                      >
-                        {getAvailableStatusesForDropdown(file.status, isInAdminContext).map(status => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <div className="rowactions">
-                        <button
-                          className="iconbtn"
-                          title="View"
-                          type="button"
-                          onClick={() => handleView(file)}
-                          disabled={!file.hasPdf}
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                        <button
-                          className="iconbtn"
-                          title="Download"
-                          type="button"
-                          onClick={() => handleDownload(file)}
-                          disabled={downloadingId === file.id || !file.hasPdf}
-                        >
-                          {downloadingId === file.id ? "⏳" : <FontAwesomeIcon icon={faDownload} />}
-                        </button>
-                        <button
-                          className="iconbtn"
-                          title="Email"
-                          type="button"
-                          onClick={() => handleEmail(file)}
-                          disabled={!file.hasPdf}
-                        >
-                          <FontAwesomeIcon icon={faEnvelope} />
-                        </button>
-                        <button
-                          className="iconbtn"
-                          title="Status Auto-Saves"
-                          type="button"
-                          disabled
-                        >
-                          {savingStatusId === file.id ? "💾…" : <FontAwesomeIcon icon={faSave} />}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+        {!loading && !error && paginatedAgreements.map((agreement) => (
+          <AgreementRow
+            key={agreement.id}
+            agreement={agreement}
+            isExpanded={expandedAgreements.has(agreement.id)}
+            selectionState={getAgreementSelectionState(agreement)}
+            selectedFiles={selected}
+            statusChangeLoading={savingStatusId ? { [savingStatusId]: true } : {}}
+            fileWatermarkStates={EMPTY_WATERMARK_STATES}
+            isInAdminContext={isInAdminContext}
+            isTrashView={false}
+            onToggleExpand={toggleAgreement}
+            onToggleSelection={toggleAgreementSelection}
+            onFileToggleSelection={toggleRow}
+            onAddFile={noop}
+            onEditAgreement={noop}
+            onDelete={noop}
+            onAgreementZohoUpload={noop}
+            onAgreementTaskCreate={noop}
+            onDateChange={async () => {}}
+            onView={(file) => handleView(file)}
+            onDownload={(file) => handleDownload(file)}
+            onEmail={handleEmail}
+            onZohoUpload={noop}
+            onEdit={noop}
+            onStatusChange={changeFileStatus}
+            onWatermarkToggle={noop}
+            onRestore={noop}
+          />
+        ))}
       </div>
 
-      <div className="ad__pager">
-        <div className="ad__page-info">
+      <div className="sf__pager">
+        <div className="sf__page-info">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredAgreements.length)}-{Math.min(currentPage * itemsPerPage, filteredAgreements.length)} of {filteredAgreements.length} agreements ({totalFiles} files)
         </div>
 
-        <div className="ad__page-controls">
+        <div className="sf__page-controls">
           <button
             type="button"
-            className="ad__link"
+            className="sf__link"
             disabled={!canGoPrev || loading}
             onClick={handlePrevPage}
           >
             Previous
           </button>
 
-          <div className="ad__page-numbers">
+          <div className="sf__page-numbers">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
               if (totalPages <= 5) {
@@ -768,7 +625,7 @@ export default function ApprovalDocuments() {
                 <button
                   key={pageNum}
                   type="button"
-                  className={`ad__page ${currentPage === pageNum ? 'ad__page--active' : ''}`}
+                  className={`sf__page ${currentPage === pageNum ? 'sf__page--active' : ''}`}
                   onClick={() => handlePageClick(pageNum)}
                   disabled={loading}
                 >
@@ -780,7 +637,7 @@ export default function ApprovalDocuments() {
 
           <button
             type="button"
-            className="ad__link"
+            className="sf__link"
             disabled={!canGoNext || loading}
             onClick={handleNextPage}
           >
