@@ -25,11 +25,13 @@ export default function NavBar() {
     { path: "/home", label: "Home" },
     { path: "/form-filling", label: "Form Filling" },
     { path: "/saved-pdfs", label: "Saved PDFs" },
-    { path: "/my-commissions", label: "My Commissions" },
-    { path: "/my-quota", label: "My Quota" },
+    ...(!isAdmin ? [
+      { path: "/my-commissions", label: "My Commissions" },
+      { path: "/my-quota", label: "My Quota" },
+    ] : []),
     { path: "/my-inside-sales", label: "Inside Sales" },
     { path: "/trash", label: "Trash" },
-    
+
     ...(isAdmin ? [
       { path: "/admin-commissions", label: "Employee Commissions" },
       { path: "/admin-panel", label: "Admin Panel" }
