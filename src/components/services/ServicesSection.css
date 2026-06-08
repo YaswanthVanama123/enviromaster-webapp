@@ -99,6 +99,13 @@
   background:transparent;
 }
 
+@media (max-width: 1180px) {
+  .svc-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .svc-grid {
     grid-template-columns: 1fr;
@@ -278,11 +285,13 @@
   margin:10px 0;
   min-width:0;
 }
-.svc-row-right{ 
-  display:flex; 
-  align-items:center; 
-  gap:6px; 
-  min-width:0; 
+.svc-row-right{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  row-gap:6px;
+  min-width:0;
 }
 .svc-row label{ 
   font-size:13px; 
