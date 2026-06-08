@@ -92,6 +92,13 @@ export const PayrollTab: React.FC = () => {
   const [history, setHistory] = useState<any[]>([]);
 
   const [viewingPayrollSlip, setViewingPayrollSlip] = useState<EmployeePayroll | null>(null);
+  const [viewingPayrollPeriod, setViewingPayrollPeriod] = useState<PayrollPeriod | null>(null);
+
+  const [selectedHistoryPeriod, setSelectedHistoryPeriod] = useState<PayrollPeriod | null>(null);
+  const [historyEmployees, setHistoryEmployees] = useState<EmployeePayroll[]>([]);
+  const [historyTotals, setHistoryTotals] = useState<PayrollTotals | null>(null);
+  const [historyDetailLoading, setHistoryDetailLoading] = useState(false);
+  const [historyFinalized, setHistoryFinalized] = useState(false);
 
   const loadPayrollData = useCallback(async () => {
     try {
@@ -130,6 +137,44 @@ export const PayrollTab: React.FC = () => {
     } catch (err) {
       console.error("Failed to load payroll history:", err);
     }
+  }, []);
+
+  const loadPeriodEmployees = useCallback(async (period: PayrollPeriod) => {
+    try {
+      setHistoryDetailLoading(true);
+      setSelectedHistoryPeriod(period);
+      setExpandedEmployee(null);
+      const res = await apiClient.get<any>(
+        `/api/payroll/employees?periodStart=${encodeURIComponent(period.start)}&periodEnd=${encodeURIComponent(period.end)}`
+      );
+      if (res.data?.success) {
+        setHistoryEmployees(res.data.employees);
+        setHistoryTotals(res.data.totals);
+        setHistoryFinalized(!!res.data.finalized);
+      } else {
+        setHistoryEmployees([]);
+        setHistoryTotals(null);
+        setHistoryFinalized(false);
+      }
+    } catch (err) {
+      console.error("Failed to load period payroll:", err);
+      setHistoryEmployees([]);
+      setHistoryTotals(null);
+    } finally {
+      setHistoryDetailLoading(false);
+    }
+  }, []);
+
+  const closePeriodDetail = useCallback(() => {
+    setSelectedHistoryPeriod(null);
+    setHistoryEmployees([]);
+    setHistoryTotals(null);
+    setExpandedEmployee(null);
+  }, []);
+
+  const openSlip = useCallback((emp: EmployeePayroll, period: PayrollPeriod) => {
+    setViewingPayrollSlip(emp);
+    setViewingPayrollPeriod(period);
   }, []);
 
   useEffect(() => {
@@ -272,6 +317,123 @@ export const PayrollTab: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const renderPayrollBody = (
+    emps: EmployeePayroll[],
+    tot: PayrollTotals | null,
+    period: PayrollPeriod
+  ) => (
+    <>
+      {tot && (
+        <div className="payroll-summary-grid">
+          <div className="payroll-summary-card primary">
+            <div className="summary-icon">
+              <FaDollarSign />
+            </div>
+            <div className="summary-content">
+              <span className="summary-label">Total Commission Payout</span>
+              <span className="summary-value">{formatMoney(tot.totalAnnualCommission)}</span>
+              <span className="summary-note">Full commission for this period</span>
+            </div>
+          </div>
+          <div className="payroll-summary-card">
+            <span className="summary-label">Salespeople</span>
+            <span className="summary-value">{tot.totalEmployees}</span>
+          </div>
+          <div className="payroll-summary-card">
+            <span className="summary-label">Agreements</span>
+            <span className="summary-value">{tot.totalAgreements}</span>
+          </div>
+          <div className="payroll-summary-card">
+            <span className="summary-label">Total Revenue</span>
+            <span className="summary-value">{formatMoney(tot.totalMonthlyRevenue)}</span>
+          </div>
+        </div>
+      )}
+
+      <div className="payroll-employees-section">
+        <h3>Salesperson Commissions</h3>
+        {emps.length === 0 ? (
+          <div className="payroll-empty">
+            <p>No agreements found for this period.</p>
+          </div>
+        ) : (
+          <div className="payroll-employees-list">
+            {emps.map((emp) => (
+              <div
+                key={emp.username}
+                className={`payroll-employee-card ${expandedEmployee === emp.username ? "expanded" : ""}`}
+              >
+                <div
+                  className="employee-header"
+                  onClick={() =>
+                    setExpandedEmployee(
+                      expandedEmployee === emp.username ? null : emp.username
+                    )
+                  }
+                >
+                  <div className="employee-avatar">
+                    {emp.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="employee-info">
+                    <span className="employee-name">{emp.username}</span>
+                    <span className="employee-meta">
+                      {emp.totalAgreements} agreements · {formatMoney(emp.totalMonthlyRevenue)}/mo
+                    </span>
+                  </div>
+                  <div className="employee-commission">
+                    <span className="commission-amount">
+                      {formatMoney(emp.totalAnnualCommission)}
+                    </span>
+                    <span className="commission-label">Period Commission</span>
+                  </div>
+                  <button
+                    className="view-payroll-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openSlip(emp, period);
+                    }}
+                  >
+                    <FaFileInvoiceDollar /> View Payroll
+                  </button>
+                  <div className="expand-icon">
+                    {expandedEmployee === emp.username ? <FaChevronUp /> : <FaChevronDown />}
+                  </div>
+                </div>
+
+                {expandedEmployee === emp.username && (
+                  <div className="employee-details">
+                    <div className="status-breakdown">
+                      <span className="status-chip draft">Draft: {emp.statusCounts.draft}</span>
+                      <span className="status-chip saved">Saved: {emp.statusCounts.saved}</span>
+                      <span className="status-chip pending">Pending: {emp.statusCounts.pending_approval}</span>
+                      <span className="status-chip approved">Approved: {emp.statusCounts.approved}</span>
+                      <span className="status-chip active">Active: {emp.statusCounts.active}</span>
+                    </div>
+                    <div className="agreements-list">
+                      <h4>Agreements</h4>
+                      {emp.agreements.map((agreement) => (
+                        <div key={agreement.id} className="agreement-item">
+                          <div className="agreement-info">
+                            <span className="agreement-title">{agreement.title}</span>
+                            <span className="agreement-date">{formatDate(agreement.createdAt)}</span>
+                          </div>
+                          <div className="agreement-values">
+                            <span className="agreement-revenue">{formatMoney(agreement.monthlyValue)}/mo</span>
+                            <span className="agreement-commission">{formatMoney(agreement.annualCommission)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   if (loading) {
     return (
       <div className="payroll-tab-container">
@@ -360,116 +522,7 @@ export const PayrollTab: React.FC = () => {
               )}
             </div>
 
-            {/* Summary Cards */}
-            {totals && (
-              <div className="payroll-summary-grid">
-                <div className="payroll-summary-card primary">
-                  <div className="summary-icon">
-                    <FaDollarSign />
-                  </div>
-                  <div className="summary-content">
-                    <span className="summary-label">Total Commission Payout</span>
-                    <span className="summary-value">{formatMoney(totals.totalAnnualCommission)}</span>
-                    <span className="summary-note">Full commission for this period</span>
-                  </div>
-                </div>
-                <div className="payroll-summary-card">
-                  <span className="summary-label">Salespeople</span>
-                  <span className="summary-value">{totals.totalEmployees}</span>
-                </div>
-                <div className="payroll-summary-card">
-                  <span className="summary-label">Agreements</span>
-                  <span className="summary-value">{totals.totalAgreements}</span>
-                </div>
-                <div className="payroll-summary-card">
-                  <span className="summary-label">Total Revenue</span>
-                  <span className="summary-value">{formatMoney(totals.totalMonthlyRevenue)}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Employee List */}
-            <div className="payroll-employees-section">
-              <h3>Salesperson Commissions</h3>
-              {employees.length === 0 ? (
-                <div className="payroll-empty">
-                  <p>No agreements found for this period.</p>
-                </div>
-              ) : (
-                <div className="payroll-employees-list">
-                  {employees.map((emp) => (
-                    <div
-                      key={emp.username}
-                      className={`payroll-employee-card ${expandedEmployee === emp.username ? "expanded" : ""}`}
-                    >
-                      <div
-                        className="employee-header"
-                        onClick={() =>
-                          setExpandedEmployee(
-                            expandedEmployee === emp.username ? null : emp.username
-                          )
-                        }
-                      >
-                        <div className="employee-avatar">
-                          {emp.username.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="employee-info">
-                          <span className="employee-name">{emp.username}</span>
-                          <span className="employee-meta">
-                            {emp.totalAgreements} agreements · {formatMoney(emp.totalMonthlyRevenue)}/mo
-                          </span>
-                        </div>
-                        <div className="employee-commission">
-                          <span className="commission-amount">
-                            {formatMoney(emp.totalAnnualCommission)}
-                          </span>
-                          <span className="commission-label">Period Commission</span>
-                        </div>
-                        <button
-                          className="view-payroll-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewingPayrollSlip(emp);
-                          }}
-                        >
-                          <FaFileInvoiceDollar /> View Payroll
-                        </button>
-                        <div className="expand-icon">
-                          {expandedEmployee === emp.username ? <FaChevronUp /> : <FaChevronDown />}
-                        </div>
-                      </div>
-
-                      {expandedEmployee === emp.username && (
-                        <div className="employee-details">
-                          <div className="status-breakdown">
-                            <span className="status-chip draft">Draft: {emp.statusCounts.draft}</span>
-                            <span className="status-chip saved">Saved: {emp.statusCounts.saved}</span>
-                            <span className="status-chip pending">Pending: {emp.statusCounts.pending_approval}</span>
-                            <span className="status-chip approved">Approved: {emp.statusCounts.approved}</span>
-                            <span className="status-chip active">Active: {emp.statusCounts.active}</span>
-                          </div>
-                          <div className="agreements-list">
-                            <h4>Agreements</h4>
-                            {emp.agreements.map((agreement) => (
-                              <div key={agreement.id} className="agreement-item">
-                                <div className="agreement-info">
-                                  <span className="agreement-title">{agreement.title}</span>
-                                  <span className="agreement-date">{formatDate(agreement.createdAt)}</span>
-                                </div>
-                                <div className="agreement-values">
-                                  <span className="agreement-revenue">{formatMoney(agreement.monthlyValue)}/mo</span>
-                                  <span className="agreement-commission">{formatMoney(agreement.annualCommission)}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {currentPeriod && renderPayrollBody(employees, totals, currentPeriod)}
           </div>
         )}
 
@@ -558,10 +611,12 @@ export const PayrollTab: React.FC = () => {
           </div>
         )}
 
-        {activeSubTab === "history" && (
+        {activeSubTab === "history" && !selectedHistoryPeriod && (
           <div className="payroll-history">
             <h3>Payroll History</h3>
-            <p className="history-subtitle">Past payroll periods and their totals</p>
+            <p className="history-subtitle">
+              Click a period to view each salesperson's payroll
+            </p>
 
             {history.length === 0 ? (
               <div className="payroll-empty">
@@ -570,10 +625,18 @@ export const PayrollTab: React.FC = () => {
             ) : (
               <div className="history-list">
                 {history.map((period, idx) => (
-                  <div key={idx} className={`history-card ${idx === 0 ? "current" : ""}`}>
+                  <div
+                    key={idx}
+                    className={`history-card clickable ${idx === 0 ? "current" : ""}`}
+                    onClick={() => loadPeriodEmployees(period.period)}
+                    role="button"
+                    tabIndex={0}
+                  >
                     <div className="history-period">
                       <span className="history-label">{period.period.label}</span>
                       {idx === 0 && <span className="current-badge">Current</span>}
+                      {period.finalized && <span className="finalized-badge">🔒 Finalized</span>}
+                      <span className="history-view-link">View payroll →</span>
                     </div>
                     <div className="history-stats">
                       <div className="history-stat">
@@ -599,14 +662,47 @@ export const PayrollTab: React.FC = () => {
             )}
           </div>
         )}
+
+        {activeSubTab === "history" && selectedHistoryPeriod && (
+          <div className="payroll-history-detail">
+            <button className="back-to-history-btn" onClick={closePeriodDetail}>
+              ← Back to History
+            </button>
+
+            <div className="payroll-period-card">
+              <div className="period-header">
+                <h3>Payroll Period</h3>
+                {historyFinalized && <span className="finalized-badge">🔒 Finalized</span>}
+              </div>
+              <div className="period-info">
+                <span className="period-label">{selectedHistoryPeriod.label}</span>
+                <span className="period-dates">
+                  {formatDate(selectedHistoryPeriod.start)} - {formatDate(selectedHistoryPeriod.end)}
+                </span>
+              </div>
+            </div>
+
+            {historyDetailLoading ? (
+              <div className="payroll-loading">
+                <div className="payroll-spinner" />
+                <p>Loading payroll...</p>
+              </div>
+            ) : (
+              renderPayrollBody(historyEmployees, historyTotals, selectedHistoryPeriod)
+            )}
+          </div>
+        )}
       </div>
 
       {/* Payroll Slip Modal */}
-      {viewingPayrollSlip && currentPeriod && (
+      {viewingPayrollSlip && viewingPayrollPeriod && (
         <PayrollSlipModal
           employee={viewingPayrollSlip}
-          period={currentPeriod}
-          onClose={() => setViewingPayrollSlip(null)}
+          period={viewingPayrollPeriod}
+          onClose={() => {
+            setViewingPayrollSlip(null);
+            setViewingPayrollPeriod(null);
+          }}
         />
       )}
     </div>

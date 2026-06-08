@@ -358,9 +358,26 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
     };
   }, []);
 
-  return useMemo(() => {
+  return useMemo(
+    () =>
+      computeGlobalCommission(
+        servicesState,
+        accountTypeCache,
+        globalContractMonths,
+        commissionRate,
+        activeRules,
+      ),
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules],
+  );
+}
 
-    const rules = activeRules;
+export function computeGlobalCommission(
+  servicesState: Record<string, any>,
+  accountTypeCache: Record<number, AccountTypeCacheEntry>,
+  globalContractMonths: number,
+  commissionRate: number,
+  rules: ResolvedCommissionRules,
+): GlobalCommissionResult {
 
     const visitsPerYearOf = (freqStr: string): number => {
       const v: any = rules.frequencyVisitsPerYear;
@@ -676,7 +693,6 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
       hasDetectedServices: services.some(s => s.accountType !== null),
       serviceCount: services.length,
     };
-  }, [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules]);
 }
 
 export default useServiceCommission;

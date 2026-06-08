@@ -9,6 +9,9 @@ import {
 } from "../../backendservice/utils/commissionCalculatorV2";
 import { DEFAULT_COMMISSION_RULES_V2 } from "../../backendservice/types/commission.types.v2";
 import type { AgreementTerm } from "../../backendservice/types/commission.types.v2";
+import { resolveCommissionRules, type ResolvedCommissionRules } from "../../backendservice/types/commission.types";
+import { commissionApi } from "../../backendservice/api/commissionApi";
+import { computeGlobalCommission } from "./hooks/useServiceCommission";
 
 export type QuotaLevel = 'below' | 'above' | 'double';
 
@@ -168,9 +171,31 @@ export const ServicesProvider: React.FC<{
   
   const accountTypeCacheLoadedFromSavedRef = useRef(false);
 
-  const [quotaLevel, setQuotaLevel] = useState<QuotaLevel>('above'); 
+  const [quotaLevel, setQuotaLevel] = useState<QuotaLevel>('above');
   const [quotaLevelData, setQuotaLevelData] = useState<QuotaLevelData | null>(null);
   const baseCommissionRate = QUOTA_COMMISSION_RATES[quotaLevel];
+
+  const [activeCommissionRules, setActiveCommissionRules] = useState<ResolvedCommissionRules>(
+    () => resolveCommissionRules(null),
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    commissionApi
+      .getActiveRules()
+      .then(response => {
+        if (cancelled) return;
+        if (response?.data) {
+          setActiveCommissionRules(resolveCommissionRules(response.data));
+        }
+      })
+      .catch(err => {
+        console.error('[RULES] ServicesContext failed to load active rules:', err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const setAccountTypeForFrequency = useCallback((frequencyKey: number, entry: AccountTypeCacheEntry) => {
     setAccountTypeCache(prev => ({
@@ -562,112 +587,38 @@ export const ServicesProvider: React.FC<{
     return 'MTM-with-install';
   };
 
-  const frequencyVisitsPerYear: Record<number, number> = {
-    1: 52,  
-    2: 26,  
-    3: 12,  
-    4: 4,   
-    5: 2,   
-    6: 1,   
-    13: 24, 
-    14: 6,  
-    0: 1,   
-  };
-
-  const getCommissionDataForSave = useCallback((baseCommissionRate: number = 6): CommissionDataForSave | null => {
-    console.log('[COMMISSION-CALC] Starting calculation with:', {
-      servicesCount: Object.keys(servicesState).length,
-      accountTypeCacheKeys: Object.keys(accountTypeCache),
+  const getCommissionDataForSave = useCallback((rate: number = 6): CommissionDataForSave | null => {
+    const global = computeGlobalCommission(
+      servicesState,
+      accountTypeCache,
       globalContractMonths,
-    });
+      rate,
+      activeCommissionRules,
+    );
 
-    const term = getAgreementTerm(globalContractMonths);
-    const agreementMultiplier = DEFAULT_COMMISSION_RULES_V2.agreementMultipliers[term];
-    const effectiveRate = baseCommissionRate * (agreementMultiplier / 100);
-
-    let totalWeeklyCommission = 0;
-    let totalAnnualCommission = 0;
-    const serviceBreakdown: CommissionDataForSave['serviceBreakdown'] = [];
-
-    Object.entries(servicesState).forEach(([serviceName, serviceData]: [string, any]) => {
-      if (!serviceData?.isActive) {
-        console.log(`[COMMISSION-CALC] Skipping ${serviceName}: not active`);
-        return;
-      }
-
-      const freqNum = getFrequencyNum(serviceData);
-      if (freqNum === null || freqNum === 0) {
-        console.log(`[COMMISSION-CALC] Skipping ${serviceName}: one-time or no frequency`);
-        return; 
-      }
-
-      const perVisitRevenue =
-        serviceData.perVisit ??
-        serviceData.totals?.perVisit?.amount ??
-        serviceData.perVisitCharge ??
-        serviceData.calc?.perVisit ??
-        0;
-
-      console.log(`[COMMISSION-CALC] ${serviceName}: perVisitRevenue=${perVisitRevenue}`, {
-        perVisit: serviceData.perVisit,
-        totalsPerVisit: serviceData.totals?.perVisit?.amount,
-        perVisitCharge: serviceData.perVisitCharge,
-        calcPerVisit: serviceData.calc?.perVisit,
-      });
-
-      if (perVisitRevenue <= 0) {
-        console.log(`[COMMISSION-CALC] Skipping ${serviceName}: no perVisitRevenue`);
-        return;
-      }
-
-      const cacheEntry = accountTypeCache[freqNum];
-      const accountType = cacheEntry?.accountType || null;
-
-      let commissionableRevenue = perVisitRevenue;
-      if (accountType) {
-        const result = calculateCommissionableRevenue(perVisitRevenue, accountType);
-        commissionableRevenue = result.commissionableRevenue;
-      }
-
-      const visitsPerYear = frequencyVisitsPerYear[freqNum] || 12;
-      const perVisitCommission = commissionableRevenue * (effectiveRate / 100);
-      const annualCommission = perVisitCommission * visitsPerYear;
-      const weeklyCommission = annualCommission / 52;
-
-      totalWeeklyCommission += weeklyCommission;
-      totalAnnualCommission += annualCommission;
-
-      serviceBreakdown.push({
-        serviceName,
-        accountType,
-        perVisitRevenue,
-        commissionableRevenue,
-        weeklyCommission,
-        annualCommission,
-      });
-    });
-
-    if (serviceBreakdown.length === 0) {
-      console.log('[COMMISSION-CALC] No services with commission data, returning null');
+    if (!global.services.length) {
       return null;
     }
 
     const years = globalContractMonths / 12;
-    const contractCommission = totalAnnualCommission * years;
 
-    const result = {
-      weeklyCommission: totalWeeklyCommission,
-      annualCommission: totalAnnualCommission,
-      contractCommission,
-      finalCommissionRate: effectiveRate,
-      agreementMultiplier,
-      baseRate: baseCommissionRate,
-      serviceBreakdown,
+    return {
+      weeklyCommission: global.totalWeeklyCommission,
+      annualCommission: global.totalAnnualCommission,
+      contractCommission: global.totalAnnualCommission * years,
+      finalCommissionRate: global.effectiveCommissionRate,
+      agreementMultiplier: global.agreementMultiplier,
+      baseRate: rate,
+      serviceBreakdown: global.services.map(s => ({
+        serviceName: s.serviceName,
+        accountType: s.accountType,
+        perVisitRevenue: s.perVisitRevenue,
+        commissionableRevenue: s.commissionableRevenue,
+        weeklyCommission: s.weeklyCommission,
+        annualCommission: s.annualCommission,
+      })),
     };
-
-    console.log('[COMMISSION-CALC] Final result:', result);
-    return result;
-  }, [servicesState, accountTypeCache, globalContractMonths]);
+  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules]);
 
   const value = useMemo<ServicesContextValue>(() => {
 

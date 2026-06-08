@@ -631,6 +631,63 @@
   background: #eef2ff;
 }
 
+.history-card.clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+.history-card.clickable:hover {
+  border-color: #6366f1;
+}
+
+.history-card.clickable:active {
+  transform: scale(0.997);
+}
+
+.history-view-link {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.finalized-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.payroll-history-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.back-to-history-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef2ff;
+  color: #6366f1;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-to-history-btn:hover {
+  background: #e0e7ff;
+}
+
 .history-period {
   display: flex;
   align-items: center;
