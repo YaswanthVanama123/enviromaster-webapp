@@ -44,6 +44,34 @@ export function GlobalCommissionSummary({
     return null;
   }
 
+  // Commission is only calculated / shown / saved when the agreement is connected
+  // to Bigin. Otherwise show a message and nothing else.
+  if (!isCompanyMapped) {
+    return (
+      <div className="commission-summary">
+        <div className="commission-summary__header">
+          <div className="commission-summary__title">
+            <span>Commission Summary</span>
+          </div>
+          {showDetectButton && (
+            <button
+              className="commission-summary__redetect-btn"
+              onClick={() => detectAccountTypes()}
+              disabled={isDetecting}
+            >
+              <span>🔄</span>
+              {isDetecting ? 'Connecting…' : 'Connect to Bigin'}
+            </button>
+          )}
+        </div>
+        <div className="commission-summary__warning">
+          Please connect to Bigin to calculate commission.
+        </div>
+        {error && <div className="commission-summary__error">{error}</div>}
+      </div>
+    );
+  }
+
   return (
     <div className="commission-summary">
       {}

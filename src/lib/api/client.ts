@@ -11,6 +11,33 @@ type UnauthorizedHandler = () => void;
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+// Surface the most meaningful server error message. The backend returns errors
+// as { error, detail } (e.g. { error: "Unauthorized", detail: "Invalid credentials" }),
+// sometimes { message }, and occasionally { errors: [{ message }] }. Fall back to a
+// status-based message instead of a generic "Request failed".
+function extractErrorMessage(data: unknown, status: number): string {
+  const d = (data ?? {}) as Record<string, unknown>;
+  const detail = typeof d.detail === "string" ? d.detail : undefined;
+  const message = typeof d.message === "string" ? d.message : undefined;
+  const err = typeof d.error === "string" ? d.error : undefined;
+  const nested =
+    Array.isArray(d.errors) && d.errors.length > 0 && typeof (d.errors[0] as any)?.message === "string"
+      ? ((d.errors[0] as any).message as string)
+      : undefined;
+
+  const resolved = detail || message || nested || err;
+  if (resolved) {
+    return resolved;
+  }
+
+  // Generic, human-readable fallbacks by status code.
+  if (status === 401 || status === 403) return "Invalid credentials";
+  if (status === 404) return "Not found";
+  if (status === 400) return "Invalid request";
+  if (status >= 500) return "Server error. Please try again.";
+  return "Request failed";
+}
+
 interface RequestOptions {
   body?: unknown;
   headers?: HeadersInit;
@@ -76,7 +103,7 @@ class ApiClient {
           this.onUnauthorized();
         }
         return {
-          error: (data as { message?: string }).message || "Request failed",
+          error: extractErrorMessage(data, response.status),
           status: response.status,
         };
       }
@@ -129,7 +156,7 @@ class ApiClient {
           this.onUnauthorized();
         }
         return {
-          error: (data as { message?: string }).message || "Request failed",
+          error: extractErrorMessage(data, response.status),
           status: response.status,
         };
       }

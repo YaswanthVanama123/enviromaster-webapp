@@ -1795,6 +1795,11 @@ function FormFillingContent({
         if ((json as any).biginCompanyId) {
           setBiginCompanyId((json as any).biginCompanyId);
         }
+        console.log('[BIGIN-EDIT] Loaded connection from edit-format →', {
+          isConnectedToBigin: (json as any).isConnectedToBigin,
+          biginCompanyId: (json as any).biginCompanyId,
+          zohoMapping: (json as any).zohoMapping,
+        });
       } catch (err) {
         console.error("Error fetching headers:", err);
       } finally {
@@ -1933,7 +1938,7 @@ function FormFillingContent({
       customColumns: (productsData as any).customColumns || { products: [], dispensers: [] },
       summary,
       
-      commission: (() => {
+      commission: !biginCompanyId ? null : (() => {
         const commissionData = getCommissionDataForSave(baseCommissionRate);
         if (!commissionData) return null;
         return {
