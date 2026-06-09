@@ -594,10 +594,9 @@ export function computeGlobalCommission(
       }
 
       totalCommissionableAnnual += g.commissionableAnnual;
-      // Quota credit = FULL contract total × pricing (redline/greenline) multiplier.
-      // Not annualized — the whole contract value counts toward the week it's created.
-      const yearsForQuota = globalContractMonths > 0 ? globalContractMonths / 12 : 1;
-      totalQuotaCredit += g.annualCurrent * yearsForQuota * g.pricingMultiplier;
+      // Quota credit = annualized contract (contract total ÷ years) × pricing
+      // (redline/greenline) multiplier. e.g. $36,000 / 3yr × Greenline 2.0 = $24,000.
+      totalQuotaCredit += g.annualCurrent * g.pricingMultiplier;
     });
 
     
