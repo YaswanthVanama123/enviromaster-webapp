@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { FaCalendarAlt, FaCog, FaUsers, FaHistory, FaDollarSign, FaChevronDown, FaChevronUp, FaSave, FaSync, FaDownload, FaFileInvoiceDollar } from "react-icons/fa";
 import { apiClient } from "../../../backendservice/utils/apiClient";
 import { PayrollSlipModal } from "./PayrollSlipModal";
+import { buildPayrollSlipHtml, printPayrollSlips } from "./payrollPdf";
 import "./PayrollTab.css";
 
 interface PayrollSettings {
@@ -317,6 +318,19 @@ export const PayrollTab: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const exportEmployeePdf = (emp: EmployeePayroll, period: PayrollPeriod) => {
+    printPayrollSlips(
+      buildPayrollSlipHtml(emp, period),
+      `Payroll - ${emp.username} - ${period.label}`,
+    );
+  };
+
+  const exportAllPdfs = (emps: EmployeePayroll[], period: PayrollPeriod) => {
+    if (!emps.length) return;
+    const html = emps.map(e => buildPayrollSlipHtml(e, period)).join("");
+    printPayrollSlips(html, `Payroll - All Employees - ${period.label}`);
+  };
+
   const renderPayrollBody = (
     emps: EmployeePayroll[],
     tot: PayrollTotals | null,
@@ -351,7 +365,18 @@ export const PayrollTab: React.FC = () => {
       )}
 
       <div className="payroll-employees-section">
-        <h3>Salesperson Commissions</h3>
+        <div className="employees-section-header">
+          <h3>Salesperson Commissions</h3>
+          {emps.length > 0 && (
+            <button
+              className="export-all-pdf-btn"
+              onClick={() => exportAllPdfs(emps, period)}
+              title="Download a PDF with every salesperson's payroll statement"
+            >
+              <FaDownload /> Export All PDFs
+            </button>
+          )}
+        </div>
         {emps.length === 0 ? (
           <div className="payroll-empty">
             <p>No agreements found for this period.</p>
@@ -394,6 +419,16 @@ export const PayrollTab: React.FC = () => {
                     }}
                   >
                     <FaFileInvoiceDollar /> View Payroll
+                  </button>
+                  <button
+                    className="export-pdf-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      exportEmployeePdf(emp, period);
+                    }}
+                    title="Download this salesperson's payroll PDF"
+                  >
+                    <FaDownload /> PDF
                   </button>
                   <div className="expand-icon">
                     {expandedEmployee === emp.username ? <FaChevronUp /> : <FaChevronDown />}

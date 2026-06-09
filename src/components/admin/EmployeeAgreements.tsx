@@ -136,13 +136,16 @@ export function EmployeeAgreements() {
       });
 
       agreements.forEach((agreement) => {
-        const creatorUsername = agreement.files[0]?.createdBy;
+        // Attribute the agreement to its ORIGINAL creator. Edits / new versions by
+        // other people change a version file's createdBy, but never the owner.
+        const creatorUsername =
+          (agreement as any).createdBy || agreement.files[0]?.createdBy;
         if (creatorUsername) {
           const employee = employeeMap.get(creatorUsername);
           if (employee) {
             employee.agreements.push(agreement);
           }
-          
+
         }
       });
 
