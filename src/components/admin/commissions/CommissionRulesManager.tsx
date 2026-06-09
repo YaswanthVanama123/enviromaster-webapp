@@ -6,6 +6,7 @@ import {
   ACCOUNT_TYPE_REVENUE_RULES,
   FREQUENCY_VISITS_PER_YEAR,
   DEFAULT_QUOTA_TIER_CUTOFFS,
+  DEFAULT_QUOTA_TARGET,
   PIT_PER_VISIT_THRESHOLD,
   ANCHOR_PER_VISIT_THRESHOLD,
   ANCHOR_BONUS_MULTIPLIER,
@@ -39,6 +40,7 @@ function hydrateV2Fields(rules: CommissionRules): CommissionRules {
       aboveQuota: DEFAULT_QUOTA_TIER_CUTOFFS.aboveQuota,
       doubleQuota: DEFAULT_QUOTA_TIER_CUTOFFS.doubleQuota,
     },
+    quotaTarget: rules.quotaTarget ?? DEFAULT_QUOTA_TARGET,
     weeksPerAnnualCommission: rules.weeksPerAnnualCommission ?? 52,
   };
 }
@@ -151,23 +153,8 @@ export const CommissionRulesManager: React.FC = () => {
     });
   };
 
-  const updateQuotaTierCutoff = (
-    key: "aboveQuota" | "doubleQuota",
-    value: string
-  ) => {
-    if (!rules) return;
-    const current = rules.quotaTierCutoffs || { aboveQuota: 10000, doubleQuota: 20000 };
-    setRules({
-      ...rules,
-      quotaTierCutoffs: {
-        ...current,
-        [key]: parseFloat(value) || 0,
-      },
-    });
-  };
 
-  
-  
+
   const updatePricingTier = (
     index: number,
     field: "minRatio" | "maxRatio" | "quotaMultiplier" | "label" | "requiresApproval",
@@ -594,30 +581,24 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Quota Tier Cutoffs (V2 — $)</h3>
+        <h3>Weekly Quota Target ($)</h3>
         <p style={{ fontSize: "0.85em", color: "#6b7280", marginTop: -4 }}>
-          Piecewise commission rate splits at these annualized quota-credit positions.
-          Default: $10K (above quota), $20K (double quota).
+          Quota resets weekly. The commission rate is split by quota-credit position:
+          first ${(rules.quotaTarget ?? DEFAULT_QUOTA_TARGET).toLocaleString()} (below target)
+          at {rules.quotaRates.below}%, up to ${((rules.quotaTarget ?? DEFAULT_QUOTA_TARGET) * 2).toLocaleString()} (2× target)
+          at {rules.quotaRates.above}%, and everything above at {rules.quotaRates.double}%.
         </p>
         <div className="rules-grid">
           <div className="rules-input-group">
-            <label>Above Quota Cutoff ($)</label>
+            <label>Weekly Quota Target ($)</label>
             <input
               type="number"
-              value={rules.quotaTierCutoffs?.aboveQuota ?? 10000}
-              onChange={(e) => updateQuotaTierCutoff("aboveQuota", e.target.value)}
+              value={rules.quotaTarget ?? DEFAULT_QUOTA_TARGET}
+              onChange={(e) =>
+                setRules({ ...rules, quotaTarget: parseFloat(e.target.value) || 0 })
+              }
               min="0"
-              step="500"
-            />
-          </div>
-          <div className="rules-input-group">
-            <label>Double Quota Cutoff ($)</label>
-            <input
-              type="number"
-              value={rules.quotaTierCutoffs?.doubleQuota ?? 20000}
-              onChange={(e) => updateQuotaTierCutoff("doubleQuota", e.target.value)}
-              min="0"
-              step="500"
+              step="1000"
             />
           </div>
         </div>

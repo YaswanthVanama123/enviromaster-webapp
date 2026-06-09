@@ -107,6 +107,8 @@ export const DEFAULT_QUOTA_TIER_CUTOFFS: QuotaTierCutoffs = {
   doubleQuota: 20000,
 };
 
+export const DEFAULT_QUOTA_TARGET = 50000;
+
 export const PIT_PER_VISIT_THRESHOLD = 100;            
 export const ANCHOR_PER_VISIT_THRESHOLD = 200;         
 export const ANCHOR_BONUS_MULTIPLIER = 1.5;            
@@ -137,6 +139,7 @@ export interface ResolvedCommissionRules {
     'one-time': number;
   };
   quotaTierCutoffs: { aboveQuota: number; doubleQuota: number };
+  quotaTarget: number;
   weeksPerAnnualCommission: number;
 }
 
@@ -185,6 +188,7 @@ export function resolveCommissionRules(
       aboveQuota: p.quotaTierCutoffs?.aboveQuota ?? DEFAULT_QUOTA_TIER_CUTOFFS.aboveQuota,
       doubleQuota: p.quotaTierCutoffs?.doubleQuota ?? DEFAULT_QUOTA_TIER_CUTOFFS.doubleQuota,
     },
+    quotaTarget: p.quotaTarget ?? DEFAULT_QUOTA_TARGET,
     weeksPerAnnualCommission: p.weeksPerAnnualCommission ?? 52,
   };
 }
@@ -446,6 +450,7 @@ export interface CommissionRules {
     aboveQuota: number;
     doubleQuota: number;
   };
+  quotaTarget?: number;
   createdAt?: string;
   updatedAt?: string;
 }

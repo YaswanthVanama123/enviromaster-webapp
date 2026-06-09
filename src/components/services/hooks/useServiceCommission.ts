@@ -335,7 +335,7 @@ export interface GlobalCommissionResult {
 }
 
 export function useGlobalCommission(commissionRate: number = 6): GlobalCommissionResult {
-  const { servicesState, accountTypeCache, globalContractMonths } = useServicesContext();
+  const { servicesState, accountTypeCache, globalContractMonths, quotaLevelData } = useServicesContext();
 
   const [activeRules, setActiveRules] = useState<ResolvedCommissionRules>(() =>
     resolveCommissionRules(null),
@@ -367,9 +367,31 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
         globalContractMonths,
         commissionRate,
         activeRules,
+        quotaLevelData?.actualSales || 0,
       ),
-    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules],
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules, quotaLevelData],
   );
+}
+
+export function progressiveQuotaCommissionRate(
+  priorQuotaCredit: number,
+  agreementQuotaCredit: number,
+  quotaTarget: number,
+  rates: { below: number; above: number; double: number },
+  fallbackRate: number,
+): number {
+  if (agreementQuotaCredit <= 0 || quotaTarget <= 0) return fallbackRate;
+  const bounds = [0, quotaTarget, quotaTarget * 2, Infinity];
+  const tierRates = [rates.below, rates.above, rates.double];
+  const lo = Math.max(0, priorQuotaCredit);
+  const hi = lo + agreementQuotaCredit;
+  let commission = 0;
+  for (let i = 0; i < tierRates.length; i++) {
+    const from = Math.max(lo, bounds[i]);
+    const to = Math.min(hi, bounds[i + 1]);
+    if (to > from) commission += (to - from) * (tierRates[i] / 100);
+  }
+  return (commission / agreementQuotaCredit) * 100;
 }
 
 export function computeGlobalCommission(
@@ -378,6 +400,7 @@ export function computeGlobalCommission(
   globalContractMonths: number,
   commissionRate: number,
   rules: ResolvedCommissionRules,
+  priorQuotaCredit: number = 0,
 ): GlobalCommissionResult {
 
     const visitsPerYearOf = (freqStr: string): number => {
@@ -609,7 +632,14 @@ export function computeGlobalCommission(
 
     const services: ServiceCommissionDetail[] = [];
 
-    const effectiveCommissionRate = commissionRate * (agreementMultiplier / 100);
+    const baseQuotaRate = progressiveQuotaCommissionRate(
+      priorQuotaCredit,
+      totalQuotaCredit,
+      rules.quotaTarget,
+      rules.quotaRates,
+      commissionRate,
+    );
+    const effectiveCommissionRate = baseQuotaRate * (agreementMultiplier / 100);
 
     groups.forEach(g => {
       

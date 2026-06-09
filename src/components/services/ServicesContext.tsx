@@ -595,6 +595,7 @@ export const ServicesProvider: React.FC<{
       globalContractMonths,
       rate,
       activeCommissionRules,
+      quotaLevelData?.actualSales || 0,
     );
 
     if (!global.services.length) {
@@ -619,7 +620,7 @@ export const ServicesProvider: React.FC<{
         annualCommission: s.annualCommission,
       })),
     };
-  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules]);
+  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules, quotaLevelData]);
 
   const getQuotaCreditForSave = useCallback((rate: number = 6): number => {
     const global = computeGlobalCommission(
