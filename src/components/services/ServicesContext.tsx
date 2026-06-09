@@ -128,6 +128,7 @@ interface ServicesContextValue {
   accountTypeCacheLoadedFromSavedRef: React.MutableRefObject<boolean>;
 
   getCommissionDataForSave: (baseCommissionRate?: number) => CommissionDataForSave | null;
+  getQuotaCreditForSave: (baseCommissionRate?: number) => number;
 
   quotaLevel: QuotaLevel;
   quotaLevelData: QuotaLevelData | null;
@@ -620,6 +621,17 @@ export const ServicesProvider: React.FC<{
     };
   }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules]);
 
+  const getQuotaCreditForSave = useCallback((rate: number = 6): number => {
+    const global = computeGlobalCommission(
+      servicesState,
+      accountTypeCache,
+      globalContractMonths,
+      rate,
+      activeCommissionRules,
+    );
+    return Math.round((global.totalQuotaCredit || 0) * 100) / 100;
+  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules]);
+
   const value = useMemo<ServicesContextValue>(() => {
 
     const sanicleanData = servicesState.saniclean;
@@ -684,6 +696,7 @@ export const ServicesProvider: React.FC<{
       accountTypeCacheLoadedFromSavedRef,
 
       getCommissionDataForSave,
+      getQuotaCreditForSave,
 
       quotaLevel,
       quotaLevelData,
@@ -691,7 +704,7 @@ export const ServicesProvider: React.FC<{
       setQuotaLevel,
       setQuotaLevelData,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, quotaLevel, quotaLevelData, baseCommissionRate]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate]);
 
   return (
     <ServicesContext.Provider value={value}>

@@ -315,6 +315,7 @@ export interface GlobalCommissionResult {
   totalAnnualCommission: number;
   totalPerVisitRevenue: number;
   totalCommissionableRevenue: number;
+  totalQuotaCredit: number;
 
   agreementMultiplier: number;
   effectiveCommissionRate: number;
@@ -593,7 +594,10 @@ export function computeGlobalCommission(
       }
 
       totalCommissionableAnnual += g.commissionableAnnual;
-      totalQuotaCredit += g.annualCurrent * g.pricingMultiplier;
+      // Quota credit = FULL contract total × pricing (redline/greenline) multiplier.
+      // Not annualized — the whole contract value counts toward the week it's created.
+      const yearsForQuota = globalContractMonths > 0 ? globalContractMonths / 12 : 1;
+      totalQuotaCredit += g.annualCurrent * yearsForQuota * g.pricingMultiplier;
     });
 
     
@@ -676,6 +680,7 @@ export function computeGlobalCommission(
       totalAnnualCommission,
       totalPerVisitRevenue,
       totalCommissionableRevenue,
+      totalQuotaCredit,
 
       agreementMultiplier,
       effectiveCommissionRate,

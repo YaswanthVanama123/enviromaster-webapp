@@ -126,15 +126,9 @@ export default function MyQuota() {
 
       {}
       <div className="my-quota__period-toggle">
-        {(Object.keys(PERIOD_LABELS) as PeriodType[]).map((type) => (
-          <button
-            key={type}
-            className={`my-quota__period-btn ${periodType === type ? 'active' : ''}`}
-            onClick={() => setPeriodType(type)}
-          >
-            {PERIOD_LABELS[type]}
-          </button>
-        ))}
+        <button className="my-quota__period-btn active" disabled>
+          Weekly
+        </button>
       </div>
 
       {}

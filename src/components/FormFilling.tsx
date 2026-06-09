@@ -89,6 +89,7 @@ type GlobalSummary = {
   serviceAgreementTotal: number;
   productMonthlyTotal: number;
   productContractTotal: number;
+  quotaCredit?: number;
 };
 
 type ServiceLine = {
@@ -1429,6 +1430,7 @@ function FormFillingContent({
     initializeAccountTypeCache,
     accountTypeCache,
     getCommissionDataForSave,
+    getQuotaCreditForSave,
     baseCommissionRate,
     quotaLevel,
     
@@ -1909,6 +1911,7 @@ function FormFillingContent({
       serviceAgreementTotal: getTotalAgreementAmount(),
       productMonthlyTotal: productTotals.monthlyTotal,
       productContractTotal: productTotals.contractTotal,
+      quotaCredit: getQuotaCreditForSave(baseCommissionRate),
     };
 
     const agreementBase = payload?.agreement || {
