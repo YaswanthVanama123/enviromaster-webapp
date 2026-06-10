@@ -135,6 +135,9 @@ interface ServicesContextValue {
   baseCommissionRate: number;
   setQuotaLevel: (level: QuotaLevel) => void;
   setQuotaLevelData: (data: QuotaLevelData | null) => void;
+
+  effectivePriorQuotaCredit: number;
+  setLoadedPriorQuotaCredit: (value: number | null) => void;
 }
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(
@@ -175,6 +178,14 @@ export const ServicesProvider: React.FC<{
   const [quotaLevel, setQuotaLevel] = useState<QuotaLevel>('above');
   const [quotaLevelData, setQuotaLevelData] = useState<QuotaLevelData | null>(null);
   const baseCommissionRate = QUOTA_COMMISSION_RATES[quotaLevel];
+
+  // The rep's weekly quota credit BEFORE this agreement. For a new agreement this
+  // is the live value; for a saved/reopened agreement it is frozen to the value
+  // stored at first calculation so the commission does not drift (the agreement's
+  // own credit must never count as its own "prior").
+  const [loadedPriorQuotaCredit, setLoadedPriorQuotaCredit] = useState<number | null>(null);
+  const effectivePriorQuotaCredit =
+    loadedPriorQuotaCredit != null ? loadedPriorQuotaCredit : quotaLevelData?.actualSales || 0;
 
   const [activeCommissionRules, setActiveCommissionRules] = useState<ResolvedCommissionRules>(
     () => resolveCommissionRules(null),
@@ -595,7 +606,7 @@ export const ServicesProvider: React.FC<{
       globalContractMonths,
       rate,
       activeCommissionRules,
-      quotaLevelData?.actualSales || 0,
+      effectivePriorQuotaCredit,
     );
 
     if (!global.services.length) {
@@ -620,7 +631,7 @@ export const ServicesProvider: React.FC<{
         annualCommission: s.annualCommission,
       })),
     };
-  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules, quotaLevelData]);
+  }, [servicesState, accountTypeCache, globalContractMonths, activeCommissionRules, effectivePriorQuotaCredit]);
 
   const getQuotaCreditForSave = useCallback((rate: number = 6): number => {
     const global = computeGlobalCommission(
@@ -704,8 +715,11 @@ export const ServicesProvider: React.FC<{
       baseCommissionRate,
       setQuotaLevel,
       setQuotaLevelData,
+
+      effectivePriorQuotaCredit,
+      setLoadedPriorQuotaCredit,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit]);
 
   return (
     <ServicesContext.Provider value={value}>

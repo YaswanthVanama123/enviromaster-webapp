@@ -320,6 +320,11 @@ export interface GlobalCommissionResult {
   agreementMultiplier: number;
   effectiveCommissionRate: number;
 
+  priorQuotaCredit: number;
+  quotaTarget: number;
+  quotaTierBreakdown: QuotaTierPortion[];
+  commissionTierBreakdown: CommissionTier[];
+
   services: ServiceCommissionDetail[];
 
   formatted: {
@@ -335,7 +340,7 @@ export interface GlobalCommissionResult {
 }
 
 export function useGlobalCommission(commissionRate: number = 6): GlobalCommissionResult {
-  const { servicesState, accountTypeCache, globalContractMonths, quotaLevelData } = useServicesContext();
+  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit } = useServicesContext();
 
   const [activeRules, setActiveRules] = useState<ResolvedCommissionRules>(() =>
     resolveCommissionRules(null),
@@ -367,10 +372,40 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
         globalContractMonths,
         commissionRate,
         activeRules,
-        quotaLevelData?.actualSales || 0,
+        effectivePriorQuotaCredit,
       ),
-    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules, quotaLevelData],
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules, effectivePriorQuotaCredit],
   );
+}
+
+export interface QuotaTierPortion {
+  level: 'below' | 'above' | 'double';
+  label: string;
+  rate: number;
+  quotaCredit: number;
+  commission: number;
+}
+
+export function computeQuotaTierPortions(
+  priorQuotaCredit: number,
+  agreementQuotaCredit: number,
+  quotaTarget: number,
+  rates: { below: number; above: number; double: number },
+): QuotaTierPortion[] {
+  const bounds = [0, quotaTarget, quotaTarget * 2, Infinity];
+  const defs: Array<{ level: 'below' | 'above' | 'double'; label: string; rate: number }> = [
+    { level: 'below', label: 'Below Quota', rate: rates.below },
+    { level: 'above', label: 'Above Quota', rate: rates.above },
+    { level: 'double', label: 'Double Quota', rate: rates.double },
+  ];
+  const lo = Math.max(0, priorQuotaCredit);
+  const hi = lo + agreementQuotaCredit;
+  return defs.map((d, i) => {
+    const from = Math.max(lo, bounds[i]);
+    const to = Math.min(hi, bounds[i + 1]);
+    const quotaCredit = Math.max(0, to - from);
+    return { ...d, quotaCredit, commission: quotaCredit * (d.rate / 100) };
+  });
 }
 
 export function progressiveQuotaCommissionRate(
@@ -381,17 +416,43 @@ export function progressiveQuotaCommissionRate(
   fallbackRate: number,
 ): number {
   if (agreementQuotaCredit <= 0 || quotaTarget <= 0) return fallbackRate;
+  const portions = computeQuotaTierPortions(priorQuotaCredit, agreementQuotaCredit, quotaTarget, rates);
+  const commission = portions.reduce((sum, t) => sum + t.commission, 0);
+  return (commission / agreementQuotaCredit) * 100;
+}
+
+export interface CommissionTier {
+  level: 'below' | 'above' | 'double';
+  label: string;
+  rate: number;
+  effectiveRate: number;
+  base: number;
+  commission: number;
+}
+
+export function computeCommissionTiers(
+  priorQuotaCredit: number,
+  commissionableBase: number,
+  quotaTarget: number,
+  rates: { below: number; above: number; double: number },
+  agreementMultiplier: number,
+): CommissionTier[] {
   const bounds = [0, quotaTarget, quotaTarget * 2, Infinity];
-  const tierRates = [rates.below, rates.above, rates.double];
+  const defs: Array<{ level: 'below' | 'above' | 'double'; label: string; rate: number }> = [
+    { level: 'below', label: 'Below Quota', rate: rates.below },
+    { level: 'above', label: 'Above Quota', rate: rates.above },
+    { level: 'double', label: 'Double Quota', rate: rates.double },
+  ];
+  const mult = agreementMultiplier / 100;
   const lo = Math.max(0, priorQuotaCredit);
-  const hi = lo + agreementQuotaCredit;
-  let commission = 0;
-  for (let i = 0; i < tierRates.length; i++) {
+  const hi = lo + commissionableBase;
+  return defs.map((d, i) => {
     const from = Math.max(lo, bounds[i]);
     const to = Math.min(hi, bounds[i + 1]);
-    if (to > from) commission += (to - from) * (tierRates[i] / 100);
-  }
-  return (commission / agreementQuotaCredit) * 100;
+    const base = Math.max(0, to - from);
+    const effectiveRate = d.rate * mult;
+    return { ...d, effectiveRate, base, commission: base * (effectiveRate / 100) };
+  });
 }
 
 export function computeGlobalCommission(
@@ -639,7 +700,31 @@ export function computeGlobalCommission(
       rules.quotaRates,
       commissionRate,
     );
-    const effectiveCommissionRate = baseQuotaRate * (agreementMultiplier / 100);
+
+    const quotaTierBreakdown =
+      rules.quotaTarget > 0 && totalQuotaCredit > 0
+        ? computeQuotaTierPortions(priorQuotaCredit, totalQuotaCredit, rules.quotaTarget, rules.quotaRates)
+        : [];
+
+    // Commission is tiered on the COMMISSIONABLE revenue (after account-type
+    // deductions), NOT the quota credit. Each tier slice is charged at its own
+    // rate × agreement multiplier and the slices are summed — quota credit only
+    // decides where the tier boundaries fall.
+    const commissionTierBreakdown =
+      rules.quotaTarget > 0 && totalCommissionableAnnual > 0
+        ? computeCommissionTiers(
+            priorQuotaCredit,
+            totalCommissionableAnnual,
+            rules.quotaTarget,
+            rules.quotaRates,
+            agreementMultiplier,
+          )
+        : [];
+    const tieredCommission = commissionTierBreakdown.reduce((sum, t) => sum + t.commission, 0);
+    const effectiveCommissionRate =
+      commissionTierBreakdown.length > 0 && totalCommissionableAnnual > 0
+        ? (tieredCommission / totalCommissionableAnnual) * 100
+        : baseQuotaRate * (agreementMultiplier / 100);
 
     groups.forEach(g => {
       
@@ -713,6 +798,11 @@ export function computeGlobalCommission(
 
       agreementMultiplier,
       effectiveCommissionRate,
+
+      priorQuotaCredit,
+      quotaTarget: rules.quotaTarget,
+      quotaTierBreakdown,
+      commissionTierBreakdown,
 
       services,
 

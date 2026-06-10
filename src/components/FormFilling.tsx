@@ -90,6 +90,7 @@ type GlobalSummary = {
   productMonthlyTotal: number;
   productContractTotal: number;
   quotaCredit?: number;
+  priorQuotaCredit?: number;
 };
 
 type ServiceLine = {
@@ -1433,7 +1434,9 @@ function FormFillingContent({
     getQuotaCreditForSave,
     baseCommissionRate,
     quotaLevel,
-    
+    effectivePriorQuotaCredit,
+    setLoadedPriorQuotaCredit,
+
   } = useServicesContext();
 
   const totalCurrentContract = getTotalAgreementAmount();
@@ -1494,7 +1497,12 @@ function FormFillingContent({
       parkingChargeFrequency,
       productMonthlyTotal,
       productContractTotal,
+      priorQuotaCredit,
     } = payload.summary;
+
+    if (typeof priorQuotaCredit === 'number') {
+      setLoadedPriorQuotaCredit(priorQuotaCredit);
+    }
 
     if (contractMonths !== undefined && contractMonths !== null) {
       setGlobalContractMonths(contractMonths);
@@ -1531,6 +1539,7 @@ function FormFillingContent({
     setGlobalParkingCharge,
     setGlobalParkingChargeFrequency,
     setProductTotals,
+    setLoadedPriorQuotaCredit,
   ]);
 
   const getDocumentStatus = useCallback((): 'saved' | 'pending_approval' => {
@@ -1902,6 +1911,11 @@ function FormFillingContent({
 
     const servicesWithDraftField = attachRefreshPowerScrubDraftCustomField(servicesData);
 
+    // Only Bigin-connected agreements (now, or previously — they already carry a
+    // saved commission) store the commission/quota keys. A never-connected draft
+    // stores none of them, so it stays out of quota and doesn't freeze a bad prior.
+    const hasBiginCommission = !!biginCompanyId || !!(payload as any)?.commission;
+
     const summary: GlobalSummary = {
       contractMonths: globalContractMonths,
       tripCharge: globalTripCharge,
@@ -1911,7 +1925,10 @@ function FormFillingContent({
       serviceAgreementTotal: getTotalAgreementAmount(),
       productMonthlyTotal: productTotals.monthlyTotal,
       productContractTotal: productTotals.contractTotal,
-      quotaCredit: getQuotaCreditForSave(baseCommissionRate),
+      quotaCredit: biginCompanyId
+        ? getQuotaCreditForSave(baseCommissionRate)
+        : (payload?.summary?.quotaCredit ?? 0),
+      priorQuotaCredit: hasBiginCommission ? effectivePriorQuotaCredit : undefined,
     };
 
     const agreementBase = payload?.agreement || {
@@ -1941,7 +1958,7 @@ function FormFillingContent({
       customColumns: (productsData as any).customColumns || { products: [], dispensers: [] },
       summary,
       
-      commission: !biginCompanyId ? null : (() => {
+      commission: !biginCompanyId ? ((payload as any)?.commission ?? null) : (() => {
         const commissionData = getCommissionDataForSave(baseCommissionRate);
         if (!commissionData) return null;
         return {
