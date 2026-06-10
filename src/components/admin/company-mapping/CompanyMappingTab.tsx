@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   companyMappingApi,
   type CompanyMapping,
@@ -35,6 +36,8 @@ export const CompanyMappingTab: React.FC = () => {
   const [loadingOptions, setLoadingOptions] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const loadMappings = useCallback(async () => {
     setLoading(true);
@@ -79,21 +82,24 @@ export const CompanyMappingTab: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdown(null);
-        setDropdownSearch('');
-      }
+      const target = event.target as Node;
+      if (menuRef.current && menuRef.current.contains(target)) return;
+      if (dropdownRef.current && dropdownRef.current.contains(target)) return;
+      setOpenDropdown(null);
+      setDropdownSearch('');
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleDropdownOpen = (biginId: string) => {
+  const handleDropdownOpen = (biginId: string, triggerEl: HTMLElement) => {
     if (openDropdown === biginId) {
       setOpenDropdown(null);
       setDropdownSearch('');
     } else {
+      const rect = triggerEl.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
       setOpenDropdown(biginId);
       setDropdownSearch('');
       loadRouteStarOptions();
@@ -374,15 +380,26 @@ export const CompanyMappingTab: React.FC = () => {
                     <div className="cm-dropdown" ref={openDropdown === mapping.biginId ? dropdownRef : null}>
                       <button
                         className={`cm-dropdown-trigger ${hasPendingChange(mapping) ? 'pending' : ''}`}
-                        onClick={() => handleDropdownOpen(mapping.biginId)}
+                        onClick={(e) => handleDropdownOpen(mapping.biginId, e.currentTarget)}
                       >
                         <span className="cm-dropdown-value">{getDisplayValue(mapping)}</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </button>
-                      {openDropdown === mapping.biginId && (
-                        <div className="cm-dropdown-menu">
+                      {openDropdown === mapping.biginId && menuPos && createPortal(
+                        <div
+                          className="cm-dropdown-menu cm-dropdown-menu--portal"
+                          ref={menuRef}
+                          style={{
+                            position: 'fixed',
+                            top: menuPos.top,
+                            left: menuPos.left,
+                            width: menuPos.width,
+                            right: 'auto',
+                            zIndex: 4000,
+                          }}
+                        >
                           <input
                             type="text"
                             placeholder="Search customers..."
@@ -422,7 +439,8 @@ export const CompanyMappingTab: React.FC = () => {
                               ))
                             )}
                           </div>
-                        </div>
+                        </div>,
+                        document.body
                       )}
                     </div>
                   </td>
