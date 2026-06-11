@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { commissionApi } from "../../../backendservice/api/commissionApi";
 import {
   resolveCommissionRules,
-  getPricingTierFromList,
   type ResolvedCommissionRules,
   type AccountType,
   type AgreementTerm,
@@ -10,6 +9,8 @@ import {
   type BusinessType,
   type ServiceFrequency,
 } from "../../../backendservice/types/commission.types";
+import { computeGlobalCommission } from "../../services/hooks/useServiceCommission";
+import { FREQUENCY_TO_BACKEND } from "../../services/hooks/useAccountTypeDetection";
 
 interface CommissionCalculatorProps {
   onRecordSaved?: () => void;
@@ -100,106 +101,42 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
 
     if (current <= 0) return null;
 
-    const monthlyValue = current / months;
-    const monthlyOriginalValue = original / months;
-    const currentContract12Months = monthlyValue * 12;
-    const originalContract12Months = monthlyOriginalValue * 12;
+    // Build a synthetic single-service agreement and run the EXACT form-filling
+    // engine (computeGlobalCommission) so the calculator matches it 1:1.
+    const freqNum = FREQUENCY_TO_BACKEND[frequency] ?? FREQUENCY_TO_BACKEND[frequency.replace("-", "")] ?? 3;
+    const servicesState: Record<string, any> = {
+      calc: {
+        isActive: true,
+        frequency,
+        contractTotal: current,
+        originalContractTotal: original,
+      },
+    };
+    const accountTypeCache: Record<number, any> = {
+      [freqNum]: { accountType, confidence: "high", reason: null },
+    };
+    // baseCommissionRate from the chosen quota level (the engine still derives
+    // the progressive tier rate from priorQuotaCredit; this is the no-target fallback).
+    const baseCommissionRate = rules.quotaRates[quotaLevel];
 
-    const priceRatio =
-      originalContract12Months > 0 ? currentContract12Months / originalContract12Months : 1;
-    const pricingTier = getPricingTierFromList(
-      currentContract12Months,
-      originalContract12Months,
-      rules.pricingTiers,
-    );
-    const pricingMultiplier = pricingTier.quotaMultiplier;
-    const isGreenline = pricingTier.label === "Greenline (130%+)";
-
-    const agreementTerm: AgreementTerm =
-      months >= 36 ? "3-year" : months >= 12 ? "1-year" : "MTM-with-install";
-    const agreementMultiplier = rules.agreementMultipliers[agreementTerm];
-
-    const visitsPerYear = rules.frequencyVisitsPerYear[frequency];
-    const pitZoneAnnual = rules.pitPerVisitThreshold * visitsPerYear;
-    const anchorZoneAnnual =
-      (isGreenline ? rules.anchorMinGreenline : rules.anchorPerVisitThreshold) * visitsPerYear;
-    const bread5Annual = rules.perVisitPenalties.Bread5 * visitsPerYear;
-    const bread15Annual = rules.perVisitPenalties.Bread15 * visitsPerYear;
-    const pitAnnual = rules.perVisitPenalties.Pit * visitsPerYear;
-
-    
-    const adjustedAnnual = currentContract12Months * pricingMultiplier;
-
-    let revenueDeduction = 0;
-    let anchorBonus = 0;
-    let commissionableAnnual = adjustedAnnual;
-
-    if (accountType === "Anchor") {
-      if (isNewLocation) {
-        const pitPart = Math.min(adjustedAnnual, pitZoneAnnual);
-        const stdPart = Math.min(
-          Math.max(0, adjustedAnnual - pitZoneAnnual),
-          anchorZoneAnnual - pitZoneAnnual,
-        );
-        const anchorPart = Math.max(0, adjustedAnnual - anchorZoneAnnual);
-        commissionableAnnual = Math.max(0, stdPart) + anchorPart * rules.anchorBonusMultiplier;
-        revenueDeduction = pitPart;
-        anchorBonus = anchorPart * (rules.anchorBonusMultiplier - 1);
-      } else {
-        const stdPart = Math.min(adjustedAnnual, anchorZoneAnnual);
-        const anchorPart = Math.max(0, adjustedAnnual - anchorZoneAnnual);
-        commissionableAnnual = stdPart + anchorPart * rules.anchorBonusMultiplier;
-        anchorBonus = anchorPart * (rules.anchorBonusMultiplier - 1);
-      }
-    } else if (accountType === "Bread5") {
-      revenueDeduction = isNewLocation ? bread5Annual : 0;
-      commissionableAnnual = Math.max(0, adjustedAnnual - revenueDeduction);
-    } else if (accountType === "Bread15") {
-      revenueDeduction = isNewLocation ? bread15Annual : 0;
-      commissionableAnnual = Math.max(0, adjustedAnnual - revenueDeduction);
-    } else {
-      
-      const isExistingAlreadyOver = !isNewLocation && adjustedAnnual > pitAnnual;
-      revenueDeduction = isExistingAlreadyOver ? 0 : pitAnnual;
-      commissionableAnnual = Math.max(0, adjustedAnnual - revenueDeduction);
-    }
-
-    const annualContractTotal = currentContract12Months;
-    const annualQuotaCredit = annualContractTotal * pricingMultiplier;
-
-    const cutoffs = rules.quotaTierCutoffs;
-    const positionAfter = positionBefore + annualQuotaCredit;
-    const belowQuotaPortion = Math.max(
-      0,
-      Math.min(positionAfter, cutoffs.aboveQuota) - positionBefore,
-    );
-    const aboveQuotaPortion = Math.max(
-      0,
-      Math.min(positionAfter, cutoffs.doubleQuota) - Math.max(positionBefore, cutoffs.aboveQuota),
-    );
-    const doubleQuotaPortion = Math.max(
-      0,
-      positionAfter - Math.max(positionBefore, cutoffs.doubleQuota),
+    const global = computeGlobalCommission(
+      servicesState,
+      accountTypeCache,
+      months,
+      baseCommissionRate,
+      rules,
+      positionBefore,
     );
 
-    const insideSalesDeduction = isInsideSales ? rules.insideSalesDeduction : 0;
-    const belowRate = (rules.quotaRates.below + insideSalesDeduction) / 100;
-    const aboveRate = (rules.quotaRates.above + insideSalesDeduction) / 100;
-    const doubleRate = (rules.quotaRates.double + insideSalesDeduction) / 100;
+    const svc = global.services[0];
+    if (!svc) return null;
 
-    const totalCredit = belowQuotaPortion + aboveQuotaPortion + doubleQuotaPortion;
-    const belowShare = totalCredit > 0 ? (belowQuotaPortion / totalCredit) * commissionableAnnual : 0;
-    const aboveShare = totalCredit > 0 ? (aboveQuotaPortion / totalCredit) * commissionableAnnual : 0;
-    const doubleShare = totalCredit > 0 ? (doubleQuotaPortion / totalCredit) * commissionableAnnual : 0;
-
-    const belowQuotaCommission = belowShare * Math.max(0, belowRate);
-    const aboveQuotaCommission = aboveShare * Math.max(0, aboveRate);
-    const doubleQuotaCommission = doubleShare * Math.max(0, doubleRate);
-
-    const agreementMult = agreementMultiplier / 100;
-    const annualCommission =
-      (belowQuotaCommission + aboveQuotaCommission + doubleQuotaCommission) * agreementMult;
-    const weeklyCommission = annualCommission / rules.weeksPerAnnualCommission;
+    const annualCommission = global.totalAnnualCommission;
+    const weeklyCommission = global.totalWeeklyCommission;
+    const tiers = global.commissionTierBreakdown;
+    const below = tiers.find(t => t.level === "below");
+    const above = tiers.find(t => t.level === "above");
+    const dbl = tiers.find(t => t.level === "double");
 
     let renewalBonusRate = 0;
     let renewalBonusAmount = 0;
@@ -208,12 +145,7 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
       renewalBonusAmount = renewalValue * (renewalBonusRate / 100);
     }
 
-    const baseRate = rules.quotaRates[quotaLevel];
-    const effectiveRate = baseRate + insideSalesDeduction;
-    const finalCommissionRate = effectiveRate * agreementMult;
-
     return {
-      
       input: {
         currentContract: current,
         originalContract: original,
@@ -230,40 +162,40 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
         customerName,
         salesPersonName,
       },
-      
-      monthlyValue,
-      currentContract12Months,
-      originalContract12Months,
-      
-      priceRatio,
-      pricingTier: pricingTier.label,
-      pricingMultiplier,
-      requiresApproval: pricingTier.requiresApproval,
-      
-      agreementTerm,
-      agreementMultiplier,
-      
-      visitsPerYear,
-      adjustedAnnual,
-      
-      revenueDeduction,
-      anchorBonus,
-      commissionableAnnual,
-      
-      annualContractTotal,
-      annualQuotaCredit,
-      
-      belowQuotaPortion,
-      aboveQuotaPortion,
-      doubleQuotaPortion,
-      belowQuotaCommission: belowQuotaCommission * agreementMult,
-      aboveQuotaCommission: aboveQuotaCommission * agreementMult,
-      doubleQuotaCommission: doubleQuotaCommission * agreementMult,
-      
-      baseRate,
-      insideSalesDeduction,
-      effectiveRate,
-      finalCommissionRate,
+
+      monthlyValue: svc.perVisitRevenue / 12,
+      currentContract12Months: svc.perVisitRevenue,
+      originalContract12Months: svc.annualOriginalRevenue,
+
+      priceRatio: svc.priceRatio,
+      pricingTier: svc.pricingTierLabel,
+      pricingMultiplier: svc.pricingMultiplier,
+      requiresApproval: false,
+
+      agreementTerm: (months >= 36 ? "3-year" : months >= 12 ? "1-year" : "MTM-with-install") as AgreementTerm,
+      agreementMultiplier: global.agreementMultiplier,
+
+      visitsPerYear: svc.visitsPerYear,
+      adjustedAnnual: svc.adjustedAnnualRevenue,
+
+      revenueDeduction: svc.revenueDeduction,
+      anchorBonus: svc.anchorBonus,
+      commissionableAnnual: svc.commissionableRevenue,
+
+      annualContractTotal: svc.perVisitRevenue,
+      annualQuotaCredit: global.totalQuotaCredit,
+
+      belowQuotaPortion: below?.base ?? 0,
+      aboveQuotaPortion: above?.base ?? 0,
+      doubleQuotaPortion: dbl?.base ?? 0,
+      belowQuotaCommission: below?.commission ?? 0,
+      aboveQuotaCommission: above?.commission ?? 0,
+      doubleQuotaCommission: dbl?.commission ?? 0,
+
+      baseRate: rules.quotaRates[quotaLevel],
+      insideSalesDeduction: isInsideSales ? rules.insideSalesDeduction : 0,
+      effectiveRate: global.effectiveCommissionRate / (global.agreementMultiplier / 100 || 1),
+      finalCommissionRate: global.effectiveCommissionRate,
       annualCommission,
       weeklyCommission,
       renewalBonusRate,

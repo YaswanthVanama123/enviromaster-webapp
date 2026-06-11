@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 import NavBar from "./components/NavBar";
 import Home from "./components/Home";
@@ -13,6 +13,7 @@ import MyCommissions from "./components/MyCommissions";
 import MyQuota from "./components/MyQuota";
 import MyInsideSales from "./components/MyInsideSales";
 import AdminCommissions from "./components/AdminCommissions";
+import Profile from "./components/Profile";
 import { AdminDashboard } from "./components/admin";
 import { LoginPage } from "./components/LoginPage";
 import { AuthProvider, AuthGuard } from "./components/auth";
@@ -47,6 +48,7 @@ function AppContent() {
             <Route path="/my-commissions" element={<MyCommissions />} />
             <Route path="/my-quota" element={<MyQuota />} />
             <Route path="/my-inside-sales" element={<MyInsideSales />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {}
@@ -59,6 +61,9 @@ function AppContent() {
             <Route path="/pricing-tables/products/:modalType?/:itemId?" element={<AdminDashboard />} />
             <Route path="/pricing-tables/:subtab?/:modalType?/:itemId?" element={<AdminDashboard />} />
           </Route>
+
+          {/* Any unknown path redirects to the home page */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>

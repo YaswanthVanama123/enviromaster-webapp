@@ -11,6 +11,7 @@ import { DEFAULT_COMMISSION_RULES_V2 } from "../../backendservice/types/commissi
 import type { AgreementTerm } from "../../backendservice/types/commission.types.v2";
 import { resolveCommissionRules, type ResolvedCommissionRules } from "../../backendservice/types/commission.types";
 import { commissionApi } from "../../backendservice/api/commissionApi";
+import { companyMappingApi } from "../../backendservice/api/companyMappingApi";
 import { computeGlobalCommission } from "./hooks/useServiceCommission";
 
 export type QuotaLevel = 'below' | 'above' | 'double';
@@ -111,6 +112,7 @@ interface ServicesContextValue {
 
   biginCompanyId: string | null;
   setBiginCompanyId: (id: string | null) => void;
+  isRouteStarMapped: boolean;
   agreementId: string | null;
   setAgreementId: (id: string | null) => void;
   accountTypeCache: AccountTypeCache;
@@ -166,6 +168,28 @@ export const ServicesProvider: React.FC<{
   const [globalParkingChargeFrequency, setGlobalParkingChargeFrequency] = useState<number>(4);
 
   const [biginCompanyId, setBiginCompanyId] = useState<string | null>(initialBiginCompanyId);
+
+  // Commission/quota only count once the Bigin company is mapped to a RouteStar
+  // customer. Bigin-connected-but-unmapped agreements must NOT be calculated.
+  const [isRouteStarMapped, setIsRouteStarMapped] = useState<boolean>(false);
+  useEffect(() => {
+    let cancelled = false;
+    if (!biginCompanyId) {
+      setIsRouteStarMapped(false);
+      return;
+    }
+    companyMappingApi
+      .getStatusByBigin(biginCompanyId)
+      .then(status => {
+        if (!cancelled) setIsRouteStarMapped(!!status?.isMapped);
+      })
+      .catch(() => {
+        if (!cancelled) setIsRouteStarMapped(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [biginCompanyId]);
   const [agreementId, setAgreementId] = useState<string | null>(null);
   const [accountTypeCache, setAccountTypeCache] = useState<AccountTypeCache>({});
   const [isDetectingAccountTypes, setIsDetectingAccountTypes] = useState(false);
@@ -693,6 +717,7 @@ export const ServicesProvider: React.FC<{
 
       biginCompanyId,
       setBiginCompanyId,
+      isRouteStarMapped,
       agreementId,
       setAgreementId,
       accountTypeCache,
@@ -719,7 +744,7 @@ export const ServicesProvider: React.FC<{
       effectivePriorQuotaCredit,
       setLoadedPriorQuotaCredit,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped]);
 
   return (
     <ServicesContext.Provider value={value}>

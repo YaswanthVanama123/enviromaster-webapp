@@ -332,7 +332,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
       </div>
         </div>
 
-        <div className="agreement-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="agreement-actions" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
           {agreement.startDate && agreement.contractMonths && (
             <AgreementTimelineBadge
               startDate={agreement.startDate}
@@ -367,7 +367,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 title="Restore this agreement"
               >
                 <FontAwesomeIcon icon={faRedo} style={{ fontSize: '10px' }} />
-                Restore
+                <span className="ag-act-label">Restore</span>
               </button>
 
               {agreement.isDeleted === true && (
@@ -392,7 +392,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   title="Permanently delete this agreement"
                 >
                   <FontAwesomeIcon icon={faTrash} style={{ fontSize: '10px' }} />
-                  Permanent Delete
+                  <span className="ag-act-label">Permanent Delete</span>
                 </button>
               )}
             </>
@@ -421,7 +421,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 title={`Upload ${uploadableFiles.length} files to Bigin`}
               >
                 <FontAwesomeIcon icon={faCloudUploadAlt} style={{ fontSize: '10px' }} />
-                Bigin
+                <span className="ag-act-label">Bigin</span>
               </button>
 
               <button
@@ -445,7 +445,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 title="Create a Bigin task for this agreement"
               >
                 <FontAwesomeIcon icon={faTasks} style={{ fontSize: '10px' }} />
-                Task
+                <span className="ag-act-label">Task</span>
               </button>
 
               <button
@@ -469,7 +469,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 title="Add file to this agreement"
               >
                 <FontAwesomeIcon icon={faPlus} style={{ fontSize: '10px' }} />
-                Add
+                <span className="ag-act-label">Add</span>
               </button>
 
               {showAgreementLevelEdit && (
@@ -494,7 +494,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   title="Edit this draft agreement"
                 >
                   <FontAwesomeIcon icon={faPencilAlt} style={{ fontSize: '10px' }} />
-                  Edit Agreement
+                  <span className="ag-act-label">Edit Agreement</span>
                 </button>
               )}
 
@@ -520,7 +520,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 title="Delete this agreement (move to trash)"
               >
                 <FontAwesomeIcon icon={faTrash} style={{ fontSize: '10px' }} />
-                Delete
+                <span className="ag-act-label">Delete</span>
               </button>
             </>
           )}

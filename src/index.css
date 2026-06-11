@@ -26,12 +26,20 @@ a:hover {
   color: #747bff;
 }
 
+html, body {
+  max-width: 100%;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  width: 100%;
   min-width: 320px;
   min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
 }
 
 h1 {

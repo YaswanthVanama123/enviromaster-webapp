@@ -127,17 +127,15 @@ export default function Home() {
 
         console.log("📊 Fetched Document Status Counts:", result);
 
-        if (result.timeSeries) {
-          setChartTimeSeries(result.timeSeries);
-        } else {
+        if (result.counts) {
           setStatusCounts({
-            done: result.counts.done,
-            pending: result.counts.pending,
-            drafts: result.counts.drafts,
-            saved: result.counts.saved
+            done: result.counts.approved ?? 0,
+            pending: result.counts.pending_approval ?? 0,
+            drafts: result.counts.draft ?? 0,
+            saved: result.counts.saved ?? 0,
           });
-          setChartTimeSeries(null);
         }
+        setChartTimeSeries(result.timeSeries ?? null);
       } catch (err) {
         console.error("Error fetching status counts:", err);
       } finally {
@@ -300,15 +298,16 @@ export default function Home() {
   const chartData = getChartData();
 
   const maxTotal = Math.max(
-    ...chartData.map(data => data.done + data.pending + data.saved + data.drafts),
+    ...chartData.map(data =>
+      (data.done || 0) + (data.pending || 0) + (data.saved || 0) + (data.drafts || 0)
+    ),
     1
   );
 
-  const maxBarHeight = 280;
-
   const getBarHeight = (value: number) => {
-    if (value === 0) return 0;
-    return Math.max((value / maxTotal) * maxBarHeight, 20);
+    if (!value || value <= 0) return 0;
+    const pct = (value / maxTotal) * 100;
+    return Number.isFinite(pct) ? Math.max(pct, 3) : 0;
   };
 
   const handleTimeFilterChange = (value: string) => {
@@ -571,7 +570,7 @@ export default function Home() {
                           {data.done > 0 && (
                             <div
                               className="home__chart-bar home__chart-bar--done"
-                              style={{ height: `${doneHeight}px` }}
+                              style={{ height: `${doneHeight}%` }}
                               onMouseEnter={() => setHoveredBar({ index, type: 'done' })}
                               onMouseLeave={() => setHoveredBar(null)}
                             >
@@ -587,7 +586,7 @@ export default function Home() {
                           {data.pending > 0 && (
                             <div
                               className="home__chart-bar home__chart-bar--pending"
-                              style={{ height: `${pendingHeight}px` }}
+                              style={{ height: `${pendingHeight}%` }}
                               onMouseEnter={() => setHoveredBar({ index, type: 'pending' })}
                               onMouseLeave={() => setHoveredBar(null)}
                             >
@@ -603,7 +602,7 @@ export default function Home() {
                           {data.saved > 0 && (
                             <div
                               className="home__chart-bar home__chart-bar--saved"
-                              style={{ height: `${savedHeight}px` }}
+                              style={{ height: `${savedHeight}%` }}
                               onMouseEnter={() => setHoveredBar({ index, type: 'saved' })}
                               onMouseLeave={() => setHoveredBar(null)}
                             >
@@ -619,7 +618,7 @@ export default function Home() {
                           {data.drafts > 0 && (
                             <div
                               className="home__chart-bar home__chart-bar--drafts"
-                              style={{ height: `${draftsHeight}px` }}
+                              style={{ height: `${draftsHeight}%` }}
                               onMouseEnter={() => setHoveredBar({ index, type: 'drafts' })}
                               onMouseLeave={() => setHoveredBar(null)}
                             >

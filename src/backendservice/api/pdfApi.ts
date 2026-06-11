@@ -515,12 +515,19 @@ export const pdfApi = {
   } = {}): Promise<{
     success: boolean;
     counts: {
-      done: number;
-      pending: number;
+      draft: number;
       saved: number;
-      drafts: number;
+      pending_approval: number;
+      approved: number;
       total: number;
     };
+    timeSeries?: Array<{
+      period: string;
+      saved: number;
+      pending: number;
+      drafts: number;
+      done: number;
+    }>;
     _metadata?: any;
   }> {
     const params = new URLSearchParams();

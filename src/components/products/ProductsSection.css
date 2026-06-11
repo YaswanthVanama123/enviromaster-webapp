@@ -18,7 +18,7 @@
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  font-size: 20px;
+  font-size: clamp(13px, 3.2vw, 20px);
   padding: 10px 8px;
   border: 1.4px solid #000;
   margin-bottom: 10px;
@@ -431,7 +431,7 @@ td:has(.th-edit) {
   background: transparent;
   padding: 4px;
   height: 28px;
-  font-size: 14px;
+  font-size: clamp(12px, 2.8vw, 14px);
   outline: none;
   box-sizing: border-box;
 }
@@ -446,7 +446,12 @@ td:has(.th-edit) {
   font-size: 14px;
 }
 
-.gwrap{ margin-bottom: 18px; }
+.gwrap{
+  margin-bottom: 18px;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .gactions{
   display: flex;
   justify-content: flex-end;
@@ -455,24 +460,32 @@ td:has(.th-edit) {
 }
 .gtable {
   width: 100%;
-  border-collapse: separate; border-spacing: 0;
-  border-left: 2px solid #000; border-right: 2px solid #000; border-bottom: 2px solid #000;
+  min-width: 640px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 1px solid #111;
 }
 .gtable thead th {
-  background: #dae9f8; color: #c20000; font-weight: 800; font-size: 14px;
-  padding: 8px 10px; border-top: 1px solid #000; border-bottom: 1px solid #000; border-right: 1px solid #000;
+  background: #dae9f8; color: #c20000; font-weight: 800;
+  font-size: clamp(12px, 2.8vw, 14px);
+  padding: 8px 10px; border: 1px solid #111;
 
   min-height: 40px;
   height: 40px;
   box-sizing: border-box;
   contain: layout style;
 }
-.gtable thead th:first-child { border-left: 1px solid #000; }
+.gtable thead th:first-child { border-left: 1px solid #111; }
 .gtable td {
-  border-right: 1px solid #000;
-  border-bottom: 1px solid #000;
+  border: 1px solid #111;
   padding: 6px 8px;
   background: #fff;
+  vertical-align: middle;
+}
+.gtable th:first-child,
+.gtable td:first-child {
+  width: 42%;
+  min-width: 170px;
 }
 
 .product-select {
@@ -551,6 +564,7 @@ td:has(.th-edit) {
 
 .namecell-display {
   flex: 1;
+  min-width: 0;
   position: relative;
   border: 1px solid #d0d0d0;
   background: #d9d9d9;
@@ -579,8 +593,9 @@ td:has(.th-edit) {
 .namecell-text {
   display: block;
   white-space: normal;
-  word-break: break-word;
-  font-size: 13px;
+  overflow-wrap: break-word;
+  word-break: normal;
+  font-size: clamp(12px, 2.6vw, 13px);
   color: #333;
   line-height: 1.4;
 }

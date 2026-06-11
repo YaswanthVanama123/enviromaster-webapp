@@ -864,7 +864,7 @@ export default function SavedFilesAgreements() {
           />
         </div>
 
-        <div style={{ marginLeft: '12px' }}>
+        <div className="sf__filters">
           <select
             value={ownershipFilter}
             onChange={(e) => {
@@ -885,9 +885,7 @@ export default function SavedFilesAgreements() {
             <option value="all">All Agreements</option>
             <option value="mine">My Agreements</option>
           </select>
-        </div>
 
-        <div style={{ marginLeft: '12px' }}>
           <select
             value={timelineFilter}
             onChange={(e) => {

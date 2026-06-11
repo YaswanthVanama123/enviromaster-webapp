@@ -45,8 +45,10 @@ body::-webkit-scrollbar,
 
 .center-align{
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-content: center;
   margin: 30px;
+  max-width: calc(100% - 60px);
   background-color: #ffffff !important;
 
   content-visibility: auto;
@@ -177,8 +179,8 @@ body::-webkit-scrollbar,
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  width: 100vw !important; 
-  height: 100vh !important; 
+  width: 100% !important;
+  height: 100vh !important;
   margin: 0 !important;
   padding: 0 !important;
   background: rgba(15, 23, 42, 0.75); 
@@ -1238,6 +1240,11 @@ body::-webkit-scrollbar,
 }
 
 @media (max-width: 768px) {
+  .center-align {
+    margin: 16px;
+    max-width: calc(100% - 32px);
+  }
+
   .contract-summary-section {
     margin: 16px;
   }
@@ -1542,6 +1549,7 @@ input[type="date"].contract-input::-webkit-calendar-picker-indicator {
 @media (min-width: 769px) and (max-width: 1024px) {
   .center-align {
     margin: 24px;
+    max-width: calc(100% - 48px);
   }
 
   .edit-mode-header {
@@ -1636,7 +1644,8 @@ input[type="date"].contract-input::-webkit-calendar-picker-indicator {
 
 @media (max-width: 480px) {
   .center-align {
-    margin: 16px;
+    margin: 12px;
+    max-width: calc(100% - 24px);
   }
 
   .edit-mode-header {

@@ -10,6 +10,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple
   min-height:100dvh;
   display:grid;
   grid-template-rows:auto 1fr;
+  width:100%;
+  max-width:100%;
+}
+
+.page-body{
+  min-width:0;
+  max-width:100%;
+  overflow-x:clip;
 }
 
 .shell.edit-mode {

@@ -42,7 +42,7 @@ export function GlobalCommissionSummary({
   const [expanded, setExpanded] = useState(false);
   const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
 
-  const { quotaLevel, quotaLevelData, baseCommissionRate } = useServicesContext();
+  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped } = useServicesContext();
   const commissionRate = baseCommissionRate;
 
   const global = useGlobalCommission(commissionRate);
@@ -87,6 +87,25 @@ export function GlobalCommissionSummary({
         </div>
         <div className="commission-summary__warning">
           Please connect to Bigin to calculate commission.
+        </div>
+        {error && <div className="commission-summary__error">{error}</div>}
+      </div>
+    );
+  }
+
+  // Commission/quota only count once this Bigin company is mapped to a RouteStar
+  // customer. Until then, don't calculate anything — prompt to map.
+  if (!isRouteStarMapped) {
+    return (
+      <div className="commission-summary">
+        <div className="commission-summary__header">
+          <div className="commission-summary__title">
+            <span>Commission Summary</span>
+          </div>
+        </div>
+        <div className="commission-summary__warning">
+          This company isn't mapped to a RouteStar customer yet. Map it under
+          Pricing Details → Company Mapping to calculate commission and count it toward quota.
         </div>
         {error && <div className="commission-summary__error">{error}</div>}
       </div>

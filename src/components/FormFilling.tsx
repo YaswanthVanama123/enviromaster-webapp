@@ -1436,6 +1436,7 @@ function FormFillingContent({
     quotaLevel,
     effectivePriorQuotaCredit,
     setLoadedPriorQuotaCredit,
+    isRouteStarMapped,
 
   } = useServicesContext();
 
@@ -1911,10 +1912,12 @@ function FormFillingContent({
 
     const servicesWithDraftField = attachRefreshPowerScrubDraftCustomField(servicesData);
 
-    // Only Bigin-connected agreements (now, or previously — they already carry a
-    // saved commission) store the commission/quota keys. A never-connected draft
-    // stores none of them, so it stays out of quota and doesn't freeze a bad prior.
-    const hasBiginCommission = !!biginCompanyId || !!(payload as any)?.commission;
+    // Commission/quota only count once the Bigin company is mapped to a RouteStar
+    // customer. Bigin-connected-but-unmapped agreements must NOT be calculated.
+    // (Previously-saved commission is still preserved so a later draft re-save
+    // never wipes it.)
+    const canCalculate = !!biginCompanyId && isRouteStarMapped;
+    const hasBiginCommission = canCalculate || !!(payload as any)?.commission;
 
     const summary: GlobalSummary = {
       contractMonths: globalContractMonths,
@@ -1925,7 +1928,7 @@ function FormFillingContent({
       serviceAgreementTotal: getTotalAgreementAmount(),
       productMonthlyTotal: productTotals.monthlyTotal,
       productContractTotal: productTotals.contractTotal,
-      quotaCredit: biginCompanyId
+      quotaCredit: canCalculate
         ? getQuotaCreditForSave(baseCommissionRate)
         : (payload?.summary?.quotaCredit ?? 0),
       priorQuotaCredit: hasBiginCommission ? effectivePriorQuotaCredit : undefined,
@@ -1958,7 +1961,7 @@ function FormFillingContent({
       customColumns: (productsData as any).customColumns || { products: [], dispensers: [] },
       summary,
       
-      commission: !biginCompanyId ? ((payload as any)?.commission ?? null) : (() => {
+      commission: !canCalculate ? ((payload as any)?.commission ?? null) : (() => {
         const commissionData = getCommissionDataForSave(baseCommissionRate);
         if (!commissionData) return null;
         return {

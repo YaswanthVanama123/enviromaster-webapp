@@ -344,30 +344,27 @@
 
 @media (max-width: 768px) {
   .timeline-badge-compact {
-    padding: 4px 6px;
+    padding: 8px 10px;
     font-size: 10px;
-    gap: 4px;
-    max-width: 100%;
-    white-space: normal;
-    flex-shrink: 1;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
     min-width: 0;
   }
 
   .timeline-badge-content {
-    gap: 4px;
+    gap: 6px;
     flex-wrap: nowrap;
     min-width: 0;
   }
 
   .timeline-badge-icon {
-    font-size: 10px;
+    font-size: 15px;
     flex-shrink: 0;
   }
 
   .timeline-badge-text {
-    gap: 4px;
-    min-width: 0;
-    flex-wrap: wrap;
+    display: none;
   }
 
   .timeline-badge-status {
@@ -381,13 +378,14 @@
   }
 
   .timeline-badge-calendar {
-    margin-left: 2px;
-    padding-left: 4px;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
     flex-shrink: 0;
   }
 
   .timeline-calendar-btn {
-    font-size: 10px;
+    font-size: 15px;
     padding: 2px 3px;
   }
 
