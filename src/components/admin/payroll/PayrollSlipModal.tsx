@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaTimes, FaDownload } from "react-icons/fa";
-import { buildPayrollSlipHtml, printPayrollSlips } from "./payrollPdf";
+import { apiClient } from "../../../backendservice/utils/apiClient";
 import "./PayrollSlipModal.css";
 
 interface Agreement {
@@ -69,11 +69,27 @@ export const PayrollSlipModal: React.FC<PayrollSlipModalProps> = ({
   const payDate = formatDate(today.toISOString());
   const checkNumber = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${employee.username.toUpperCase().slice(0, 3)}${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
 
-  const handleDownloadPDF = () => {
-    printPayrollSlips(
-      buildPayrollSlipHtml(employee, period),
-      `Payroll Statement - ${employee.username}`,
-    );
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloading(true);
+      const blob = await apiClient.downloadBlob(
+        `/api/payroll/download-pdf?periodStart=${encodeURIComponent(period.start)}&periodEnd=${encodeURIComponent(period.end)}&username=${encodeURIComponent(employee.username)}`,
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `payroll-${employee.username.replace(/[^a-z0-9]+/gi, "-")}-${period.label.replace(/[^a-z0-9]+/gi, "-")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download payroll PDF:", err);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -82,8 +98,8 @@ export const PayrollSlipModal: React.FC<PayrollSlipModalProps> = ({
         <div className="payroll-modal-header">
           <h2>Payroll Statement</h2>
           <div className="modal-actions">
-            <button className="modal-btn download-btn" onClick={handleDownloadPDF}>
-              <FaDownload /> Download PDF
+            <button className="modal-btn download-btn" onClick={handleDownloadPDF} disabled={downloading}>
+              <FaDownload /> {downloading ? "Generating…" : "Download PDF"}
             </button>
             <button className="modal-btn close-btn" onClick={onClose}>
               <FaTimes />

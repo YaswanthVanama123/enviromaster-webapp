@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileAlt, faEye, faDownload, faEnvelope, faSave, faPencilAlt,
   faUpload, faFolder, faFolderOpen, faChevronDown, faChevronRight,
-  faPlus, faCheckSquare, faSquare, faCheckCircle, faClock, faExclamationCircle
+  faPlus, faCheckSquare, faSquare, faCheckCircle, faClock, faExclamationCircle,
+  faPaperclip, faHourglassHalf
 } from "@fortawesome/free-solid-svg-icons";
 import DocumentSidebar from "./DocumentSidebar";
 import "./SavedFiles.css";
@@ -650,7 +651,7 @@ export default function SavedFiles() {
                       <span>{f.title}</span>
                       {f.hasPdf && (
                         <span style={{ fontSize: '12px', color: '#10b981', marginLeft: '4px' }}>
-                          📎
+                          <FontAwesomeIcon icon={faPaperclip} />
                         </span>
                       )}
                     </div>
@@ -706,7 +707,7 @@ export default function SavedFiles() {
                         onClick={() => handleDownload(f)}
                         disabled={downloadingId === f.id || !f.hasPdf}
                       >
-                        {downloadingId === f.id ? "⏳" : <FontAwesomeIcon icon={faDownload} />}
+                        {downloadingId === f.id ? <FontAwesomeIcon icon={faHourglassHalf} /> : <FontAwesomeIcon icon={faDownload} />}
                       </button>
                       <button
                         className="iconbtn"
@@ -732,7 +733,7 @@ export default function SavedFiles() {
                         type="button"
                         disabled
                       >
-                        {savingStatusId === f.id ? "💾..." : <FontAwesomeIcon icon={faSave} />}
+                        {savingStatusId === f.id ? <FontAwesomeIcon icon={faSave} /> : <FontAwesomeIcon icon={faSave} />}
                       </button>
                     </div>
                   </td>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faLightbulb, faFileAlt, faPencilAlt, faDownload, faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { FaTint, FaMagic } from "react-icons/fa";
 import { Toast } from "./admin/Toast";
 import type { ToastType } from "./admin/Toast";
 import { pdfApi } from "../backendservice/api";
@@ -376,7 +377,7 @@ export default function PDFViewer() {
                   className="watermark-checkbox"
                 />
                 <span className="watermark-label-text">
-                  {showWatermark ? "💧 Draft Watermark" : "✨ Normal View"}
+                  {showWatermark ? <><FaTint /> Draft Watermark</> : <><FaMagic /> Normal View</>}
                 </span>
               </label>
             </div>

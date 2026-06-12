@@ -25,6 +25,7 @@ import {
   faFolder,
   faFolderOpen,
   faChevronRight,
+  faChevronLeft,
   faEnvelope,
   faTrash,
   faFileContract,
@@ -32,6 +33,7 @@ import {
   faHistory,
   faUserFriends
 } from "@fortawesome/free-solid-svg-icons";
+import { FaSort } from "react-icons/fa";
 import "./AdminPanel.css";
 import { UserManagement } from "./admin/UserManagement";
 import { EditHistory } from "./admin/EditHistory";
@@ -61,6 +63,23 @@ export default function AdminPanel() {
   const { isAuthenticated, user, logout } = useAdminAuth();
   const isNavigatingRef = useRef(false);
 
+  const secondaryNavRef = useRef<HTMLElement>(null);
+  const [navScroll, setNavScroll] = useState({ left: false, right: false });
+
+  const updateNavScroll = useCallback(() => {
+    const el = secondaryNavRef.current;
+    if (!el) return;
+    const canLeft = el.scrollLeft > 4;
+    const canRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setNavScroll(prev => (prev.left === canLeft && prev.right === canRight ? prev : { left: canLeft, right: canRight }));
+  }, []);
+
+  const scrollNav = useCallback((direction: number) => {
+    const el = secondaryNavRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * 320, behavior: 'smooth' });
+  }, []);
+
   useAdminAuthGuard();
 
   const getSubtabFromUrl = (): string | undefined => {
@@ -84,6 +103,13 @@ export default function AdminPanel() {
   };
 
   const [activeTab, setActiveTab] = useState<TabType>(getActiveTabFromUrl());
+
+  useEffect(() => {
+    updateNavScroll();
+    window.addEventListener('resize', updateNavScroll);
+    return () => window.removeEventListener('resize', updateNavScroll);
+  }, [updateNavScroll, activeTab]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [recentAgreements, setRecentAgreements] = useState<SavedFileGroup[]>([]);
@@ -507,7 +533,17 @@ export default function AdminPanel() {
         </div>
       </header>
 
-      <nav className="secondary-nav">
+      <div className="secondary-nav-wrap">
+        <button
+          type="button"
+          className="secondary-nav-arrow"
+          onClick={() => scrollNav(-1)}
+          disabled={!navScroll.left}
+          aria-label="Scroll tabs left"
+        >
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
+        <nav className="secondary-nav" ref={secondaryNavRef} onScroll={updateNavScroll}>
         <button
           className={`secondary-nav-item ${activeTab === "dashboard" ? "active" : ""}`}
           onClick={() => handleTabChange("dashboard")}
@@ -575,7 +611,17 @@ export default function AdminPanel() {
           <FontAwesomeIcon icon={faFileContract} size="lg" />
           Service Agreement
         </button>
-      </nav>
+        </nav>
+        <button
+          type="button"
+          className="secondary-nav-arrow"
+          onClick={() => scrollNav(1)}
+          disabled={!navScroll.right}
+          aria-label="Scroll tabs right"
+        >
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>
 
       <main className="modern-content">
         {activeTab === "dashboard" && (
@@ -632,7 +678,7 @@ export default function AdminPanel() {
                         <th>Agreement / File Name</th>
                         <th>Type</th>
                         <th>Updated</th>
-                        <th>Status ↕</th>
+                        <th>Status <FaSort /></th>
                         <th>Actions</th>
                       </tr>
                     </thead>

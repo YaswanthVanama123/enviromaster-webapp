@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAdminAuth } from "../../backendservice/hooks";
 import { PricingTablesView } from "./PricingTablesView";
@@ -19,6 +19,9 @@ import { AccountTypeDetectorTab } from "./account-type/AccountTypeDetectorTab";
 import { PayrollTab } from "./payroll/PayrollTab";
 import { pdfApi } from "../../backendservice/api/pdfApi";
 import { MdAttachMoney, MdSettings, MdInventory, MdBackup, MdWorkspaces, MdCalculate, MdTrendingUp, MdPeople, MdHistory, MdBusiness, MdLink, MdMap, MdRefresh, MdVerifiedUser, MdCategory, MdPayment } from "react-icons/md";
+import { FaHourglassHalf, FaDownload } from "react-icons/fa";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import "./AdminDashboard.css";
 
 type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll";
@@ -156,6 +159,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>(getActiveTabFromUrl());
   const [exportingPdf, setExportingPdf] = useState(false);
 
+  const navScrollRef = useRef<HTMLDivElement>(null);
+  const [navScroll, setNavScroll] = useState({ left: false, right: false });
+
+  const updateNavScroll = useCallback(() => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    const canLeft = el.scrollLeft > 4;
+    const canRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setNavScroll(prev => (prev.left === canLeft && prev.right === canRight ? prev : { left: canLeft, right: canRight }));
+  }, []);
+
+  useEffect(() => {
+    updateNavScroll();
+    window.addEventListener("resize", updateNavScroll);
+    return () => window.removeEventListener("resize", updateNavScroll);
+  }, [updateNavScroll, activeTab]);
+
+  const scrollNav = useCallback((direction: number) => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * 320, behavior: "smooth" });
+  }, []);
+
   const handleExportPdf = async () => {
     setExportingPdf(true);
     try {
@@ -217,7 +243,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       <div className="admin-dashboard-navigation" style={styles.navigation}>
-        <div style={styles.navTabs}>
+        <div className="apd-nav-scroll-wrap">
+          <button
+            type="button"
+            className="apd-nav-arrow"
+            onClick={() => scrollNav(-1)}
+            disabled={!navScroll.left}
+            aria-label="Scroll tabs left"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <div className="apd-nav-scroll" ref={navScrollRef} onScroll={updateNavScroll} style={styles.navTabs}>
           <button
             className="admin-dashboard-nav-button"
             style={{
@@ -379,12 +415,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <MdPayment size={20} style={{ marginRight: "8px" }} /> Payroll
           </button>
         </div>
+          <button
+            type="button"
+            className="apd-nav-arrow"
+            onClick={() => scrollNav(1)}
+            disabled={!navScroll.right}
+            aria-label="Scroll tabs right"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </div>
         <button
           style={{ ...styles.exportPdfButton, opacity: exportingPdf ? 0.7 : 1 }}
           onClick={handleExportPdf}
           disabled={exportingPdf}
         >
-          {exportingPdf ? "⏳ Generating..." : "⬇ Export Pricing PDF"}
+          {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
         </button>
       </div>
 
@@ -488,7 +534,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "16px 24px",
     backgroundColor: "white",
     borderBottom: "1px solid #e5e5e5",
-    overflowX: "auto",
   },
   navTabs: {
     display: "flex",

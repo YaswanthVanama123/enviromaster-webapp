@@ -1,6 +1,22 @@
 
 
 import React, { useState, useEffect } from "react";
+import {
+  FaClipboardList,
+  FaCalendarAlt,
+  FaMapMarkedAlt,
+  FaDollarSign,
+  FaChartBar,
+  FaTimes,
+  FaBroom,
+  FaBuilding,
+  FaPlus,
+  FaIndustry,
+  FaCog,
+  FaExclamationTriangle,
+  FaLink,
+  FaLightbulb,
+} from "react-icons/fa";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
 import "./ServicePricingEditor.css";
 
@@ -26,7 +42,7 @@ type TabKey =
 interface Tab {
   key: TabKey;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
 }
 
 export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
@@ -83,46 +99,46 @@ export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
   const getAvailableTabs = (): Tab[] => {
     const serviceId = config.serviceId;
     const allTabs: Tab[] = [
-      { key: "overview", label: "Overview", icon: "📋" },
+      { key: "overview", label: "Overview", icon: <FaClipboardList /> },
     ];
 
     if (["saniscrub", "microfiberMopping", "rpmWindows", "carpetCleaning", "stripWax", "foamingDrain", "sanipod", "electrostaticSpray", "refreshPowerScrub"].includes(serviceId)) {
-      allTabs.push({ key: "frequencies", label: "Frequencies", icon: "📅" });
+      allTabs.push({ key: "frequencies", label: "Frequencies", icon: <FaCalendarAlt /> });
     }
 
     if (["saniclean"].includes(serviceId)) {
-      allTabs.push({ key: "geographic", label: "Geographic Pricing", icon: "🗺️" });
+      allTabs.push({ key: "geographic", label: "Geographic Pricing", icon: <FaMapMarkedAlt /> });
     }
 
     if (["saniclean", "sanipod", "microfiberMopping", "rpmWindows", "stripWax"].includes(serviceId)) {
-      allTabs.push({ key: "rateTiers", label: "Rate Tiers", icon: "💰" });
+      allTabs.push({ key: "rateTiers", label: "Rate Tiers", icon: <FaDollarSign /> });
     }
 
     if (["saniscrub", "saniclean", "microfiberMopping"].includes(serviceId)) {
-      allTabs.push({ key: "minimums", label: "Minimums", icon: "📊" });
+      allTabs.push({ key: "minimums", label: "Minimums", icon: <FaChartBar /> });
     }
 
     if (["saniscrub", "rpmWindows", "carpetCleaning", "refreshPowerScrub"].includes(serviceId)) {
-      allTabs.push({ key: "multipliers", label: "Multipliers", icon: "✖️" });
+      allTabs.push({ key: "multipliers", label: "Multipliers", icon: <FaTimes /> });
     }
 
     if (serviceId === "pureJanitorial") {
-      allTabs.push({ key: "janitorial", label: "Janitorial Config", icon: "🧹" });
+      allTabs.push({ key: "janitorial", label: "Janitorial Config", icon: <FaBroom /> });
     }
 
     if (["saniclean"].includes(serviceId)) {
-      allTabs.push({ key: "components", label: "Facility Components", icon: "🏢" });
+      allTabs.push({ key: "components", label: "Facility Components", icon: <FaBuilding /> });
     }
 
     if (["saniclean", "microfiberMopping", "electrostaticSpray"].includes(serviceId)) {
-      allTabs.push({ key: "addons", label: "Add-Ons", icon: "➕" });
+      allTabs.push({ key: "addons", label: "Add-Ons", icon: <FaPlus /> });
     }
 
     if (serviceId === "refreshPowerScrub") {
-      allTabs.push({ key: "refreshPowerScrub", label: "Core Rates & Areas", icon: "🏭" });
+      allTabs.push({ key: "refreshPowerScrub", label: "Core Rates & Areas", icon: <FaIndustry /> });
     }
 
-    allTabs.push({ key: "advanced", label: "Advanced", icon: "⚙️" });
+    allTabs.push({ key: "advanced", label: "Advanced", icon: <FaCog /> });
 
     return allTabs;
   };
@@ -152,7 +168,7 @@ export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
 
       {hasChanges && (
         <div className="spe__changes-indicator">
-          ⚠️ You have unsaved changes
+          <FaExclamationTriangle /> You have unsaved changes
         </div>
       )}
 
@@ -355,7 +371,7 @@ const FrequenciesTab: React.FC<{
         <div className="spe__table-container">
           {monthlyAndTwiceLinked && (
             <div className="spe__note" style={{ marginBottom: "16px" }}>
-              🔗 Monthly and 2x Per Month are linked. Changing one will update the other.
+              <FaLink /> Monthly and 2x Per Month are linked. Changing one will update the other.
             </div>
           )}
 
@@ -389,7 +405,7 @@ const FrequenciesTab: React.FC<{
                       {freq === "twicePerMonth" ? "2x Per Month" : freq.charAt(0).toUpperCase() + freq.slice(1)}
                       {isLinkedToMonthly && monthlyAndTwiceLinked && (
                         <span style={{ marginLeft: "8px", fontSize: "12px", color: "#2563eb" }}>
-                          🔗
+                          <FaLink />
                         </span>
                       )}
                     </td>
@@ -446,7 +462,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            💡 Tip: In SaniScrub, monthly and 2x monthly typically share the same rate per fixture and minimum. The linked values ensure consistency.
+            <FaLightbulb /> Tip: In SaniScrub, monthly and 2x monthly typically share the same rate per fixture and minimum. The linked values ensure consistency.
           </div>
         </div>
       );
@@ -781,7 +797,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            💡 Tip: Monthly multipliers convert per-visit costs to monthly costs. Annual multipliers convert to yearly costs. For example, weekly service has a 4.33 monthly multiplier (4.33 weeks per month average).
+            <FaLightbulb /> Tip: Monthly multipliers convert per-visit costs to monthly costs. Annual multipliers convert to yearly costs. For example, weekly service has a 4.33 monthly multiplier (4.33 weeks per month average).
           </div>
         </div>
       );
@@ -1389,7 +1405,7 @@ const MultipliersTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            💡 These multipliers convert per-visit costs to monthly and annual billing amounts. They are used throughout the Refresh Power Scrub calculation engine.
+            <FaLightbulb /> These multipliers convert per-visit costs to monthly and annual billing amounts. They are used throughout the Refresh Power Scrub calculation engine.
           </div>
         </div>
       </div>
@@ -2128,7 +2144,7 @@ const RefreshPowerScrubTab: React.FC<{
       </div>
 
       <div className="spe__note" style={{ marginTop: "24px" }}>
-        💡 <strong>Refresh Power Scrub Pricing Rules:</strong>
+        <FaLightbulb /> <strong>Refresh Power Scrub Pricing Rules:</strong>
         <br />• <strong>Trip Charge:</strong> ${coreRates.tripCharge || 75} per visit
         <br />• <strong>Hourly Rate:</strong> ${coreRates.defaultHourlyRate || 200}/hour/worker
         <br />• <strong>Minimum:</strong> ${coreRates.minimumVisit || 475} per visit
@@ -2174,7 +2190,7 @@ const AdvancedTab: React.FC<{
       <h3 className="spe__section-title">Advanced JSON Editor</h3>
 
       <div className="spe__warning">
-        ⚠️ Warning: Editing JSON directly can break the pricing calculator. Use the structured tabs above when possible.
+        <FaExclamationTriangle /> Warning: Editing JSON directly can break the pricing calculator. Use the structured tabs above when possible.
       </div>
 
       {jsonError && <div className="spe__error">{jsonError}</div>}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaStopwatch, FaPlus } from "react-icons/fa";
 import "./PriceChanges.css";
 
 type Category = "Small Product" | "Dispenser" | "Big Product";
@@ -110,7 +111,7 @@ export default function PriceChanges() {
                 </td>
                 <td>{new Date(item.effectiveFrom).toLocaleDateString()}</td>
                 <td>{item.frequency}</td>
-                <td className="clock">⏱️</td>
+                <td className="clock"><FaStopwatch /></td>
               </tr>
             ))}
           </tbody>
@@ -119,7 +120,7 @@ export default function PriceChanges() {
 
       <div className="pc__footer">
         <button className="pc__btn pc__btn--light" onClick={addNewService}>
-          ➕ Add Service
+          <FaPlus /> Add Service
         </button>
         <button className="pc__btn pc__btn--primary" onClick={saveChanges}>
           Save Changes

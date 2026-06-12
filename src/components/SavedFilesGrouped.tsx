@@ -6,7 +6,7 @@ import { Toast } from "./admin/Toast";
 import type { ToastType } from "./admin/Toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCheckSquare, faTrash, faClipboardList
+  faCheckSquare, faTrash, faClipboardList, faExclamationTriangle, faPaperclip
 } from "@fortawesome/free-solid-svg-icons";
 import EmailComposer, { type EmailData } from "./EmailComposer";
 import { ZohoUpload } from "./ZohoUpload";
@@ -1083,7 +1083,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                           fontSize: '11px',
                           fontWeight: '600'
                         }}>
-                          ⚠️ Significant Changes
+                          <FontAwesomeIcon icon={faExclamationTriangle} /> Significant Changes
                         </span>
                       </div>
                     )}
@@ -1221,7 +1221,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 }}>
                   <FontAwesomeIcon icon={faFileAlt} style={{ color: '#2563eb' }} />
                   <span>{file.title}</span>
-                  <span style={{ color: '#10b981' }}>📎</span>
+                  <span style={{ color: '#10b981' }}><FontAwesomeIcon icon={faPaperclip} /></span>
                 </div>
               ))}
             </div>

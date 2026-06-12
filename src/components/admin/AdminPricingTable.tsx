@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { FaPlus, FaArrowUp, FaDownload, FaTrashAlt } from "react-icons/fa";
 import { usePricing } from "../../pricing/pricingStore";
 import type { PriceRow, Frequency, UnitType, Category } from "../../pricing/pricingTypes";
 import { toCsv, fromCsv } from "../../pricing/pricingCsv";
@@ -104,10 +105,10 @@ export default function AdminPricingTable() {
         />
         <div className="pc__spacer" />
         <button className="pc__btn pc__btn--light" onClick={addRow}>
-          ➕ Add Service
+          <FaPlus /> Add Service
         </button>
         <label className="pc__btn pc__btn--light" style={{ cursor: "pointer" }}>
-          ⬆️ Import CSV
+          <FaArrowUp /> Import CSV
           <input
             type="file"
             accept=".csv"
@@ -116,7 +117,7 @@ export default function AdminPricingTable() {
           />
         </label>
         <button className="pc__btn pc__btn--primary" onClick={onExport}>
-          ⬇️ Export CSV
+          <FaDownload /> Export CSV
         </button>
       </div>
 
@@ -238,7 +239,7 @@ export default function AdminPricingTable() {
                     className="pc__btn pc__btn--light"
                     onClick={() => removeRow(r.id)}
                   >
-                    🗑️
+                    <FaTrashAlt />
                   </button>
                 </td>
               </tr>

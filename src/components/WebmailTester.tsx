@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaEnvelope, FaClipboardList, FaWrench } from "react-icons/fa";
 import {
   shareViaPdf,
   createPdfEmailData
@@ -31,7 +32,7 @@ const EmailTester: React.FC = () => {
       margin: '20px',
       backgroundColor: '#f8f9fa'
     }}>
-      <h2>📧 Email Integration Tester</h2>
+      <h2><FaEnvelope /> Email Integration Tester</h2>
       <p><strong>Note:</strong> This tests the new mailto-based email functionality.</p>
 
       <div style={{ marginBottom: '20px' }}>
@@ -68,7 +69,7 @@ const EmailTester: React.FC = () => {
       )}
 
       <div style={{ marginTop: '20px', backgroundColor: '#fff3cd', padding: '10px', borderRadius: '4px' }}>
-        <h4>📋 Testing Instructions</h4>
+        <h4><FaClipboardList /> Testing Instructions</h4>
         <ol>
           <li><strong>Test Email:</strong> Click "Test Email Compose" to open your default email client</li>
           <li><strong>Check PDF Download:</strong> A PDF file should download automatically for attachment</li>
@@ -78,7 +79,7 @@ const EmailTester: React.FC = () => {
       </div>
 
       <div style={{ marginTop: '20px', backgroundColor: '#d1ecf1', padding: '10px', borderRadius: '4px' }}>
-        <h4>🔧 How it works</h4>
+        <h4><FaWrench /> How it works</h4>
         <ul>
           <li><strong>Opens default email client:</strong> Uses mailto: links to open your system email client</li>
           <li><strong>Automatic PDF download:</strong> Downloads PDF file for manual attachment</li>

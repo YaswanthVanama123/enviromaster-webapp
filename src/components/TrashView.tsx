@@ -265,7 +265,7 @@ export default function TrashView() {
 
     if (!isInAdminContext) {
       setToastMessage({
-        message: "⚠️ Admin access required to permanently delete items. Please access this page from the Admin Panel to perform permanent deletions.",
+        message: "Admin access required to permanently delete items. Please access this page from the Admin Panel to perform permanent deletions.",
         type: "error"
       });
       setDeleteConfirmOpen(false);

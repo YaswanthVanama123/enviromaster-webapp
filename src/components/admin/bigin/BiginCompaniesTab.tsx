@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginCompanyApi, type BiginCompany, type FetchStatus, type CompanyStats } from '../../../backendservice/api/biginCompanyApi';
 import './BiginCompaniesTab.css';
 
@@ -149,7 +150,7 @@ export const BiginCompaniesTab: React.FC = () => {
             <span className="bc-fetch-time">{formatDate(fetchStatus.lastFetchAt)}</span>
             {fetchStatus.lastFetchResult && (
               <span className={`bc-fetch-result ${fetchStatus.lastFetchResult}`}>
-                {fetchStatus.lastFetchResult === 'success' ? '✓ Success' : '✗ Failed'}
+                {fetchStatus.lastFetchResult === 'success' ? <><FaCheckCircle /> Success</> : <><FaTimesCircle /> Failed</>}
               </span>
             )}
             {fetchStatus.totalCompanies > 0 && (

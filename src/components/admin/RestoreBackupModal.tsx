@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaExclamationTriangle } from "react-icons/fa";
 import { backupUtils } from '../../backendservice/api/pricingBackupApi';
 import type { PricingBackup } from '../../backendservice/types/pricingBackup.types';
 
@@ -255,7 +256,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
         <div style={styles.content}>
           <div style={styles.warningBox}>
             <h3 style={styles.warningTitle}>
-              ⚠️ Important Warning
+              <FaExclamationTriangle /> Important Warning
             </h3>
             <p style={styles.warningText}>
               This action will <strong>completely replace</strong> all current pricing data with the backup from {backupUtils.formatChangeDay(backup.changeDay)}.

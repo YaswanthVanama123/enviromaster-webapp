@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaClipboardList } from "react-icons/fa";
 
 interface CreateBackupModalProps {
   onClose: () => void;
@@ -163,7 +164,7 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
         <div style={styles.content}>
           <div style={styles.infoBox}>
             <p style={styles.infoText}>
-              📋 This will create a backup of all current pricing data (PriceFixes, Product Catalog, and Service Configs).
+              <FaClipboardList /> This will create a backup of all current pricing data (PriceFixes, Product Catalog, and Service Configs).
               Only one backup per day is allowed - if a backup already exists for today, this action will be skipped.
             </p>
           </div>

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FaCalendarAlt, FaCog, FaUsers, FaHistory, FaDollarSign, FaChevronDown, FaChevronUp, FaSave, FaSync, FaDownload, FaFileInvoiceDollar } from "react-icons/fa";
+import { FaCalendarAlt, FaCog, FaUsers, FaHistory, FaDollarSign, FaChevronDown, FaChevronUp, FaSave, FaSync, FaDownload, FaFileInvoiceDollar, FaFilePdf, FaLock } from "react-icons/fa";
 import { apiClient } from "../../../backendservice/utils/apiClient";
 import { PayrollSlipModal } from "./PayrollSlipModal";
-import { buildPayrollSlipHtml, printPayrollSlips } from "./payrollPdf";
 import "./PayrollTab.css";
 
 interface PayrollSettings {
@@ -318,17 +317,36 @@ export const PayrollTab: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const exportEmployeePdf = (emp: EmployeePayroll, period: PayrollPeriod) => {
-    printPayrollSlips(
-      buildPayrollSlipHtml(emp, period),
-      `Payroll - ${emp.username} - ${period.label}`,
-    );
-  };
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [downloadingEmployee, setDownloadingEmployee] = useState<string | null>(null);
 
-  const exportAllPdfs = (emps: EmployeePayroll[], period: PayrollPeriod) => {
-    if (!emps.length) return;
-    const html = emps.map(e => buildPayrollSlipHtml(e, period)).join("");
-    printPayrollSlips(html, `Payroll - All Employees - ${period.label}`);
+  const downloadPayrollPdf = async (period: PayrollPeriod, emp?: EmployeePayroll) => {
+    try {
+      if (emp) setDownloadingEmployee(emp.username);
+      else setDownloadingPdf(true);
+      setError(null);
+      const usernameParam = emp ? `&username=${encodeURIComponent(emp.username)}` : "";
+      const blob = await apiClient.downloadBlob(
+        `/api/payroll/download-pdf?periodStart=${encodeURIComponent(period.start)}&periodEnd=${encodeURIComponent(period.end)}${usernameParam}`
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const namePart = emp ? `${emp.username.replace(/[^a-z0-9]+/gi, "-")}-` : "";
+      link.download = `payroll-${namePart}${period.label.replace(/[^a-z0-9]+/gi, "-")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      if (activeSubTab === "history") {
+        loadHistory();
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to download payroll PDF");
+    } finally {
+      setDownloadingPdf(false);
+      setDownloadingEmployee(null);
+    }
   };
 
   const renderPayrollBody = (
@@ -368,13 +386,16 @@ export const PayrollTab: React.FC = () => {
         <div className="employees-section-header">
           <h3>Salesperson Commissions</h3>
           {emps.length > 0 && (
-            <button
-              className="export-all-pdf-btn"
-              onClick={() => exportAllPdfs(emps, period)}
-              title="Download a PDF with every salesperson's payroll statement"
-            >
-              <FaDownload /> Export All PDFs
-            </button>
+            <div className="employees-section-actions">
+              <button
+                className="download-payroll-pdf-btn"
+                onClick={() => downloadPayrollPdf(period)}
+                disabled={downloadingPdf}
+                title="Download one combined PDF with every employee's payroll and record it in history"
+              >
+                <FaFilePdf /> {downloadingPdf ? "Generating…" : "Download Payroll PDF"}
+              </button>
+            </div>
           )}
         </div>
         {emps.length === 0 ? (
@@ -424,11 +445,12 @@ export const PayrollTab: React.FC = () => {
                     className="export-pdf-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      exportEmployeePdf(emp, period);
+                      downloadPayrollPdf(period, emp);
                     }}
+                    disabled={downloadingEmployee === emp.username}
                     title="Download this salesperson's payroll PDF"
                   >
-                    <FaDownload /> PDF
+                    <FaDownload /> {downloadingEmployee === emp.username ? "…" : "PDF"}
                   </button>
                   <div className="expand-icon">
                     {expandedEmployee === emp.username ? <FaChevronUp /> : <FaChevronDown />}
@@ -670,7 +692,12 @@ export const PayrollTab: React.FC = () => {
                     <div className="history-period">
                       <span className="history-label">{period.period.label}</span>
                       {idx === 0 && <span className="current-badge">Current</span>}
-                      {period.finalized && <span className="finalized-badge">🔒 Finalized</span>}
+                      {period.finalized && <span className="finalized-badge"><FaLock /> Finalized</span>}
+                      {period.pdfGeneratedAt && (
+                        <span className="pdf-badge" title={`Payroll PDF generated ${formatDate(period.pdfGeneratedAt)}${period.pdfCount > 1 ? ` · ${period.pdfCount}×` : ""}`}>
+                          <FaFilePdf /> PDF
+                        </span>
+                      )}
                       <span className="history-view-link">View payroll →</span>
                     </div>
                     <div className="history-stats">
@@ -707,7 +734,7 @@ export const PayrollTab: React.FC = () => {
             <div className="payroll-period-card">
               <div className="period-header">
                 <h3>Payroll Period</h3>
-                {historyFinalized && <span className="finalized-badge">🔒 Finalized</span>}
+                {historyFinalized && <span className="finalized-badge"><FaLock /> Finalized</span>}
               </div>
               <div className="period-info">
                 <span className="period-label">{selectedHistoryPeriod.label}</span>

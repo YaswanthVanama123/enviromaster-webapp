@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { FaDollarSign, FaExclamationTriangle } from "react-icons/fa";
 import { commissionApi } from "../../../backendservice/api/commissionApi";
 import {
   resolveCommissionRules,
@@ -280,7 +281,7 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
   return (
     <div className="commission-calculator">
       <h3 className="calculator-section-title">
-        <span>$</span> Deal Information
+        <span><FaDollarSign /></span> Deal Information
       </h3>
       <p style={{ color: "#6b7280", fontSize: "0.85em", marginTop: -8 }}>
         Same V2 spec-faithful pipeline as FormFilling — pricing tier from current/redline ratio,
@@ -593,7 +594,7 @@ function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculato
         </div>
         {r.requiresApproval && (
           <div style={{ ...rowStyle, color: "#dc2626" }}>
-            <span>⚠ Requires Approval</span>
+            <span><FaExclamationTriangle /> Requires Approval</span>
             <span></span>
           </div>
         )}

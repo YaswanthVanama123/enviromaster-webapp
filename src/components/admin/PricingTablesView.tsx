@@ -10,6 +10,7 @@ import { Spinner } from "../atoms/Spinner";
 import "./PricingTablesView.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
+import { FaBox, FaTools, FaExclamationTriangle } from "react-icons/fa";
 
 const truncateText = (text: string | undefined, maxLength: number): string => {
   if (!text) return "—";
@@ -619,7 +620,7 @@ export const PricingTablesView: React.FC = () => {
     return (
       <div style={styles.container} className="pricing-container">
         <div style={styles.errorBox} className="pricing-error-box">
-          <h3>⚠️ Error Loading Data</h3>
+          <h3><FaExclamationTriangle /> Error Loading Data</h3>
           {servicesError && <p>Services Error: {servicesError}</p>}
           {catalogError && <p>Catalog Error: {catalogError}</p>}
         </div>
@@ -631,7 +632,7 @@ export const PricingTablesView: React.FC = () => {
     return (
       <div style={styles.container} className="pricing-container">
         <div style={styles.errorBox} className="pricing-error-box">
-          <h3>⚠️ No Data Available</h3>
+          <h3><FaExclamationTriangle /> No Data Available</h3>
           <p>No services or products found. Please check backend connection.</p>
           <p>Configs length: {configs?.length || 0}</p>
           <p>Catalog families: {catalog?.families?.length || 0}</p>
@@ -649,7 +650,7 @@ export const PricingTablesView: React.FC = () => {
 
       {}
       <div style={styles.section} className="pricing-section">
-        <h2 style={styles.sectionTitle} className="pricing-section-title">📦 PRODUCT CATALOG</h2>
+        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaBox /> PRODUCT CATALOG</h2>
 
         <div style={styles.tabBar} className="pricing-tab-bar">
           {catalog?.families.map((family) => (
@@ -776,7 +777,7 @@ export const PricingTablesView: React.FC = () => {
 
       {}
       <div style={styles.section} className="pricing-section">
-        <h2 style={styles.sectionTitle} className="pricing-section-title">🛠️ SERVICES PRICING</h2>
+        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaTools /> SERVICES PRICING</h2>
 
         <div style={styles.tabBar} className="pricing-tab-bar">
           {configs.map((service) => (
@@ -901,7 +902,7 @@ export const PricingTablesView: React.FC = () => {
 
         {!selectedServiceData && (
           <div style={styles.errorBox} className="pricing-error-box">
-            <p>⚠️ Service not found</p>
+            <p><FaExclamationTriangle /> Service not found</p>
             <p>Selected: {selectedService}</p>
             <p>Available services: {configs.map(c => c.serviceId).join(", ")}</p>
           </div>

@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginAuditApi, type BiginAuditLog, type ScrapeStatus, type AuditStats } from '../../../backendservice/api/biginAuditApi';
 import './BiginAuditTab.css';
 
@@ -309,7 +310,7 @@ export const BiginAuditTab: React.FC = () => {
             <span className="ba-scrape-time">{formatDate(scrapeStatus.lastScrapeAt)}</span>
             {scrapeStatus.lastScrapeResult && (
               <span className={`ba-scrape-result ${scrapeStatus.lastScrapeResult}`}>
-                {scrapeStatus.lastScrapeResult === 'success' ? '✓ Success' : '✗ Failed'}
+                {scrapeStatus.lastScrapeResult === 'success' ? <><FaCheckCircle /> Success</> : <><FaTimesCircle /> Failed</>}
               </span>
             )}
             {scrapeStatus.totalLogs > 0 && (
@@ -617,7 +618,7 @@ export const BiginAuditTab: React.FC = () => {
               {uploadResult && (
                 <div className={`ba-upload-result ${uploadResult.success ? 'success' : 'error'}`}>
                   <div className="ba-result-icon">
-                    {uploadResult.success ? '✓' : '✗'}
+                    {uploadResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
                     <strong>{uploadResult.success ? 'Upload Successful' : 'Upload Failed'}</strong>
@@ -678,7 +679,7 @@ export const BiginAuditTab: React.FC = () => {
               ) : (
                 <div className={`ba-delete-result ${deleteResult.success ? 'success' : 'error'}`}>
                   <div className="ba-result-icon">
-                    {deleteResult.success ? '✓' : '✗'}
+                    {deleteResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
                     <strong>{deleteResult.success ? 'Deletion Successful' : 'Deletion Failed'}</strong>
@@ -730,7 +731,7 @@ export const BiginAuditTab: React.FC = () => {
               ) : (
                 <div className={`ba-delete-result ${deleteResult.success ? 'success' : 'error'}`}>
                   <div className="ba-result-icon">
-                    {deleteResult.success ? '✓' : '✗'}
+                    {deleteResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
                     <strong>{deleteResult.success ? 'Deletion Successful' : 'Deletion Failed'}</strong>

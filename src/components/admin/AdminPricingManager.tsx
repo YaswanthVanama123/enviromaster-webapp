@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaBox, FaHourglassHalf, FaDownload } from "react-icons/fa";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
 import { ServicePricingEditor } from "./ServicePricingEditor";
@@ -131,7 +132,7 @@ export const AdminPricingManager: React.FC = () => {
             style={styles.viewButton}
             onClick={() => setViewMode("products")}
           >
-            📦 View Product Catalog
+            <FaBox /> View Product Catalog
           </button>
           <button
             className="apm-export-pdf-button"
@@ -139,7 +140,7 @@ export const AdminPricingManager: React.FC = () => {
             onClick={handleExportPdf}
             disabled={exportingPdf}
           >
-            {exportingPdf ? "⏳ Generating..." : "⬇ Export Pricing PDF"}
+            {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
           </button>
         </div>
 
@@ -264,7 +265,7 @@ export const AdminPricingManager: React.FC = () => {
             onClick={handleExportPdf}
             disabled={exportingPdf}
           >
-            {exportingPdf ? "⏳ Generating..." : "⬇ Export Pricing PDF"}
+            {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
           </button>
         </div>
 

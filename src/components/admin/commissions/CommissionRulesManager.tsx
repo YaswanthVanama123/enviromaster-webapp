@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaCog } from "react-icons/fa";
 import { commissionApi } from "../../../backendservice/api/commissionApi";
 import type { CommissionRules } from "../../../backendservice/types/commission.types";
 import {
@@ -206,7 +207,7 @@ export const CommissionRulesManager: React.FC = () => {
   return (
     <div className="commission-rules-manager">
       <h3 className="calculator-section-title">
-        <span>⚙️</span> Commission Rules Configuration
+        <span><FaCog /></span> Commission Rules Configuration
       </h3>
 
       {error && <div className="error-message">{error}</div>}
