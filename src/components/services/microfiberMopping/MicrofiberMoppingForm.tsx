@@ -841,7 +841,7 @@ export const MicrofiberMoppingForm: React.FC<
                   borderRadius: '4px',
                   display: 'inline-block'
                 }}>
-                  🔴 Redline Pricing
+                  <FaCircle color="#dc2626" /> Redline Pricing
                 </span>
               )}
             </div>
