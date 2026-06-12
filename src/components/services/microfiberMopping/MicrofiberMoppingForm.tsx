@@ -8,6 +8,7 @@ import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
+import { FaCircle } from "react-icons/fa";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -828,7 +829,7 @@ export const MicrofiberMoppingForm: React.FC<
                   borderRadius: '4px',
                   display: 'inline-block'
                 }}>
-                  🟢 Greenline Pricing
+                  <FaCircle color="#16a34a" /> Greenline Pricing
                 </span>
               ) : (
                 <span style={{

@@ -1,6 +1,7 @@
 
 
 import React, { useState } from 'react';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import { sanitizeText, detectProblematicCharacters, getReplacementSummary } from '../../utils/textSanitizer';
 
 interface SanitizedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -71,7 +72,7 @@ export const SanitizedInput: React.FC<SanitizedInputProps> = ({
             zIndex: 10,
           }}
         >
-          ⚠️ {warning}
+          <FaExclamationTriangle /> {warning}
         </div>
       )}
     </div>
@@ -146,7 +147,7 @@ export const SanitizedTextarea: React.FC<SanitizedTextareaProps> = ({
             zIndex: 10,
           }}
         >
-          ⚠️ {warning}
+          <FaExclamationTriangle /> {warning}
         </div>
       )}
     </div>

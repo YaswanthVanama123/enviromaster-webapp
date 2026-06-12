@@ -142,7 +142,7 @@ export const RouteStarCustomersTab: React.FC = () => {
             {syncStatus.lastSyncResult && (
               <span className={`rs-sync-result ${syncStatus.lastSyncResult}`}>
                 {syncStatus.lastSyncResult === 'success' ? '✓ Success' :
-                 syncStatus.lastSyncResult === 'partial' ? '⚠ Partial' : '✗ Failed'}
+                 syncStatus.lastSyncResult === 'partial' ? 'Partial' : '✗ Failed'}
               </span>
             )}
           </div>

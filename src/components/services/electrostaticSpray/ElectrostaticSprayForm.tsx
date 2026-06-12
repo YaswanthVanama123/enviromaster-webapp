@@ -15,6 +15,7 @@ import {
   RefreshButton,
 } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
+import { FaCircle } from "react-icons/fa";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -574,11 +575,11 @@ export const ElectrostaticSprayForm: React.FC<
               <div className="svc-field">
                 {calc.contractTotal > calc.originalContractTotal * 1.3 ? (
                   <span className="em-pricing-tier em-pricing-tier--green">
-                    🟢 Greenline Pricing
+                    <FaCircle color="#16a34a" /> Greenline Pricing
                   </span>
                 ) : (
                   <span className="em-pricing-tier em-pricing-tier--red">
-                    🔴 Redline Pricing
+                    <FaCircle color="#dc2626" /> Redline Pricing
                   </span>
                 )}
               </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { FaInfoCircle, FaUsers } from "react-icons/fa";
 import { salesPersonApi } from "../../../backendservice/api/quotaApi";
 import type {
   SalesPerson,
@@ -144,7 +145,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
           </select>
         </div>
         <div className="info-banner">
-          <span className="info-icon">ℹ️</span>
+          <span className="info-icon"><FaInfoCircle /></span>
           <span>Employees are managed in <strong>User Management</strong>. Edit quota targets here.</span>
         </div>
       </div>
@@ -233,7 +234,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
         <div className="loading-state">Loading employees...</div>
       ) : salesPersons.length === 0 ? (
         <div className="empty-state-container">
-          <div className="empty-state-icon">👥</div>
+          <div className="empty-state-icon"><FaUsers /></div>
           <h3>No Employees Found</h3>
           <p>
             Employees are managed in <strong>User Management</strong>.<br />

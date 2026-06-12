@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { FaUsers } from "react-icons/fa";
 import { quotaApi, salesPersonApi } from "../../../backendservice/api/quotaApi";
 import type {
   SalesPerson,
@@ -101,7 +102,7 @@ export const QuotaDashboard: React.FC<QuotaDashboardProps> = ({ onViewAgreements
         <div className="error-state">{error}</div>
       ) : salesPersons.length === 0 ? (
         <div className="empty-state-container">
-          <div className="empty-state-icon">👥</div>
+          <div className="empty-state-icon"><FaUsers /></div>
           <h3>No Employees Found</h3>
           <p>Employees are managed in <strong>User Management</strong>. Add employees there to start tracking quotas.</p>
         </div>
