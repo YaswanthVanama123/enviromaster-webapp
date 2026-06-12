@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FaCircle } from "react-icons/fa";
 import { useJanitorialCalc, DEFAULT_SUPPLIES } from "./useJanitorialCalc";
 import type { JanitorialFormState } from "./useJanitorialCalc";
 import { janitorialFrequencyLabels, janitorialFrequencyList } from "./janitorialConfig";
@@ -453,11 +454,11 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             <div className="svc-row-right">
               {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
                 <span style={{ color: "#388e3c", fontSize: "13px", fontWeight: 600, padding: "4px 8px", backgroundColor: "#e8f5e9", borderRadius: "4px", display: "inline-block" }}>
-                  🟢 Greenline Pricing
+                  <FaCircle color="#16a34a" /> Greenline Pricing
                 </span>
               ) : (
                 <span style={{ color: "#d32f2f", fontSize: "13px", fontWeight: 600, padding: "4px 8px", backgroundColor: "#ffebee", borderRadius: "4px", display: "inline-block" }}>
-                  🔴 Redline Pricing
+                  <FaCircle color="#dc2626" /> Redline Pricing
                 </span>
               )}
             </div>

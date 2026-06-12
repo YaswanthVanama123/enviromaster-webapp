@@ -7,6 +7,7 @@ import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
+import { FaCircle } from "react-icons/fa";
 
 const formatNumber = (num: number | undefined): string => {
   if (num === undefined || num === null || isNaN(num)) {
@@ -781,7 +782,7 @@ export const RpmWindowsForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                🟢 Greenline Pricing
+                <FaCircle color="#16a34a" /> Greenline Pricing
               </span>
             ) : (
               <span style={{
@@ -793,7 +794,7 @@ export const RpmWindowsForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                🔴 Redline Pricing
+                <FaCircle color="#dc2626" /> Redline Pricing
               </span>
             )}
           </div>

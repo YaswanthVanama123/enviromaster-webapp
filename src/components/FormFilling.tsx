@@ -2287,13 +2287,13 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
 
       if (documentStatus === 'pending_approval') {
         setToastMessage({
-          message: `PDF created successfully! ${pricingStatus === 'red' ? '⚠️ Red Line pricing' : '⚠️ Pricing below threshold'} - pending approval before finalization.`,
+          message: `PDF created successfully! ${pricingStatus === 'red' ? 'Red Line pricing' : 'Pricing below threshold'} - pending approval before finalization.`,
           type: "warning"
         });
         zohoApi.createAutoApprovalTask(documentId, payload?.headerTitle || 'Agreement').catch(() => {});
       } else {
         setToastMessage({
-          message: "First version (v1) created and approved successfully! ✅ Green Line pricing.",
+          message: "First version (v1) created and approved successfully! Green Line pricing.",
           type: "success"
         });
       }
@@ -2399,13 +2399,13 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
 
         if (documentStatus === 'pending_approval') {
           setToastMessage({
-            message: `Agreement created! ${pricingStatus === 'red' ? '⚠️ Red Line pricing' : '⚠️ Pricing below threshold'} - pending approval before finalization.`,
+            message: `Agreement created! ${pricingStatus === 'red' ? 'Red Line pricing' : 'Pricing below threshold'} - pending approval before finalization.`,
             type: "warning"
           });
           zohoApi.createAutoApprovalTask(newId, payloadToSend.headerTitle || 'Agreement').catch(() => {});
         } else {
           setToastMessage({
-            message: "Agreement created and approved successfully! ✅ Green Line pricing.",
+            message: "Agreement created and approved successfully! Green Line pricing.",
             type: "success"
           });
         }
@@ -2469,16 +2469,16 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
       if (documentStatus === 'pending_approval') {
         setToastMessage({
           message: replaceRecent
-            ? `Current version replaced! ${pricingStatus === 'red' ? '⚠️ Red Line pricing' : '⚠️ Pricing below threshold'} - pending approval.`
-            : `Version ${result.version?.versionNumber} created! ${pricingStatus === 'red' ? '⚠️ Red Line pricing' : '⚠️ Pricing below threshold'} - pending approval.`,
+            ? `Current version replaced! ${pricingStatus === 'red' ? 'Red Line pricing' : 'Pricing below threshold'} - pending approval.`
+            : `Version ${result.version?.versionNumber} created! ${pricingStatus === 'red' ? 'Red Line pricing' : 'Pricing below threshold'} - pending approval.`,
           type: "warning"
         });
         zohoApi.createAutoApprovalTask(documentId, payload?.headerTitle || 'Agreement').catch(() => {});
       } else {
         setToastMessage({
           message: replaceRecent
-            ? `Current version replaced and approved successfully! ✅ Green Line pricing.`
-            : `Version ${result.version?.versionNumber} created and approved successfully! ✅ Green Line pricing.`,
+            ? `Current version replaced and approved successfully! Green Line pricing.`
+            : `Version ${result.version?.versionNumber} created and approved successfully! Green Line pricing.`,
           type: "success"
         });
       }

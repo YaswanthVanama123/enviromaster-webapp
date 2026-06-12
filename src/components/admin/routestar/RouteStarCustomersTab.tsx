@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 import { routestarCustomersApi, type RouteStarCustomer, type CustomerSyncStatus, type CustomerStats } from '../../../backendservice/api/routestarCustomersApi';
 import './RouteStarCustomersTab.css';
 
@@ -273,7 +274,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                         className="rs-external-link"
                         title="Open in RouteStar"
                       >
-                        ↗
+                        <FaExternalLinkAlt />
                       </a>
                     )}
                   </td>
@@ -384,7 +385,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                     rel="noopener noreferrer"
                     className="rs-external-btn"
                   >
-                    Open in RouteStar ↗
+                    Open in RouteStar <FaExternalLinkAlt />
                   </a>
                 </div>
               )}

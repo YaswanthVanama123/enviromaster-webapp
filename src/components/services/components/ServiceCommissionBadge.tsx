@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaHourglassHalf, FaExclamationTriangle } from 'react-icons/fa';
 import { useServiceCommission } from '../hooks/useServiceCommission';
 import type { AccountType } from '../../../backendservice/api/accountTypeApi';
 
@@ -34,7 +35,7 @@ export function ServiceCommissionBadge({
   if (!commission.accountType) {
     return (
       <div className="commission-badge commission-badge--pending">
-        <span className="commission-badge__icon">⏳</span>
+        <span className="commission-badge__icon"><FaHourglassHalf /></span>
         <span className="commission-badge__text">Detecting...</span>
       </div>
     );
@@ -173,7 +174,7 @@ export function ServiceCommissionBadge({
 
           {commission.usedFallback && (
             <div style={{ marginTop: '4px', fontSize: '11px', color: '#f59e0b' }}>
-              ⚠️ Using estimated driving time
+              <FaExclamationTriangle /> Using estimated driving time
             </div>
           )}
         </div>

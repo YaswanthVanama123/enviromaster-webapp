@@ -18,9 +18,9 @@ const EmailTester: React.FC = () => {
       });
 
       shareViaPdf(emailData, attachment);
-      setTestResult('✅ Email client opened and PDF download initiated successfully!');
+      setTestResult('Email client opened and PDF download initiated successfully!');
     } catch (error) {
-      setTestResult(`❌ Email test failed: ${error}`);
+      setTestResult(`Email test failed: ${error}`);
     }
   };
 

@@ -1722,7 +1722,7 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       setEditingField(null);
     } catch (error) {
       console.error("Error saving field:", error);
-      setErrorMessage("❌ Failed to update price. Please try again.");
+      setErrorMessage("Failed to update price. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -1748,7 +1748,7 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       setNewPTLabel("");
       setNewPTRate("1000");
     } catch {
-      setErrorMessage("❌ Failed to add place type. Please try again.");
+      setErrorMessage("Failed to add place type. Please try again.");
     } finally {
       setSavingNewPT(false);
     }

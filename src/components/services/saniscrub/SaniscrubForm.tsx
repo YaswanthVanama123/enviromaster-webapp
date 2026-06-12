@@ -7,6 +7,7 @@ import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
+import { FaCircle } from "react-icons/fa";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -667,11 +668,11 @@ export const SaniscrubForm: React.FC<
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
                 <span className="em-pricing-tier em-pricing-tier--green">
-                  🟢 Greenline Pricing
+                  <FaCircle color="#16a34a" /> Greenline Pricing
                 </span>
               ) : (
                 <span className="em-pricing-tier em-pricing-tier--red">
-                  🔴 Redline Pricing
+                  <FaCircle color="#dc2626" /> Redline Pricing
                 </span>
               )}
           </div>

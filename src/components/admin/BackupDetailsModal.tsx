@@ -786,7 +786,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                         ...styles.expandIcon,
                         ...(expandedItems.has('catalog-main') ? styles.expandIconExpanded : {})
                       }}>
-                        ▶
+                        <FontAwesomeIcon icon={faCaretRight} />
                       </span>
                       <strong><FontAwesomeIcon icon={faClipboard} /> {snapshot.dataTypes.productCatalog.active.version}</strong>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
@@ -847,7 +847,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                   ...styles.expandIcon,
                                   ...(expandedItems.has(`family-${familyIndex}`) ? styles.expandIconExpanded : {})
                                 }}>
-                                  ▶
+                                  <FontAwesomeIcon icon={faCaretRight} />
                                 </span>
                                 <strong><FontAwesomeIcon icon={faFolder} /> {family.familyName || family.name || `Family ${familyIndex + 1}`}</strong>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
@@ -891,7 +891,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                             ...styles.expandIcon,
                                             ...(expandedItems.has(`product-${familyIndex}-${productIndex}`) ? styles.expandIconExpanded : {})
                                           }}>
-                                            ▶
+                                            <FontAwesomeIcon icon={faCaretRight} />
                                           </span>
                                           <div style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'space-between' }}>
                                             <strong><FontAwesomeIcon icon={faBox} /> {product.name || product.productName || `Product ${productIndex + 1}`}</strong>
@@ -1051,7 +1051,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                           ...styles.expandIcon,
                           ...(expandedItems.has(`service-${configIndex}`) ? styles.expandIconExpanded : {})
                         }}>
-                          ▶
+                          <FontAwesomeIcon icon={faCaretRight} />
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                           <strong style={config.isActive ? styles.serviceStatusActive : styles.serviceStatusInactive}>
@@ -1130,7 +1130,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                     ...styles.expandIcon,
                                     ...(expandedItems.has(`settings-${configIndex}`) ? styles.expandIconExpanded : {})
                                   }}>
-                                    ▶
+                                    <FontAwesomeIcon icon={faCaretRight} />
                                   </span>
                                   <strong><FontAwesomeIcon icon={faCog} /> Configuration Settings</strong>
                                   <span style={{...styles.badge, backgroundColor: '#e0e7ff', color: '#3730a3', marginLeft: '12px'}}>
@@ -1177,7 +1177,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                       ...styles.expandIcon,
                                       ...(expandedItems.has(`pricing-${configIndex}`) ? styles.expandIconExpanded : {})
                                     }}>
-                                      ▶
+                                      <FontAwesomeIcon icon={faCaretRight} />
                                     </span>
                                     <strong><FontAwesomeIcon icon={faMoneyBill} /> Service Pricing Details</strong>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
@@ -1387,7 +1387,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                         ...styles.expandIcon,
                         ...(expandedItems.has(`pricing-${pricingIndex}`) ? styles.expandIconExpanded : {})
                       }}>
-                        ▶
+                        <FontAwesomeIcon icon={faCaretRight} />
                       </span>
                       <strong><FontAwesomeIcon icon={faMoneyBill} /> {pricing.serviceId || 'Unknown Service'}</strong>
                       {pricing.pricing && (

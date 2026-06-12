@@ -55,7 +55,7 @@ export default function PriceChanges() {
   };
 
   const saveChanges = () => {
-    setAlertMessage("✅ Changes saved successfully (dummy action).");
+    setAlertMessage("Changes saved successfully (dummy action).");
   };
 
   return (

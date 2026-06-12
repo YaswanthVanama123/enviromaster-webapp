@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaSync, FaHourglassHalf, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useGlobalCommission } from '../hooks/useServiceCommission';
 import { useAccountTypeDetection } from '../hooks/useAccountTypeDetection';
 import { useServicesContext, QuotaLevel, QUOTA_COMMISSION_RATES } from '../ServicesContext';
@@ -80,7 +81,7 @@ export function GlobalCommissionSummary({
               onClick={() => detectAccountTypes()}
               disabled={isDetecting}
             >
-              <span>🔄</span>
+              <span><FaSync /></span>
               {isDetecting ? 'Connecting…' : 'Connect to Bigin'}
             </button>
           )}
@@ -130,7 +131,7 @@ export function GlobalCommissionSummary({
           </span>
           {isDetecting && (
             <span className="commission-summary__detecting">
-              <span className="animate-spin">⏳</span>
+              <span className="animate-spin"><FaHourglassHalf /></span>
               Detecting...
             </span>
           )}
@@ -141,7 +142,7 @@ export function GlobalCommissionSummary({
             className="commission-summary__redetect-btn"
             onClick={() => detectAccountTypes()}
           >
-            <span>🔄</span>
+            <span><FaSync /></span>
             Re-detect
           </button>
         )}
@@ -254,7 +255,7 @@ export function GlobalCommissionSummary({
                 >
                   <div className="service-row__info">
                     <span className="service-row__expand-icon">
-                      {isServiceExpanded ? '▼' : '▶'}
+                      {isServiceExpanded ? <FaChevronDown /> : <FaChevronRight />}
                     </span>
                     <span className="service-row__name">
                       {service.serviceName}

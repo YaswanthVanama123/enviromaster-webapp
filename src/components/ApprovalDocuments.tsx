@@ -528,7 +528,7 @@ export default function ApprovalDocuments() {
         <div className="sf__search">
           <input
             type="text"
-            placeholder="🔍 Search"
+            placeholder="Search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

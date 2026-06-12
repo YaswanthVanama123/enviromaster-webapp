@@ -7,6 +7,7 @@ import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { FaCircle, FaPen } from "react-icons/fa";
 
 const formatMoney = (n: number): string => `$${(isNaN(n) ? 0 : n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 const safeNumber = (n: any): number => (typeof n === "number" && !isNaN(n)) ? n : 0;
@@ -161,7 +162,7 @@ function IncludedItemsEditor({
                 title="Edit item"
                 style={{ opacity: 0.55, fontSize: 11 }}
               >
-                ✎
+                <FaPen />
               </button>
               <button
                 className="svc-btn svc-btn--small"
@@ -1826,7 +1827,7 @@ export const SanicleanForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                🟢 Greenline Pricing
+                <FaCircle color="#16a34a" /> Greenline Pricing
               </span>
             ) : (
               <span style={{
@@ -1838,7 +1839,7 @@ export const SanicleanForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                🔴 Redline Pricing
+                <FaCircle color="#dc2626" /> Redline Pricing
               </span>
             )}
           </div>
