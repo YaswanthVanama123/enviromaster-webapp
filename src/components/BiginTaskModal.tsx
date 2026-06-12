@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTimes,
@@ -23,10 +24,10 @@ interface BiginTaskModalProps {
 type Step = "loading" | "select-company" | "form" | "submitting" | "success" | "error";
 
 const SE_MODULES = [
-  { value: "Accounts", label: "Companies" },
-  { value: "Pipelines", label: "Pipelines" },
-  { value: "Contacts", label: "Contacts" },
-  { value: "Products", label: "Products" },
+  { value: "Accounts", labelKey: "misc.btModuleCompanies" },
+  { value: "Pipelines", labelKey: "misc.btModulePipelines" },
+  { value: "Contacts", labelKey: "misc.btModuleContacts" },
+  { value: "Products", labelKey: "misc.btModuleProducts" },
 ];
 
 export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
@@ -35,6 +36,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>("loading");
   const [linkedCompany, setLinkedCompany] = useState<{ id: string; name: string } | null>(null);
   const [linkedDeal, setLinkedDeal] = useState<{ id: string; name: string } | null>(null);
@@ -137,16 +139,16 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!taskName.trim()) { setErrorMsg("Task Name is required."); return; }
+    if (!taskName.trim()) { setErrorMsg(t("misc.btTaskNameRequired")); return; }
     const company = linkedCompany ?? (selectedCompany ? { id: selectedCompany.id, name: selectedCompany.name } : null);
-    if (!company) { setErrorMsg("Please select a company."); return; }
+    if (!company) { setErrorMsg(t("misc.btSelectCompanyError")); return; }
 
     const today = new Date(); today.setHours(0, 0, 0, 0);
 
     if (dueDate) {
       const due = new Date(dueDate);
       if (due < today) {
-        setErrorMsg("Due Date cannot be in the past.");
+        setErrorMsg(t("misc.btDueDatePast"));
         return;
       }
     }
@@ -155,24 +157,24 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
       const until = new Date(repeatUntil);
       const due = dueDate ? new Date(dueDate) : today;
       if (until <= due) {
-        setErrorMsg("'Until' date must be greater than the Due Date.");
+        setErrorMsg(t("misc.btUntilError"));
         return;
       }
     }
 
     if (reminder) {
       if (!dueDate && reminderWhen !== "On due date") {
-        setErrorMsg("A Due Date is required when using a day-based reminder.");
+        setErrorMsg(t("misc.btDueDateRequiredReminder"));
         return;
       }
-      
+
       const base = dueDate ? new Date(dueDate) : new Date(Date.now() + 86400000);
       if (reminderWhen === "A day before due date") base.setDate(base.getDate() - 1);
       else if (reminderWhen === "2 days before due date") base.setDate(base.getDate() - 2);
       const [hh, mm] = reminderTime.split(":").map(Number);
       base.setHours(hh, mm, 0, 0);
       if (base <= new Date()) {
-        setErrorMsg("The reminder date and time must be in the future.");
+        setErrorMsg(t("misc.btReminderFutureError"));
         return;
       }
     }
@@ -202,12 +204,12 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
         : await zohoApi.createTaskForCompany(company.id, { ...payload, companyName: company.name, agreementId });
 
       if (result.success) { setStep("success"); onSuccess(); }
-      else { setErrorMsg(result.error ?? "Task creation failed."); setStep("form"); }
+      else { setErrorMsg(result.error ?? t("misc.btTaskCreationFailed")); setStep("form"); }
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Task creation failed.");
+      setErrorMsg(err instanceof Error ? err.message : t("misc.btTaskCreationFailed"));
       setStep("form");
     }
-  }, [taskName, dueDate, description, highPriority, markCompleted, selectedOwner, seModule, reminder, reminderWhen, reminderTime, repeat, repeatFrequency, repeatUntil, linkedCompany, selectedCompany, agreementId, onSuccess]);
+  }, [taskName, dueDate, description, highPriority, markCompleted, selectedOwner, seModule, reminder, reminderWhen, reminderTime, repeat, repeatFrequency, repeatUntil, linkedCompany, selectedCompany, agreementId, onSuccess, t]);
   const effectiveCompany = linkedCompany ?? (selectedCompany ? { id: selectedCompany.id, name: selectedCompany.name } : null);
   
   const relatedToName = linkedDeal ? linkedDeal.name : effectiveCompany?.name;
@@ -222,7 +224,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
       <div style={modal}>
         {}
         <div style={header}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>Create Task</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>{t("misc.btCreateTask")}</div>
           {step !== "loading" && step !== "submitting" && (
             <button style={closeBtn} onClick={onClose}><FontAwesomeIcon icon={faTimes} /></button>
           )}
@@ -233,7 +235,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
           <div style={centerBox}>
             <FontAwesomeIcon icon={faSpinner} spin style={{ fontSize: 28, color: "#ea580c" }} />
             <div style={{ fontSize: 14, color: "#6b7280" }}>
-              {step === "loading" ? "Checking Bigin link…" : "Creating task in Bigin…"}
+              {step === "loading" ? t("misc.btCheckingLink") : t("misc.btCreatingTask")}
             </div>
           </div>
         )}
@@ -242,11 +244,13 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
         {step === "success" && (
           <div style={centerBox}>
             <FontAwesomeIcon icon={faCheckCircle} style={{ fontSize: 44, color: "#16a34a" }} />
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>Task Created!</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>{t("misc.btTaskCreated")}</div>
             <div style={{ fontSize: 14, color: "#6b7280", textAlign: "center" }}>
-              Added to {linkedDeal ? `pipeline "${linkedDeal.name}"` : (effectiveCompany?.name ?? "the company")} in Bigin.
+              {linkedDeal
+                ? t("misc.btAddedToPipeline", { name: linkedDeal.name })
+                : t("misc.btAddedToCompany", { name: effectiveCompany?.name ?? t("misc.btTheCompany") })}
             </div>
-            <button style={greenBtn} onClick={onClose}>Done</button>
+            <button style={greenBtn} onClick={onClose}>{t("misc.btDone")}</button>
           </div>
         )}
 
@@ -254,9 +258,9 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
         {step === "error" && (
           <div style={centerBox}>
             <FontAwesomeIcon icon={faExclamationTriangle} style={{ fontSize: 36, color: "#ef4444" }} />
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>Something went wrong</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>{t("misc.btSomethingWrong")}</div>
             <div style={{ fontSize: 13, color: "#6b7280", textAlign: "center" }}>{errorMsg}</div>
-            <button style={greenBtn} onClick={onClose}>Close</button>
+            <button style={greenBtn} onClick={onClose}>{t("misc.btCloseBtn")}</button>
           </div>
         )}
 
@@ -264,17 +268,17 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
         {step === "select-company" && (
           <div style={body}>
             <div style={sectionRow}>
-              <span style={sectionTitle}>Task Information</span>
+              <span style={sectionTitle}>{t("misc.btTaskInformation")}</span>
             </div>
-            <label style={fieldLabel}>Related To — Select Company</label>
+            <label style={fieldLabel}>{t("misc.btRelatedToSelectCompany")}</label>
             <div style={searchBox}>
               <FontAwesomeIcon icon={faSearch} style={{ color: "#9ca3af", fontSize: 13 }} />
-              <input style={searchInput} placeholder="Search companies…" value={companySearch}
+              <input style={searchInput} placeholder={t("misc.btSearchCompanies")} value={companySearch}
                 onChange={e => setCompanySearch(e.target.value)} autoFocus />
               {loadingCompanies && <FontAwesomeIcon icon={faSpinner} spin style={{ color: "#9ca3af", fontSize: 12 }} />}
             </div>
             <div style={listBox}>
-              {!loadingCompanies && allCompanies.length === 0 && <div style={emptyText}>No companies found</div>}
+              {!loadingCompanies && allCompanies.length === 0 && <div style={emptyText}>{t("misc.btNoCompaniesFound")}</div>}
               {allCompanies.map(c => (
                 <button key={c.id} style={listItem} onClick={() => handleSelectCompany(c)}>
                   <FontAwesomeIcon icon={faBuilding} style={{ color: "#9ca3af", fontSize: 12 }} />
@@ -290,9 +294,9 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
           <div style={body}>
             {}
             <div style={sectionRow}>
-              <span style={sectionTitle}>Task Information</span>
+              <span style={sectionTitle}>{t("misc.btTaskInformation")}</span>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 13, color: "#6b7280" }}>Owner</span>
+                <span style={{ fontSize: 13, color: "#6b7280" }}>{t("misc.btOwner")}</span>
                 {}
                 <div ref={ownerRef} style={{ position: "relative" }}>
                   <button style={ownerBtn} onClick={() => setOwnerDropOpen(v => !v)}>
@@ -300,7 +304,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
                       {selectedOwner ? initials(selectedOwner.name) : <FontAwesomeIcon icon={faUser} style={{ fontSize: 10 }} />}
                     </span>
                     <span style={{ fontSize: 13, fontWeight: 500, color: "#374151", maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {selectedOwner ? selectedOwner.name : "Select owner"}
+                      {selectedOwner ? selectedOwner.name : t("misc.btSelectOwner")}
                     </span>
                     <FontAwesomeIcon icon={faChevronDown} style={{ fontSize: 10, color: "#9ca3af" }} />
                   </button>
@@ -308,11 +312,11 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
                     <div style={dropdownBox}>
                       <div style={searchBox}>
                         <FontAwesomeIcon icon={faSearch} style={{ color: "#9ca3af", fontSize: 12 }} />
-                        <input style={searchInput} placeholder="Search…" value={ownerSearch}
+                        <input style={searchInput} placeholder={t("misc.btSearch")} value={ownerSearch}
                           onChange={e => setOwnerSearch(e.target.value)} autoFocus />
                       </div>
                       <div style={{ maxHeight: 200, overflowY: "auto" }}>
-                        {filteredUsers.length === 0 && <div style={emptyText}>No users found</div>}
+                        {filteredUsers.length === 0 && <div style={emptyText}>{t("misc.btNoUsersFound")}</div>}
                         {filteredUsers.map(u => (
                           <button key={u.id} style={listItem} onClick={() => { setSelectedOwner(u); setOwnerDropOpen(false); setOwnerSearch(""); }}>
                             <span style={{ ...ownerAvatar, fontSize: 10 }}>{initials(u.name)}</span>
@@ -331,37 +335,37 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
 
             {}
             <div style={formRow}>
-              <label style={fieldLabel}>Task Name <span style={{ color: "#ef4444" }}>*</span></label>
-              <input style={textInput} placeholder="Enter task name…" value={taskName}
+              <label style={fieldLabel}>{t("misc.btTaskName")} <span style={{ color: "#ef4444" }}>*</span></label>
+              <input style={textInput} placeholder={t("misc.btTaskNamePlaceholder")} value={taskName}
                 onChange={e => setTaskName(e.target.value)} autoFocus />
             </div>
 
             {}
             <div style={formRow}>
-              <label style={fieldLabel}>Due Date</label>
+              <label style={fieldLabel}>{t("misc.btDueDate")}</label>
               <input style={textInput} type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
             </div>
 
             {}
             <div style={checkRow} onClick={() => setRepeat(v => !v)}>
               <div style={checkbox(repeat)} />
-              <span style={{ fontSize: 14, color: "#374151" }}>Repeat</span>
+              <span style={{ fontSize: 14, color: "#374151" }}>{t("misc.btRepeat")}</span>
             </div>
             {repeat && (
               <div style={{ marginBottom: 12, marginTop: -6, paddingLeft: 26 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <select style={subSelect} value={repeatFrequency} onChange={e => setRepeatFrequency(e.target.value)}>
-                    <option>Every Day</option>
-                    <option>Every Week</option>
-                    <option>Every Month</option>
-                    <option>Every Year</option>
+                    <option value="Every Day">{t("misc.btEveryDay")}</option>
+                    <option value="Every Week">{t("misc.btEveryWeek")}</option>
+                    <option value="Every Month">{t("misc.btEveryMonth")}</option>
+                    <option value="Every Year">{t("misc.btEveryYear")}</option>
                   </select>
-                  <span style={{ fontSize: 13, color: "#6b7280" }}>Until</span>
+                  <span style={{ fontSize: 13, color: "#6b7280" }}>{t("misc.btUntil")}</span>
                   <input type="date" style={{ ...subSelect, flex: 1, ...(repeatUntil && dueDate && new Date(repeatUntil) <= new Date(dueDate) ? { borderColor: "#ef4444" } : {}) }}
                     value={repeatUntil} onChange={e => setRepeatUntil(e.target.value)} />
                 </div>
                 {repeatUntil && dueDate && new Date(repeatUntil) <= new Date(dueDate) && (
-                  <div style={inlineError}>'Until' date must be greater than the Due Date.</div>
+                  <div style={inlineError}>{t("misc.btUntilError")}</div>
                 )}
               </div>
             )}
@@ -369,15 +373,15 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
             {}
             <div style={checkRow} onClick={() => setReminder(v => !v)}>
               <div style={checkbox(reminder)} />
-              <span style={{ fontSize: 14, color: "#374151" }}>Reminder</span>
+              <span style={{ fontSize: 14, color: "#374151" }}>{t("misc.btReminder")}</span>
             </div>
             {reminder && (
               <div style={{ marginBottom: 12, marginTop: -6, paddingLeft: 26 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <select style={subSelect} value={reminderWhen} onChange={e => setReminderWhen(e.target.value)}>
-                    <option>On due date</option>
-                    <option>A day before due date</option>
-                    <option>2 days before due date</option>
+                    <option value="On due date">{t("misc.btOnDueDate")}</option>
+                    <option value="A day before due date">{t("misc.btDayBefore")}</option>
+                    <option value="2 days before due date">{t("misc.btTwoDaysBefore")}</option>
                   </select>
                   <input type="time" style={subSelect} value={reminderTime} onChange={e => setReminderTime(e.target.value)} />
                 </div>
@@ -388,14 +392,14 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
                   else if (reminderWhen === "2 days before due date") base.setDate(base.getDate() - 2);
                   const [hh, mm] = reminderTime.split(":").map(Number);
                   base.setHours(hh, mm, 0, 0);
-                  return base <= new Date() ? <div style={inlineError}>The reminder date and time must be in the future.</div> : null;
+                  return base <= new Date() ? <div style={inlineError}>{t("misc.btReminderFutureError")}</div> : null;
                 })()}
               </div>
             )}
 
             {}
             <div style={formRow}>
-              <label style={fieldLabel}>Related To</label>
+              <label style={fieldLabel}>{t("misc.btRelatedTo")}</label>
               <div style={relatedToRow}>
                 {}
                 <div ref={moduleRef} style={{ position: "relative" }}>
@@ -403,7 +407,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
                     style={{ ...moduleBtn, ...(linkedDeal ? { background: "#f9fafb", cursor: "default", color: "#6b7280" } : {}) }}
                     onClick={() => { if (!linkedDeal) setModuleDropOpen(v => !v); }}
                   >
-                    {linkedDeal ? "Pipelines" : (SE_MODULES.find(m => m.value === seModule)?.label ?? "Pipelines")}
+                    {linkedDeal ? t("misc.btModulePipelines") : t(SE_MODULES.find(m => m.value === seModule)?.labelKey ?? "misc.btModulePipelines")}
                     {!linkedDeal && <FontAwesomeIcon icon={faChevronDown} style={{ fontSize: 10, color: "#9ca3af" }} />}
                   </button>
                   {moduleDropOpen && !linkedDeal && (
@@ -411,7 +415,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
                       {SE_MODULES.map(m => (
                         <button key={m.value} style={{ ...listItem, background: seModule === m.value ? "#f0fdf4" : "#fff" }}
                           onClick={() => { setSeModule(m.value); setModuleDropOpen(false); }}>
-                          <span style={{ fontSize: 13, color: seModule === m.value ? "#16a34a" : "#374151", fontWeight: seModule === m.value ? 600 : 400 }}>{m.label}</span>
+                          <span style={{ fontSize: 13, color: seModule === m.value ? "#16a34a" : "#374151", fontWeight: seModule === m.value ? 600 : 400 }}>{t(m.labelKey)}</span>
                         </button>
                       ))}
                     </div>
@@ -439,21 +443,21 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
 
             {}
             <div style={formRow}>
-              <label style={fieldLabel}>Description</label>
-              <textarea style={textArea} placeholder="A few words about this task…" value={description}
+              <label style={fieldLabel}>{t("misc.btDescription")}</label>
+              <textarea style={textArea} placeholder={t("misc.btDescriptionPlaceholder")} value={description}
                 onChange={e => setDescription(e.target.value)} rows={3} />
             </div>
 
             {}
             <div style={checkRow} onClick={() => setHighPriority(v => !v)}>
               <div style={checkbox(highPriority)} />
-              <span style={{ fontSize: 14, color: "#374151" }}>Mark as High Priority</span>
+              <span style={{ fontSize: 14, color: "#374151" }}>{t("misc.btMarkHighPriority")}</span>
             </div>
 
             {}
             <div style={checkRow} onClick={() => setMarkCompleted(v => !v)}>
               <div style={checkbox(markCompleted)} />
-              <span style={{ fontSize: 14, color: "#374151" }}>Mark as completed</span>
+              <span style={{ fontSize: 14, color: "#374151" }}>{t("misc.btMarkCompleted")}</span>
             </div>
 
             {errorMsg && (
@@ -465,8 +469,8 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
 
             {}
             <div style={footerRow}>
-              <button style={cancelBtn} onClick={onClose}>Cancel</button>
-              <button style={greenBtn} onClick={handleSubmit}>Save</button>
+              <button style={cancelBtn} onClick={onClose}>{t("misc.btCancel")}</button>
+              <button style={greenBtn} onClick={handleSubmit}>{t("misc.btSave")}</button>
             </div>
           </div>
         )}

@@ -1,0 +1,66 @@
+{
+  "title": "Mis Comisiones",
+  "subtitle": "Realice el seguimiento de sus comisiones en todos los acuerdos",
+  "loading": "Cargando sus comisiones...",
+  "error": "Error",
+  "noData": "Sin datos",
+  "noDataMessage": "No hay datos de comisiones disponibles.",
+  "noResults": "No se encontraron acuerdos para este filtro.",
+  "fetchError": "Error al obtener las comisiones",
+  "quotaLevel": {
+    "below": "Por debajo de la cuota",
+    "above": "Por encima de la cuota",
+    "double": "Cuota doble"
+  },
+  "quotaBadgeTitle": "Su estado actual de cuota. Ventas: {{actual}} / Objetivo: {{target}}. Los nuevos acuerdos usarán una tasa base del {{rate}}%.",
+  "rateNote": "Nota: La tasa de cada acuerdo se bloquea al guardarlo. Su tasa actual ({{rate}}%) se aplica a los nuevos acuerdos.",
+  "rateNoteMonth": " Este mes: {{actual}} de {{target}} objetivo.",
+  "timePeriod": {
+    "all": "Todo el tiempo",
+    "weekly": "Esta semana",
+    "14days": "Últimos 14 días",
+    "monthly": "Este mes",
+    "quarterly": "Este trimestre",
+    "annually": "Este año",
+    "custom": "Rango de fechas"
+  },
+  "dateRange": {
+    "from": "Desde",
+    "to": "Hasta",
+    "separator": "a",
+    "clear": "Borrar"
+  },
+  "summary": {
+    "annualCommission": "Comisión anual",
+    "monthlyCommission": "Comisión mensual",
+    "totalAgreements": "Total de acuerdos",
+    "avgCommissionRate": "Tasa media de comisión"
+  },
+  "status": {
+    "title": "Por estado",
+    "all": "Todos ({{count}})",
+    "draft": "Borrador",
+    "saved": "Guardado",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "adminApproved": "Aprobado por administrador",
+    "active": "Activo"
+  },
+  "agreements": "Acuerdos ({{count}})",
+  "months": "{{count}} meses",
+  "contractValue": "Valor del contrato",
+  "annualCommissionLabel": "Comisión anual",
+  "breakdown": {
+    "title": "Desglose de la comisión",
+    "monthlyValue": "Valor mensual",
+    "baseRate": "Tasa base ({{term}})",
+    "quotaLevel": "Nivel de cuota",
+    "multiplier": "Multiplicador del acuerdo",
+    "accountTypeAdjustment": "Ajuste por tipo de cuenta",
+    "greenlineBonus": "Bonificación Greenline",
+    "insideSalesDeduction": "Deducción de ventas internas",
+    "finalRate": "Tasa final",
+    "monthlyCommission": "Comisión mensual",
+    "annualCommission": "Comisión anual"
+  }
+}

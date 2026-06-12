@@ -1,0 +1,29 @@
+{
+  "searchPlaceholder": "Search",
+  "agreementsCount": "{{count}} agreements",
+  "filesPendingApproval": "{{count}} files pending approval",
+  "approveSelected": "Approve Selected ({{count}})",
+  "loading": "Loading approval documents…",
+  "loadError": "Unable to load approval documents. Please try again.",
+  "noneFound": "No documents pending approval found.",
+  "pageInfo": "Showing {{from}}-{{to}} of {{agreements}} agreements ({{files}} files)",
+  "previous": "Previous",
+  "next": "Next",
+  "statusUpdated": "Status updated successfully!",
+  "statusUpdateError": "Unable to update status. Please try again.",
+  "downloadError": "Unable to download this PDF. Please try again.",
+  "emailSent": "Approval request email sent successfully with PDF attachment!",
+  "stats": {
+    "pendingApproval": "Pending Approval",
+    "approvedSalesman": "Approved by Salesman",
+    "approvedAdmin": "Approved by Admin"
+  },
+  "email": {
+    "subject": "{{name}} - Approval Request",
+    "body": "Hello,\n\nPlease review the following document for approval.\n\nDocument: {{name}}\nType: {{type}}\nStatus: {{status}}\nUpdated: {{updated}}\n\nBest regards",
+    "typeMainPdf": "Main Agreement PDF",
+    "typeVersionPdf": "Version {{version}} PDF",
+    "typeAttachedPdf": "Attached PDF",
+    "typeDocument": "Document"
+  }
+}

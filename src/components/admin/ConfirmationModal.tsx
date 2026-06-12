@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faExclamationTriangle,
   faTrash,
@@ -25,14 +26,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   type = 'warning',
   onConfirm,
   onCancel,
   loading = false,
   details
 }) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const getIcon = () => {
@@ -210,7 +212,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onMouseEnter={(e) => handleMouseEnter(e, '#e5e7eb')}
             onMouseLeave={(e) => handleMouseLeave(e, '#f3f4f6')}
           >
-            {cancelText}
+            {cancelText ?? t('adminModals.cancel')}
           </button>
           <button
             style={{ ...styles.button, ...styles.confirmButton }}
@@ -219,7 +221,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onMouseEnter={(e) => handleMouseEnter(e, buttonStyles.confirmHover)}
             onMouseLeave={(e) => handleMouseLeave(e, buttonStyles.confirm.backgroundColor as string)}
           >
-            {loading ? 'Processing...' : confirmText}
+            {loading ? t('adminModals.processing') : (confirmText ?? t('adminModals.confirm'))}
           </button>
         </div>
       </div>

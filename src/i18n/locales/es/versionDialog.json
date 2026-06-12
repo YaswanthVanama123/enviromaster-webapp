@@ -1,0 +1,19 @@
+{
+  "title": "Opciones para guardar el PDF",
+  "agreementLabel": "Acuerdo:",
+  "currentVersions": "Versiones actuales: {{count}}",
+  "latestVersion": " (última: v{{number}})",
+  "howToSave": "¿Cómo desea guardar este PDF?",
+  "createVersionTitle": "Crear nueva versión",
+  "createVersionDescription": "Crear la versión {{number}}. Recomendado para seguir los cambios.",
+  "replaceRecentTitle": "Reemplazar versión reciente",
+  "replaceRecentDescription": "Reemplazar la versión {{number}} con este contenido actualizado. Ahorra espacio de almacenamiento.",
+  "recommended": "Recomendado",
+  "notesLabel": "¿Qué cambió? *",
+  "notesPlaceholder": "Describa qué cambió en esta versión (p. ej., precios actualizados, servicios añadidos, cambios por comentarios del cliente)",
+  "existingVersions": "Versiones existentes ({{count}})",
+  "moreVersions": "+{{count}} versiones más",
+  "saving": "Guardando...",
+  "createVersionButton": "Crear versión {{number}}",
+  "replaceVersionButton": "Reemplazar versión {{number}}"
+}

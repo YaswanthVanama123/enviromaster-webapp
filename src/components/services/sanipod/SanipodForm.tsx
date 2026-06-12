@@ -9,6 +9,7 @@ import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
 import { FaCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const fmt = (n: number): string =>
   n > 0
@@ -36,6 +37,8 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
   initialData,
   onRemove,
 }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -430,8 +433,8 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
   const pods = Math.max(0, form.podQuantity || 0);
 
   const bagUnitLabel = form.extraBagsRecurring
-    ? "$/bag/wk"
-    : "$/bag one-time";
+    ? t("serviceForms.sanipod.bagWeekly")
+    : t("serviceForms.sanipod.bagOneTime");
 
   const normalizeRate = (value: number | string | undefined) => {
     const num = Number(value);
@@ -447,11 +450,11 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       : `${formatRateLabel(form.weeklyRatePerUnit)} + ${formatRateLabel(form.standaloneExtraWeeklyCharge)}`);
   const ruleLabel = form.isStandalone
     ? effectiveRuleLabel
-    : `${formatRateLabel(form.altWeeklyRatePerUnit)} (always)`;
+    : t("serviceForms.sanipod.always", { rate: formatRateLabel(form.altWeeklyRatePerUnit) });
 
   return (
     <ServiceCardShell
-      title="SANIPOD (STANDALONE ONLY)"
+      title={t("serviceForms.sanipod.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -468,7 +471,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -476,16 +479,16 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             value={form.frequency}
             onChange={onChange}
           >
-            <option value="oneTime">One Time</option>
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Bi-Weekly</option>
-            <option value="twicePerMonth">2× / Month</option>
-            <option value="monthly">Monthly</option>
-            <option value="everyFourWeeks">Every 4 Weeks</option>
-            <option value="bimonthly">Every 2 Months</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="biannual">Bi-Annual</option>
-            <option value="annual">Annual</option>
+            <option value="oneTime">{t("serviceForms.sanipod.freq.oneTime")}</option>
+            <option value="weekly">{t("serviceForms.sanipod.freq.weekly")}</option>
+            <option value="biweekly">{t("serviceForms.sanipod.freq.biweekly")}</option>
+            <option value="twicePerMonth">{t("serviceForms.sanipod.freq.twicePerMonth")}</option>
+            <option value="monthly">{t("serviceForms.sanipod.freq.monthly")}</option>
+            <option value="everyFourWeeks">{t("serviceForms.sanipod.freq.everyFourWeeks")}</option>
+            <option value="bimonthly">{t("serviceForms.sanipod.freq.bimonthly")}</option>
+            <option value="quarterly">{t("serviceForms.sanipod.freq.quarterly")}</option>
+            <option value="biannual">{t("serviceForms.sanipod.freq.biannual")}</option>
+            <option value="annual">{t("serviceForms.sanipod.freq.annual")}</option>
           </select>
         </div>
       </div>
@@ -494,7 +497,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
 
       <div className="svc-row">
-        <label>Package base rate (${formatRatePlain(form.weeklyRatePerUnit)}/pod)</label>
+        <label>{t("serviceForms.sanipod.packageBaseRate", { rate: formatRatePlain(form.weeklyRatePerUnit) })}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -512,12 +515,12 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             }}
           />
           <span className="svc-small">
-            $/wk each (standalone adds ${formatRatePlain(form.standaloneExtraWeeklyCharge)}/wk base)
+            {t("serviceForms.sanipod.packageBaseNote", { rate: formatRatePlain(form.standaloneExtraWeeklyCharge) })}
           </span>
         </div>
       </div>
       <div className="svc-row">
-        <label>Alternative flat rate (${formatRatePlain(form.altWeeklyRatePerUnit)}/pod)</label>
+        <label>{t("serviceForms.sanipod.altFlatRate", { rate: formatRatePlain(form.altWeeklyRatePerUnit) })}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -534,11 +537,11 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
               width: "90px",
             }}
           />
-          <span className="svc-small">$/wk each (for standalone opt A)</span>
+          <span className="svc-small">{t("serviceForms.sanipod.altFlatNote")}</span>
         </div>
       </div>
       <div className="svc-row">
-        <label>Standalone base weekly charge ({formatRateLabel(form.standaloneExtraWeeklyCharge)})</label>
+        <label>{t("serviceForms.sanipod.standaloneBaseWeekly", { rate: formatRateLabel(form.standaloneExtraWeeklyCharge) })}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -555,13 +558,13 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
               width: "90px",
             }}
           />
-          <span className="svc-small">$/wk base used when standalone</span>
+          <span className="svc-small">{t("serviceForms.sanipod.standaloneBaseNote")}</span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>SaniPods</label>
+        <label>{t("serviceForms.sanipod.sanipods")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small field-qty"
@@ -590,10 +593,10 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             onChange={handleLocalChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            title="Effective rate per pod (editable)"
+            title={t("serviceForms.sanipod.effectiveRateTitle")}
             style={{ backgroundColor: form.customWeeklyPodRate !== undefined ? '#fffacd' : 'white', width: "70px"}}
           />
-          <span className="svc-small">$/wk</span>
+          <span className="svc-small">{t("serviceForms.sanipod.perWeek")}</span>
           <span className="svc-eq">=</span>
           <input
             className="svc-in svc-in-small field-qty"
@@ -618,14 +621,14 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             }}
           />
           <span className="svc-small" style={{ marginLeft: "8px" }}>
-            (using {ruleLabel})
+            {t("serviceForms.sanipod.usingRule", { rule: ruleLabel })}
           </span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Extra Bags</label>
+        <label>{t("serviceForms.sanipod.extraBags")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small field-qty"
@@ -681,7 +684,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
               onChange={onChange}
             />{" "}
             <span className="svc-small">
-              Recurring
+              {t("serviceForms.sanipod.recurring")}
             </span>
           </label>
         </div>
@@ -692,7 +695,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
 
       {}
       <div className="svc-row">
-        <label>New Install?</label>
+        <label>{t("serviceForms.sanipod.newInstall")}</label>
         <div className="svc-row-right">
           <input
             type="checkbox"
@@ -711,7 +714,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             onChange={onChange}
             style={{ width: "60px" }}
           />
-          <span className="svc-small"> / pod install</span>
+          <span className="svc-small">{t("serviceForms.sanipod.perPodInstall")}</span>
         </div>
       </div>
 
@@ -719,7 +722,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {form.isNewInstall && (
         <>
           <div className="svc-row">
-            <label>Install Pods</label>
+            <label>{t("serviceForms.sanipod.installPods")}</label>
             <div className="svc-row-right">
               <input
                 className="svc-in svc-in-small"
@@ -739,7 +742,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
                 onChange={onChange}
                 style={{ backgroundColor: installRateChanged ? '#fffacd' : 'white', width: "70px" }}
               />
-              <span className="svc-small">$/pod install</span>
+              <span className="svc-small">{t("serviceForms.sanipod.installPodsNote")}</span>
               <span className="svc-eq">=</span>
               <span className="svc-dollar">
                 ${fmt(form.installQuantity * form.installRatePerPod)}
@@ -749,7 +752,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
 
           {}
           <div className="svc-row">
-            <label>Installation Total</label>
+            <label>{t("serviceForms.common.installationTotal")}</label>
             <div className="svc-row-right">
               <span className="svc-dollar">
                 <span>$</span>
@@ -784,7 +787,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
       {!isVisitBasedFrequency && (
         <div className="svc-row svc-row-total">
-          <label>First Visit Total</label>
+          <label>{t("serviceForms.common.firstVisitTotal")}</label>
           <div className="svc-dollar">
             <span className="svc-dollar">
               $  {calc.firstVisit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -796,7 +799,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             {}
       {isVisitBasedFrequency && form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>First Visit Total</label>
+          <label>{t("serviceForms.common.firstVisitTotal")}</label>
           <div className="svc-dollar">
             $<input
               className="svc-in svc-in-small"
@@ -833,8 +836,8 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
            form.frequency === "biannual" ||
            form.frequency === "annual" ||
            form.frequency === "everyFourWeeks"
-            ? "Recurring Visit Total"
-            : "Per Visit Service"}
+            ? t("serviceForms.common.recurringVisitTotal")
+            : t("serviceForms.sanipod.perVisitService")}
         </label>
         <div className="svc-dollar">
           $<input
@@ -863,8 +866,8 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
                    form.frequency === "quarterly" ||
                    form.frequency === "biannual" ||
                    form.frequency === "annual"
-                    ? "Recurring visit total - editable"
-                    : "Per visit service - editable"}
+                    ? t("serviceForms.sanipod.recurringVisitTotalTitle")
+                    : t("serviceForms.sanipod.perVisitServiceTitle")}
           />
         </div>
       </div>}
@@ -872,7 +875,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
       {!isVisitBasedFrequency && (
         <div className="svc-row svc-row-total">
-          <label>First Month Total</label>
+          <label>{t("serviceForms.common.firstMonthTotal")}</label>
           <div className="svc-dollar">
             $<input
               className="svc-in svc-in-small"
@@ -903,7 +906,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
       {form.frequency === "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Total Price</label>
+          <label>{t("serviceForms.common.totalPrice")}</label>
           <div className="svc-dollar">
             $<input
               className="svc-in svc-in-small"
@@ -930,7 +933,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
       {!isVisitBasedFrequency && (
         <div className="svc-row svc-row-total">
-          <label>Monthly Recurring</label>
+          <label>{t("serviceForms.common.monthlyRecurring")}</label>
           <div className="svc-dollar">
             $<input
               className="svc-in svc-in-small"
@@ -950,7 +953,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
       {}
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div className="svc-row-right">
             <select
               className="svc-in"
@@ -960,7 +963,7 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
             >
               {contractMonthOptions.map((m) => (
                 <option key={m} value={m}>
-                  {m} months
+                  {t("serviceForms.common.months", { count: m })}
                 </option>
               ))}
             </select>
@@ -997,11 +1000,11 @@ export const SanipodForm: React.FC<ServiceInitialData<SanipodFormState>> = ({
           <div className="svc-field">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
               <span className="em-pricing-tier em-pricing-tier--green">
-                <FaCircle color="#16a34a" /> Greenline Pricing
+                <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
               </span>
             ) : (
               <span className="em-pricing-tier em-pricing-tier--red">
-                <FaCircle color="#dc2626" /> Redline Pricing
+                <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
               </span>
             )}
           </div>

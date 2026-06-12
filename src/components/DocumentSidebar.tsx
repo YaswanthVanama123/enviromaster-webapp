@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar,
@@ -45,6 +46,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
   onDateSelect,
   agreementTimelines = []
 }) => {
+  const { t } = useTranslation();
   const timelineStats = useMemo(() => {
     const active = agreementTimelines.filter(t => t.status === 'active').length;
     const expiringSoon = agreementTimelines.filter(t => t.status === 'expiring-soon').length;
@@ -110,7 +112,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
               fontWeight: '600',
               color: '#374151'
             }}>
-              Active Days Remaining
+              {t("documentSidebar.activeDaysRemaining")}
             </h3>
           </div>
         </div>
@@ -141,7 +143,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
               color: '#059669',
               fontWeight: '500'
             }}>
-              Active
+              {t("documentSidebar.active")}
             </div>
           </div>
 
@@ -165,7 +167,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
               color: '#d97706',
               fontWeight: '500'
             }}>
-              Expiring
+              {t("documentSidebar.expiring")}
             </div>
           </div>
 
@@ -189,7 +191,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
               color: '#b91c1c',
               fontWeight: '500'
             }}>
-              Expired
+              {t("documentSidebar.expired")}
             </div>
           </div>
         </div>
@@ -208,7 +210,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
               color: '#9ca3af',
               fontSize: '14px'
             }}>
-              No active agreements with contract dates
+              {t("documentSidebar.noActiveAgreements")}
             </div>
           )}
 
@@ -268,14 +270,14 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
                     fontSize: '12px',
                     color: '#6b7280'
                   }}>
-                    {timeline.contractMonths} month contract
+                    {t("documentSidebar.monthContract", { count: timeline.contractMonths })}
                   </span>
                   <span style={{
                     fontSize: '14px',
                     fontWeight: '700',
                     color: getTimelineColor(timeline.status)
                   }}>
-                    {timeline.daysRemaining > 0 ? `${timeline.daysRemaining}d left` : 'Expired'}
+                    {timeline.daysRemaining > 0 ? t("documentSidebar.daysLeft", { count: timeline.daysRemaining }) : t("documentSidebar.expired")}
                   </span>
                 </div>
 
@@ -299,7 +301,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
                   color: '#9ca3af',
                   marginTop: '6px'
                 }}>
-                  Started: {new Date(timeline.startDate).toLocaleDateString()}
+                  {t("documentSidebar.started", { date: new Date(timeline.startDate).toLocaleDateString() })}
                 </div>
               </div>
             );
@@ -333,7 +335,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
             fontWeight: '600',
             color: '#374151'
           }}>
-            {mode === 'trash' ? 'Trash Status' : mode === 'approval' ? 'Approval Status' : 'Document Status'}
+            {mode === 'trash' ? t("documentSidebar.trashStatus") : mode === 'approval' ? t("documentSidebar.approvalStatus") : t("documentSidebar.documentStatus")}
           </h3>
         </div>
 
@@ -351,7 +353,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
             fontWeight: '500',
             color: '#6b7280'
           }}>
-            Total Documents
+            {t("documentSidebar.totalDocuments")}
           </span>
           <span style={{
             fontSize: '18px',
@@ -422,7 +424,7 @@ export const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
             color: '#9ca3af',
             fontSize: '14px'
           }}>
-            No status information available
+            {t("documentSidebar.noStatusInfo")}
           </div>
         )}
       </div>

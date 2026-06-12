@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAdminAuth, useAdminAuthGuard } from "../backendservice/hooks";
 import { pdfApi, manualUploadApi } from "../backendservice/api";
 import type { SavedFileGroup, SavedFileListItem } from "../backendservice/api/pdfApi";
@@ -54,6 +55,7 @@ interface Document {
 
 export default function AdminPanel() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { tab, subtab, modalType, itemId } = useParams<{
     tab: string;
     subtab: string;
@@ -440,27 +442,27 @@ export default function AdminPanel() {
   const getTabTitle = () => {
     switch (activeTab) {
       case "dashboard":
-        return "Dashboard";
+        return t("adminPanel.titles.dashboard");
       case "saved-pdfs":
-        return "Saved PDFs";
+        return t("adminPanel.titles.savedPdfs");
       case "approval-documents":
-        return "Approval Documents";
+        return t("adminPanel.titles.approvalDocuments");
       case "pricing-details":
-        return "Pricing Details";
+        return t("adminPanel.titles.pricingDetails");
       case "user-management":
-        return "User Management";
+        return t("adminPanel.titles.userManagement");
       case "edit-history":
-        return "Edit History";
+        return t("adminPanel.titles.editHistory");
       case "employee-agreements":
-        return "Employee Agreements";
+        return t("adminPanel.titles.employeeAgreements");
       case "email-template":
-        return "Email Template";
+        return t("adminPanel.titles.emailTemplate");
       case "service-agreement-template":
-        return "Service Agreement Template";
+        return t("adminPanel.titles.serviceAgreementTemplate");
       case "trash":
-        return "Trash";
+        return t("adminPanel.titles.trash");
       default:
-        return "Dashboard";
+        return t("adminPanel.titles.dashboard");
     }
   };
 
@@ -548,68 +550,68 @@ export default function AdminPanel() {
           className={`secondary-nav-item ${activeTab === "dashboard" ? "active" : ""}`}
           onClick={() => handleTabChange("dashboard")}
         >
-          Dashboard
+          {t("adminPanel.tabs.dashboard")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "saved-pdfs" ? "active" : ""}`}
           onClick={() => handleTabChange("saved-pdfs")}
         >
-          Saved PDFs
+          {t("adminPanel.tabs.savedPdfs")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "approval-documents" ? "active" : ""}`}
           onClick={() => handleTabChange("approval-documents")}
         >
-          Approval Documents
+          {t("adminPanel.tabs.approvalDocuments")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "trash" ? "active" : ""}`}
           onClick={() => handleTabChange("trash")}
         >
           <FontAwesomeIcon icon={faTrash} size="lg" />
-          Trash
+          {t("adminPanel.tabs.trash")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "pricing-details" ? "active" : ""}`}
           onClick={() => handleTabChange("pricing-details")}
         >
           <FontAwesomeIcon icon={faDollarSign} size="lg" />
-          Pricing Details
+          {t("adminPanel.tabs.pricingDetails")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "user-management" ? "active" : ""}`}
           onClick={() => handleTabChange("user-management")}
         >
           <FontAwesomeIcon icon={faUsers} size="lg" />
-          User Management
+          {t("adminPanel.tabs.userManagement")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "edit-history" ? "active" : ""}`}
           onClick={() => handleTabChange("edit-history")}
         >
           <FontAwesomeIcon icon={faHistory} size="lg" />
-          Edit History
+          {t("adminPanel.tabs.editHistory")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "employee-agreements" ? "active" : ""}`}
           onClick={() => handleTabChange("employee-agreements")}
         >
           <FontAwesomeIcon icon={faUserFriends} size="lg" />
-          Employee Files
+          {t("adminPanel.tabs.employeeFiles")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "email-template" ? "active" : ""}`}
           onClick={() => handleTabChange("email-template")}
         >
           <FontAwesomeIcon icon={faEnvelope} size="lg" />
-          Email Template
+          {t("adminPanel.tabs.emailTemplate")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "service-agreement-template" ? "active" : ""}`}
           onClick={() => handleTabChange("service-agreement-template")}
         >
           <FontAwesomeIcon icon={faFileContract} size="lg" />
-          Service Agreement
+          {t("adminPanel.tabs.serviceAgreement")}
         </button>
         </nav>
         <button
@@ -667,7 +669,7 @@ export default function AdminPanel() {
 
               <div className="recent-section">
                 <div className="section-header">
-                  <h2 className="section-heading">Recent Documents</h2>
+                  <h2 className="section-heading">{t("adminPanel.headers.recentDocuments")}</h2>
                   <button className="view-all-btn" onClick={() => handleTabChange("saved-pdfs")}>→</button>
                 </div>
 
@@ -869,7 +871,7 @@ export default function AdminPanel() {
             <aside className="dashboard-sidebar">
               <div className="sidebar-card pie-chart-card">
                 <div className="pie-chart-header">
-                  <h3 className="pie-chart-title">Document Status</h3>
+                  <h3 className="pie-chart-title">{t("adminPanel.headers.documentStatus")}</h3>
                   <select
                     className="pie-filter-dropdown"
                     value={pieTimeFilter}
@@ -885,7 +887,7 @@ export default function AdminPanel() {
                 {showDatePicker && (
                   <div className="date-picker-overlay" onClick={handleDatePickerClose}>
                     <div className="date-picker-modal" onClick={(e) => e.stopPropagation()}>
-                      <h3 className="date-picker-title">Select Date Range</h3>
+                      <h3 className="date-picker-title">{t("adminPanel.headers.selectDateRange")}</h3>
 
                       <div className="date-range-inputs">
                         <div className="date-input-group">

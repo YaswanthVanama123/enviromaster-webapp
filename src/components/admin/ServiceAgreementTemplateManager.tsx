@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { serviceAgreementTemplateApi, type ServiceAgreementTemplate } from '../../backendservice/api/serviceAgreementTemplateApi';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
@@ -7,6 +8,7 @@ import { faSave, faUndo, faFileContract, faInfoCircle } from '@fortawesome/free-
 import './ServiceAgreementTemplateManager.css';
 
 export const ServiceAgreementTemplateManager: React.FC = () => {
+  const { t } = useTranslation();
   const [template, setTemplate] = useState<ServiceAgreementTemplate | null>(null);
   const [formData, setFormData] = useState({
     term1: '',
@@ -83,7 +85,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
     } catch (error) {
       console.error('Error loading template:', error);
       setToastMessage({
-        message: 'Failed to load service agreement template',
+        message: t('serviceAgreementTemplate.failedToLoad'),
         type: 'error'
       });
     } finally {
@@ -96,7 +98,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
     for (const field of requiredFields) {
       if (!formData[field as keyof typeof formData].trim()) {
         setToastMessage({
-          message: `${field} cannot be empty`,
+          message: t('serviceAgreementTemplate.fieldEmpty', { field }),
           type: 'error'
         });
         return;
@@ -111,14 +113,14 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
         setTemplate(result.template);
         setHasChanges(false);
         setToastMessage({
-          message: 'Service agreement template saved successfully!',
+          message: t('serviceAgreementTemplate.savedSuccess'),
           type: 'success'
         });
       }
     } catch (error) {
       console.error('Error saving template:', error);
       setToastMessage({
-        message: 'Failed to save service agreement template',
+        message: t('serviceAgreementTemplate.failedToSave'),
         type: 'error'
       });
     } finally {
@@ -154,7 +156,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
       });
       setHasChanges(false);
       setToastMessage({
-        message: 'Changes discarded',
+        message: t('serviceAgreementTemplate.changesDiscarded'),
         type: 'success'
       });
     }
@@ -172,11 +174,11 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
       <div className="sa-template-header">
         <div className="sa-template-title">
           <FontAwesomeIcon icon={faFileContract} />
-          <h2>Service Agreement Template Manager</h2>
+          <h2>{t('serviceAgreementTemplate.title')}</h2>
         </div>
         <div className="sa-template-info">
           <FontAwesomeIcon icon={faInfoCircle} />
-          <span>This template will be used for all service agreements</span>
+          <span>{t('serviceAgreementTemplate.infoBanner')}</span>
         </div>
       </div>
 
@@ -186,14 +188,14 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
           className={`sa-tab ${activeSection === 'terms' ? 'active' : ''}`}
           onClick={() => setActiveSection('terms')}
         >
-          Terms & Conditions
+          {t('serviceAgreementTemplate.tabTerms')}
         </button>
         <button
           type="button"
           className={`sa-tab ${activeSection === 'labels' ? 'active' : ''}`}
           onClick={() => setActiveSection('labels')}
         >
-          Labels & Text
+          {t('serviceAgreementTemplate.tabLabels')}
         </button>
       </div>
 
@@ -201,19 +203,19 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
         {loading ? (
           <div className="sa-template-loading-state">
             <div className="sa-template-spinner-inline">
-              <span className="sa-template-sr-only">Loading template…</span>
+              <span className="sa-template-sr-only">{t('serviceAgreementTemplate.loadingTemplate')}</span>
             </div>
-            <p className="sa-template-loading-text">Loading template data...</p>
+            <p className="sa-template-loading-text">{t('serviceAgreementTemplate.loadingTemplateData')}</p>
           </div>
         ) : (
           <>
             {activeSection === 'terms' && (
               <div className="sa-section">
-                <h3>Agreement Terms</h3>
+                <h3>{t('serviceAgreementTemplate.agreementTerms')}</h3>
 
                 <div className="sa-template-field">
                   <label htmlFor="term1">
-                    Term 1: Property Ownership
+                    {t('serviceAgreementTemplate.term1')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -228,7 +230,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term2">
-                    Term 2: Promise of Good Service
+                    {t('serviceAgreementTemplate.term2')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -243,7 +245,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term3">
-                    Term 3: Payment Terms
+                    {t('serviceAgreementTemplate.term3')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -258,7 +260,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term4">
-                    Term 4: Indemnification
+                    {t('serviceAgreementTemplate.term4')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -273,7 +275,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term5">
-                    Term 5: Expiration/Termination
+                    {t('serviceAgreementTemplate.term5')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -288,7 +290,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term6">
-                    Term 6: Install Warranty/Scope of Service
+                    {t('serviceAgreementTemplate.term6')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -303,7 +305,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="term7">
-                    Term 7: Sale of Customer Business
+                    {t('serviceAgreementTemplate.term7')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -318,7 +320,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
                 <div className="sa-template-field">
                   <label htmlFor="noteText">
-                    Agreement Note/Duration Text
+                    {t('serviceAgreementTemplate.noteText')}
                     <span className="required">*</span>
                   </label>
                   <textarea
@@ -335,13 +337,13 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
 
             {activeSection === 'labels' && (
               <div className="sa-section">
-                <h3>Document Labels</h3>
+                <h3>{t('serviceAgreementTemplate.documentLabels')}</h3>
 
                 <div className="sa-subsection">
-                  <h4>Header Section</h4>
+                  <h4>{t('serviceAgreementTemplate.headerSection')}</h4>
 
                   <div className="sa-template-field">
-                    <label htmlFor="titleText">Title Text</label>
+                    <label htmlFor="titleText">{t('serviceAgreementTemplate.titleText')}</label>
                     <input
                       id="titleText"
                       type="text"
@@ -353,7 +355,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="subtitleText">Subtitle Text</label>
+                    <label htmlFor="subtitleText">{t('serviceAgreementTemplate.subtitleText')}</label>
                     <input
                       id="subtitleText"
                       type="text"
@@ -366,10 +368,10 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 </div>
 
                 <div className="sa-subsection">
-                  <h4>Dispenser Options</h4>
+                  <h4>{t('serviceAgreementTemplate.dispenserOptions')}</h4>
 
                   <div className="sa-template-field">
-                    <label htmlFor="retainDispensersLabel">Retain Dispensers Label</label>
+                    <label htmlFor="retainDispensersLabel">{t('serviceAgreementTemplate.retainDispensersLabel')}</label>
                     <input
                       id="retainDispensersLabel"
                       type="text"
@@ -381,7 +383,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="disposeDispensersLabel">Dispose Dispensers Label</label>
+                    <label htmlFor="disposeDispensersLabel">{t('serviceAgreementTemplate.disposeDispensersLabel')}</label>
                     <input
                       id="disposeDispensersLabel"
                       type="text"
@@ -394,10 +396,10 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 </div>
 
                 <div className="sa-subsection">
-                  <h4>Representative Labels</h4>
+                  <h4>{t('serviceAgreementTemplate.representativeLabels')}</h4>
 
                   <div className="sa-template-field">
-                    <label htmlFor="emSalesRepLabel">EM Sales Rep Label</label>
+                    <label htmlFor="emSalesRepLabel">{t('serviceAgreementTemplate.emSalesRepLabel')}</label>
                     <input
                       id="emSalesRepLabel"
                       type="text"
@@ -409,7 +411,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="insideSalesRepLabel">Inside Sales Rep Label</label>
+                    <label htmlFor="insideSalesRepLabel">{t('serviceAgreementTemplate.insideSalesRepLabel')}</label>
                     <input
                       id="insideSalesRepLabel"
                       type="text"
@@ -422,10 +424,10 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 </div>
 
                 <div className="sa-subsection">
-                  <h4>Signature Section</h4>
+                  <h4>{t('serviceAgreementTemplate.signatureSection')}</h4>
 
                   <div className="sa-template-field">
-                    <label htmlFor="authorityText">Authority Statement</label>
+                    <label htmlFor="authorityText">{t('serviceAgreementTemplate.authorityText')}</label>
                     <input
                       id="authorityText"
                       type="text"
@@ -437,7 +439,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="customerContactLabel">Customer Contact Label</label>
+                    <label htmlFor="customerContactLabel">{t('serviceAgreementTemplate.customerContactLabel')}</label>
                     <input
                       id="customerContactLabel"
                       type="text"
@@ -449,7 +451,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="customerSignatureLabel">Customer Signature Label</label>
+                    <label htmlFor="customerSignatureLabel">{t('serviceAgreementTemplate.customerSignatureLabel')}</label>
                     <input
                       id="customerSignatureLabel"
                       type="text"
@@ -461,7 +463,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="customerDateLabel">Customer Date Label</label>
+                    <label htmlFor="customerDateLabel">{t('serviceAgreementTemplate.customerDateLabel')}</label>
                     <input
                       id="customerDateLabel"
                       type="text"
@@ -473,7 +475,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="emFranchiseeLabel">EM Franchisee Label</label>
+                    <label htmlFor="emFranchiseeLabel">{t('serviceAgreementTemplate.emFranchiseeLabel')}</label>
                     <input
                       id="emFranchiseeLabel"
                       type="text"
@@ -485,7 +487,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="emSignatureLabel">EM Signature Label</label>
+                    <label htmlFor="emSignatureLabel">{t('serviceAgreementTemplate.emSignatureLabel')}</label>
                     <input
                       id="emSignatureLabel"
                       type="text"
@@ -497,7 +499,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                   </div>
 
                   <div className="sa-template-field">
-                    <label htmlFor="emDateLabel">EM Date Label</label>
+                    <label htmlFor="emDateLabel">{t('serviceAgreementTemplate.emDateLabel')}</label>
                     <input
                       id="emDateLabel"
                       type="text"
@@ -510,10 +512,10 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 </div>
 
                 <div className="sa-subsection">
-                  <h4>Footer</h4>
+                  <h4>{t('serviceAgreementTemplate.footer')}</h4>
 
                   <div className="sa-template-field">
-                    <label htmlFor="pageNumberText">Page Number Text</label>
+                    <label htmlFor="pageNumberText">{t('serviceAgreementTemplate.pageNumberText')}</label>
                     <input
                       id="pageNumberText"
                       type="text"
@@ -535,7 +537,7 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 disabled={!hasChanges || saving}
               >
                 <FontAwesomeIcon icon={faUndo} />
-                Discard Changes
+                {t('serviceAgreementTemplate.discardChanges')}
               </button>
               <button
                 type="button"
@@ -544,13 +546,13 @@ export const ServiceAgreementTemplateManager: React.FC = () => {
                 disabled={!hasChanges || saving}
               >
                 <FontAwesomeIcon icon={faSave} />
-                {saving ? 'Saving...' : 'Save Template'}
+                {saving ? t('serviceAgreementTemplate.saving') : t('serviceAgreementTemplate.saveTemplate')}
               </button>
             </div>
 
             {template && (
               <div className="sa-template-meta">
-                Last updated: {new Date(template.updatedAt).toLocaleString()}
+                {t('serviceAgreementTemplate.lastUpdated', { date: new Date(template.updatedAt).toLocaleString() })}
               </div>
             )}
           </>

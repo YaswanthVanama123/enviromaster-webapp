@@ -1,0 +1,9 @@
+{
+  "types": {
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "close": "Cerrar"
+}

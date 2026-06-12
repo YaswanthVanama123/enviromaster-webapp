@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTimes,
@@ -42,6 +43,7 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
   onSuccess,
   bulkFiles
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<UploadStep>('loading');
   const [uploadStatus, setUploadStatus] = useState<ZohoUploadStatus | null>(null);
   const [allCompanies, setAllCompanies] = useState<ZohoCompany[]>([]);
@@ -272,9 +274,9 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
       console.error('Failed to initialize upload:', err);
 
       if (err.message?.includes('authorization') || err.message?.includes('auth')) {
-        setError('Zoho integration not set up. Please contact your administrator to configure Zoho Bigin access.');
+        setError(t('misc.zhIntegrationNotSetUp'));
       } else {
-        setError('Failed to load upload options. Please try again.');
+        setError(t('misc.zhFailedToLoadOptions'));
       }
 
       setStep('error');
@@ -380,7 +382,7 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
 
   const handleCreateCompany = async () => {
     if (!newCompany.name.trim()) {
-      setToastMessage({ message: 'Company name is required', type: 'error' });
+      setToastMessage({ message: t('misc.zhCompanyNameRequired'), type: 'error' });
       return;
     }
 
@@ -396,13 +398,13 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
 
         setShowCreateCompany(false);
         setNewCompany({ name: '', phone: '', email: '', website: '', address: '' });
-        setToastMessage({ message: 'Company created successfully', type: 'success' });
+        setToastMessage({ message: t('misc.zhCompanyCreatedSuccess'), type: 'success' });
       } else {
-        setToastMessage({ message: result.error || 'Failed to create company', type: 'error' });
+        setToastMessage({ message: result.error || t('misc.zhFailedToCreateCompany'), type: 'error' });
       }
     } catch (err) {
       console.error('Failed to create company:', err);
-      setToastMessage({ message: 'Failed to create company', type: 'error' });
+      setToastMessage({ message: t('misc.zhFailedToCreateCompany'), type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -410,11 +412,11 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
 
   const handleFirstTimeUpload = async () => {
     if (!selectedCompany) {
-      setToastMessage({ message: 'Please select a company', type: 'error' });
+      setToastMessage({ message: t('misc.zhSelectCompanyError'), type: 'error' });
       return;
     }
     if (!dealName.trim()) {
-      setToastMessage({ message: 'Deal name is required', type: 'error' });
+      setToastMessage({ message: t('misc.zhDealNameRequired'), type: 'error' });
       return;
     }
 
@@ -427,7 +429,7 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
       const hasNotes = trimmedNote.length > 0;
 
       if (!hasAnyFile && !hasNotes) {
-        setToastMessage({ message: "Please add a note or select at least one file to upload to Bigin.", type: "error" });
+        setToastMessage({ message: t('misc.zhAddNoteOrFileError'), type: "error" });
         return;
       }
 
@@ -448,10 +450,10 @@ export const ZohoUpload: React.FC<ZohoUploadProps> = ({
 
           if (result.success) {
             setStep('success');
-            setToastMessage({ message: 'Deal created with note only!', type: 'success' });
+            setToastMessage({ message: t('misc.zhDealCreatedNoteOnly'), type: 'success' });
             onSuccess();
           } else {
-            setError(result.error || 'Upload failed');
+            setError(result.error || t('misc.zhUploadFailedGeneric'));
             setStep('error');
           }
           return;
@@ -622,12 +624,12 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         if (successCount > 0) {
           setStep('success');
           const message = failCount > 0
-            ? `Created deal and added ${successCount} files, ${failCount} failed`
-            : `Successfully created deal with all ${successCount} selected files!`;
+            ? t('misc.zhCreatedDealPartial', { success: successCount, fail: failCount })
+            : t('misc.zhCreatedDealAll', { count: successCount });
           setToastMessage({ message, type: successCount === selectedBulkFiles.length ? 'success' : 'warning' });
           onSuccess();
         } else {
-          setError('Failed to create deal and upload selected files. Please check your connection and try again.');
+          setError(t('misc.zhFailedCreateDealUpload'));
           setStep('error');
         }
         return;
@@ -646,21 +648,21 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
 
       if (result.success) {
         setStep('success');
-        setToastMessage({ message: 'Successfully uploaded to Zoho Bigin!', type: 'success' });
+        setToastMessage({ message: t('misc.zhUploadedToBigin'), type: 'success' });
         onSuccess();
       } else {
-        setError(result.error || 'Upload failed');
+        setError(result.error || t('misc.zhUploadFailedGeneric'));
         setStep('error');
       }
     } catch (err) {
       console.error('Upload failed:', err);
-      setError('Upload failed. Please try again.');
+      setError(t('misc.zhUploadFailedRetry'));
       setStep('error');
     }
   };
   const sendUpdateNoteOnly = async () => {
     if (!uploadStatus?.mapping?.dealId) {
-      setError("No existing Zoho deal mapping found. Upload the agreement at least once before sending notes.");
+      setError(t('misc.zhNoExistingMapping'));
       setStep("error");
       return;
     }
@@ -673,17 +675,17 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
 
     if (updateResult.success) {
       setStep("success");
-      setToastMessage({ message: `Successfully added note to deal ${uploadStatus.mapping.dealName}!`, type: "success" });
+      setToastMessage({ message: t('misc.zhAddedNoteToDeal', { dealName: uploadStatus.mapping.dealName }), type: "success" });
       onSuccess();
     } else {
-      setError(updateResult.error || "Update failed");
+      setError(updateResult.error || t('misc.zhUpdateFailed'));
       setStep("error");
     }
   };
 
   const handleUpdateUpload = async () => {
     if (!noteText.trim()) {
-      setToastMessage({ message: 'Please add notes about what changed in this version', type: 'error' });
+      setToastMessage({ message: t('misc.zhAddNotesAboutChanges'), type: 'error' });
       return;
     }
 
@@ -776,12 +778,12 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         if (successCount > 0) {
           setStep('success');
           const message = failCount > 0
-            ? `Added ${successCount} files to existing deal, ${failCount} failed`
-            : `Successfully added all ${successCount} selected files to existing deal!`;
+            ? t('misc.zhAddedFilesPartial', { success: successCount, fail: failCount })
+            : t('misc.zhAddedFilesAll', { count: successCount });
           setToastMessage({ message, type: successCount === selectedBulkFiles.length ? 'success' : 'warning' });
           onSuccess();
         } else {
-          setError('All selected file additions failed. Please check your connection and try again.');
+          setError(t('misc.zhAllAdditionsFailed'));
           setStep('error');
         }
         return;
@@ -799,15 +801,15 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
 
       if (result.success) {
         setStep('success');
-        setToastMessage({ message: `Successfully uploaded version ${uploadStatus?.mapping?.nextVersion || 'new'}!`, type: 'success' });
+        setToastMessage({ message: t('misc.zhUploadedVersion', { version: uploadStatus?.mapping?.nextVersion || 'new' }), type: 'success' });
         onSuccess();
       } else {
-        setError(result.error || 'Upload failed');
+        setError(result.error || t('misc.zhUploadFailedGeneric'));
         setStep('error');
       }
     } catch (err) {
       console.error('Update upload failed:', err);
-      setError('Upload failed. Please try again.');
+      setError(t('misc.zhUploadFailedRetry'));
       setStep('error');
     }
   };
@@ -816,7 +818,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     <div className="zoho-upload__step zoho-upload__step--loading">
       <div className="zoho-upload__loading">
         <FontAwesomeIcon icon={faSpinner} spin size="2x" />
-        <p>Loading upload options...</p>
+        <p>{t('misc.zhLoadingOptions')}</p>
       </div>
     </div>
   );
@@ -825,11 +827,11 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     const hasNotes = noteText.trim().length > 0;
     const warningColor = hasNotes ? '#f59e0b' : '#f44336';
     const noteOnlyMessage = bulkFiles && bulkFiles.length > 0
-      ? 'No files selected. Notes-only upload will create the deal without uploading documents.'
-      : 'No file selected. This action will send only notes to Zoho Bigin.';
+      ? t('misc.zhNoFilesSelectedFirstTime')
+      : t('misc.zhNoFileSelected');
     const warningMessage = hasNotes
       ? noteOnlyMessage
-      : 'Please add a note or select at least one file to upload to Bigin.';
+      : t('misc.zhAddNoteOrFile');
 
     return (
       <div className="zoho-upload__step zoho-upload__step--first-time">
@@ -837,14 +839,14 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         <h3>
           <FontAwesomeIcon icon={faUpload} />
           {bulkFiles && bulkFiles.length > 0
-            ? `Upload ${bulkFiles.length} Files to Bigin`
-            : 'First-time Upload to Bigin'
+            ? t('misc.zhUploadFilesToBigin', { count: bulkFiles.length })
+            : t('misc.zhFirstTimeUpload')
           }
         </h3>
         <p>
           {bulkFiles && bulkFiles.length > 0
-            ? `Upload ${bulkFiles.length} documents to your Zoho Bigin CRM.`
-            : "This agreement hasn't been uploaded to Bigin yet. Let's set it up!"
+            ? t('misc.zhUploadDocuments', { count: bulkFiles.length })
+            : t('misc.zhNotUploadedYet')
           }
         </p>
       </div>
@@ -852,8 +854,8 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
       <div className="zoho-upload__section">        <label className="zoho-upload__label">
           <FontAwesomeIcon icon={faFileAlt} />
           {bulkFiles && bulkFiles.length > 0
-            ? `Select Documents to Upload (${selectedFiles.size} of ${bulkFiles.length} selected)`
-            : `Document to Upload (${selectedFiles.has(agreementId) ? '1 selected' : '0 selected'})`
+            ? t('misc.zhSelectDocuments', { selected: selectedFiles.size, total: bulkFiles.length })
+            : t('misc.zhDocumentToUpload', { count: selectedFiles.has(agreementId) ? 1 : 0 })
           }
         </label>
 
@@ -865,7 +867,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               onClick={selectAllFiles}
               style={{ padding: '5px 10px', fontSize: '12px' }}
             >
-              Select All
+              {t('misc.zhSelectAll')}
             </button>
             <button
               type="button"
@@ -873,7 +875,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               onClick={deselectAllFiles}
               style={{ padding: '5px 10px', fontSize: '12px' }}
             >
-              Deselect All
+              {t('misc.zhDeselectAll')}
             </button>
           </div>
         )}
@@ -909,7 +911,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               <FontAwesomeIcon icon={faFileAlt} className="file-icon" />
               <span className="file-name" style={{ flex: 1 }}>{agreementTitle}</span>
               <span style={{ fontSize: '12px', color: '#666' }}>
-                (PDF Document)
+                {t('misc.zhPdfDocument')}
               </span>
             </div>
           )}
@@ -926,7 +928,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         <div className="zoho-upload__section">
           <label className="zoho-upload__label">
             <FontAwesomeIcon icon={faBuilding} />
-            Select Company
+            {t('misc.zhSelectCompany')}
           </label>
 
           {!showCreateCompany ? (
@@ -935,7 +937,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                 <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search companies..."
+                  placeholder={t('misc.zhSearchCompanies')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="zoho-upload__search-input"
@@ -964,7 +966,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                               whiteSpace: 'nowrap',
                               flexShrink: 0
                             }}
-                            title={`Match score: ${(company.matchScore || 0).toFixed(2)}`}
+                            title={t('misc.zhMatchScore', { score: (company.matchScore || 0).toFixed(2) })}
                           >
                             {getMatchTypeLabel(company.matchType)}
                           </span>
@@ -976,7 +978,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                   ))
                 ) : (
                   <div className="zoho-upload__no-results">
-                    {searchTerm ? `No companies found for "${searchTerm}"` : 'No companies found'}
+                    {searchTerm ? t('misc.zhNoCompaniesForSearch', { term: searchTerm }) : t('misc.zhNoCompanies')}
                   </div>
                 )}
               </div>
@@ -987,15 +989,15 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                 onClick={() => setShowCreateCompany(true)}
               >
                 <FontAwesomeIcon icon={faPlus} />
-                Create New Company
+                {t('misc.zhCreateNewCompany')}
               </button>
             </>
           ) : (
             <div className="zoho-upload__create-company">
-              <h4>Create New Company</h4>
+              <h4>{t('misc.zhCreateNewCompany')}</h4>
               <input
                 type="text"
-                placeholder="Company Name *"
+                placeholder={t('misc.zhCompanyNamePlaceholder')}
                 value={newCompany.name}
                 onChange={(e) => setNewCompany(prev => ({ ...prev, name: e.target.value }))}
                 className="zoho-upload__input"
@@ -1003,28 +1005,28 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               />
               <input
                 type="tel"
-                placeholder="Phone"
+                placeholder={t('misc.zhPhone')}
                 value={newCompany.phone}
                 onChange={(e) => setNewCompany(prev => ({ ...prev, phone: e.target.value }))}
                 className="zoho-upload__input"
               />
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t('misc.zhEmail')}
                 value={newCompany.email}
                 onChange={(e) => setNewCompany(prev => ({ ...prev, email: e.target.value }))}
                 className="zoho-upload__input"
               />
               <input
                 type="url"
-                placeholder="Website"
+                placeholder={t('misc.zhWebsite')}
                 value={newCompany.website}
                 onChange={(e) => setNewCompany(prev => ({ ...prev, website: e.target.value }))}
                 className="zoho-upload__input"
               />
               <input
                 type="text"
-                placeholder="Address"
+                placeholder={t('misc.zhAddress')}
                 value={newCompany.address}
                 onChange={(e) => setNewCompany(prev => ({ ...prev, address: e.target.value }))}
                 className="zoho-upload__input"
@@ -1037,14 +1039,14 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                   onClick={handleCreateCompany}
                   disabled={loading || !newCompany.name.trim()}
                 >
-                  {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'Create Company'}
+                  {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t('misc.zhCreateCompany')}
                 </button>
                 <button
                   type="button"
                   className="zoho-upload__btn zoho-upload__btn--secondary"
                   onClick={() => setShowCreateCompany(false)}
                 >
-                  Cancel
+                  {t('misc.zhCancel')}
                 </button>
               </div>
             </div>
@@ -1054,20 +1056,20 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         {selectedCompany && !showCreateCompany && (
           <>
             <div className="zoho-upload__section">
-              <label className="zoho-upload__label">Deal Name</label>
+              <label className="zoho-upload__label">{t('misc.zhDealName')}</label>
               <input
                 type="text"
                 value={dealName}
                 onChange={(e) => setDealName(e.target.value)}
                 className="zoho-upload__input"
-                placeholder="Enter deal name"
+                placeholder={t('misc.zhDealNamePlaceholder')}
                 required
               />
             </div>
 
             <div className="zoho-upload__row">
               <div className="zoho-upload__col">
-                <label className="zoho-upload__label">Pipeline</label>
+                <label className="zoho-upload__label">{t('misc.zhPipeline')}</label>
                 <select
                   value={pipelineName}
                   onChange={(e) => setPipelineName(e.target.value)}
@@ -1081,7 +1083,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
                 </select>
               </div>
               <div className="zoho-upload__col">
-                <label className="zoho-upload__label">Stage</label>
+                <label className="zoho-upload__label">{t('misc.zhStage')}</label>
                 <select
                   value={stage}
                   onChange={(e) => setStage(e.target.value)}
@@ -1097,12 +1099,12 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
             </div>
 
             <div className="zoho-upload__section">
-              <label className="zoho-upload__label">Notes *</label>
+              <label className="zoho-upload__label">{t('misc.zhNotes')}</label>
               <textarea
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 className="zoho-upload__textarea"
-                placeholder="Describe this proposal (e.g., services included, pricing details, special requirements...)"
+                placeholder={t('misc.zhNotesPlaceholder')}
                 rows={4}
                 required
               />
@@ -1118,18 +1120,18 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     const hasNotes = noteText.trim().length > 0;
     const warningColor = hasNotes ? '#f59e0b' : '#f44336';
     const noteOnlyMessage = bulkFiles && bulkFiles.length > 0
-      ? 'No files selected. Notes-only update will add the note to the deal without uploading documents.'
-      : 'No file selected. This action will send only notes to Zoho Bigin.';
+      ? t('misc.zhNoFilesSelectedUpdate')
+      : t('misc.zhNoFileSelected');
     const warningMessage = hasNotes
       ? noteOnlyMessage
-      : 'Please add a note or select at least one file to upload to Bigin.';
+      : t('misc.zhAddNoteOrFile');
 
     return (
       <div className="zoho-upload__step zoho-upload__step--update">
       <div className="zoho-upload__header">
         <h3>
           <FontAwesomeIcon icon={faHistory} />
-          Upload Updated Version
+          {t('misc.zhUploadUpdatedVersion')}
           {bulkFiles && bulkFiles.length > 1 && (
             <span style={{
               fontSize: '14px',
@@ -1137,11 +1139,11 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               color: '#059669',
               marginLeft: '8px'
             }}>
-              (Bulk - {selectedFiles.size} files)
+              {t('misc.zhBulkFiles', { count: selectedFiles.size })}
             </span>
           )}
         </h3>
-        <p>This agreement has been uploaded before. Adding version {uploadStatus?.mapping?.nextVersion}.</p>
+        <p>{t('misc.zhUploadedBeforeAddingVersion', { version: uploadStatus?.mapping?.nextVersion })}</p>
 
         {uploadStatus?.mapping && (
           <div style={{
@@ -1161,26 +1163,26 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               gap: '6px'
             }}>
               <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '12px' }} />
-              {bulkFiles && bulkFiles.length > 1 ? 'Adding to Existing Deal (Bulk Upload)' : 'Uploading to Existing Deal'}
+              {bulkFiles && bulkFiles.length > 1 ? t('misc.zhAddingToExistingDealBulk') : t('misc.zhUploadingToExistingDeal')}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px 12px', fontSize: '13px' }}>
-              <span style={{ fontWeight: '500', color: '#6b7280' }}>Company:</span>
+              <span style={{ fontWeight: '500', color: '#6b7280' }}>{t('misc.zhCompany')}</span>
               <span style={{ color: '#374151' }}>{uploadStatus.mapping.companyName}</span>
 
-              <span style={{ fontWeight: '500', color: '#6b7280' }}>Deal:</span>
+              <span style={{ fontWeight: '500', color: '#6b7280' }}>{t('misc.zhDeal')}</span>
               <span style={{ color: '#374151' }}>{uploadStatus.mapping.dealName}</span>
 
-              <span style={{ fontWeight: '500', color: '#6b7280' }}>Current Version:</span>
+              <span style={{ fontWeight: '500', color: '#6b7280' }}>{t('misc.zhCurrentVersion')}</span>
               <span style={{ color: '#374151' }}>v{uploadStatus.mapping.currentVersion}</span>
 
-              <span style={{ fontWeight: '500', color: '#6b7280' }}>Last Updated:</span>
+              <span style={{ fontWeight: '500', color: '#6b7280' }}>{t('misc.zhLastUpdated')}</span>
               <span style={{ color: '#374151' }}>{new Date(uploadStatus.mapping.lastUploadedAt).toLocaleDateString()}</span>
 
               {bulkFiles && bulkFiles.length > 1 && (
                 <>
-                  <span style={{ fontWeight: '500', color: '#6b7280' }}>Upload Mode:</span>
+                  <span style={{ fontWeight: '500', color: '#6b7280' }}>{t('misc.zhUploadMode')}</span>
                   <span style={{ color: '#059669', fontWeight: '500' }}>
-                    Bulk Update ({selectedFiles.size} of {bulkFiles.length} selected)
+                    {t('misc.zhBulkUpdateSelected', { selected: selectedFiles.size, total: bulkFiles.length })}
                   </span>
                 </>
               )}
@@ -1193,8 +1195,8 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
         <label className="zoho-upload__label">
           <FontAwesomeIcon icon={faFileAlt} />
           {bulkFiles && bulkFiles.length > 0
-            ? `Select Documents to Upload (${selectedFiles.size} of ${bulkFiles.length} selected)`
-            : `Document to Upload (${selectedFiles.has(agreementId) ? '1 selected' : '0 selected'})`
+            ? t('misc.zhSelectDocuments', { selected: selectedFiles.size, total: bulkFiles.length })
+            : t('misc.zhDocumentToUpload', { count: selectedFiles.has(agreementId) ? 1 : 0 })
           }
         </label>
 
@@ -1206,7 +1208,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               onClick={selectAllFiles}
               style={{ padding: '5px 10px', fontSize: '12px' }}
             >
-              Select All
+              {t('misc.zhSelectAll')}
             </button>
             <button
               type="button"
@@ -1214,7 +1216,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               onClick={deselectAllFiles}
               style={{ padding: '5px 10px', fontSize: '12px' }}
             >
-              Deselect All
+              {t('misc.zhDeselectAll')}
             </button>
           </div>
         )}
@@ -1250,7 +1252,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
               <FontAwesomeIcon icon={faFileAlt} className="file-icon" />
               <span className="file-name" style={{ flex: 1 }}>{agreementTitle}</span>
               <span style={{ fontSize: '12px', color: '#666' }}>
-                (Updated PDF Document)
+                {t('misc.zhUpdatedPdfDocument')}
               </span>
             </div>
           )}
@@ -1266,13 +1268,13 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
       <div className="zoho-upload__form">
         <div className="zoho-upload__section">
           <label className="zoho-upload__label">
-            What changed in this version? *
+            {t('misc.zhWhatChanged')}
           </label>
           <textarea
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             className="zoho-upload__textarea"
-            placeholder="Describe what changed (e.g., updated pricing, added services, removed items, adjusted schedule...)"
+            placeholder={t('misc.zhWhatChangedPlaceholder')}
             rows={4}
             required
           />
@@ -1284,11 +1286,11 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
 
   const renderUploadingStep = () => {
     const uploadingLabel = uploadMode === 'notes'
-      ? "Creating deal and adding note..."
-      : "Creating deal, adding note, and uploading files...";
+      ? t('misc.zhCreatingDealNote')
+      : t('misc.zhCreatingDealUploading');
     const uploadingSubtext = uploadMode === 'notes'
-      ? "Adding the note to the new Bigin deal."
-      : "Creating deal, adding note, and uploading files to Bigin.";
+      ? t('misc.zhAddingNote')
+      : t('misc.zhCreatingDealUploadingSub');
 
     return (
       <div className="zoho-upload__step zoho-upload__step--uploading">
@@ -1305,12 +1307,11 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     <div className="zoho-upload__step zoho-upload__step--success">
       <div className="zoho-upload__result zoho-upload__result--success">
         <FontAwesomeIcon icon={faCheckCircle} size="3x" />
-        <h3>Upload Successful!</h3>
+        <h3>{t('misc.zhUploadSuccessful')}</h3>
         <p>
-          Your document has been successfully uploaded to Zoho Bigin.
           {uploadStatus?.isFirstTime
-            ? ' The deal has been created and the PDF is now available in Zoho.'
-            : ` Version ${uploadStatus?.mapping?.nextVersion} has been added to the existing deal.`
+            ? t('misc.zhUploadSuccessFirstTime')
+            : t('misc.zhUploadSuccessVersion', { version: uploadStatus?.mapping?.nextVersion })
           }
         </p>
       </div>
@@ -1321,7 +1322,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     <div className="zoho-upload__step zoho-upload__step--error">
       <div className="zoho-upload__result zoho-upload__result--error">
         <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-        <h3>Upload Failed</h3>
+        <h3>{t('misc.zhUploadFailed')}</h3>
         <p>{error}</p>
         <button
           className="zoho-upload__btn zoho-upload__btn--primary"
@@ -1330,7 +1331,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
             setStep(uploadStatus?.isFirstTime ? 'first-time' : 'update');
           }}
         >
-          Try Again
+          {t('misc.zhTryAgain')}
         </button>
       </div>
     </div>
@@ -1348,7 +1349,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
             className="zoho-upload__btn zoho-upload__btn--secondary"
             onClick={onClose}
           >
-            Close
+            {t('misc.zhClose')}
           </button>
         </div>
       );
@@ -1361,7 +1362,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
             className="zoho-upload__btn zoho-upload__btn--secondary"
             onClick={onClose}
           >
-            Cancel
+            {t('misc.zhCancel')}
           </button>
           <button
             className="zoho-upload__btn zoho-upload__btn--primary"
@@ -1375,8 +1376,8 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
           >
             <FontAwesomeIcon icon={faUpload} />
             {selectedFiles.size > 0
-              ? `Upload ${selectedFiles.size} Selected File${selectedFiles.size !== 1 ? 's' : ''} to Bigin`
-              : 'Send Notes to Bigin'
+              ? t('misc.zhUploadSelectedFiles', { count: selectedFiles.size })
+              : t('misc.zhSendNotesToBigin')
             }
           </button>
         </div>
@@ -1390,7 +1391,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
             className="zoho-upload__btn zoho-upload__btn--secondary"
             onClick={onClose}
           >
-            Cancel
+            {t('misc.zhCancel')}
           </button>
           <button
             className="zoho-upload__btn zoho-upload__btn--primary"
@@ -1401,8 +1402,8 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
           >
             <FontAwesomeIcon icon={faUpload} />
             {selectedFiles.size > 0
-              ? `Upload ${selectedFiles.size} Selected Files (Version ${uploadStatus?.mapping?.nextVersion})`
-              : `Send Notes to Bigin (Version ${uploadStatus?.mapping?.nextVersion})`
+              ? t('misc.zhUploadSelectedVersion', { count: selectedFiles.size, version: uploadStatus?.mapping?.nextVersion })
+              : t('misc.zhSendNotesVersion', { version: uploadStatus?.mapping?.nextVersion })
             }
           </button>
         </div>
@@ -1417,7 +1418,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
       <div className="zoho-upload__overlay" onClick={onClose} />
       <div className="zoho-upload__modal">
         <div className="zoho-upload__modal-header">
-          <h2>Upload to Bigin</h2>
+          <h2>{t('misc.zhUploadToBigin')}</h2>
           <button className="zoho-upload__close" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>

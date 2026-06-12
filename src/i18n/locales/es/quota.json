@@ -1,0 +1,48 @@
+{
+  "title": "Mi Cuota",
+  "subtitle": "Realice el seguimiento del progreso de su cuota de ventas",
+  "loading": "Cargando su cuota...",
+  "error": "Error",
+  "noData": "Sin datos de cuota",
+  "noDataMessage": "No hay datos de cuota disponibles para su cuenta.",
+  "fetchError": "Error al obtener los datos de la cuota",
+  "period": {
+    "weekly": "Semanal"
+  },
+  "level": {
+    "below": "Por debajo de la cuota",
+    "above": "Por encima de la cuota",
+    "double": "Cuota doble"
+  },
+  "levelBadge": "{{label}} ({{rate}})",
+  "progressLabel": "{{percent}}% de la cuota",
+  "marker100": "100%",
+  "marker200": "200%",
+  "stats": {
+    "target": "Objetivo",
+    "actualSales": "Ventas reales",
+    "commissionRate": "Tasa de comisión",
+    "earned": "Ganado"
+  },
+  "nextTier": {
+    "title": "Progreso al siguiente nivel",
+    "toReachQuota": "Para alcanzar la cuota (tasa del 6%):",
+    "toReachDouble": "Para alcanzar el doble (tasa del 9%):",
+    "achieved": "¡Ha alcanzado el nivel más alto!",
+    "achievedValue": "9% de comisión"
+  },
+  "agreementStats": {
+    "title": "Estadísticas de acuerdos",
+    "totalAgreements": "Total de acuerdos",
+    "newBusiness": "Nuevos negocios",
+    "renewals": "Renovaciones"
+  },
+  "recent": {
+    "title": "Acuerdos recientes",
+    "perMonth": "{{amount}}/mes"
+  },
+  "history": {
+    "title": "Historial de cuotas",
+    "agreements": "{{count}} acuerdos"
+  }
+}

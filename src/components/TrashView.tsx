@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
 import type { SavedFileListItem, SavedFileGroup } from "../backendservice/api/pdfApi";
 import { Toast } from "./admin/Toast";
@@ -16,6 +17,7 @@ import { getDocumentTypeForSavedFile } from "../utils/savedFileDocumentType";
 import { AgreementRow } from "./SavedFiles/AgreementRow";
 
 export default function TrashView() {
+  const { t } = useTranslation();
   const [groups, setGroups] = useState<SavedFileGroup[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -162,7 +164,7 @@ export default function TrashView() {
     } catch (error) {
       console.error("Failed to view file:", error);
       setToastMessage({
-        message: "Failed to view file. Please try again.",
+        message: t("trash.toast.viewFailed"),
         type: "error"
       });
     }
@@ -210,13 +212,13 @@ export default function TrashView() {
       window.URL.revokeObjectURL(url);
 
       setToastMessage({
-        message: `Downloaded: ${safeName}`,
+        message: t("trash.toast.downloaded", { name: safeName }),
         type: "success"
       });
     } catch (error) {
       console.error("Failed to download file:", error);
       setToastMessage({
-        message: "Failed to download file. Please try again.",
+        message: t("trash.toast.downloadFailed"),
         type: "error"
       });
     }
@@ -234,13 +236,13 @@ export default function TrashView() {
       if (type === 'folder') {
         await pdfApi.restoreAgreement(id);
         setToastMessage({
-          message: `Restored agreement: ${title}`,
+          message: t("trash.toast.restoredAgreement", { title }),
           type: "success"
         });
       } else {
         await pdfApi.restoreFile(id, { fileType });
         setToastMessage({
-          message: `Restored file: ${title}`,
+          message: t("trash.toast.restoredFile", { title }),
           type: "success"
         });
       }
@@ -249,7 +251,7 @@ export default function TrashView() {
     } catch (error) {
       console.error(`Failed to restore ${type}:`, error);
       setToastMessage({
-        message: `Failed to restore ${type}. Please try again.`,
+        message: type === 'folder' ? t("trash.toast.restoreFailedFolder") : t("trash.toast.restoreFailedFile"),
         type: "error"
       });
     }
@@ -265,7 +267,7 @@ export default function TrashView() {
 
     if (!isInAdminContext) {
       setToastMessage({
-        message: "Admin access required to permanently delete items. Please access this page from the Admin Panel to perform permanent deletions.",
+        message: t("trash.toast.adminRequired"),
         type: "error"
       });
       setDeleteConfirmOpen(false);
@@ -281,13 +283,13 @@ export default function TrashView() {
       if (itemToDelete.type === 'folder') {
         await pdfApi.permanentlyDeleteAgreement(itemToDelete.id);
         setToastMessage({
-          message: `Permanently deleted agreement: ${itemToDelete.title}`,
+          message: t("trash.toast.deletedAgreement", { title: itemToDelete.title }),
           type: "success"
         });
       } else {
         await pdfApi.permanentlyDeleteFile(itemToDelete.id, { fileType: itemToDelete.fileType });
         setToastMessage({
-          message: `Permanently deleted file: ${itemToDelete.title}`,
+          message: t("trash.toast.deletedFile", { title: itemToDelete.title }),
           type: "success"
         });
       }
@@ -300,7 +302,7 @@ export default function TrashView() {
     } catch (error) {
       console.error(`Failed to permanently delete ${itemToDelete.type}:`, error);
       setToastMessage({
-        message: `Failed to permanently delete ${itemToDelete.type}. Please try again.`,
+        message: itemToDelete.type === 'folder' ? t("trash.toast.deleteFailedFolder") : t("trash.toast.deleteFailedFile"),
         type: "error"
       });
     }
@@ -335,8 +337,8 @@ export default function TrashView() {
     });
 
     return [
-      { label: 'Deleted Files', count: deletedFiles, color: '#dc2626', icon: faFileAlt },
-      { label: 'Deleted Folders', count: deletedFolders, color: '#991b1b', icon: faFolder }
+      { label: t('trash.stats.deletedFiles'), count: deletedFiles, color: '#dc2626', icon: faFileAlt },
+      { label: t('trash.stats.deletedFolders'), count: deletedFolders, color: '#991b1b', icon: faFolder }
     ];
   }, [groups]);
 
@@ -417,7 +419,7 @@ export default function TrashView() {
               color: '#111827'
             }}
           >
-            Trash
+            {t("trash.title")}
           </h1>
         </div>
         <p
@@ -428,7 +430,7 @@ export default function TrashView() {
             color: '#6b7280'
           }}
         >
-          View and manage deleted agreements and files. Items in trash can be restored or permanently deleted.
+          {t("trash.description")}
         </p>
       </div>
 
@@ -453,7 +455,7 @@ export default function TrashView() {
             <input
               className="trash-view-search-input"
               type="text"
-              placeholder="Search deleted items..."
+              placeholder={t("trash.searchPlaceholder")}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -480,14 +482,14 @@ export default function TrashView() {
             >
               <input type="checkbox" />
               <FontAwesomeIcon icon={faCheckSquare} style={{ fontSize: '14px' }} />
-              Select All
+              {t("trash.selectAll")}
             </label>
           </div>
 
           {error && <div className="sf__error">{error}</div>}
           {!loading && !error && groups.length === 0 && (
             <div className="sf__empty">
-              {query ? `No deleted items found matching "${query}"` : "Trash is empty"}
+              {query ? t("trash.noResults", { query }) : t("trash.empty")}
             </div>
           )}
 
@@ -610,7 +612,7 @@ export default function TrashView() {
           {totalGroups > groupsPerPage && (
             <div className="sf__pager" style={{ marginTop: '20px' }}>
               <div className="sf__page-info">
-                Showing {Math.min((currentPage - 1) * groupsPerPage + 1, totalGroups)}-{Math.min(currentPage * groupsPerPage, totalGroups)} of {totalGroups} deleted agreements
+                {t("trash.pageInfo", { from: Math.min((currentPage - 1) * groupsPerPage + 1, totalGroups), to: Math.min(currentPage * groupsPerPage, totalGroups), total: totalGroups })}
               </div>
             </div>
           )}
@@ -641,7 +643,7 @@ export default function TrashView() {
         onSend={async (emailData: EmailData) => {
           console.log("📧 [TRASH] Sending email:", emailData);
           setToastMessage({
-            message: "Email sent successfully!",
+            message: t("trash.toast.emailSent"),
             type: "success"
           });
           setEmailComposerOpen(false);
@@ -684,12 +686,12 @@ export default function TrashView() {
           >
             <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 600, color: '#212121', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#dc2626', fontSize: '24px' }} />
-              Permanently Delete {itemToDelete.type === 'folder' ? 'Agreement' : 'File'}?
+              {itemToDelete.type === 'folder' ? t("trash.deleteModal.titleAgreement") : t("trash.deleteModal.titleFile")}
             </h3>
             <p style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#4a4a4a', lineHeight: 1.5 }}>
-              This will <strong>permanently delete</strong>: <strong>{itemToDelete.title}</strong>
+              {t("trash.deleteModal.warningPrefix")} <strong>{t("trash.deleteModal.permanentlyDelete")}</strong>: <strong>{itemToDelete.title}</strong>
               <br />
-              <span style={{ color: '#dc2626', fontWeight: 600 }}>This action cannot be undone!</span>
+              <span style={{ color: '#dc2626', fontWeight: 600 }}>{t("trash.deleteModal.cannotBeUndone")}</span>
             </p>
 
             <div style={{
@@ -724,18 +726,18 @@ export default function TrashView() {
                   userSelect: 'none'
                 }}
               >
-                I understand this will permanently delete this {itemToDelete.type === 'folder' ? 'agreement' : 'file'}
+                {itemToDelete.type === 'folder' ? t("trash.deleteModal.understandAgreement") : t("trash.deleteModal.understandFile")}
               </label>
             </div>
 
             <p style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 500 }}>
-              Type <strong style={{ color: '#dc2626' }}>DELETE</strong> to confirm:
+              Type <strong style={{ color: '#dc2626' }}>DELETE</strong> {t("trash.deleteModal.typeToConfirm")}
             </p>
             <input
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              placeholder="Type DELETE"
+              placeholder={t("trash.deleteModal.typeDeletePlaceholder")}
               style={{
                 width: '100%',
                 padding: '10px',
@@ -765,7 +767,7 @@ export default function TrashView() {
                   fontWeight: 500
                 }}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={confirmPermanentDelete}
@@ -783,7 +785,7 @@ export default function TrashView() {
                   textTransform: 'uppercase'
                 }}
               >
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           </div>

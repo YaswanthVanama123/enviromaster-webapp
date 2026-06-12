@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
 import { Toast } from "./Toast";
 import "./ServicePricingDetailedView.css";
@@ -46,6 +47,7 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
   onUpdateField,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const getInitialTab = (): TabKey => {
     if (service.serviceId === "rpmWindows") return "windowRates";
     if (service.serviceId === "carpetCleaning") return "unitPricing";
@@ -203,170 +205,170 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const windowPricing = getValue(["windowPricingBothSidesIncluded"]) || {};
       categories.windowRates = [
         {
-          label: "Small Window Price",
+          label: t("servicePricing.detailedFields.smallWindowPrice"),
           value: windowPricing.smallWindowPrice ?? 0,
           path: ["windowPricingBothSidesIncluded", "smallWindowPrice"],
           unit: "$ per window",
-          description: "Price for cleaning small windows (both sides included, typically $1.50)",
+          description: t("servicePricing.detailedFields.smallWindowPriceDesc"),
         },
         {
-          label: "Medium Window Price",
+          label: t("servicePricing.detailedFields.mediumWindowPrice"),
           value: windowPricing.mediumWindowPrice ?? 0,
           path: ["windowPricingBothSidesIncluded", "mediumWindowPrice"],
           unit: "$ per window",
-          description: "Price for cleaning medium windows (both sides included, typically $3.00)",
+          description: t("servicePricing.detailedFields.mediumWindowPriceDesc"),
         },
         {
-          label: "Large Window Price",
+          label: t("servicePricing.detailedFields.largeWindowPrice"),
           value: windowPricing.largeWindowPrice ?? 0,
           path: ["windowPricingBothSidesIncluded", "largeWindowPrice"],
           unit: "$ per window",
-          description: "Price for cleaning large windows (both sides included, typically $7.00)",
+          description: t("servicePricing.detailedFields.largeWindowPriceDesc"),
         },
       ];
 
       const installPricing = getValue(["installPricing"]) || {};
       categories.installMultipliers = [
         {
-          label: "Installation Multiplier",
+          label: t("servicePricing.detailedFields.installationMultiplier"),
           value: installPricing.installationMultiplier ?? 0,
           path: ["installPricing", "installationMultiplier"],
           unit: "×",
-          description: "Multiply base price by this for first-time/dirty installations (typically 3x)",
+          description: t("servicePricing.detailedFields.installationMultiplierDesc"),
         },
       ];
 
       const tripChargesData = getValue(["tripCharges"]) || {};
       categories.minimumAndTripCharges = [
         {
-          label: "Minimum Charge Per Visit",
+          label: t("servicePricing.detailedFields.minimumChargePerVisit"),
           value: getValue(["minimumChargePerVisit"]) ?? 0,
           path: ["minimumChargePerVisit"],
           unit: "$",
-          description: "Minimum charge per service visit (typically $50)",
+          description: t("servicePricing.detailedFields.rpmMinimumChargePerVisitDesc"),
         },
         {
-          label: "Standard Trip Charge",
+          label: t("servicePricing.detailedFields.standardTripCharge"),
           value: tripChargesData.standard ?? 0,
           path: ["tripCharges", "standard"],
           unit: "$",
-          description: "Standard trip charge for service visits (typically $0)",
+          description: t("servicePricing.detailedFields.standardTripChargeDesc"),
         },
         {
-          label: "Beltway Trip Charge",
+          label: t("servicePricing.detailedFields.beltwayTripCharge"),
           value: tripChargesData.beltway ?? 0,
           path: ["tripCharges", "beltway"],
           unit: "$",
-          description: "Trip charge for beltway locations (typically $0)",
+          description: t("servicePricing.detailedFields.beltwayTripChargeDesc"),
         },
       ];
 
       const freqPriceMultipliers = getValue(["frequencyPriceMultipliers"]) || {};
       categories.frequencyPriceMultipliers = [
         {
-          label: "Biweekly Price Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyPriceMultiplier"),
           value: freqPriceMultipliers.biweeklyPriceMultiplier ?? 0,
           path: ["frequencyPriceMultipliers", "biweeklyPriceMultiplier"],
           unit: "×",
-          description: "Multiplier applied for biweekly service (typically 1.25x)",
+          description: t("servicePricing.detailedFields.biweeklyPriceMultiplierDesc"),
         },
         {
-          label: "Monthly Price Multiplier",
+          label: t("servicePricing.detailedFields.monthlyPriceMultiplier"),
           value: freqPriceMultipliers.monthlyPriceMultiplier ?? 0,
           path: ["frequencyPriceMultipliers", "monthlyPriceMultiplier"],
           unit: "×",
-          description: "Multiplier applied for monthly service (typically 1.25x)",
+          description: t("servicePricing.detailedFields.monthlyPriceMultiplierDesc"),
         },
         {
-          label: "Quarterly Price Multiplier (After First Time)",
+          label: t("servicePricing.detailedFields.quarterlyPriceMultiplierAfterFirstTime"),
           value: freqPriceMultipliers.quarterlyPriceMultiplierAfterFirstTime ?? 0,
           path: ["frequencyPriceMultipliers", "quarterlyPriceMultiplierAfterFirstTime"],
           unit: "×",
-          description: "Multiplier for quarterly service after initial clean (typically 2x)",
+          description: t("servicePricing.detailedFields.quarterlyPriceMultiplierAfterFirstTimeDesc"),
         },
         {
-          label: "Quarterly First Time Multiplier",
+          label: t("servicePricing.detailedFields.quarterlyFirstTimeMultiplier"),
           value: freqPriceMultipliers.quarterlyFirstTimeMultiplier ?? 0,
           path: ["frequencyPriceMultipliers", "quarterlyFirstTimeMultiplier"],
           unit: "×",
-          description: "Multiplier for quarterly first-time service (typically 3x)",
+          description: t("servicePricing.detailedFields.quarterlyFirstTimeMultiplierDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.frequencyConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Bimonthly - Cycle Months",
+          label: t("servicePricing.detailedFields.bimonthlyCycleMonths"),
           value: freqMeta.bimonthly?.cycleMonths ?? 0,
           path: ["frequencyMetadata", "bimonthly", "cycleMonths"],
           unit: "months",
-          description: "Billing cycle in months (typically 2)",
+          description: t("servicePricing.detailedFields.bimonthlyCycleMonthsDesc"),
         },
         {
-          label: "Quarterly - Cycle Months",
+          label: t("servicePricing.detailedFields.quarterlyCycleMonths"),
           value: freqMeta.quarterly?.cycleMonths ?? 0,
           path: ["frequencyMetadata", "quarterly", "cycleMonths"],
           unit: "months",
-          description: "Billing cycle in months (typically 3)",
+          description: t("servicePricing.detailedFields.quarterlyCycleMonthsDesc"),
         },
         {
-          label: "Biannual - Cycle Months",
+          label: t("servicePricing.detailedFields.biannualCycleMonths"),
           value: freqMeta.biannual?.cycleMonths ?? 0,
           path: ["frequencyMetadata", "biannual", "cycleMonths"],
           unit: "months",
-          description: "Billing cycle in months (typically 6)",
+          description: t("servicePricing.detailedFields.biannualCycleMonthsDesc"),
         },
         {
-          label: "Annual - Cycle Months",
+          label: t("servicePricing.detailedFields.annualCycleMonths"),
           value: freqMeta.annual?.cycleMonths ?? 0,
           path: ["frequencyMetadata", "annual", "cycleMonths"],
           unit: "months",
-          description: "Billing cycle in months (typically 12)",
+          description: t("servicePricing.detailedFields.annualCycleMonthsDesc"),
         },
       ];
 
       categories.contractTerms = [
         {
-          label: "Minimum Contract Months",
+          label: t("servicePricing.detailedFields.minContractMonths"),
           value: getValue(["minContractMonths"]) ?? 0,
           path: ["minContractMonths"],
           unit: "months",
-          description: "Minimum contract duration required (typically 2 months)",
+          description: t("servicePricing.detailedFields.minContractMonthsDesc"),
         },
         {
-          label: "Maximum Contract Months",
+          label: t("servicePricing.detailedFields.maxContractMonths"),
           value: getValue(["maxContractMonths"]) ?? 0,
           path: ["maxContractMonths"],
           unit: "months",
-          description: "Maximum contract duration allowed (typically 36 months)",
+          description: t("servicePricing.detailedFields.maxContractMonthsDesc"),
         },
       ];
     }
@@ -374,92 +376,92 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
     if (service.serviceId === "carpetCleaning") {
       categories.unitPricing = [
         {
-          label: "Base Sq-ft Unit",
+          label: t("servicePricing.detailedFields.baseSqFtUnit"),
           value: getValue(["baseSqFtUnit"]) ?? 0,
           path: ["baseSqFtUnit"],
           unit: "sq ft",
-          description: "Base square footage unit for pricing (typically 500 sq ft)",
+          description: t("servicePricing.detailedFields.baseSqFtUnitDesc"),
         },
         {
-          label: "Base Price",
+          label: t("servicePricing.detailedFields.basePrice"),
           value: getValue(["basePrice"]) ?? 0,
           path: ["basePrice"],
           unit: "$",
-          description: "Price for the base square footage unit",
+          description: t("servicePricing.detailedFields.basePriceDesc"),
         },
         {
-          label: "Additional Sq-ft Unit",
+          label: t("servicePricing.detailedFields.additionalSqFtUnit"),
           value: getValue(["additionalSqFtUnit"]) ?? 0,
           path: ["additionalSqFtUnit"],
           unit: "sq ft",
-          description: "Additional square footage unit for pricing",
+          description: t("servicePricing.detailedFields.additionalSqFtUnitDesc"),
         },
         {
-          label: "Additional Unit Price",
+          label: t("servicePricing.detailedFields.additionalUnitPrice"),
           value: getValue(["additionalUnitPrice"]) ?? 0,
           path: ["additionalUnitPrice"],
           unit: "$",
-          description: "Price for each additional unit beyond the base",
+          description: t("servicePricing.detailedFields.additionalUnitPriceDesc"),
         },
       ];
 
       categories.minimums = [
         {
-          label: "Minimum Charge Per Visit",
+          label: t("servicePricing.detailedFields.minimumChargePerVisit"),
           value: getValue(["minimumChargePerVisit"]) ?? 0,
           path: ["minimumChargePerVisit"],
           unit: "$",
-          description: "Minimum charge per service visit regardless of area",
+          description: t("servicePricing.detailedFields.carpetMinimumChargePerVisitDesc"),
         },
       ];
 
       const installMults = getValue(["installationMultipliers"]) || {};
       categories.carpetInstallMultipliers = [
         {
-          label: "Dirty Install Multiplier",
+          label: t("servicePricing.detailedFields.dirtyInstallMultiplier"),
           value: installMults.dirtyInstallMultiplier ?? 0,
           path: ["installationMultipliers", "dirtyInstallMultiplier"],
           unit: "×",
-          description: "Multiply rate by this for dirty/heavily soiled carpets (typically 3x)",
+          description: t("servicePricing.detailedFields.dirtyInstallMultiplierDesc"),
         },
         {
-          label: "Clean Install Multiplier",
+          label: t("servicePricing.detailedFields.cleanInstallMultiplier"),
           value: installMults.cleanInstallMultiplier ?? 0,
           path: ["installationMultipliers", "cleanInstallMultiplier"],
           unit: "×",
-          description: "Multiply rate by this for clean/lightly soiled carpets (typically 1x)",
+          description: t("servicePricing.detailedFields.cleanInstallMultiplierDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.frequencyMeta = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -475,39 +477,39 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
 
       categories.sprayRates = [
         {
-          label: "Spray Rate Per Room",
+          label: t("servicePricing.detailedFields.sprayRatePerRoom"),
           value: standardSprayPricing.sprayRatePerRoom ?? 0,
           path: ["standardSprayPricing", "sprayRatePerRoom"],
           unit: "$ per room",
-          description: "Rate per room when pricing by room count (typically $20)",
+          description: t("servicePricing.detailedFields.sprayRatePerRoomDesc"),
         },
         {
-          label: "Sq-ft Unit",
+          label: t("servicePricing.detailedFields.sqFtUnit"),
           value: standardSprayPricing.sqFtUnit ?? 0,
           path: ["standardSprayPricing", "sqFtUnit"],
           unit: "sq ft",
-          description: "Square footage unit for pricing (typically 1000 sq ft)",
+          description: t("servicePricing.detailedFields.spraySqFtUnitDesc"),
         },
         {
-          label: "Spray Rate Per Sq-ft Unit",
+          label: t("servicePricing.detailedFields.sprayRatePerSqFtUnit"),
           value: standardSprayPricing.sprayRatePerSqFtUnit ?? 0,
           path: ["standardSprayPricing", "sprayRatePerSqFtUnit"],
           unit: "$ per unit",
-          description: "Rate per square footage unit (typically $50)",
+          description: t("servicePricing.detailedFields.sprayRatePerSqFtUnitDesc"),
         },
         {
-          label: "Minimum Price Optional",
+          label: t("servicePricing.detailedFields.minimumPriceOptional"),
           value: standardSprayPricing.minimumPriceOptional ?? 0,
           path: ["standardSprayPricing", "minimumPriceOptional"],
           unit: "$",
-          description: "Optional minimum price per visit",
+          description: t("servicePricing.detailedFields.minimumPriceOptionalDesc"),
         },
         {
-          label: "Minimum Charge Per Visit",
+          label: t("servicePricing.detailedFields.minimumChargePerVisit"),
           value: getValue(["minimumChargePerVisit"]) ?? 0,
           path: ["minimumChargePerVisit"],
           unit: "$",
-          description: "Minimum charge per service visit (typically $50)",
+          description: t("servicePricing.detailedFields.rpmMinimumChargePerVisitDesc"),
         },
       ];
 
@@ -517,32 +519,32 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
 
       categories.sprayFrequencyConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Weekly to monthly conversion (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyConversionDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Biweekly to monthly conversion (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyConversionDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -556,93 +558,93 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const standardPricing = getValue(["standardPricing"]) || {};
       categories.standardRates = [
         {
-          label: "Standard Drain Rate",
+          label: t("servicePricing.detailedFields.standardDrainRate"),
           value: standardPricing.standardDrainRate ?? 0,
           path: ["standardPricing", "standardDrainRate"],
           unit: "$ per drain",
-          description: "Base rate per drain for standard foaming treatment",
+          description: t("servicePricing.detailedFields.standardDrainRateDesc"),
         },
         {
-          label: "Alternate Base Charge",
+          label: t("servicePricing.detailedFields.alternateBaseCharge"),
           value: standardPricing.alternateBaseCharge ?? 0,
           path: ["standardPricing", "alternateBaseCharge"],
           unit: "$",
-          description: "Alternative pricing model - base charge",
+          description: t("servicePricing.detailedFields.alternateBaseChargeDesc"),
         },
         {
-          label: "Alternate Extra Per Drain",
+          label: t("servicePricing.detailedFields.alternateExtraPerDrain"),
           value: standardPricing.alternateExtraPerDrain ?? 0,
           path: ["standardPricing", "alternateExtraPerDrain"],
           unit: "$ per drain",
-          description: "Alternative pricing model - additional charge per drain",
+          description: t("servicePricing.detailedFields.alternateExtraPerDrainDesc"),
         },
         {
-          label: "Minimum Charge Per Visit",
+          label: t("servicePricing.detailedFields.minimumChargePerVisit"),
           value: getValue(["minimumChargePerVisit"]) ?? 0,
           path: ["minimumChargePerVisit"],
           unit: "$",
-          description: "Minimum charge per service visit",
+          description: t("servicePricing.detailedFields.drainMinimumChargePerVisitDesc"),
         },
       ];
 
       const volPricing = getValue(["volumePricing"]) || {};
       categories.volumePricing = [
         {
-          label: "Minimum Drains for Volume Pricing",
+          label: t("servicePricing.detailedFields.minimumDrains"),
           value: volPricing.minimumDrains ?? 0,
           path: ["volumePricing", "minimumDrains"],
           unit: "drains",
-          description: "Minimum number of drains required to qualify for volume pricing",
+          description: t("servicePricing.detailedFields.minimumDrainsDesc"),
         },
         {
-          label: "Weekly Rate Per Drain",
+          label: t("servicePricing.detailedFields.weeklyRatePerDrain"),
           value: volPricing.weeklyRatePerDrain ?? 0,
           path: ["volumePricing", "weeklyRatePerDrain"],
           unit: "$ per drain",
-          description: "Discounted rate per drain for weekly service with volume pricing",
+          description: t("servicePricing.detailedFields.weeklyRatePerDrainVolumeDesc"),
         },
         {
-          label: "Bimonthly Rate Per Drain",
+          label: t("servicePricing.detailedFields.bimonthlyRatePerDrain"),
           value: volPricing.bimonthlyRatePerDrain ?? 0,
           path: ["volumePricing", "bimonthlyRatePerDrain"],
           unit: "$ per drain",
-          description: "Discounted rate per drain for bimonthly service with volume pricing",
+          description: t("servicePricing.detailedFields.bimonthlyRatePerDrainDesc"),
         },
       ];
 
       const grease = getValue(["greaseTrapPricing"]) || {};
       categories.greaseTrap = [
         {
-          label: "Weekly Rate Per Trap",
+          label: t("servicePricing.detailedFields.weeklyRatePerTrap"),
           value: grease.weeklyRatePerTrap ?? 0,
           path: ["greaseTrapPricing", "weeklyRatePerTrap"],
           unit: "$ per trap",
-          description: "Weekly service rate for grease trap treatment",
+          description: t("servicePricing.detailedFields.weeklyRatePerTrapDesc"),
         },
         {
-          label: "Install Charge Per Trap",
+          label: t("servicePricing.detailedFields.installPerTrap"),
           value: grease.installPerTrap ?? 0,
           path: ["greaseTrapPricing", "installPerTrap"],
           unit: "$",
-          description: "One-time installation charge for grease trap service",
+          description: t("servicePricing.detailedFields.installPerTrapDesc"),
         },
       ];
 
       const green = getValue(["greenDrainPricing"]) || {};
       categories.greenDrain = [
         {
-          label: "Install Per Drain",
+          label: t("servicePricing.detailedFields.installPerDrain"),
           value: green.installPerDrain ?? 0,
           path: ["greenDrainPricing", "installPerDrain"],
           unit: "$",
-          description: "One-time installation charge for green drain service",
+          description: t("servicePricing.detailedFields.installPerDrainDesc"),
         },
         {
-          label: "Weekly Rate Per Drain",
+          label: t("servicePricing.detailedFields.weeklyRatePerDrain"),
           value: green.weeklyRatePerDrain ?? 0,
           path: ["greenDrainPricing", "weeklyRatePerDrain"],
           unit: "$ per drain",
-          description: "Weekly service rate for eco-friendly green drain treatment",
+          description: t("servicePricing.detailedFields.greenWeeklyRatePerDrainDesc"),
         },
       ];
 
@@ -650,18 +652,18 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const installMults = getValue(["installationMultipliers"]) || {};
       categories.addonsMultipliers = [
         {
-          label: "Plumbing Weekly Addon Per Drain",
+          label: t("servicePricing.detailedFields.plumbingWeeklyAddonPerDrain"),
           value: addOns.plumbingWeeklyAddonPerDrain ?? 0,
           path: ["addOns", "plumbingWeeklyAddonPerDrain"],
           unit: "$ per drain",
-          description: "Additional weekly charge per drain for plumbing addon service",
+          description: t("servicePricing.detailedFields.plumbingWeeklyAddonPerDrainDesc"),
         },
         {
-          label: "Filthy Installation Multiplier",
+          label: t("servicePricing.detailedFields.filthyMultiplier"),
           value: installMults.filthyMultiplier ?? 0,
           path: ["installationMultipliers", "filthyMultiplier"],
           unit: "×",
-          description: "Multiply rate by this for heavily clogged/filthy drains (typically 3x)",
+          description: t("servicePricing.detailedFields.filthyMultiplierDesc"),
         },
       ];
 
@@ -673,32 +675,32 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.billingConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
 
       ];
@@ -714,67 +716,67 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const bathroomPricing = getValue(["bathroomMoppingPricing"]) || {};
       categories.basicRates = [
         {
-          label: "Flat Price Per Bathroom",
+          label: t("servicePricing.detailedFields.flatPricePerBathroom"),
           value: bathroomPricing.flatPricePerBathroom ?? 0,
           path: ["bathroomMoppingPricing", "flatPricePerBathroom"],
           unit: "$ per bathroom",
-          description: "Base rate per bathroom included with SaniClean service",
+          description: t("servicePricing.detailedFields.flatPricePerBathroomDesc"),
         },
         {
-          label: "Minimum Charge Per Visit",
+          label: t("servicePricing.detailedFields.minimumChargePerVisit"),
           value: getValue(["minimumChargePerVisit"]) ?? 0,
           path: ["minimumChargePerVisit"],
           unit: "$",
-          description: "Minimum charge per service visit",
+          description: t("servicePricing.detailedFields.moppingMinimumChargePerVisitDesc"),
         },
       ];
 
       categories.hugeBathrooms = [
         {
-          label: "Huge Bathroom Sq-ft Unit",
+          label: t("servicePricing.detailedFields.hugeBathroomSqFtUnit"),
           value: bathroomPricing.hugeBathroomSqFtUnit ?? 0,
           path: ["bathroomMoppingPricing", "hugeBathroomSqFtUnit"],
           unit: "sq ft",
-          description: "Square footage threshold for huge bathrooms (typically 300 sq ft)",
+          description: t("servicePricing.detailedFields.hugeBathroomSqFtUnitDesc"),
         },
         {
-          label: "Huge Bathroom Rate",
+          label: t("servicePricing.detailedFields.hugeBathroomRate"),
           value: bathroomPricing.hugeBathroomRate ?? 0,
           path: ["bathroomMoppingPricing", "hugeBathroomRate"],
           unit: "$ per unit",
-          description: "Rate per unit for bathrooms exceeding standard size",
+          description: t("servicePricing.detailedFields.hugeBathroomRateDesc"),
         },
       ];
 
       const extraArea = getValue(["nonBathroomAddonAreas"]) || {};
       categories.extraAreas = [
         {
-          label: "Flat Price Single Large Area",
+          label: t("servicePricing.detailedFields.flatPriceSingleLargeArea"),
           value: extraArea.flatPriceSingleLargeArea ?? 0,
           path: ["nonBathroomAddonAreas", "flatPriceSingleLargeArea"],
           unit: "$",
-          description: "Flat rate for a single large extra area (e.g., lobby, hallway)",
+          description: t("servicePricing.detailedFields.flatPriceSingleLargeAreaDesc"),
         },
         {
-          label: "Sq-ft Unit",
+          label: t("servicePricing.detailedFields.sqFtUnit"),
           value: extraArea.sqFtUnit ?? 0,
           path: ["nonBathroomAddonAreas", "sqFtUnit"],
           unit: "sq ft",
-          description: "Square footage unit for extra areas pricing (typically 400 sq ft)",
+          description: t("servicePricing.detailedFields.extraAreaSqFtUnitDesc"),
         },
         {
-          label: "Rate Per Sq-ft Unit",
+          label: t("servicePricing.detailedFields.ratePerSqFtUnit"),
           value: extraArea.ratePerSqFtUnit ?? 0,
           path: ["nonBathroomAddonAreas", "ratePerSqFtUnit"],
           unit: "$ per unit",
-          description: "Rate per square footage unit for extra areas",
+          description: t("servicePricing.detailedFields.ratePerSqFtUnitDesc"),
         },
         {
-          label: "Use Higher Rate",
+          label: t("servicePricing.detailedFields.useHigherRate"),
           value: extraArea.useHigherRate ? 1 : 0,
           path: ["nonBathroomAddonAreas", "useHigherRate"],
           unit: "boolean",
-          description: "Use the higher of flat rate or per-unit calculation",
+          description: t("servicePricing.detailedFields.useHigherRateDesc"),
         },
       ];
 
@@ -782,78 +784,78 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const tripCharges = getValue(["tripCharges"]) || {};
       categories.standalonePricing = [
         {
-          label: "Sq-ft Unit",
+          label: t("servicePricing.detailedFields.sqFtUnit"),
           value: standalone.sqFtUnit ?? 0,
           path: ["standaloneMoppingPricing", "sqFtUnit"],
           unit: "sq ft",
-          description: "Square footage unit for standalone pricing (typically 200 sq ft)",
+          description: t("servicePricing.detailedFields.standaloneSqFtUnitDesc"),
         },
         {
-          label: "Rate Per Sq-ft Unit",
+          label: t("servicePricing.detailedFields.ratePerSqFtUnit"),
           value: standalone.ratePerSqFtUnit ?? 0,
           path: ["standaloneMoppingPricing", "ratePerSqFtUnit"],
           unit: "$ per unit",
-          description: "Rate per unit when purchased as a standalone service",
+          description: t("servicePricing.detailedFields.standaloneRatePerSqFtUnitDesc"),
         },
         {
-          label: "Minimum Price",
+          label: t("servicePricing.detailedFields.minimumPrice"),
           value: standalone.minimumPrice ?? 0,
           path: ["standaloneMoppingPricing", "minimumPrice"],
           unit: "$",
-          description: "Minimum charge for standalone microfiber mopping service",
+          description: t("servicePricing.detailedFields.standaloneMinimumPriceDesc"),
         },
         {
-          label: "Include Trip Charge",
+          label: t("servicePricing.detailedFields.includeTripCharge"),
           value: standalone.includeTripCharge ? 1 : 0,
           path: ["standaloneMoppingPricing", "includeTripCharge"],
           unit: "boolean",
-          description: "Whether to include trip charge in standalone pricing",
+          description: t("servicePricing.detailedFields.includeTripChargeDesc"),
         },
         {
-          label: "Standard Trip Charge",
+          label: t("servicePricing.detailedFields.standardTripCharge"),
           value: tripCharges.standard ?? 0,
           path: ["tripCharges", "standard"],
           unit: "$",
-          description: "Standard trip charge amount",
+          description: t("servicePricing.detailedFields.standardTripChargeAmountDesc"),
         },
         {
-          label: "Beltway Trip Charge",
+          label: t("servicePricing.detailedFields.beltwayTripCharge"),
           value: tripCharges.beltway ?? 0,
           path: ["tripCharges", "beltway"],
           unit: "$",
-          description: "Beltway area trip charge amount",
+          description: t("servicePricing.detailedFields.beltwayTripChargeAmountDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.moppingMetadata = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -870,43 +872,43 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
         value: Number(v),
         path: ["productionRates", k],
         unit: "sq ft/hr",
-        description: `Production rate for ${k.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+        description: t("servicePricing.detailedFields.janProductionRateDesc", { name: k.replace(/([A-Z])/g, ' $1').toLowerCase() }),
       }));
 
       categories.janLaborDefaults = [
         {
-          label: "Cost Per Labor Hour",
+          label: t("servicePricing.detailedFields.costPerLaborHour"),
           value: getValue(["costPerHour"]) ?? 20,
           path: ["costPerHour"],
           unit: "$/hr",
-          description: "Admin-configured baseline labor cost per hour. Salespeople can override per quote. Default: $20",
+          description: t("servicePricing.detailedFields.costPerLaborHourDesc"),
         },
         {
-          label: "Labor Tax %",
+          label: t("servicePricing.detailedFields.laborTaxPct"),
           value: getValue(["laborTaxPct"]) ?? 15,
           path: ["laborTaxPct"],
           unit: "%",
-          description: "Percentage added on top of base labor to cover payroll taxes and benefits. Default: 15%",
+          description: t("servicePricing.detailedFields.laborTaxPctDesc"),
         },
         {
-          label: "Gross Profit %",
+          label: t("servicePricing.detailedFields.grossProfitPct"),
           value: getValue(["grossProfitPct"]) ?? 33,
           path: ["grossProfitPct"],
           unit: "%",
-          description: "Target gross profit margin. Contract Value = Total Cost ÷ (1 − Gross Profit%). Default: 33%",
+          description: t("servicePricing.detailedFields.grossProfitPctDesc"),
         },
       ];
 
       const ds = getValue(["defaultSupplies"]) || {};
       categories.janSupplyDefaults = [
-        { label: "Vacuums",           value: ds.vacuums          ?? 100, path: ["defaultSupplies", "vacuums"],          unit: "$/yr", description: "Default annual cost for vacuum equipment. Default: $100" },
-        { label: "Mops",              value: ds.mops             ?? 500, path: ["defaultSupplies", "mops"],             unit: "$/yr", description: "Default annual cost for mops. Default: $500" },
-        { label: "Mop Buckets",       value: ds.mopBuckets       ?? 200, path: ["defaultSupplies", "mopBuckets"],       unit: "$/yr", description: "Default annual cost for mop buckets. Default: $200" },
-        { label: "Dust Mops",         value: ds.dustMops         ?? 300, path: ["defaultSupplies", "dustMops"],         unit: "$/yr", description: "Default annual cost for dust mops. Default: $300" },
-        { label: "Microfiber",        value: ds.microfiber       ?? 0,   path: ["defaultSupplies", "microfiber"],       unit: "$/yr", description: "Default annual cost for microfiber cloths. Default: $0" },
-        { label: "Cleaning Products", value: ds.cleaningProducts ?? 0,   path: ["defaultSupplies", "cleaningProducts"], unit: "$/yr", description: "Default annual cost for cleaning products. Default: $0" },
-        { label: "Consumables",       value: ds.consumables      ?? 0,   path: ["defaultSupplies", "consumables"],      unit: "$/yr", description: "Default annual cost for consumables. Default: $0" },
-        { label: "Miscellaneous",     value: ds.miscellaneous    ?? 0,   path: ["defaultSupplies", "miscellaneous"],    unit: "$/yr", description: "Default annual cost for miscellaneous supplies. Default: $0" },
+        { label: t("servicePricing.detailedFields.supplyVacuums"),          value: ds.vacuums          ?? 100, path: ["defaultSupplies", "vacuums"],          unit: "$/yr", description: t("servicePricing.detailedFields.supplyVacuumsDesc") },
+        { label: t("servicePricing.detailedFields.supplyMops"),             value: ds.mops             ?? 500, path: ["defaultSupplies", "mops"],             unit: "$/yr", description: t("servicePricing.detailedFields.supplyMopsDesc") },
+        { label: t("servicePricing.detailedFields.supplyMopBuckets"),       value: ds.mopBuckets       ?? 200, path: ["defaultSupplies", "mopBuckets"],       unit: "$/yr", description: t("servicePricing.detailedFields.supplyMopBucketsDesc") },
+        { label: t("servicePricing.detailedFields.supplyDustMops"),         value: ds.dustMops         ?? 300, path: ["defaultSupplies", "dustMops"],         unit: "$/yr", description: t("servicePricing.detailedFields.supplyDustMopsDesc") },
+        { label: t("servicePricing.detailedFields.supplyMicrofiber"),       value: ds.microfiber       ?? 0,   path: ["defaultSupplies", "microfiber"],       unit: "$/yr", description: t("servicePricing.detailedFields.supplyMicrofiberDesc") },
+        { label: t("servicePricing.detailedFields.supplyCleaningProducts"), value: ds.cleaningProducts ?? 0,   path: ["defaultSupplies", "cleaningProducts"], unit: "$/yr", description: t("servicePricing.detailedFields.supplyCleaningProductsDesc") },
+        { label: t("servicePricing.detailedFields.supplyConsumables"),      value: ds.consumables      ?? 0,   path: ["defaultSupplies", "consumables"],      unit: "$/yr", description: t("servicePricing.detailedFields.supplyConsumablesDesc") },
+        { label: t("servicePricing.detailedFields.supplyMiscellaneous"),    value: ds.miscellaneous    ?? 0,   path: ["defaultSupplies", "miscellaneous"],    unit: "$/yr", description: t("servicePricing.detailedFields.supplyMiscellaneousDesc") },
       ];
     }
 
@@ -915,86 +917,86 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const insideBeltway = getValue(["standardALaCartePricing", "insideBeltway"]) || {};
       categories.insideBeltway = [
         {
-          label: "Price Per Fixture",
+          label: t("servicePricing.detailedFields.pricePerFixture"),
           value: insideBeltway.pricePerFixture ?? 0,
           path: ["standardALaCartePricing", "insideBeltway", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "Standard a la carte rate per fixture for inside beltway locations (typically $7)",
+          description: t("servicePricing.detailedFields.insidePricePerFixtureDesc"),
         },
         {
-          label: "Minimum Price",
+          label: t("servicePricing.detailedFields.minimumPrice"),
           value: insideBeltway.minimumPrice ?? 0,
           path: ["standardALaCartePricing", "insideBeltway", "minimumPrice"],
           unit: "$",
-          description: "Minimum charge for inside beltway locations (typically $40)",
+          description: t("servicePricing.detailedFields.insideMinimumPriceDesc"),
         },
         {
-          label: "Trip Charge",
+          label: t("servicePricing.detailedFields.tripCharge"),
           value: insideBeltway.tripCharge ?? 0,
           path: ["standardALaCartePricing", "insideBeltway", "tripCharge"],
           unit: "$",
-          description: "Trip charge for inside beltway locations (typically $8)",
+          description: t("servicePricing.detailedFields.insideTripChargeDesc"),
         },
         {
-          label: "Parking Fee Add-On",
+          label: t("servicePricing.detailedFields.parkingFeeAddOn"),
           value: insideBeltway.parkingFeeAddOn ?? 0,
           path: ["standardALaCartePricing", "insideBeltway", "parkingFeeAddOn"],
           unit: "$",
-          description: "Additional parking fee for paid parking locations (typically $15)",
+          description: t("servicePricing.detailedFields.parkingFeeAddOnDesc"),
         },
       ];
 
       const outsideBeltway = getValue(["standardALaCartePricing", "outsideBeltway"]) || {};
       categories.outsideBeltway = [
         {
-          label: "Price Per Fixture",
+          label: t("servicePricing.detailedFields.pricePerFixture"),
           value: outsideBeltway.pricePerFixture ?? 0,
           path: ["standardALaCartePricing", "outsideBeltway", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "Standard a la carte rate per fixture for outside beltway locations (typically $6)",
+          description: t("servicePricing.detailedFields.outsidePricePerFixtureDesc"),
         },
         {
-          label: "Trip Charge",
+          label: t("servicePricing.detailedFields.tripCharge"),
           value: outsideBeltway.tripCharge ?? 0,
           path: ["standardALaCartePricing", "outsideBeltway", "tripCharge"],
           unit: "$",
-          description: "Trip charge for outside beltway locations (typically $0)",
+          description: t("servicePricing.detailedFields.outsideTripChargeDesc"),
         },
       ];
 
       const allInclusive = getValue(["allInclusivePricing"]) || {};
       categories.allInclusive = [
         {
-          label: "Price Per Fixture",
+          label: t("servicePricing.detailedFields.pricePerFixture"),
           value: allInclusive.pricePerFixture ?? 0,
           path: ["allInclusivePricing", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "All-inclusive package rate per fixture (typically $12)",
+          description: t("servicePricing.detailedFields.allInclusivePricePerFixtureDesc"),
         },
         {
-          label: "Auto All-Inclusive Minimum Fixtures",
+          label: t("servicePricing.detailedFields.autoAllInclusiveMinFixtures"),
           value: allInclusive.autoAllInclusiveMinFixtures ?? 0,
           path: ["allInclusivePricing", "autoAllInclusiveMinFixtures"],
           unit: "fixtures",
-          description: "Minimum fixtures to auto-qualify for all-inclusive pricing (typically 25)",
+          description: t("servicePricing.detailedFields.autoAllInclusiveMinFixturesDesc"),
         },
       ];
 
       const smallBathroom = getValue(["smallBathroomMinimums"]) || {};
       categories.smallFacility = [
         {
-          label: "Minimum Fixtures Threshold",
+          label: t("servicePricing.detailedFields.minimumFixturesThreshold"),
           value: smallBathroom.minimumFixturesThreshold ?? 0,
           path: ["smallBathroomMinimums", "minimumFixturesThreshold"],
           unit: "fixtures",
-          description: "Maximum fixtures to qualify as small facility (typically 6)",
+          description: t("servicePricing.detailedFields.minimumFixturesThresholdDesc"),
         },
         {
-          label: "Minimum Price Under Threshold",
+          label: t("servicePricing.detailedFields.minimumPriceUnderThreshold"),
           value: smallBathroom.minimumPriceUnderThreshold ?? 0,
           path: ["smallBathroomMinimums", "minimumPriceUnderThreshold"],
           unit: "$",
-          description: "Minimum charge for small facilities under threshold (typically $48)",
+          description: t("servicePricing.detailedFields.minimumPriceUnderThresholdDesc"),
         },
       ];
 
@@ -1002,25 +1004,25 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const excessCharges = soapUpgrades.excessUsageCharges || {};
       categories.soapUpgrades = [
         {
-          label: "Standard to Luxury Per Dispenser Per Week",
+          label: t("servicePricing.detailedFields.standardToLuxuryPerDispenserPerWeek"),
           value: soapUpgrades.standardToLuxuryPerDispenserPerWeek ?? 0,
           path: ["soapUpgrades", "standardToLuxuryPerDispenserPerWeek"],
           unit: "$ per dispenser per week",
-          description: "Upgrade charge from standard to luxury soap per dispenser per week (typically $0.50)",
+          description: t("servicePricing.detailedFields.standardToLuxuryPerDispenserPerWeekDesc"),
         },
         {
-          label: "Excess Standard Soap Per Gallon",
+          label: t("servicePricing.detailedFields.excessStandardSoapPerGallon"),
           value: excessCharges.standardSoapPerGallon ?? 0,
           path: ["soapUpgrades", "excessUsageCharges", "standardSoapPerGallon"],
           unit: "$ per gallon",
-          description: "Charge for excessive standard soap usage per gallon (typically $45)",
+          description: t("servicePricing.detailedFields.excessStandardSoapPerGallonDesc"),
         },
         {
-          label: "Excess Luxury Soap Per Gallon",
+          label: t("servicePricing.detailedFields.excessLuxurySoapPerGallon"),
           value: excessCharges.luxurySoapPerGallon ?? 0,
           path: ["soapUpgrades", "excessUsageCharges", "luxurySoapPerGallon"],
           unit: "$ per gallon",
-          description: "Charge for excessive luxury soap usage per gallon (typically $75)",
+          description: t("servicePricing.detailedFields.excessLuxurySoapPerGallonDesc"),
         },
       ];
 
@@ -1028,57 +1030,57 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const paperCredit = getValue(["paperCredit"]) || {};
       categories.warrantyCredits = [
         {
-          label: "Air Freshener Dispenser Warranty Fee Per Week",
+          label: t("servicePricing.detailedFields.airFreshenerDispenserWarrantyFeePerWeek"),
           value: warrantyFees.airFreshenerDispenserWarrantyFeePerWeek ?? 0,
           path: ["warrantyFees", "airFreshenerDispenserWarrantyFeePerWeek"],
           unit: "$ per week",
-          description: "Weekly warranty fee per air freshener dispenser (typically $1.25)",
+          description: t("servicePricing.detailedFields.airFreshenerDispenserWarrantyFeePerWeekDesc"),
         },
         {
-          label: "Soap Dispenser Warranty Fee Per Week",
+          label: t("servicePricing.detailedFields.soapDispenserWarrantyFeePerWeek"),
           value: warrantyFees.soapDispenserWarrantyFeePerWeek ?? 0,
           path: ["warrantyFees", "soapDispenserWarrantyFeePerWeek"],
           unit: "$ per week",
-          description: "Weekly warranty fee per soap dispenser (typically $0.50)",
+          description: t("servicePricing.detailedFields.soapDispenserWarrantyFeePerWeekDesc"),
         },
         {
-          label: "Paper Credit Per Fixture Per Week",
+          label: t("servicePricing.detailedFields.paperCreditPerFixturePerWeek"),
           value: paperCredit.creditPerFixturePerWeek ?? 0,
           path: ["paperCredit", "creditPerFixturePerWeek"],
           unit: "$",
-          description: "Credit applied per fixture per week for paper products (typically $1)",
+          description: t("servicePricing.detailedFields.paperCreditPerFixturePerWeekDesc"),
         },
       ];
 
       const freqMetadata = getValue(["frequencyMetadata"]) || {};
       categories.sanicleanBillingConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMetadata.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate by this to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringByThisDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMetadata.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMetadata.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMetadata.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
 
       ];
@@ -1086,114 +1088,114 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const rateCategories = getValue(["rateCategories"]) || {};
       categories.sanicleanRateTiers = [
         {
-          label: "Red Rate Multiplier",
+          label: t("servicePricing.detailedFields.redRateMultiplier"),
           value: rateCategories.redRate?.multiplier ?? 0,
           path: ["rateCategories", "redRate", "multiplier"],
           unit: "×",
-          description: "Standard rate multiplier (typically 1.0)",
+          description: t("servicePricing.detailedFields.redRateMultiplierDesc"),
         },
         {
-          label: "Red Rate Commission",
+          label: t("servicePricing.detailedFields.redRateCommission"),
           value: parseFloat(rateCategories.redRate?.commissionRate?.replace('%', '') || '0'),
           path: ["rateCategories", "redRate", "commissionRate"],
           unit: "%",
-          description: "Commission rate for Red Rate tier (typically 20%)",
+          description: t("servicePricing.detailedFields.redRateCommissionDesc"),
         },
         {
-          label: "Green Rate Multiplier",
+          label: t("servicePricing.detailedFields.greenRateMultiplier"),
           value: rateCategories.greenRate?.multiplier ?? 0,
           path: ["rateCategories", "greenRate", "multiplier"],
           unit: "×",
-          description: "Premium rate multiplier (typically 1.3 = 30% higher)",
+          description: t("servicePricing.detailedFields.greenRateMultiplierDesc"),
         },
         {
-          label: "Green Rate Commission",
+          label: t("servicePricing.detailedFields.greenRateCommission"),
           value: parseFloat(rateCategories.greenRate?.commissionRate?.replace('%', '') || '0'),
           path: ["rateCategories", "greenRate", "commissionRate"],
           unit: "%",
-          description: "Commission rate for Green Rate tier (typically 25%)",
+          description: t("servicePricing.detailedFields.greenRateCommissionDesc"),
         },
       ];
 
       const includedItemsData = getValue(["includedItems"]) || {};
       categories.includedItems = [
         {
-          label: "Electrostatic Spray Included",
+          label: t("servicePricing.detailedFields.electrostaticSprayIncluded"),
           value: includedItemsData.electrostaticSprayIncluded ? 1 : 0,
           path: ["includedItems", "electrostaticSprayIncluded"],
           unit: "boolean",
-          description: "Whether electrostatic spray service is included in the package",
+          description: t("servicePricing.detailedFields.electrostaticSprayIncludedDesc"),
         },
         {
-          label: "Included Weekly Refills Default",
+          label: t("servicePricing.detailedFields.includedWeeklyRefillsDefault"),
           value: includedItemsData.includedWeeklyRefillsDefault ?? 0,
           path: ["includedItems", "includedWeeklyRefillsDefault"],
           unit: "refills",
-          description: "Default number of weekly refills included (typically 1)",
+          description: t("servicePricing.detailedFields.includedWeeklyRefillsDefaultDesc"),
         },
       ];
 
       const monthlyAddOns = getValue(["monthlyAddOnSupplyPricing"]) || {};
       categories.monthlyAddOns = [
         {
-          label: "Urinal Mat Monthly Price",
+          label: t("servicePricing.detailedFields.urinalMatMonthlyPrice"),
           value: monthlyAddOns.urinalMatMonthlyPrice ?? 0,
           path: ["monthlyAddOnSupplyPricing", "urinalMatMonthlyPrice"],
           unit: "$ per month",
-          description: "Monthly charge for urinal mat supply (typically $16)",
+          description: t("servicePricing.detailedFields.urinalMatMonthlyPriceDesc"),
         },
         {
-          label: "Urinal Screen Monthly Price",
+          label: t("servicePricing.detailedFields.urinalScreenMonthlyPrice"),
           value: monthlyAddOns.urinalScreenMonthlyPrice === "included" ? 0 : (monthlyAddOns.urinalScreenMonthlyPrice ?? 0),
           path: ["monthlyAddOnSupplyPricing", "urinalScreenMonthlyPrice"],
           unit: monthlyAddOns.urinalScreenMonthlyPrice === "included" ? "included" : "$ per month",
-          description: "Monthly charge for urinal screen (typically included)",
+          description: t("servicePricing.detailedFields.urinalScreenMonthlyPriceDesc"),
         },
         {
-          label: "Toilet Clip Monthly Price",
+          label: t("servicePricing.detailedFields.toiletClipMonthlyPrice"),
           value: monthlyAddOns.toiletClipMonthlyPrice ?? 0,
           path: ["monthlyAddOnSupplyPricing", "toiletClipMonthlyPrice"],
           unit: "$ per month",
-          description: "Monthly charge for toilet clip supply (typically $4)",
+          description: t("servicePricing.detailedFields.toiletClipMonthlyPriceDesc"),
         },
         {
-          label: "Toilet Seat Cover Dispenser Monthly Price",
+          label: t("servicePricing.detailedFields.toiletSeatCoverDispenserMonthlyPrice"),
           value: monthlyAddOns.toiletSeatCoverDispenserMonthlyPrice === "included" ? 0 : (monthlyAddOns.toiletSeatCoverDispenserMonthlyPrice ?? 0),
           path: ["monthlyAddOnSupplyPricing", "toiletSeatCoverDispenserMonthlyPrice"],
           unit: monthlyAddOns.toiletSeatCoverDispenserMonthlyPrice === "included" ? "included" : "$ per month",
-          description: "Monthly charge for toilet seat cover dispenser (typically included)",
+          description: t("servicePricing.detailedFields.toiletSeatCoverDispenserMonthlyPriceDesc"),
         },
         {
-          label: "SaniPod Monthly Price Per Pod",
+          label: t("servicePricing.detailedFields.sanipodMonthlyPricePerPod"),
           value: monthlyAddOns.sanipodMonthlyPricePerPod ?? 0,
           path: ["monthlyAddOnSupplyPricing", "sanipodMonthlyPricePerPod"],
           unit: "$ per month",
-          description: "Monthly charge per SaniPod unit (typically $12)",
+          description: t("servicePricing.detailedFields.sanipodMonthlyPricePerPodDesc"),
         },
       ];
 
       const microfiberMopping = getValue(["microfiberMoppingIncludedWithSaniClean"]) || {};
       categories.microfiberMoppingAddon = [
         {
-          label: "Price Per Bathroom",
+          label: t("servicePricing.detailedFields.pricePerBathroom"),
           value: microfiberMopping.pricePerBathroom ?? 0,
           path: ["microfiberMoppingIncludedWithSaniClean", "pricePerBathroom"],
           unit: "$ per bathroom",
-          description: "Microfiber mopping charge per bathroom when bundled with SaniClean (typically $10)",
+          description: t("servicePricing.detailedFields.microfiberPricePerBathroomDesc"),
         },
         {
-          label: "Huge Bathroom Sq-ft Unit",
+          label: t("servicePricing.detailedFields.hugeBathroomSqFtUnit"),
           value: microfiberMopping.hugeBathroomSqFtUnit ?? 0,
           path: ["microfiberMoppingIncludedWithSaniClean", "hugeBathroomSqFtUnit"],
           unit: "sq ft",
-          description: "Square footage threshold for huge bathrooms (typically 300 sq ft)",
+          description: t("servicePricing.detailedFields.hugeBathroomSqFtUnitDesc"),
         },
         {
-          label: "Huge Bathroom Rate",
+          label: t("servicePricing.detailedFields.hugeBathroomRate"),
           value: microfiberMopping.hugeBathroomRate ?? 0,
           path: ["microfiberMoppingIncludedWithSaniClean", "hugeBathroomRate"],
           unit: "$ per unit",
-          description: "Additional rate per unit for bathrooms exceeding standard size (typically $10)",
+          description: t("servicePricing.detailedFields.microfiberHugeBathroomRateDesc"),
         },
       ];
 
@@ -1207,61 +1209,61 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const corePricing = getValue(["corePricingIncludedWithSaniClean"]) || {};
       categories.podRates = [
         {
-          label: "Core - Weekly Price Per Unit",
+          label: t("servicePricing.detailedFields.coreWeeklyPricePerUnit"),
           value: corePricing.weeklyPricePerUnit ?? 0,
           path: ["corePricingIncludedWithSaniClean", "weeklyPricePerUnit"],
           unit: "$ per pod",
-          description: "Base weekly rate per pod when included with SaniClean (typically $3)",
+          description: t("servicePricing.detailedFields.coreWeeklyPricePerUnitDesc"),
         },
         {
-          label: "Core - Install Price Per Unit",
+          label: t("servicePricing.detailedFields.coreInstallPricePerUnit"),
           value: corePricing.installPricePerUnit ?? 0,
           path: ["corePricingIncludedWithSaniClean", "installPricePerUnit"],
           unit: "$ per pod",
-          description: "One-time installation charge per pod (typically $25)",
+          description: t("servicePricing.detailedFields.coreInstallPricePerUnitDesc"),
         },
         {
-          label: "Core - Included Weekly Refills",
+          label: t("servicePricing.detailedFields.coreIncludedWeeklyRefills"),
           value: corePricing.includedWeeklyRefills ?? 0,
           path: ["corePricingIncludedWithSaniClean", "includedWeeklyRefills"],
           unit: "refills",
-          description: "Number of weekly refills included in base price (typically 1)",
+          description: t("servicePricing.detailedFields.coreIncludedWeeklyRefillsDesc"),
         },
       ];
 
       const extraBagPricing = getValue(["extraBagPricing"]) || {};
       categories.extraBags = [
         {
-          label: "Price Per Bag",
+          label: t("servicePricing.detailedFields.pricePerBag"),
           value: extraBagPricing.pricePerBag ?? 0,
           path: ["extraBagPricing", "pricePerBag"],
           unit: "$ per bag",
-          description: "Price per additional waste bag beyond included refills (typically $2/bag)",
+          description: t("servicePricing.detailedFields.pricePerBagDesc"),
         },
       ];
 
       const standalonePricing = getValue(["standalonePricingWithoutSaniClean"]) || {};
       categories.standaloneService = [
         {
-          label: "Standalone - Price Per Unit Per Week (Option A)",
+          label: t("servicePricing.detailedFields.standalonePricePerUnitPerWeekA"),
           value: standalonePricing.pricePerUnitPerWeek ?? 0,
           path: ["standalonePricingWithoutSaniClean", "pricePerUnitPerWeek"],
           unit: "$ per pod",
-          description: "Flat rate per pod per week for standalone service (typically $8/pod)",
+          description: t("servicePricing.detailedFields.standalonePricePerUnitPerWeekADesc"),
         },
         {
-          label: "Standalone - Alternate Price Per Unit Per Week (Option B)",
+          label: t("servicePricing.detailedFields.standaloneAlternatePricePerUnitPerWeekB"),
           value: standalonePricing.alternatePricePerUnitPerWeek ?? 0,
           path: ["standalonePricingWithoutSaniClean", "alternatePricePerUnitPerWeek"],
           unit: "$ per pod",
-          description: "Alternative pricing: per-pod rate in $3+$40 model (typically $3/pod)",
+          description: t("servicePricing.detailedFields.standaloneAlternatePricePerUnitPerWeekBDesc"),
         },
         {
-          label: "Standalone - Weekly Minimum Price",
+          label: t("servicePricing.detailedFields.standaloneWeeklyMinimumPrice"),
           value: standalonePricing.weeklyMinimumPrice ?? 0,
           path: ["standalonePricingWithoutSaniClean", "weeklyMinimumPrice"],
           unit: "$",
-          description: "Account-level base charge for standalone service (typically $40/week)",
+          description: t("servicePricing.detailedFields.standaloneWeeklyMinimumPriceDesc"),
         },
       ];
 
@@ -1270,32 +1272,32 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.sanipodBillingConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33 = 52/12)",
+          description: t("servicePricing.detailedFields.sanipodWeeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165 = 26/12)",
+          description: t("servicePricing.detailedFields.sanipodBiweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -1314,18 +1316,18 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const monthlyPricing = getValue(["monthlyPricing"]) || {};
       categories.fixtureRates = [
         {
-          label: "Monthly - Price Per Fixture",
+          label: t("servicePricing.detailedFields.monthlyPricePerFixture"),
           value: monthlyPricing.pricePerFixture ?? 0,
           path: ["monthlyPricing", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "Monthly rate per bathroom fixture (typically $25)",
+          description: t("servicePricing.detailedFields.monthlyPricePerFixtureDesc"),
         },
         {
-          label: "Monthly - Minimum Price",
+          label: t("servicePricing.detailedFields.monthlyMinimumPrice"),
           value: monthlyPricing.minimumPrice ?? 0,
           path: ["monthlyPricing", "minimumPrice"],
           unit: "$",
-          description: "Minimum monthly charge (typically $175)",
+          description: t("servicePricing.detailedFields.monthlyMinimumPriceDesc"),
         },
       ];
 
@@ -1334,107 +1336,107 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const twicePerMonthPricing = getValue(["twicePerMonthPricing"]) || {};
       categories.saniscrubMinimums = [
         {
-          label: "Bimonthly - Price Per Fixture",
+          label: t("servicePricing.detailedFields.bimonthlyPricePerFixture"),
           value: bimonthlyPricing.pricePerFixture ?? 0,
           path: ["bimonthlyPricing", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "Bimonthly rate per fixture (typically $35)",
+          description: t("servicePricing.detailedFields.bimonthlyPricePerFixtureDesc"),
         },
         {
-          label: "Bimonthly - Minimum Price",
+          label: t("servicePricing.detailedFields.bimonthlyMinimumPrice"),
           value: bimonthlyPricing.minimumPrice ?? 0,
           path: ["bimonthlyPricing", "minimumPrice"],
           unit: "$",
-          description: "Minimum bimonthly charge (typically $250)",
+          description: t("servicePricing.detailedFields.bimonthlyMinimumPriceDesc"),
         },
         {
-          label: "Quarterly - Price Per Fixture",
+          label: t("servicePricing.detailedFields.quarterlyPricePerFixture"),
           value: quarterlyPricing.pricePerFixture ?? 0,
           path: ["quarterlyPricing", "pricePerFixture"],
           unit: "$ per fixture",
-          description: "Quarterly rate per fixture (typically $40)",
+          description: t("servicePricing.detailedFields.quarterlyPricePerFixtureDesc"),
         },
         {
-          label: "Quarterly - Minimum Price",
+          label: t("servicePricing.detailedFields.quarterlyMinimumPrice"),
           value: quarterlyPricing.minimumPrice ?? 0,
           path: ["quarterlyPricing", "minimumPrice"],
           unit: "$",
-          description: "Minimum quarterly charge (typically $250)",
+          description: t("servicePricing.detailedFields.quarterlyMinimumPriceDesc"),
         },
         {
-          label: "Twice Per Month - Discount",
+          label: t("servicePricing.detailedFields.twicePerMonthDiscount"),
           value: twicePerMonthPricing.discountFromMonthlyRate ?? 0,
           path: ["twicePerMonthPricing", "discountFromMonthlyRate"],
           unit: "$",
-          description: "Discount applied to twice-monthly service (typically $15)",
+          description: t("servicePricing.detailedFields.twicePerMonthDiscountDesc"),
         },
       ];
 
       const nonBathroomRule = getValue(["nonBathroomSqFtPricingRule"]) || {};
       categories.nonBathroomPricing = [
         {
-          label: "Sq Ft Block Unit",
+          label: t("servicePricing.detailedFields.sqFtBlockUnit"),
           value: nonBathroomRule.sqFtBlockUnit ?? 0,
           path: ["nonBathroomSqFtPricingRule", "sqFtBlockUnit"],
           unit: "sq ft",
-          description: "Square footage per pricing block (typically 500 sq ft)",
+          description: t("servicePricing.detailedFields.sqFtBlockUnitDesc"),
         },
         {
-          label: "Price First Block",
+          label: t("servicePricing.detailedFields.priceFirstBlock"),
           value: nonBathroomRule.priceFirstBlock ?? 0,
           path: ["nonBathroomSqFtPricingRule", "priceFirstBlock"],
           unit: "$",
-          description: "Price for the first block (typically $250)",
+          description: t("servicePricing.detailedFields.priceFirstBlockDesc"),
         },
         {
-          label: "Price Additional Block",
+          label: t("servicePricing.detailedFields.priceAdditionalBlock"),
           value: nonBathroomRule.priceAdditionalBlock ?? 0,
           path: ["nonBathroomSqFtPricingRule", "priceAdditionalBlock"],
           unit: "$",
-          description: "Price per additional block (typically $125)",
+          description: t("servicePricing.detailedFields.priceAdditionalBlockDesc"),
         },
       ];
 
       const installPricing = getValue(["installationPricing"]) || {};
       categories.saniscrubInstallMultipliers = [
         {
-          label: "Dirty/First Time Multiplier",
+          label: t("servicePricing.detailedFields.dirtyFirstTimeMultiplier"),
           value: installPricing.installMultiplierDirtyOrFirstTime ?? 0,
           path: ["installationPricing", "installMultiplierDirtyOrFirstTime"],
           unit: "×",
-          description: "Multiply base by this for dirty/first-time installs (typically 3x)",
+          description: t("servicePricing.detailedFields.dirtyFirstTimeMultiplierDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.serviceFrequencies = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Weekly to monthly conversion (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyConversionDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Biweekly to monthly conversion (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyConversionDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
 
       ];
@@ -1454,103 +1456,103 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       const standardFull = getValue(["variants", "standardFull"]) || {};
       categories.standardFull = [
         {
-          label: "Rate Per Square Foot",
+          label: t("servicePricing.detailedFields.ratePerSquareFoot"),
           value: standardFull.ratePerSqFt ?? 0,
           path: ["variants", "standardFull", "ratePerSqFt"],
           unit: "$ per sq ft",
-          description: "Standard full strip & wax rate per square foot (complete strip, reseal, wax)",
+          description: t("servicePricing.detailedFields.standardFullRatePerSqFtDesc"),
         },
         {
-          label: "Minimum Charge",
+          label: t("servicePricing.detailedFields.minimumCharge"),
           value: standardFull.minCharge ?? 0,
           path: ["variants", "standardFull", "minCharge"],
           unit: "$",
-          description: "Minimum charge for standard full strip & wax regardless of square footage",
+          description: t("servicePricing.detailedFields.standardFullMinChargeDesc"),
         },
       ];
 
       const noSealant = getValue(["variants", "noSealant"]) || {};
       categories.noSealant = [
         {
-          label: "Rate Per Square Foot",
+          label: t("servicePricing.detailedFields.ratePerSquareFoot"),
           value: noSealant.ratePerSqFt ?? 0,
           path: ["variants", "noSealant", "ratePerSqFt"],
           unit: "$ per sq ft",
-          description: "Strip & wax without sealant - rate per square foot (lighter service)",
+          description: t("servicePricing.detailedFields.noSealantRatePerSqFtDesc"),
         },
         {
-          label: "Minimum Charge",
+          label: t("servicePricing.detailedFields.minimumCharge"),
           value: noSealant.minCharge ?? 0,
           path: ["variants", "noSealant", "minCharge"],
           unit: "$",
-          description: "Minimum charge for no-sealant strip & wax",
+          description: t("servicePricing.detailedFields.noSealantMinChargeDesc"),
         },
       ];
 
       const wellMaintained = getValue(["variants", "wellMaintained"]) || {};
       categories.wellMaintained = [
         {
-          label: "Rate Per Square Foot",
+          label: t("servicePricing.detailedFields.ratePerSquareFoot"),
           value: wellMaintained.ratePerSqFt ?? 0,
           path: ["variants", "wellMaintained", "ratePerSqFt"],
           unit: "$ per sq ft",
-          description: "Well-maintained floor rate - discounted for regularly maintained floors",
+          description: t("servicePricing.detailedFields.wellMaintainedRatePerSqFtDesc"),
         },
         {
-          label: "Minimum Charge",
+          label: t("servicePricing.detailedFields.minimumCharge"),
           value: wellMaintained.minCharge ?? 0,
           path: ["variants", "wellMaintained", "minCharge"],
           unit: "$",
-          description: "Minimum charge for well-maintained floor strip & wax",
+          description: t("servicePricing.detailedFields.wellMaintainedMinChargeDesc"),
         },
       ];
 
       categories.stripWaxContractTerms = [
         {
-          label: "Minimum Contract Months",
+          label: t("servicePricing.detailedFields.minContractMonths"),
           value: getValue(["minContractMonths"]) ?? 0,
           path: ["minContractMonths"],
           unit: "months",
-          description: "Minimum contract duration required (typically 2 months)",
+          description: t("servicePricing.detailedFields.minContractMonthsDesc"),
         },
         {
-          label: "Maximum Contract Months",
+          label: t("servicePricing.detailedFields.maxContractMonths"),
           value: getValue(["maxContractMonths"]) ?? 0,
           path: ["maxContractMonths"],
           unit: "months",
-          description: "Maximum contract duration allowed (typically 36 months)",
+          description: t("servicePricing.detailedFields.maxContractMonthsDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.stripWaxBillingConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33 = 52/12)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurring433Desc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165 = 26/12)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurring2165Desc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -1564,139 +1566,139 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
 
       categories.defaultRates = [
         {
-          label: "Default Hourly Rate",
+          label: t("servicePricing.detailedFields.defaultHourlyRate"),
           value: getValue(["coreRates", "defaultHourlyRate"]) ?? 0,
           path: ["coreRates", "defaultHourlyRate"],
           unit: "$ per hour per worker",
-          description: "Standard hourly rate per worker (typically $200/hr/worker)",
+          description: t("servicePricing.detailedFields.defaultHourlyRateDesc"),
         },
         {
-          label: "Per Worker Rate",
+          label: t("servicePricing.detailedFields.perWorkerRate"),
           value: getValue(["coreRates", "perWorkerRate"]) ?? 0,
           path: ["coreRates", "perWorkerRate"],
           unit: "$ per worker",
-          description: "Rate per worker when pricing per worker (typically $200)",
+          description: t("servicePricing.detailedFields.perWorkerRateDesc"),
         },
         {
-          label: "Per Hour Rate",
+          label: t("servicePricing.detailedFields.perHourRate"),
           value: getValue(["coreRates", "perHourRate"]) ?? 0,
           path: ["coreRates", "perHourRate"],
           unit: "$ per hour",
-          description: "Rate per hour when pricing per hour (typically $400)",
+          description: t("servicePricing.detailedFields.perHourRateDesc"),
         },
         {
-          label: "Default Trip Charge",
+          label: t("servicePricing.detailedFields.defaultTripCharge"),
           value: getValue(["coreRates", "tripCharge"]) ?? 0,
           path: ["coreRates", "tripCharge"],
           unit: "$",
-          description: "Trip charge added to hourly/sq ft pricing (typically $75)",
+          description: t("servicePricing.detailedFields.defaultTripChargeDesc"),
         },
         {
-          label: "Default Minimum",
+          label: t("servicePricing.detailedFields.defaultMinimum"),
           value: getValue(["coreRates", "minimumVisit"]) ?? 0,
           path: ["coreRates", "minimumVisit"],
           unit: "$",
-          description: "Minimum charge per visit regardless of service size (typically $475)",
+          description: t("servicePricing.detailedFields.defaultMinimumDesc"),
         },
       ];
 
       categories.kitchenPricing = [
         {
-          label: "Small/Medium Kitchen",
+          label: t("servicePricing.detailedFields.smallMediumKitchen"),
           value: getValue(["areaSpecificPricing", "kitchen", "smallMedium"]) ?? 0,
           path: ["areaSpecificPricing", "kitchen", "smallMedium"],
           unit: "$",
-          description: "Package price for small/medium kitchen back of house (typically $1,500)",
+          description: t("servicePricing.detailedFields.smallMediumKitchenDesc"),
         },
         {
-          label: "Large Kitchen",
+          label: t("servicePricing.detailedFields.largeKitchen"),
           value: getValue(["areaSpecificPricing", "kitchen", "large"]) ?? 0,
           path: ["areaSpecificPricing", "kitchen", "large"],
           unit: "$",
-          description: "Package price for large kitchen back of house (typically $2,500)",
+          description: t("servicePricing.detailedFields.largeKitchenDesc"),
         },
       ];
 
       categories.fohPricing = [
         {
-          label: "Front of House Rate",
+          label: t("servicePricing.detailedFields.frontOfHouseRate"),
           value: getValue(["areaSpecificPricing", "frontOfHouse"]) ?? 0,
           path: ["areaSpecificPricing", "frontOfHouse"],
           unit: "$",
-          description: "Package price for front of house deep clean (typically $2,500)",
+          description: t("servicePricing.detailedFields.frontOfHouseRateDesc"),
         },
       ];
 
       categories.patioPricing = [
         {
-          label: "Patio Standalone",
+          label: t("servicePricing.detailedFields.patioStandalone"),
           value: getValue(["areaSpecificPricing", "patio", "standalone"]) ?? 0,
           path: ["areaSpecificPricing", "patio", "standalone"],
           unit: "$",
-          description: "Package price for patio only service (typically $800)",
+          description: t("servicePricing.detailedFields.patioStandaloneDesc"),
         },
         {
-          label: "Patio Upsell",
+          label: t("servicePricing.detailedFields.patioUpsell"),
           value: getValue(["areaSpecificPricing", "patio", "upsell"]) ?? 0,
           path: ["areaSpecificPricing", "patio", "upsell"],
           unit: "$",
-          description: "Upsell price when adding patio to FOH service (typically $500)",
+          description: t("servicePricing.detailedFields.patioUpsellDesc"),
         },
       ];
 
       categories.sqftPricing = [
         {
-          label: "Fixed Fee",
+          label: t("servicePricing.detailedFields.fixedFee"),
           value: getValue(["squareFootagePricing", "fixedFee"]) ?? 0,
           path: ["squareFootagePricing", "fixedFee"],
           unit: "$",
-          description: "Fixed base fee for square footage pricing (typically $200)",
+          description: t("servicePricing.detailedFields.fixedFeeDesc"),
         },
         {
-          label: "Inside Rate",
+          label: t("servicePricing.detailedFields.insideRate"),
           value: getValue(["squareFootagePricing", "insideRate"]) ?? 0,
           path: ["squareFootagePricing", "insideRate"],
           unit: "$ per sq ft",
-          description: "Rate per square foot for inside areas (typically $0.60/sq ft)",
+          description: t("servicePricing.detailedFields.insideRateDesc"),
         },
         {
-          label: "Outside Rate",
+          label: t("servicePricing.detailedFields.outsideRate"),
           value: getValue(["squareFootagePricing", "outsideRate"]) ?? 0,
           path: ["squareFootagePricing", "outsideRate"],
           unit: "$ per sq ft",
-          description: "Rate per square foot for outside areas (typically $0.40/sq ft)",
+          description: t("servicePricing.detailedFields.outsideRateDesc"),
         },
       ];
 
       const freqMeta = getValue(["frequencyMetadata"]) || {};
       categories.scrubFrequencyConversions = [
         {
-          label: "Weekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.weeklyMonthlyRecurring"),
           value: freqMeta.weekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply weekly rate to get monthly billing (typically 4.33)",
+          description: t("servicePricing.detailedFields.weeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Weekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.weeklyFirstMonthExtra"),
           value: freqMeta.weekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "weekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 3.33)",
+          description: t("servicePricing.detailedFields.weeklyFirstMonthExtraDesc"),
         },
         {
-          label: "Biweekly - Monthly Recurring Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyMonthlyRecurring"),
           value: freqMeta.biweekly?.monthlyRecurringMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "monthlyRecurringMultiplier"],
           unit: "×",
-          description: "Multiply biweekly rate to get monthly billing (typically 2.165)",
+          description: t("servicePricing.detailedFields.biweeklyMonthlyRecurringDesc"),
         },
         {
-          label: "Biweekly - First Month Extra Multiplier",
+          label: t("servicePricing.detailedFields.biweeklyFirstMonthExtra"),
           value: freqMeta.biweekly?.firstMonthExtraMultiplier ?? 0,
           path: ["frequencyMetadata", "biweekly", "firstMonthExtraMultiplier"],
           unit: "×",
-          description: "Additional multiplier for first month (typically 1.165)",
+          description: t("servicePricing.detailedFields.biweeklyFirstMonthExtraDesc"),
         },
       ];
 
@@ -1718,11 +1720,11 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
     setSaving(true);
     try {
       await onUpdateField(editingField.path, parseFloat(editingField.value) || 0);
-      setSuccessMessage("✓ Price updated successfully!");
+      setSuccessMessage(t("servicePricing.detailedView.priceUpdated"));
       setEditingField(null);
     } catch (error) {
       console.error("Error saving field:", error);
-      setErrorMessage("Failed to update price. Please try again.");
+      setErrorMessage(t("servicePricing.detailedView.priceUpdateFailed"));
     } finally {
       setSaving(false);
     }
@@ -1743,12 +1745,12 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
     setSavingNewPT(true);
     try {
       await onUpdateField(["productionRates", key], parseFloat(newPTRate) || 1000);
-      setSuccessMessage(`✓ Added "${label}" place type!`);
+      setSuccessMessage(t("servicePricing.detailedView.placeTypeAdded", { label }));
       setShowNewPT(false);
       setNewPTLabel("");
       setNewPTRate("1000");
     } catch {
-      setErrorMessage("Failed to add place type. Please try again.");
+      setErrorMessage(t("servicePricing.detailedView.placeTypeAddFailed"));
     } finally {
       setSavingNewPT(false);
     }
@@ -1758,124 +1760,124 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
   const getTabs = (): { key: TabKey; label: string; icon: any }[] => {
     if (service.serviceId === "rpmWindows") {
       return [
-        { key: "windowRates", label: "Window Rates", icon: faWindowMaximize },
-        { key: "installMultipliers", label: "Install Multiplier", icon: faBolt },
-        { key: "minimumAndTripCharges", label: "Minimum & Trip Charges", icon: faDollarSign },
-        { key: "frequencyPriceMultipliers", label: "Frequency Multipliers", icon: faTimes },
-        { key: "frequencyConversions", label: "Billing Conversions", icon: faSync },
+        { key: "windowRates", label: t("servicePricing.detailedTabs.windowRates"), icon: faWindowMaximize },
+        { key: "installMultipliers", label: t("servicePricing.detailedTabs.installMultiplier"), icon: faBolt },
+        { key: "minimumAndTripCharges", label: t("servicePricing.detailedTabs.minimumAndTripCharges"), icon: faDollarSign },
+        { key: "frequencyPriceMultipliers", label: t("servicePricing.detailedTabs.frequencyMultipliers"), icon: faTimes },
+        { key: "frequencyConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "carpetCleaning") {
       return [
-        { key: "unitPricing", label: "Unit Pricing", icon: faRuler },
-        { key: "minimums", label: "Minimums", icon: faDollarSign },
-        { key: "carpetInstallMultipliers", label: "Install Multipliers", icon: faBolt },
-        { key: "frequencyMeta", label: "Service Frequencies", icon: faCalendar },
+        { key: "unitPricing", label: t("servicePricing.detailedTabs.unitPricing"), icon: faRuler },
+        { key: "minimums", label: t("servicePricing.detailedTabs.minimums"), icon: faDollarSign },
+        { key: "carpetInstallMultipliers", label: t("servicePricing.detailedTabs.installMultipliers"), icon: faBolt },
+        { key: "frequencyMeta", label: t("servicePricing.detailedTabs.serviceFrequencies"), icon: faCalendar },
 
       ];
     }
 
     if (service.serviceId === "electrostaticSpray") {
       return [
-        { key: "sprayRates", label: "Spray Rates", icon: faWind },
-        { key: "sprayTripCharges", label: "Trip Charges", icon: faCar },
-        { key: "sprayFrequencyConversions", label: "Frequency Conversions", icon: faSync },
+        { key: "sprayRates", label: t("servicePricing.detailedTabs.sprayRates"), icon: faWind },
+        { key: "sprayTripCharges", label: t("servicePricing.detailedTabs.tripCharges"), icon: faCar },
+        { key: "sprayFrequencyConversions", label: t("servicePricing.detailedTabs.frequencyConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "foamingDrain") {
       return [
-        { key: "standardRates", label: "Standard Rates", icon: faDroplet },
-        { key: "volumePricing", label: "Volume Pricing", icon: faChartBar },
-        { key: "greaseTrap", label: "Grease Trap", icon: faOilCan },
-        { key: "greenDrain", label: "Green Drain", icon: faLeaf },
-        { key: "addonsMultipliers", label: "Add-ons & Multipliers", icon: faPlus },
+        { key: "standardRates", label: t("servicePricing.detailedTabs.standardRates"), icon: faDroplet },
+        { key: "volumePricing", label: t("servicePricing.detailedTabs.volumePricing"), icon: faChartBar },
+        { key: "greaseTrap", label: t("servicePricing.detailedTabs.greaseTrap"), icon: faOilCan },
+        { key: "greenDrain", label: t("servicePricing.detailedTabs.greenDrain"), icon: faLeaf },
+        { key: "addonsMultipliers", label: t("servicePricing.detailedTabs.addonsMultipliers"), icon: faPlus },
 
-        { key: "billingConversions", label: "Billing Conversions", icon: faSync },
+        { key: "billingConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "microfiberMopping") {
       return [
-        { key: "basicRates", label: "Basic Rates", icon: faBroom },
-        { key: "hugeBathrooms", label: "Huge Bathrooms", icon: faBuilding },
-        { key: "extraAreas", label: "Extra Areas", icon: faLandmark },
-        { key: "standalonePricing", label: "Standalone Service", icon: faStar },
-        { key: "moppingMetadata", label: "Billing Conversions", icon: faSync },
+        { key: "basicRates", label: t("servicePricing.detailedTabs.basicRates"), icon: faBroom },
+        { key: "hugeBathrooms", label: t("servicePricing.detailedTabs.hugeBathrooms"), icon: faBuilding },
+        { key: "extraAreas", label: t("servicePricing.detailedTabs.extraAreas"), icon: faLandmark },
+        { key: "standalonePricing", label: t("servicePricing.detailedTabs.standaloneService"), icon: faStar },
+        { key: "moppingMetadata", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "pureJanitorial") {
       return [
-        { key: "janProductionRates", label: "Production Rates", icon: faRuler },
-        { key: "janLaborDefaults",   label: "Labor Defaults",   icon: faDollarSign },
-        { key: "janSupplyDefaults",  label: "Supply Defaults",  icon: faBox },
+        { key: "janProductionRates", label: t("servicePricing.detailedTabs.productionRates"), icon: faRuler },
+        { key: "janLaborDefaults",   label: t("servicePricing.detailedTabs.laborDefaults"),   icon: faDollarSign },
+        { key: "janSupplyDefaults",  label: t("servicePricing.detailedTabs.supplyDefaults"),  icon: faBox },
       ];
     }
 
     if (service.serviceId === "saniclean") {
       return [
-        { key: "insideBeltway", label: "Inside Beltway", icon: faCity },
-        { key: "outsideBeltway", label: "Outside Beltway", icon: faTree },
-        { key: "allInclusive", label: "All-Inclusive Package", icon: faBox },
-        { key: "smallFacility", label: "Small Facility", icon: faStore },
-        { key: "soapUpgrades", label: "Soap Upgrades", icon: faSoap },
-        { key: "warrantyCredits", label: "Warranty & Credits", icon: faTicket },
-        { key: "includedItems", label: "Included Items", icon: faCheck },
-        { key: "monthlyAddOns", label: "Monthly Add-Ons", icon: faClipboard },
-        { key: "microfiberMoppingAddon", label: "Microfiber Mopping", icon: faBroom },
-        { key: "sanicleanBillingConversions", label: "Billing Conversions", icon: faSync },
+        { key: "insideBeltway", label: t("servicePricing.detailedTabs.insideBeltway"), icon: faCity },
+        { key: "outsideBeltway", label: t("servicePricing.detailedTabs.outsideBeltway"), icon: faTree },
+        { key: "allInclusive", label: t("servicePricing.detailedTabs.allInclusivePackage"), icon: faBox },
+        { key: "smallFacility", label: t("servicePricing.detailedTabs.smallFacility"), icon: faStore },
+        { key: "soapUpgrades", label: t("servicePricing.detailedTabs.soapUpgrades"), icon: faSoap },
+        { key: "warrantyCredits", label: t("servicePricing.detailedTabs.warrantyCredits"), icon: faTicket },
+        { key: "includedItems", label: t("servicePricing.detailedTabs.includedItems"), icon: faCheck },
+        { key: "monthlyAddOns", label: t("servicePricing.detailedTabs.monthlyAddOns"), icon: faClipboard },
+        { key: "microfiberMoppingAddon", label: t("servicePricing.detailedTabs.microfiberMopping"), icon: faBroom },
+        { key: "sanicleanBillingConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "sanipod") {
       return [
-        { key: "podRates", label: "Pod Rates", icon: faTrash },
-        { key: "extraBags", label: "Extra Bags", icon: faShoppingBag },
-        { key: "standaloneService", label: "Standalone Service", icon: faStar },
+        { key: "podRates", label: t("servicePricing.detailedTabs.podRates"), icon: faTrash },
+        { key: "extraBags", label: t("servicePricing.detailedTabs.extraBags"), icon: faShoppingBag },
+        { key: "standaloneService", label: t("servicePricing.detailedTabs.standaloneService"), icon: faStar },
 
-        { key: "sanipodBillingConversions", label: "Billing Conversions", icon: faSync },
+        { key: "sanipodBillingConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "saniscrub") {
       return [
-        { key: "fixtureRates", label: "Fixture Rates", icon: faShower },
-        { key: "saniscrubMinimums", label: "Minimums", icon: faDollarSign },
-        { key: "nonBathroomPricing", label: "Non-Bathroom Areas", icon: faLandmark },
-        { key: "saniscrubInstallMultipliers", label: "Install Multipliers", icon: faBolt },
-        { key: "serviceFrequencies", label: "Service Frequencies", icon: faCalendar },
-        { key: "discountsAndFees", label: "Discounts & Fees", icon: faTicket },
+        { key: "fixtureRates", label: t("servicePricing.detailedTabs.fixtureRates"), icon: faShower },
+        { key: "saniscrubMinimums", label: t("servicePricing.detailedTabs.minimums"), icon: faDollarSign },
+        { key: "nonBathroomPricing", label: t("servicePricing.detailedTabs.nonBathroomAreas"), icon: faLandmark },
+        { key: "saniscrubInstallMultipliers", label: t("servicePricing.detailedTabs.installMultipliers"), icon: faBolt },
+        { key: "serviceFrequencies", label: t("servicePricing.detailedTabs.serviceFrequencies"), icon: faCalendar },
+        { key: "discountsAndFees", label: t("servicePricing.detailedTabs.discountsAndFees"), icon: faTicket },
 
       ];
     }
 
     if (service.serviceId === "stripWax") {
       return [
-        { key: "standardFull", label: "Standard Full", icon: faStar },
-        { key: "noSealant", label: "No Sealant", icon: faDroplet },
-        { key: "wellMaintained", label: "Well Maintained", icon: faWandMagicSparkles },
-        { key: "stripWaxContractTerms", label: "Contract Terms", icon: faClipboard },
-        { key: "stripWaxBillingConversions", label: "Billing Conversions", icon: faSync },
+        { key: "standardFull", label: t("servicePricing.detailedTabs.standardFull"), icon: faStar },
+        { key: "noSealant", label: t("servicePricing.detailedTabs.noSealant"), icon: faDroplet },
+        { key: "wellMaintained", label: t("servicePricing.detailedTabs.wellMaintained"), icon: faWandMagicSparkles },
+        { key: "stripWaxContractTerms", label: t("servicePricing.detailedTabs.contractTerms"), icon: faClipboard },
+        { key: "stripWaxBillingConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
 
     if (service.serviceId === "refreshPowerScrub") {
       return [
-        { key: "defaultRates", label: "Default Rates", icon: faDollarSign },
-        { key: "kitchenPricing", label: "Kitchen Pricing", icon: faUtensils },
-        { key: "fohPricing", label: "Front of House", icon: faLandmark },
-        { key: "patioPricing", label: "Patio Pricing", icon: faLeaf },
-        { key: "sqftPricing", label: "Square Footage", icon: faRuler },
-        { key: "scrubFrequencyConversions", label: "Billing Conversions", icon: faSync },
+        { key: "defaultRates", label: t("servicePricing.detailedTabs.defaultRates"), icon: faDollarSign },
+        { key: "kitchenPricing", label: t("servicePricing.detailedTabs.kitchenPricing"), icon: faUtensils },
+        { key: "fohPricing", label: t("servicePricing.detailedTabs.frontOfHouse"), icon: faLandmark },
+        { key: "patioPricing", label: t("servicePricing.detailedTabs.patioPricing"), icon: faLeaf },
+        { key: "sqftPricing", label: t("servicePricing.detailedTabs.squareFootage"), icon: faRuler },
+        { key: "scrubFrequencyConversions", label: t("servicePricing.detailedTabs.billingConversions"), icon: faSync },
 
       ];
     }
@@ -1889,11 +1891,11 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
     <div className="spd">
       <div className="spd__header">
         <div>
-          <h2 className="spd__title">{service.label} - Pricing Details</h2>
+          <h2 className="spd__title">{t("servicePricing.detailedView.title", { label: service.label })}</h2>
           <p className="spd__subtitle">{service.description}</p>
         </div>
         <button className="spd__close" onClick={onClose}>
-          ✕ Close
+          ✕ {t("servicePricing.detailedView.close")}
         </button>
       </div>
 
@@ -1945,13 +1947,13 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
                           onClick={handleSave}
                           disabled={saving}
                         >
-                          {saving ? "..." : "Save"}
+                          {saving ? t("servicePricing.detailedView.saving") : t("servicePricing.detailedView.save")}
                         </button>
                         <button
                           className="spd__btn spd__btn--cancel"
                           onClick={handleCancel}
                         >
-                          Cancel
+                          {t("servicePricing.detailedView.cancel")}
                         </button>
                       </div>
                     </div>
@@ -1964,7 +1966,7 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
                         className="spd__btn spd__btn--edit"
                         onClick={() => handleEdit(field)}
                       >
-                        Edit
+                        {t("servicePricing.detailedView.edit")}
                       </button>
                     </div>
                   )}
@@ -1982,19 +1984,19 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
                 style={{ marginLeft: "0", display: "flex", alignItems: "center", gap: "6px", fontWeight: 700 }}
                 onClick={() => setShowNewPT(true)}
               >
-                + New Place Type
+                + {t("servicePricing.detailedView.newPlaceType")}
               </button>
             ) : (
               <div className="spd__field" style={{ flexWrap: "wrap", gap: "8px", alignItems: "flex-start" }}>
                 <div className="spd__field-info" style={{ minWidth: "160px" }}>
-                  <div className="spd__field-label">New Place Type</div>
-                  <div className="spd__field-description">Enter a name and production rate</div>
+                  <div className="spd__field-label">{t("servicePricing.detailedView.newPlaceType")}</div>
+                  <div className="spd__field-description">{t("servicePricing.detailedView.newPlaceTypeDescription")}</div>
                 </div>
                 <div className="spd__field-edit" style={{ flex: 1, display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
                   <input
                     type="text"
                     className="spd__input"
-                    placeholder="e.g. Warehouse"
+                    placeholder={t("servicePricing.detailedView.newPlaceTypePlaceholder")}
                     value={newPTLabel}
                     onChange={e => setNewPTLabel(e.target.value)}
                     style={{ minWidth: "140px" }}
@@ -2010,20 +2012,20 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
                     step="50"
                     style={{ width: "90px" }}
                   />
-                  <span className="spd__unit">sq ft/hr</span>
+                  <span className="spd__unit">{t("servicePricing.detailedView.sqFtPerHr")}</span>
                   <div className="spd__actions">
                     <button
                       className="spd__btn spd__btn--save"
                       onClick={handleAddPlaceType}
                       disabled={savingNewPT || !newPTLabel.trim()}
                     >
-                      {savingNewPT ? "..." : "Add"}
+                      {savingNewPT ? t("servicePricing.detailedView.saving") : t("servicePricing.detailedView.add")}
                     </button>
                     <button
                       className="spd__btn spd__btn--cancel"
                       onClick={() => { setShowNewPT(false); setNewPTLabel(""); setNewPTRate("1000"); }}
                     >
-                      Cancel
+                      {t("servicePricing.detailedView.cancel")}
                     </button>
                   </div>
                 </div>
@@ -2034,7 +2036,7 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
 
         {categories[activeTab].length === 0 && !showNewPT && (
           <div className="spd__empty">
-            No fields available in this category
+            {t("servicePricing.detailedView.emptyCategory")}
           </div>
         )}
       </div>

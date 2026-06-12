@@ -1,0 +1,31 @@
+{
+  "tabs": {
+    "dashboard": "Panel",
+    "savedPdfs": "PDF guardados",
+    "approvalDocuments": "Documentos de aprobación",
+    "trash": "Papelera",
+    "pricingDetails": "Detalles de precios",
+    "userManagement": "Gestión de usuarios",
+    "editHistory": "Historial de ediciones",
+    "employeeFiles": "Archivos de empleados",
+    "emailTemplate": "Plantilla de correo",
+    "serviceAgreement": "Acuerdo de servicio"
+  },
+  "titles": {
+    "dashboard": "Panel",
+    "savedPdfs": "PDF guardados",
+    "approvalDocuments": "Documentos de aprobación",
+    "pricingDetails": "Detalles de precios",
+    "userManagement": "Gestión de usuarios",
+    "editHistory": "Historial de ediciones",
+    "employeeAgreements": "Acuerdos de empleados",
+    "emailTemplate": "Plantilla de correo",
+    "serviceAgreementTemplate": "Plantilla de acuerdo de servicio",
+    "trash": "Papelera"
+  },
+  "headers": {
+    "recentDocuments": "Documentos recientes",
+    "documentStatus": "Estado del documento",
+    "selectDateRange": "Seleccionar intervalo de fechas"
+  }
+}

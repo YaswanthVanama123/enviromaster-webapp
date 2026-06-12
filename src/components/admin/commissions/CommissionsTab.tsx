@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { CommissionCalculator } from "./CommissionCalculator";
 import { CommissionRulesManager } from "./CommissionRulesManager";
 import "./CommissionsTab.css";
@@ -6,6 +7,7 @@ import "./CommissionsTab.css";
 type SubTab = "calculator" | "rules";
 
 export const CommissionsTab: React.FC = () => {
+  const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("rules");
 
   
@@ -14,9 +16,9 @@ export const CommissionsTab: React.FC = () => {
   return (
     <div className="commissions-tab-container">
       <div className="commissions-header">
-        <h2>Commission Calculator</h2>
+        <h2>{t("adminCommissionTools.tab.title")}</h2>
         <p className="commissions-subtitle">
-          Calculate sales commissions based on account type, pricing line, and quota achievement
+          {t("adminCommissionTools.tab.subtitle")}
         </p>
       </div>
 
@@ -26,14 +28,14 @@ export const CommissionsTab: React.FC = () => {
           onClick={() => setActiveSubTab("calculator")}
         >
           <span className="subtab-icon">C</span>
-          Calculator
+          {t("adminCommissionTools.tab.calculator")}
         </button>
         <button
           className={`subtab-btn ${activeSubTab === "rules" ? "active" : ""}`}
           onClick={() => setActiveSubTab("rules")}
         >
           <span className="subtab-icon">R</span>
-          Rules Config
+          {t("adminCommissionTools.tab.rulesConfig")}
         </button>
       </div>
 

@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { biginAuditApi } from '../backendservice/api/biginAuditApi';
 import { useAuthContext } from './auth';
 import './MyInsideSales.css';
@@ -33,6 +34,7 @@ interface InsideSalesResult {
 }
 
 export const MyInsideSales: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<InsideSalesResult | null>(null);
@@ -54,7 +56,7 @@ export const MyInsideSales: React.FC = () => {
     const salespersonName = user?.fullName || user?.username;
 
     if (!salespersonName) {
-      setError('User not logged in');
+      setError(t('insideSales.notLoggedIn'));
       setLoading(false);
       return;
     }
@@ -70,11 +72,11 @@ export const MyInsideSales: React.FC = () => {
         setResult(response.data);
         setLastChecked(new Date());
       } else {
-        setError('Failed to check inside sales eligibility');
+        setError(t('insideSales.checkFailed'));
       }
     } catch (err) {
       console.error('Error checking inside sales:', err);
-      setError('Error checking inside sales eligibility');
+      setError(t('insideSales.checkError'));
     } finally {
       setLoading(false);
     }
@@ -89,9 +91,9 @@ export const MyInsideSales: React.FC = () => {
       {}
       <div className="mis-header">
         <div className="mis-header-content">
-          <h1>My Inside Sales Status</h1>
+          <h1>{t('insideSales.title')}</h1>
           <p className="mis-subtitle">
-            View your Inside Sales eligibility based on your agreements in Lisa Rothwell's audit history
+            {t('insideSales.subtitle')}
           </p>
         </div>
         <button
@@ -102,7 +104,7 @@ export const MyInsideSales: React.FC = () => {
           {loading ? (
             <>
               <span className="mis-spinner"></span>
-              Checking...
+              {t('insideSales.checking')}
             </>
           ) : (
             <>
@@ -110,7 +112,7 @@ export const MyInsideSales: React.FC = () => {
                 <path d="M21 12a9 9 0 11-2.52-6.25" />
                 <path d="M21 3v6h-6" />
               </svg>
-              Refresh
+              {t('common.refresh')}
             </>
           )}
         </button>
@@ -132,7 +134,7 @@ export const MyInsideSales: React.FC = () => {
       {loading && !result && (
         <div className="mis-loading-card">
           <div className="mis-spinner-large"></div>
-          <p>Checking your Inside Sales eligibility...</p>
+          <p>{t('insideSales.loadingCard')}</p>
         </div>
       )}
 
@@ -157,18 +159,20 @@ export const MyInsideSales: React.FC = () => {
               </div>
               <div className="mis-status-info">
                 <h2 className={result.isInsideSales ? 'status-has-deduction' : 'status-no-deduction'}>
-                  {result.isInsideSales ? 'Inside Sales (3% Deduction)' : 'No Inside Sales Deduction'}
+                  {result.isInsideSales ? t('insideSales.statusHasDeduction') : t('insideSales.statusNoDeduction')}
                 </h2>
                 <p className="mis-status-details">
-                  {result.totalAgreementsByUser || 0} total agreement{(result.totalAgreementsByUser || 0) !== 1 ? 's' : ''} | {' '}
-                  {result.agreementCount || 0} uploaded to Bigin | {' '}
-                  {result.matchCount} found in audit
+                  {t('insideSales.statusDetails', {
+                    total: result.totalAgreementsByUser || 0,
+                    uploaded: result.agreementCount || 0,
+                    matched: result.matchCount,
+                  })}
                 </p>
                 {result.message && (
                   <p className="mis-status-message">{result.message}</p>
                 )}
                 {lastChecked && (
-                  <p className="mis-last-checked">Last checked: {formatDate(lastChecked.toISOString())}</p>
+                  <p className="mis-last-checked">{t('insideSales.lastChecked', { date: formatDate(lastChecked.toISOString()) })}</p>
                 )}
               </div>
             </div>
@@ -178,34 +182,34 @@ export const MyInsideSales: React.FC = () => {
           <div className="mis-stats-row">
             <div className="mis-stat-card">
               <div className="mis-stat-value">{result.totalAgreementsByUser || 0}</div>
-              <div className="mis-stat-label">Total Agreements</div>
+              <div className="mis-stat-label">{t('insideSales.stats.totalAgreements')}</div>
             </div>
             <div className="mis-stat-card">
               <div className="mis-stat-value">{result.agreementCount || 0}</div>
-              <div className="mis-stat-label">Uploaded to Bigin</div>
+              <div className="mis-stat-label">{t('insideSales.stats.uploadedToBigin')}</div>
             </div>
             <div className="mis-stat-card">
               <div className="mis-stat-value">{result.matchCount}</div>
-              <div className="mis-stat-label">Found in Lisa's Audit</div>
+              <div className="mis-stat-label">{t('insideSales.stats.foundInAudit')}</div>
             </div>
           </div>
 
           {}
           {result.matchCount > 0 && result.matchDetails.length > 0 && (
             <div className="mis-section-card">
-              <h3>Matching Audit Records</h3>
+              <h3>{t('insideSales.matchingRecords.title')}</h3>
               <p className="mis-section-subtitle">
-                These agreements were found in Lisa Rothwell's audit history (last 1 year)
+                {t('insideSales.matchingRecords.subtitle')}
               </p>
               <div className="mis-table-wrapper">
                 <table className="mis-table">
                   <thead>
                     <tr>
-                      <th>Bigin ID</th>
-                      <th>Record Name</th>
-                      <th>Action</th>
-                      <th>Module</th>
-                      <th>Timestamp</th>
+                      <th>{t('insideSales.matchingRecords.biginId')}</th>
+                      <th>{t('insideSales.matchingRecords.recordName')}</th>
+                      <th>{t('insideSales.matchingRecords.action')}</th>
+                      <th>{t('insideSales.matchingRecords.module')}</th>
+                      <th>{t('insideSales.matchingRecords.timestamp')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -228,20 +232,20 @@ export const MyInsideSales: React.FC = () => {
 
           {/* All Agreements */}
           <div className="mis-section-card">
-            <h3>Your Agreements ({result.totalAgreementsByUser || 0} total, {result.agreementCount || 0} uploaded to Bigin)</h3>
+            <h3>{t('insideSales.agreementsTable.title', { total: result.totalAgreementsByUser || 0, uploaded: result.agreementCount || 0 })}</h3>
             <p className="mis-section-subtitle">
-              List of your agreements and their Bigin upload status
+              {t('insideSales.agreementsTable.subtitle')}
             </p>
             {result.agreementDetails && result.agreementDetails.length > 0 ? (
               <div className="mis-table-wrapper">
                 <table className="mis-table">
                   <thead>
                     <tr>
-                      <th>Agreement Title</th>
-                      <th>Bigin Deal ID</th>
-                      <th>Deal Name</th>
-                      <th>Created At</th>
-                      <th>Status</th>
+                      <th>{t('insideSales.agreementsTable.agreementTitle')}</th>
+                      <th>{t('insideSales.agreementsTable.biginDealId')}</th>
+                      <th>{t('insideSales.agreementsTable.dealName')}</th>
+                      <th>{t('insideSales.agreementsTable.createdAt')}</th>
+                      <th>{t('insideSales.agreementsTable.status')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -252,17 +256,17 @@ export const MyInsideSales: React.FC = () => {
                         <tr key={idx} className={isMatched ? 'row-matched' : !hasBiginId ? 'row-not-uploaded' : ''}>
                           <td>{agreement.title}</td>
                           <td className="mis-monospace">
-                            {hasBiginId ? agreement.biginId : <span className="text-muted">Not uploaded</span>}
+                            {hasBiginId ? agreement.biginId : <span className="text-muted">{t('insideSales.agreementsTable.notUploaded')}</span>}
                           </td>
                           <td>{agreement.dealName || '-'}</td>
                           <td>{formatDate(agreement.createdAt)}</td>
                           <td>
                             {!hasBiginId ? (
-                              <span className="mis-badge badge-pending">Not Uploaded</span>
+                              <span className="mis-badge badge-pending">{t('insideSales.agreementsTable.badgeNotUploaded')}</span>
                             ) : isMatched ? (
-                              <span className="mis-badge badge-success">Found in Audit</span>
+                              <span className="mis-badge badge-success">{t('insideSales.agreementsTable.badgeFoundInAudit')}</span>
                             ) : (
-                              <span className="mis-badge badge-neutral">Not in Audit</span>
+                              <span className="mis-badge badge-neutral">{t('insideSales.agreementsTable.badgeNotInAudit')}</span>
                             )}
                           </td>
                         </tr>
@@ -273,20 +277,20 @@ export const MyInsideSales: React.FC = () => {
               </div>
             ) : (
               <p className="mis-empty-message">
-                No agreements found. Create agreements and upload them to Bigin to track your Inside Sales eligibility.
+                {t('insideSales.agreementsTable.empty')}
               </p>
             )}
           </div>
 
           {/* Info Card */}
           <div className="mis-info-card">
-            <h4>How Inside Sales Works</h4>
+            <h4>{t('insideSales.info.title')}</h4>
             <ul>
-              <li>When you create and upload agreements to Bigin, they get a Bigin Deal ID</li>
-              <li>Lisa Rothwell processes these deals, creating audit records</li>
-              <li>If any of your agreement's Bigin IDs appear in Lisa's audit history within the last year, you are classified as <strong>Inside Sales</strong></li>
-              <li><strong>Inside Sales = 3% deduction</strong> from your commission</li>
-              <li><strong>No matches = No deduction</strong> - you keep your full commission</li>
+              <li>{t('insideSales.info.item1')}</li>
+              <li>{t('insideSales.info.item2')}</li>
+              <li>{t('insideSales.info.item3Prefix')}<strong>{t('insideSales.info.item3Bold')}</strong></li>
+              <li><strong>{t('insideSales.info.item4')}</strong>{t('insideSales.info.item4Suffix')}</li>
+              <li><strong>{t('insideSales.info.item5Bold')}</strong>{t('insideSales.info.item5Suffix')}</li>
             </ul>
           </div>
         </>

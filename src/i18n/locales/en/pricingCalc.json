@@ -1,0 +1,139 @@
+{
+  "tables": {
+    "title": "Pricing Tables",
+    "subtitle": "Choose a service to configure its rates, rules, and agreement totals.",
+    "tabs": {
+      "saniClean": "SaniClean",
+      "rpmWindows": "RPM Windows"
+    }
+  },
+  "common": {
+    "agreementMonths": "Agreement Months",
+    "masterRatesTable": {
+      "item": "Item",
+      "key": "Key",
+      "value": "Value",
+      "notes": "Notes"
+    }
+  },
+  "tripCharge": {
+    "label": "Trip Charge",
+    "parkingLabel": "Parking (only for paid)",
+    "options": {
+      "beltway8": "Beltway $8",
+      "standard6": "Standard $6",
+      "paid7": "Paid $7 + parking",
+      "waived": "Waived"
+    }
+  },
+  "totals": {
+    "heading": "Totals",
+    "perVisit": "Per Visit",
+    "perMonth": "Per Month",
+    "agreement": "Agreement ({{months}} mo)"
+  },
+  "inlineMoney": {
+    "editTooltip": "Click to edit"
+  },
+  "saniClean": {
+    "region": {
+      "label": "Region",
+      "inside": "Inside Beltway",
+      "outside": "Outside Beltway"
+    },
+    "fixtures": "Fixtures (count)",
+    "allInclusive": {
+      "label": "All-Inclusive?",
+      "no": "No",
+      "yes": "Yes (Trip waived, $20/fixture)"
+    },
+    "smallThreshold": {
+      "label": "Small-Account Threshold",
+      "hint": "≤ threshold → $50 visit incl. trip"
+    },
+    "masterRatesHeading": "Master Rates",
+    "monthlyLabel": "Per Month (×4.33)",
+    "rates": {
+      "insidePrice": "Inside Beltway (per fixture)",
+      "insideMin": "Inside Min (per visit)",
+      "beltwayTrip": "Trip — Beltway",
+      "outsidePrice": "Outside Beltway (per fixture)",
+      "outsideMin": "Outside Min (per visit)",
+      "outsideTripPDF": "Trip — Outside (PDF line)",
+      "paidBase": "Trip — Paid base",
+      "smallMin": "Small-Account Min (≤ threshold)",
+      "allIncPrice": "All-Inclusive (per fixture)"
+    },
+    "notes": {
+      "insidePrice": "Base rate inside beltway",
+      "insideMin": "Regional minimum",
+      "beltwayTrip": "Standard $8",
+      "outsidePrice": "Base rate outside beltway",
+      "outsideMin": "— if none",
+      "outsideTripPDF": "SaniClean line says $8",
+      "paidBase": "+ parking pass-through",
+      "smallMin": "Includes trip",
+      "allIncPrice": "Trip waived"
+    },
+    "rules": {
+      "allInclusive": "All-Inclusive: trip waived; other services bundled.",
+      "standard": "Trip = {{trip}}; Regional minimum = {{min}}.",
+      "smallAccount": "Small-account rule: fixtures ≤ {{threshold}}, minimum {{min}} (trip included)."
+    }
+  },
+  "rpm": {
+    "frequency": {
+      "label": "Frequency",
+      "weekly": "Weekly (×1.00)",
+      "biweekly": "Biweekly (×1.25)",
+      "monthly": "Monthly (×1.25)",
+      "quarterly": "Quarterly (×2.00 after first)",
+      "weeklyShort": "Weekly",
+      "biweeklyShort": "Biweekly",
+      "monthlyShort": "Monthly",
+      "quarterlyShort": "Quarterly"
+    },
+    "firstTime": {
+      "label": "First Time (Install 300%)",
+      "no": "No",
+      "yes": "Yes (installers handle)"
+    },
+    "countsHeading": "Counts (both sides)",
+    "smallWindows": "Small Windows",
+    "mediumWindows": "Medium Windows",
+    "largeWindows": "Large / Door Windows",
+    "includeMirrors": {
+      "label": "Include Mirrors?",
+      "no": "No",
+      "yes": "Yes (same pricing)"
+    },
+    "smallMirrors": "Small Mirrors",
+    "mediumMirrors": "Medium Mirrors",
+    "largeMirrors": "Large Mirrors",
+    "mirrorNote": "Mirror chem/technique same as windows → priced the same per size.",
+    "masterRatesHeading": "Master Rates & Multipliers",
+    "rates": {
+      "rateSmall": "Small (weekly, both sides)",
+      "rateMedium": "Medium (weekly, both sides)",
+      "rateLarge": "Large/Door (weekly, both sides)",
+      "multInstall": "First Time Multiplier",
+      "mult125": "Biweekly/Monthly Multiplier",
+      "multQuarterly": "Quarterly Multiplier (after first)",
+      "tripBeltway": "Trip — Beltway",
+      "tripStandard": "Trip — Standard",
+      "tripPaidBase": "Trip — Paid base"
+    },
+    "notes": {
+      "rateSmall": "Per pane",
+      "rateMedium": "Per pane",
+      "rateLarge": "Per pane",
+      "multInstall": "300% (installers)",
+      "mult125": "125% of weekly",
+      "multQuarterly": "200%",
+      "tripBeltway": "Usually $8",
+      "tripStandard": "Usually $6",
+      "tripPaidBase": "+ parking"
+    },
+    "rule": "{{freq}} ×{{mult}}. Trip = {{trip}}."
+  }
+}

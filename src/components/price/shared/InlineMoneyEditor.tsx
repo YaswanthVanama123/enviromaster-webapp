@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { money, unmoney } from "./money";
 
 const inputStyle = {
@@ -10,6 +11,7 @@ const inputStyle = {
 };
 
 export default function InlineMoneyEditor({ value, display, onCommit }) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(display ?? money(value ?? 0));
   const [cursorPosition, setCursorPosition] = useState(null);
@@ -52,7 +54,7 @@ export default function InlineMoneyEditor({ value, display, onCommit }) {
         setText(display ?? money(value ?? 0));
         setEditing(true);
       }}
-      title="Click to edit"
+      title={t("pricingCalc.inlineMoney.editTooltip")}
       style={{
         border: "1px dashed transparent",
         borderRadius: 8,

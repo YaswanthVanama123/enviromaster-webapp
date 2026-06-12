@@ -1,0 +1,6 @@
+{
+  "confirm": "Confirmer",
+  "cancel": "Annuler",
+  "processing": "Traitement...",
+  "typeToConfirm": "Veuillez saisir « {{text}} » pour confirmer"
+}

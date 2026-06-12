@@ -1,0 +1,35 @@
+{
+  "title": "Bienvenue chez Enviro-Master",
+  "subtitle": "Système professionnel de gestion des contrats",
+  "description": "Créez, gérez et maintenez facilement les contrats de service client. Notre plateforme complète optimise votre flux de travail et garantit l'exactitude.",
+  "sectionTitle": "Gestion des contrats",
+  "filter": {
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois",
+    "thisYear": "Cette année",
+    "dateRange": "Plage de dates"
+  },
+  "legend": {
+    "done": "Terminé",
+    "pending": "En attente",
+    "saved": "Enregistré",
+    "drafts": "Brouillons"
+  },
+  "cards": {
+    "create": {
+      "title": "Créer un contrat",
+      "description": "Créez un nouveau contrat client avec des détails de service complets et une sélection de produits",
+      "button": "Commencer →"
+    },
+    "extend": {
+      "title": "Prolonger le contrat",
+      "description": "Prolongez un contrat client existant avec de nouvelles conditions et des forfaits de service mis à jour",
+      "button": "Cliquez pour prolonger"
+    },
+    "edit": {
+      "title": "Modifier le contrat",
+      "description": "Modifiez les détails du contrat existant, mettez à jour les services ou ajustez les configurations de produits",
+      "button": "Commencer →"
+    }
+  }
+}

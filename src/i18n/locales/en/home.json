@@ -1,0 +1,35 @@
+{
+  "title": "Welcome to Enviro-Master",
+  "subtitle": "Professional Agreement Management System",
+  "description": "Create, manage, and maintain customer service agreements with ease. Our comprehensive platform streamlines your workflow and ensures accuracy.",
+  "sectionTitle": "Agreement Management",
+  "filter": {
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year",
+    "dateRange": "Date Range"
+  },
+  "legend": {
+    "done": "Done",
+    "pending": "Pending",
+    "saved": "Saved",
+    "drafts": "Drafts"
+  },
+  "cards": {
+    "create": {
+      "title": "Create Agreement",
+      "description": "Create a new customer agreement with comprehensive service details and product selections",
+      "button": "Get Started →"
+    },
+    "extend": {
+      "title": "Extend Agreement",
+      "description": "Extend an existing customer agreement with new terms and updated service packages",
+      "button": "Click to extend"
+    },
+    "edit": {
+      "title": "Edit Agreement",
+      "description": "Modify existing agreement details, update services, or adjust product configurations",
+      "button": "Get Started →"
+    }
+  }
+}

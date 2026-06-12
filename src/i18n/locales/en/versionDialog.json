@@ -1,0 +1,19 @@
+{
+  "title": "Save PDF Options",
+  "agreementLabel": "Agreement:",
+  "currentVersions": "Current versions: {{count}}",
+  "latestVersion": " (latest: v{{number}})",
+  "howToSave": "How would you like to save this PDF?",
+  "createVersionTitle": "Create New Version",
+  "createVersionDescription": "Create version {{number}}. Recommended for tracking changes.",
+  "replaceRecentTitle": "Replace Recent Version",
+  "replaceRecentDescription": "Replace version {{number}} with this updated content. Saves storage space.",
+  "recommended": "Recommended",
+  "notesLabel": "What changed? *",
+  "notesPlaceholder": "Describe what changed in this version (e.g., updated pricing, added services, client feedback changes)",
+  "existingVersions": "Existing Versions ({{count}})",
+  "moreVersions": "+{{count}} more versions",
+  "saving": "Saving...",
+  "createVersionButton": "Create Version {{number}}",
+  "replaceVersionButton": "Replace Version {{number}}"
+}

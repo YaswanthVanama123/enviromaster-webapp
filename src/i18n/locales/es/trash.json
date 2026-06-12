@@ -1,0 +1,39 @@
+{
+  "title": "Papelera",
+  "description": "Consulta y gestiona los acuerdos y archivos eliminados. Los elementos de la papelera se pueden restaurar o eliminar permanentemente.",
+  "searchPlaceholder": "Buscar elementos eliminados...",
+  "selectAll": "Seleccionar todo",
+  "noResults": "No se encontraron elementos eliminados que coincidan con \"{{query}}\"",
+  "empty": "La papelera está vacía",
+  "pageInfo": "Mostrando {{from}}-{{to}} de {{total}} acuerdos eliminados",
+  "stats": {
+    "deletedFiles": "Archivos eliminados",
+    "deletedFolders": "Carpetas eliminadas"
+  },
+  "toast": {
+    "viewFailed": "No se pudo ver el archivo. Inténtalo de nuevo.",
+    "downloaded": "Descargado: {{name}}",
+    "downloadFailed": "No se pudo descargar el archivo. Inténtalo de nuevo.",
+    "restoredAgreement": "Acuerdo restaurado: {{title}}",
+    "restoredFile": "Archivo restaurado: {{title}}",
+    "restoreFailedFolder": "No se pudo restaurar la carpeta. Inténtalo de nuevo.",
+    "restoreFailedFile": "No se pudo restaurar el archivo. Inténtalo de nuevo.",
+    "adminRequired": "Se requiere acceso de administrador para eliminar elementos permanentemente. Accede a esta página desde el Panel de administración para realizar eliminaciones permanentes.",
+    "deletedAgreement": "Acuerdo eliminado permanentemente: {{title}}",
+    "deletedFile": "Archivo eliminado permanentemente: {{title}}",
+    "deleteFailedFolder": "No se pudo eliminar permanentemente la carpeta. Inténtalo de nuevo.",
+    "deleteFailedFile": "No se pudo eliminar permanentemente el archivo. Inténtalo de nuevo.",
+    "emailSent": "¡Correo electrónico enviado correctamente!"
+  },
+  "deleteModal": {
+    "titleAgreement": "¿Eliminar el acuerdo permanentemente?",
+    "titleFile": "¿Eliminar el archivo permanentemente?",
+    "warningPrefix": "Esto",
+    "permanentlyDelete": "eliminará permanentemente",
+    "cannotBeUndone": "¡Esta acción no se puede deshacer!",
+    "understandAgreement": "Entiendo que esto eliminará permanentemente este acuerdo",
+    "understandFile": "Entiendo que esto eliminará permanentemente este archivo",
+    "typeToConfirm": "para confirmar:",
+    "typeDeletePlaceholder": "Escribe DELETE"
+  }
+}

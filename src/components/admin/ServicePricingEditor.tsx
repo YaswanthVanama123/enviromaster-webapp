@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FaClipboardList,
   FaCalendarAlt,
@@ -54,6 +55,7 @@ export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
   const [editedConfig, setEditedConfig] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setEditedConfig(JSON.parse(JSON.stringify(config.config)));
@@ -99,46 +101,46 @@ export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
   const getAvailableTabs = (): Tab[] => {
     const serviceId = config.serviceId;
     const allTabs: Tab[] = [
-      { key: "overview", label: "Overview", icon: <FaClipboardList /> },
+      { key: "overview", label: t("servicePricing.tabs.overview"), icon: <FaClipboardList /> },
     ];
 
     if (["saniscrub", "microfiberMopping", "rpmWindows", "carpetCleaning", "stripWax", "foamingDrain", "sanipod", "electrostaticSpray", "refreshPowerScrub"].includes(serviceId)) {
-      allTabs.push({ key: "frequencies", label: "Frequencies", icon: <FaCalendarAlt /> });
+      allTabs.push({ key: "frequencies", label: t("servicePricing.tabs.frequencies"), icon: <FaCalendarAlt /> });
     }
 
     if (["saniclean"].includes(serviceId)) {
-      allTabs.push({ key: "geographic", label: "Geographic Pricing", icon: <FaMapMarkedAlt /> });
+      allTabs.push({ key: "geographic", label: t("servicePricing.tabs.geographic"), icon: <FaMapMarkedAlt /> });
     }
 
     if (["saniclean", "sanipod", "microfiberMopping", "rpmWindows", "stripWax"].includes(serviceId)) {
-      allTabs.push({ key: "rateTiers", label: "Rate Tiers", icon: <FaDollarSign /> });
+      allTabs.push({ key: "rateTiers", label: t("servicePricing.tabs.rateTiers"), icon: <FaDollarSign /> });
     }
 
     if (["saniscrub", "saniclean", "microfiberMopping"].includes(serviceId)) {
-      allTabs.push({ key: "minimums", label: "Minimums", icon: <FaChartBar /> });
+      allTabs.push({ key: "minimums", label: t("servicePricing.tabs.minimums"), icon: <FaChartBar /> });
     }
 
     if (["saniscrub", "rpmWindows", "carpetCleaning", "refreshPowerScrub"].includes(serviceId)) {
-      allTabs.push({ key: "multipliers", label: "Multipliers", icon: <FaTimes /> });
+      allTabs.push({ key: "multipliers", label: t("servicePricing.tabs.multipliers"), icon: <FaTimes /> });
     }
 
     if (serviceId === "pureJanitorial") {
-      allTabs.push({ key: "janitorial", label: "Janitorial Config", icon: <FaBroom /> });
+      allTabs.push({ key: "janitorial", label: t("servicePricing.tabs.janitorial"), icon: <FaBroom /> });
     }
 
     if (["saniclean"].includes(serviceId)) {
-      allTabs.push({ key: "components", label: "Facility Components", icon: <FaBuilding /> });
+      allTabs.push({ key: "components", label: t("servicePricing.tabs.components"), icon: <FaBuilding /> });
     }
 
     if (["saniclean", "microfiberMopping", "electrostaticSpray"].includes(serviceId)) {
-      allTabs.push({ key: "addons", label: "Add-Ons", icon: <FaPlus /> });
+      allTabs.push({ key: "addons", label: t("servicePricing.tabs.addons"), icon: <FaPlus /> });
     }
 
     if (serviceId === "refreshPowerScrub") {
-      allTabs.push({ key: "refreshPowerScrub", label: "Core Rates & Areas", icon: <FaIndustry /> });
+      allTabs.push({ key: "refreshPowerScrub", label: t("servicePricing.tabs.coreRatesAreas"), icon: <FaIndustry /> });
     }
 
-    allTabs.push({ key: "advanced", label: "Advanced", icon: <FaCog /> });
+    allTabs.push({ key: "advanced", label: t("servicePricing.tabs.advanced"), icon: <FaCog /> });
 
     return allTabs;
   };
@@ -149,26 +151,26 @@ export const ServicePricingEditor: React.FC<ServicePricingEditorProps> = ({
     <div className="spe">
       <div className="spe__header">
         <div>
-          <h2 className="spe__title">Edit Pricing: {config.label}</h2>
-          <p className="spe__subtitle">{config.serviceId} - v{config.version}</p>
+          <h2 className="spe__title">{t("servicePricing.editor.title", { label: config.label })}</h2>
+          <p className="spe__subtitle">{t("servicePricing.editor.subtitle", { serviceId: config.serviceId, version: config.version })}</p>
         </div>
         <div className="spe__actions">
           <button className="spe__btn spe__btn--cancel" onClick={onCancel}>
-            Cancel
+            {t("servicePricing.editor.cancel")}
           </button>
           <button
             className="spe__btn spe__btn--save"
             onClick={handleSave}
             disabled={saving || !hasChanges}
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? t("servicePricing.editor.saving") : t("servicePricing.editor.saveChanges")}
           </button>
         </div>
       </div>
 
       {hasChanges && (
         <div className="spe__changes-indicator">
-          <FaExclamationTriangle /> You have unsaved changes
+          <FaExclamationTriangle /> {t("servicePricing.editor.unsavedChanges")}
         </div>
       )}
 
@@ -281,44 +283,45 @@ const OverviewTab: React.FC<{
   config: ServiceConfig;
   editedConfig: Record<string, any>;
 }> = ({ config, editedConfig }) => {
+  const { t } = useTranslation();
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Service Overview</h3>
+      <h3 className="spe__section-title">{t("servicePricing.overview.title")}</h3>
 
       <div className="spe__info-grid">
         <div className="spe__info-card">
-          <div className="spe__info-label">Service ID</div>
+          <div className="spe__info-label">{t("servicePricing.overview.serviceId")}</div>
           <div className="spe__info-value">{config.serviceId}</div>
         </div>
 
         <div className="spe__info-card">
-          <div className="spe__info-label">Label</div>
+          <div className="spe__info-label">{t("servicePricing.overview.label")}</div>
           <div className="spe__info-value">{config.label}</div>
         </div>
 
         <div className="spe__info-card">
-          <div className="spe__info-label">Version</div>
+          <div className="spe__info-label">{t("servicePricing.overview.version")}</div>
           <div className="spe__info-value">{config.version}</div>
         </div>
 
         <div className="spe__info-card">
-          <div className="spe__info-label">Status</div>
+          <div className="spe__info-label">{t("servicePricing.overview.status")}</div>
           <div className="spe__info-value">
             <span className={`spe__status ${config.isActive ? "spe__status--active" : "spe__status--inactive"}`}>
-              {config.isActive ? "Active" : "Inactive"}
+              {config.isActive ? t("servicePricing.overview.active") : t("servicePricing.overview.inactive")}
             </span>
           </div>
         </div>
       </div>
 
       <div className="spe__description">
-        <div className="spe__info-label">Description</div>
+        <div className="spe__info-label">{t("servicePricing.overview.description")}</div>
         <p>{config.description}</p>
       </div>
 
       {config.tags && config.tags.length > 0 && (
         <div className="spe__tags">
-          <div className="spe__info-label">Tags</div>
+          <div className="spe__info-label">{t("servicePricing.overview.tags")}</div>
           <div className="spe__tag-list">
             {config.tags.map((tag) => (
               <span key={tag} className="spe__tag">{tag}</span>
@@ -328,7 +331,7 @@ const OverviewTab: React.FC<{
       )}
 
       <div className="spe__config-summary">
-        <div className="spe__info-label">Configuration Summary</div>
+        <div className="spe__info-label">{t("servicePricing.overview.configurationSummary")}</div>
         <pre className="spe__json-preview">
           {JSON.stringify(editedConfig, null, 2)}
         </pre>
@@ -343,6 +346,7 @@ const FrequenciesTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ serviceId, editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
 
   const updateLinkedFields = (
     primaryPath: string[],
@@ -371,17 +375,17 @@ const FrequenciesTab: React.FC<{
         <div className="spe__table-container">
           {monthlyAndTwiceLinked && (
             <div className="spe__note" style={{ marginBottom: "16px" }}>
-              <FaLink /> Monthly and 2x Per Month are linked. Changing one will update the other.
+              <FaLink /> {t("servicePricing.frequencies.linkedNote")}
             </div>
           )}
 
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Rate Per Fixture</th>
-                <th>Minimum Charge</th>
-                <th>Visits Per Year</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.ratePerFixture")}</th>
+                <th>{t("servicePricing.frequencies.minimumCharge")}</th>
+                <th>{t("servicePricing.frequencies.visitsPerYear")}</th>
               </tr>
             </thead>
             <tbody>
@@ -402,7 +406,7 @@ const FrequenciesTab: React.FC<{
                 return (
                   <tr key={freq}>
                     <td className="spe__freq-label">
-                      {freq === "twicePerMonth" ? "2x Per Month" : freq.charAt(0).toUpperCase() + freq.slice(1)}
+                      {freq === "twicePerMonth" ? t("servicePricing.frequencies.twicePerMonth") : freq.charAt(0).toUpperCase() + freq.slice(1)}
                       {isLinkedToMonthly && monthlyAndTwiceLinked && (
                         <span style={{ marginLeft: "8px", fontSize: "12px", color: "#2563eb" }}>
                           <FaLink />
@@ -462,7 +466,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            <FaLightbulb /> Tip: In SaniScrub, monthly and 2x monthly typically share the same rate per fixture and minimum. The linked values ensure consistency.
+            <FaLightbulb /> {t("servicePricing.frequencies.saniscrubTip")}
           </div>
         </div>
       );
@@ -479,9 +483,9 @@ const FrequenciesTab: React.FC<{
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Multiplier</th>
-                <th>Visits Per Year</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.multiplier")}</th>
+                <th>{t("servicePricing.frequencies.visitsPerYear")}</th>
               </tr>
             </thead>
             <tbody>
@@ -519,7 +523,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__field-group">
-            <label className="spe__label">Quarterly First Time Multiplier</label>
+            <label className="spe__label">{t("servicePricing.frequencies.quarterlyFirstTimeMultiplier")}</label>
             <input
               type="number"
               className="spe__input"
@@ -544,9 +548,9 @@ const FrequenciesTab: React.FC<{
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Annual Multiplier</th>
-                <th>Monthly Multiplier</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.annualMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.monthlyMultiplier")}</th>
               </tr>
             </thead>
             <tbody>
@@ -602,8 +606,8 @@ const FrequenciesTab: React.FC<{
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Annual Visits</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.annualVisits")}</th>
               </tr>
             </thead>
             <tbody>
@@ -629,7 +633,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__field-group">
-            <label className="spe__label">Weeks Per Month</label>
+            <label className="spe__label">{t("servicePricing.frequencies.weeksPerMonth")}</label>
             <input
               type="number"
               className="spe__input"
@@ -641,7 +645,7 @@ const FrequenciesTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Weeks Per Year</label>
+            <label className="spe__label">{t("servicePricing.frequencies.weeksPerYear")}</label>
             <input
               type="number"
               className="spe__input"
@@ -663,9 +667,9 @@ const FrequenciesTab: React.FC<{
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Monthly Multiplier</th>
-                <th>Annual Multiplier</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.monthlyMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.annualMultiplier")}</th>
               </tr>
             </thead>
             <tbody>
@@ -710,7 +714,7 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__field-group">
-            <label className="spe__label">Actual Weeks Per Month</label>
+            <label className="spe__label">{t("servicePricing.frequencies.actualWeeksPerMonth")}</label>
             <input
               type="number"
               className="spe__input"
@@ -733,10 +737,10 @@ const FrequenciesTab: React.FC<{
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Monthly Multiplier</th>
-                <th>Annual Multiplier</th>
-                <th>Description</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.monthlyMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.annualMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.descriptionHeader")}</th>
               </tr>
             </thead>
             <tbody>
@@ -788,7 +792,7 @@ const FrequenciesTab: React.FC<{
                           e.target.value
                         )
                       }
-                      placeholder={`${freq} frequency description`}
+                      placeholder={t("servicePricing.frequencies.descriptionPlaceholder", { freq })}
                     />
                   </td>
                 </tr>
@@ -797,18 +801,18 @@ const FrequenciesTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            <FaLightbulb /> Tip: Monthly multipliers convert per-visit costs to monthly costs. Annual multipliers convert to yearly costs. For example, weekly service has a 4.33 monthly multiplier (4.33 weeks per month average).
+            <FaLightbulb /> {t("servicePricing.frequencies.refreshTip")}
           </div>
         </div>
       );
     }
 
-    return <div className="spe__empty">No frequency configuration for this service</div>;
+    return <div className="spe__empty">{t("servicePricing.frequencies.empty")}</div>;
   };
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Frequency-Based Pricing</h3>
+      <h3 className="spe__section-title">{t("servicePricing.frequencies.title")}</h3>
       {renderFrequencyConfig()}
     </div>
   );
@@ -819,20 +823,21 @@ const GeographicTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   const insideBeltway = getConfigValue(["geographicPricing", "insideBeltway"]) || {};
   const outsideBeltway = getConfigValue(["geographicPricing", "outsideBeltway"]) || {};
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Geographic Pricing</h3>
+      <h3 className="spe__section-title">{t("servicePricing.geographic.title")}</h3>
 
       <div className="spe__geo-grid">
         {}
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Inside Beltway</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.geographic.insideBeltway")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per Fixture</label>
+            <label className="spe__label">{t("servicePricing.geographic.ratePerFixture")}</label>
             <input
               type="number"
               className="spe__input"
@@ -849,7 +854,7 @@ const GeographicTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Weekly Minimum</label>
+            <label className="spe__label">{t("servicePricing.geographic.weeklyMinimum")}</label>
             <input
               type="number"
               className="spe__input"
@@ -866,7 +871,7 @@ const GeographicTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Trip Charge</label>
+            <label className="spe__label">{t("servicePricing.geographic.tripCharge")}</label>
             <input
               type="number"
               className="spe__input"
@@ -883,7 +888,7 @@ const GeographicTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Parking Fee</label>
+            <label className="spe__label">{t("servicePricing.geographic.parkingFee")}</label>
             <input
               type="number"
               className="spe__input"
@@ -902,10 +907,10 @@ const GeographicTab: React.FC<{
 
         {}
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Outside Beltway</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.geographic.outsideBeltway")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per Fixture</label>
+            <label className="spe__label">{t("servicePricing.geographic.ratePerFixture")}</label>
             <input
               type="number"
               className="spe__input"
@@ -922,7 +927,7 @@ const GeographicTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Weekly Minimum</label>
+            <label className="spe__label">{t("servicePricing.geographic.weeklyMinimum")}</label>
             <input
               type="number"
               className="spe__input"
@@ -939,7 +944,7 @@ const GeographicTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Trip Charge</label>
+            <label className="spe__label">{t("servicePricing.geographic.tripCharge")}</label>
             <input
               type="number"
               className="spe__input"
@@ -965,6 +970,7 @@ const RateTiersTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   const rateTiers = getConfigValue(["rateTiers"]) || getConfigValue(["rateCategories"]) || {};
   const pathPrefix = editedConfig.rateTiers ? "rateTiers" : "rateCategories";
 
@@ -973,15 +979,15 @@ const RateTiersTab: React.FC<{
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Rate Tiers (Red & Green)</h3>
+      <h3 className="spe__section-title">{t("servicePricing.rateTiers.title")}</h3>
 
       <div className="spe__geo-grid">
         {}
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Red Rate (Standard)</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.rateTiers.redRate")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Multiplier</label>
+            <label className="spe__label">{t("servicePricing.rateTiers.multiplier")}</label>
             <input
               type="number"
               className="spe__input"
@@ -995,7 +1001,7 @@ const RateTiersTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Commission Rate</label>
+            <label className="spe__label">{t("servicePricing.rateTiers.commissionRate")}</label>
             <input
               type="text"
               className="spe__input"
@@ -1003,17 +1009,17 @@ const RateTiersTab: React.FC<{
               onChange={(e) =>
                 updateConfig([pathPrefix, "redRate", "commissionRate"], e.target.value)
               }
-              placeholder="e.g., 20% or 0.2"
+              placeholder={t("servicePricing.rateTiers.redCommissionPlaceholder")}
             />
           </div>
         </div>
 
         {}
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Green Rate (Premium)</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.rateTiers.greenRate")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Multiplier</label>
+            <label className="spe__label">{t("servicePricing.rateTiers.multiplier")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1024,11 +1030,11 @@ const RateTiersTab: React.FC<{
               step="0.01"
               min="0"
             />
-            <div className="spe__hint">Typically 1.3 (30% higher than red)</div>
+            <div className="spe__hint">{t("servicePricing.rateTiers.greenMultiplierHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Commission Rate</label>
+            <label className="spe__label">{t("servicePricing.rateTiers.commissionRate")}</label>
             <input
               type="text"
               className="spe__input"
@@ -1036,7 +1042,7 @@ const RateTiersTab: React.FC<{
               onChange={(e) =>
                 updateConfig([pathPrefix, "greenRate", "commissionRate"], e.target.value)
               }
-              placeholder="e.g., 25% or 0.25"
+              placeholder={t("servicePricing.rateTiers.greenCommissionPlaceholder")}
             />
           </div>
         </div>
@@ -1051,19 +1057,20 @@ const MinimumsTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ serviceId, editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   if (serviceId === "saniclean") {
     const smallFacilityMinimum = getConfigValue(["smallFacilityMinimum"]) || {};
     const allInclusivePackage = getConfigValue(["allInclusivePackage"]) || {};
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Minimum Charges</h3>
+        <h3 className="spe__section-title">{t("servicePricing.minimums.title")}</h3>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Small Facility Minimum</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.minimums.smallFacilityMinimum")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Fixture Threshold</label>
+            <label className="spe__label">{t("servicePricing.minimums.fixtureThreshold")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1073,11 +1080,11 @@ const MinimumsTab: React.FC<{
               }
               min="0"
             />
-            <div className="spe__hint">Facilities with ≤ this many fixtures get minimum charge</div>
+            <div className="spe__hint">{t("servicePricing.minimums.fixtureThresholdHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Minimum Weekly Charge</label>
+            <label className="spe__label">{t("servicePricing.minimums.minimumWeeklyCharge")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1099,16 +1106,16 @@ const MinimumsTab: React.FC<{
                   updateConfig(["smallFacilityMinimum", "includesTripCharge"], e.target.checked)
                 }
               />
-              <span>Includes Trip Charge</span>
+              <span>{t("servicePricing.minimums.includesTripCharge")}</span>
             </label>
           </div>
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">All-Inclusive Package</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.minimums.allInclusivePackage")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Weekly Rate Per Fixture</label>
+            <label className="spe__label">{t("servicePricing.minimums.weeklyRatePerFixture")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1122,7 +1129,7 @@ const MinimumsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Auto All-Inclusive Min Fixtures</label>
+            <label className="spe__label">{t("servicePricing.minimums.autoAllInclusiveMinFixtures")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1143,7 +1150,7 @@ const MinimumsTab: React.FC<{
                   updateConfig(["allInclusivePackage", "includeAllAddOns"], e.target.checked)
                 }
               />
-              <span>Include All Add-Ons</span>
+              <span>{t("servicePricing.minimums.includeAllAddOns")}</span>
             </label>
           </div>
 
@@ -1156,7 +1163,7 @@ const MinimumsTab: React.FC<{
                   updateConfig(["allInclusivePackage", "waiveTripCharge"], e.target.checked)
                 }
               />
-              <span>Waive Trip Charge</span>
+              <span>{t("servicePricing.minimums.waiveTripCharge")}</span>
             </label>
           </div>
 
@@ -1169,7 +1176,7 @@ const MinimumsTab: React.FC<{
                   updateConfig(["allInclusivePackage", "waiveWarrantyFees"], e.target.checked)
                 }
               />
-              <span>Waive Warranty Fees</span>
+              <span>{t("servicePricing.minimums.waiveWarrantyFees")}</span>
             </label>
           </div>
         </div>
@@ -1182,13 +1189,13 @@ const MinimumsTab: React.FC<{
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Minimum Charges</h3>
+        <h3 className="spe__section-title">{t("servicePricing.minimums.title")}</h3>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Standalone Pricing</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.minimums.standalonePricing")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Standalone Minimum</label>
+            <label className="spe__label">{t("servicePricing.minimums.standaloneMinimum")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1210,7 +1217,7 @@ const MinimumsTab: React.FC<{
                   updateConfig(["standalonePricing", "includeTripCharge"], e.target.checked)
                 }
               />
-              <span>Include Trip Charge</span>
+              <span>{t("servicePricing.minimums.includeTripCharge")}</span>
             </label>
           </div>
         </div>
@@ -1220,8 +1227,8 @@ const MinimumsTab: React.FC<{
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Minimum Charges</h3>
-      <div className="spe__empty">No minimum configuration for this service</div>
+      <h3 className="spe__section-title">{t("servicePricing.minimums.title")}</h3>
+      <div className="spe__empty">{t("servicePricing.minimums.empty")}</div>
     </div>
   );
 };
@@ -1232,15 +1239,16 @@ const MultipliersTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ serviceId, editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   if (serviceId === "saniscrub" || serviceId === "carpetCleaning") {
     const installMultipliers = getConfigValue(["installMultipliers"]) || {};
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Install Multipliers</h3>
+        <h3 className="spe__section-title">{t("servicePricing.multipliers.installTitle")}</h3>
 
         <div className="spe__field-group">
-          <label className="spe__label">Dirty/First Time Multiplier</label>
+          <label className="spe__label">{t("servicePricing.multipliers.dirtyFirstTimeMultiplier")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1251,11 +1259,11 @@ const MultipliersTab: React.FC<{
             step="0.01"
             min="0"
           />
-          <div className="spe__hint">Typically 3x for dirty/first-time installations</div>
+          <div className="spe__hint">{t("servicePricing.multipliers.dirtyHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Clean Multiplier</label>
+          <label className="spe__label">{t("servicePricing.multipliers.cleanMultiplier")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1266,7 +1274,7 @@ const MultipliersTab: React.FC<{
             step="0.01"
             min="0"
           />
-          <div className="spe__hint">Typically 1x for clean installations</div>
+          <div className="spe__hint">{t("servicePricing.multipliers.cleanHint")}</div>
         </div>
       </div>
     );
@@ -1278,10 +1286,10 @@ const MultipliersTab: React.FC<{
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Install Multipliers</h3>
+        <h3 className="spe__section-title">{t("servicePricing.multipliers.installTitle")}</h3>
 
         <div className="spe__field-group">
-          <label className="spe__label">First Time Install Multiplier</label>
+          <label className="spe__label">{t("servicePricing.multipliers.firstTimeInstallMultiplier")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1292,11 +1300,11 @@ const MultipliersTab: React.FC<{
             step="0.01"
             min="0"
           />
-          <div className="spe__hint">Typically 3x for first-time installations</div>
+          <div className="spe__hint">{t("servicePricing.multipliers.firstTimeHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Clean Install Multiplier</label>
+          <label className="spe__label">{t("servicePricing.multipliers.cleanInstallMultiplier")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1307,7 +1315,7 @@ const MultipliersTab: React.FC<{
             step="0.01"
             min="0"
           />
-          <div className="spe__hint">Typically 1x for clean installations</div>
+          <div className="spe__hint">{t("servicePricing.multipliers.cleanHint")}</div>
         </div>
       </div>
     );
@@ -1319,16 +1327,16 @@ const MultipliersTab: React.FC<{
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Billing Conversion Multipliers</h3>
+        <h3 className="spe__section-title">{t("servicePricing.multipliers.billingConversionTitle")}</h3>
 
         <div className="spe__table-container">
           <table className="spe__table">
             <thead>
               <tr>
-                <th>Frequency</th>
-                <th>Monthly Multiplier</th>
-                <th>Annual Multiplier</th>
-                <th>Description</th>
+                <th>{t("servicePricing.frequencies.frequency")}</th>
+                <th>{t("servicePricing.frequencies.monthlyMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.annualMultiplier")}</th>
+                <th>{t("servicePricing.frequencies.descriptionHeader")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1358,10 +1366,10 @@ const MultipliersTab: React.FC<{
                       }
                     />
                     <div className="spe__hint">
-                      {freq === "weekly" ? "4.33 weeks/month" :
-                       freq === "biweekly" ? "26 visits ÷ 12 months" :
-                       freq === "monthly" ? "1 visit/month" :
-                       freq === "bimonthly" ? "0.5 visits/month" : "4 visits ÷ 12 months"}
+                      {freq === "weekly" ? t("servicePricing.multipliers.weeklyHint") :
+                       freq === "biweekly" ? t("servicePricing.multipliers.biweeklyHint") :
+                       freq === "monthly" ? t("servicePricing.multipliers.monthlyHint") :
+                       freq === "bimonthly" ? t("servicePricing.multipliers.bimonthlyHint") : t("servicePricing.multipliers.quarterlyHint")}
                     </div>
                   </td>
                   <td>
@@ -1396,7 +1404,7 @@ const MultipliersTab: React.FC<{
                           e.target.value
                         )
                       }
-                      placeholder={`${freq} billing conversion`}
+                      placeholder={t("servicePricing.multipliers.billingConversionPlaceholder", { freq })}
                     />
                   </td>
                 </tr>
@@ -1405,7 +1413,7 @@ const MultipliersTab: React.FC<{
           </table>
 
           <div className="spe__note" style={{ marginTop: "16px" }}>
-            <FaLightbulb /> These multipliers convert per-visit costs to monthly and annual billing amounts. They are used throughout the Refresh Power Scrub calculation engine.
+            <FaLightbulb /> {t("servicePricing.multipliers.refreshNote")}
           </div>
         </div>
       </div>
@@ -1414,8 +1422,8 @@ const MultipliersTab: React.FC<{
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Multipliers</h3>
-      <div className="spe__empty">No multiplier configuration for this service</div>
+      <h3 className="spe__section-title">{t("servicePricing.multipliers.title")}</h3>
+      <div className="spe__empty">{t("servicePricing.multipliers.empty")}</div>
     </div>
   );
 };
@@ -1425,6 +1433,7 @@ const ComponentsTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   const facilityComponents = getConfigValue(["facilityComponents"]) || {};
   const urinals = facilityComponents.urinals || {};
   const maleToilets = facilityComponents.maleToilets || {};
@@ -1435,13 +1444,13 @@ const ComponentsTab: React.FC<{
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Facility Components</h3>
+      <h3 className="spe__section-title">{t("servicePricing.components.title")}</h3>
 
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Urinals</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.components.urinals")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Urinal Screen</label>
+          <label className="spe__label">{t("servicePricing.components.urinalScreen")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1455,7 +1464,7 @@ const ComponentsTab: React.FC<{
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Urinal Mat</label>
+          <label className="spe__label">{t("servicePricing.components.urinalMat")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1470,10 +1479,10 @@ const ComponentsTab: React.FC<{
       </div>
 
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Male Toilets</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.components.maleToilets")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Toilet Clips</label>
+          <label className="spe__label">{t("servicePricing.components.toiletClips")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1487,7 +1496,7 @@ const ComponentsTab: React.FC<{
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Seat Cover Dispenser</label>
+          <label className="spe__label">{t("servicePricing.components.seatCoverDispenser")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1502,10 +1511,10 @@ const ComponentsTab: React.FC<{
       </div>
 
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Female Toilets</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.components.femaleToilets")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">SaniPod Service</label>
+          <label className="spe__label">{t("servicePricing.components.sanipodService")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1520,10 +1529,10 @@ const ComponentsTab: React.FC<{
       </div>
 
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Sinks</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.components.sinks")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Ratio Sink to Soap</label>
+          <label className="spe__label">{t("servicePricing.components.ratioSinkToSoap")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1537,7 +1546,7 @@ const ComponentsTab: React.FC<{
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Ratio Sink to Air Freshener</label>
+          <label className="spe__label">{t("servicePricing.components.ratioSinkToAirFreshener")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1552,10 +1561,10 @@ const ComponentsTab: React.FC<{
       </div>
 
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Soap Upgrades & Warranty</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.components.soapUpgradesWarranty")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Standard to Luxury Soap Upgrade</label>
+          <label className="spe__label">{t("servicePricing.components.standardToLuxury")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1569,7 +1578,7 @@ const ComponentsTab: React.FC<{
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Warranty Fee Per Dispenser</label>
+          <label className="spe__label">{t("servicePricing.components.warrantyFeePerDispenser")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1592,19 +1601,20 @@ const AddonsTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ serviceId, editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   if (serviceId === "saniclean") {
     const addOnServices = getConfigValue(["addOnServices"]) || {};
     const microfiberMopping = addOnServices.microfiberMopping || {};
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Add-On Services</h3>
+        <h3 className="spe__section-title">{t("servicePricing.addons.title")}</h3>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Microfiber Mopping</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.microfiberMopping")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Price Per Bathroom</label>
+            <label className="spe__label">{t("servicePricing.addons.pricePerBathroom")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1628,13 +1638,13 @@ const AddonsTab: React.FC<{
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Additional Pricing Options</h3>
+        <h3 className="spe__section-title">{t("servicePricing.addons.additionalPricingTitle")}</h3>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Trip Charges</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.tripCharges")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Inside Beltway</label>
+            <label className="spe__label">{t("servicePricing.addons.insideBeltway")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1648,7 +1658,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Outside Beltway</label>
+            <label className="spe__label">{t("servicePricing.addons.outsideBeltway")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1662,7 +1672,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Standard</label>
+            <label className="spe__label">{t("servicePricing.addons.standard")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1677,7 +1687,7 @@ const AddonsTab: React.FC<{
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Huge Bathroom Pricing</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.hugeBathroomPricing")}</h4>
 
           <div className="spe__field-group">
             <label className="spe__checkbox-label">
@@ -1688,12 +1698,12 @@ const AddonsTab: React.FC<{
                   updateConfig(["hugeBathroomPricing", "enabled"], e.target.checked)
                 }
               />
-              <span>Enable Huge Bathroom Pricing</span>
+              <span>{t("servicePricing.addons.enableHugeBathroom")}</span>
             </label>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per Sq Ft</label>
+            <label className="spe__label">{t("servicePricing.addons.ratePerSqFt")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1707,7 +1717,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Sq Ft Unit</label>
+            <label className="spe__label">{t("servicePricing.addons.sqFtUnit")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1717,15 +1727,15 @@ const AddonsTab: React.FC<{
               }
               min="0"
             />
-            <div className="spe__hint">Charge per this many square feet</div>
+            <div className="spe__hint">{t("servicePricing.addons.sqFtUnitHint")}</div>
           </div>
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Extra Area Pricing</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.extraAreaPricing")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Single Large Area Rate</label>
+            <label className="spe__label">{t("servicePricing.addons.singleLargeAreaRate")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1739,7 +1749,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Extra Area Sq Ft Unit</label>
+            <label className="spe__label">{t("servicePricing.addons.extraAreaSqFtUnit")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1752,7 +1762,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per Unit</label>
+            <label className="spe__label">{t("servicePricing.addons.ratePerUnit")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1774,13 +1784,13 @@ const AddonsTab: React.FC<{
 
     return (
       <div className="spe__tab-content">
-        <h3 className="spe__section-title">Pricing Rates & Trip Charges</h3>
+        <h3 className="spe__section-title">{t("servicePricing.addons.pricingRatesTripChargesTitle")}</h3>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Pricing Rates</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.pricingRates")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per Room</label>
+            <label className="spe__label">{t("servicePricing.addons.ratePerRoom")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1789,11 +1799,11 @@ const AddonsTab: React.FC<{
               step="0.01"
               min="0"
             />
-            <div className="spe__hint">Price per moderately sized room</div>
+            <div className="spe__hint">{t("servicePricing.addons.ratePerRoomHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Rate Per 1000 Sq Ft</label>
+            <label className="spe__label">{t("servicePricing.addons.ratePerThousandSqFt")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1802,11 +1812,11 @@ const AddonsTab: React.FC<{
               step="0.01"
               min="0"
             />
-            <div className="spe__hint">Price per 1000 square feet</div>
+            <div className="spe__hint">{t("servicePricing.addons.ratePerThousandSqFtHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Sq Ft Unit</label>
+            <label className="spe__label">{t("servicePricing.addons.sqFtUnit")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1814,15 +1824,15 @@ const AddonsTab: React.FC<{
               onChange={(e) => updateConfig(["sqFtUnit"], Number(e.target.value) || 0)}
               min="0"
             />
-            <div className="spe__hint">Square footage unit (typically 1000)</div>
+            <div className="spe__hint">{t("servicePricing.addons.sqFtUnitElectrostaticHint")}</div>
           </div>
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Trip Charges</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.tripCharges")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Inside Beltway</label>
+            <label className="spe__label">{t("servicePricing.addons.insideBeltway")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1836,7 +1846,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Outside Beltway</label>
+            <label className="spe__label">{t("servicePricing.addons.outsideBeltway")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1850,7 +1860,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Standard</label>
+            <label className="spe__label">{t("servicePricing.addons.standard")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1865,10 +1875,10 @@ const AddonsTab: React.FC<{
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Contract Settings</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.addons.contractSettings")}</h4>
 
           <div className="spe__field-group">
-            <label className="spe__label">Min Contract Months</label>
+            <label className="spe__label">{t("servicePricing.addons.minContractMonths")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1879,7 +1889,7 @@ const AddonsTab: React.FC<{
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Max Contract Months</label>
+            <label className="spe__label">{t("servicePricing.addons.maxContractMonths")}</label>
             <input
               type="number"
               className="spe__input"
@@ -1895,8 +1905,8 @@ const AddonsTab: React.FC<{
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Add-On Services</h3>
-      <div className="spe__empty">No add-on configuration for this service</div>
+      <h3 className="spe__section-title">{t("servicePricing.addons.title")}</h3>
+      <div className="spe__empty">{t("servicePricing.addons.empty")}</div>
     </div>
   );
 };
@@ -1906,20 +1916,21 @@ const RefreshPowerScrubTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ editedConfig, updateConfig, getConfigValue }) => {
+  const { t } = useTranslation();
   const coreRates = getConfigValue(["coreRates"]) || {};
   const areaSpecificPricing = getConfigValue(["areaSpecificPricing"]) || {};
   const squareFootagePricing = getConfigValue(["squareFootagePricing"]) || {};
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Core Rates & Area-Specific Pricing</h3>
+      <h3 className="spe__section-title">{t("servicePricing.refreshPowerScrub.title")}</h3>
 
       {}
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Core Rates</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.refreshPowerScrub.coreRates")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Default Hourly Rate</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.defaultHourlyRate")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1931,11 +1942,11 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="200"
           />
-          <div className="spe__hint">Base rate per hour per worker ($200)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.defaultHourlyRateHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Per Worker Rate</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.perWorkerRate")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1947,11 +1958,11 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="200"
           />
-          <div className="spe__hint">Rate per worker when pricing per worker ($200)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.perWorkerRateHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Per Hour Rate</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.perHourRate")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1963,11 +1974,11 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="400"
           />
-          <div className="spe__hint">Rate per hour when pricing per hour ($400)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.perHourRateHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Trip Charge</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.tripCharge")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1979,11 +1990,11 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="75"
           />
-          <div className="spe__hint">Trip charge per visit ($75)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.tripChargeHint")}</div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Minimum Visit</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.minimumVisit")}</label>
           <input
             type="number"
             className="spe__input"
@@ -1995,17 +2006,17 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="475"
           />
-          <div className="spe__hint">Minimum charge per visit ($475)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.minimumVisitHint")}</div>
         </div>
       </div>
 
       {}
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Area-Specific Pricing</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.refreshPowerScrub.areaSpecificPricing")}</h4>
 
         <div className="spe__field-row">
           <div className="spe__field-group">
-            <label className="spe__label">Kitchen - Small/Medium</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.kitchenSmallMedium")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2017,11 +2028,11 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="1500"
             />
-            <div className="spe__hint">Small/medium kitchen package ($1,500)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.kitchenSmallMediumHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Kitchen - Large</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.kitchenLarge")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2033,12 +2044,12 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="2500"
             />
-            <div className="spe__hint">Large kitchen package ($2,500)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.kitchenLargeHint")}</div>
           </div>
         </div>
 
         <div className="spe__field-group">
-          <label className="spe__label">Front of House Rate</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.frontOfHouseRate")}</label>
           <input
             type="number"
             className="spe__input"
@@ -2050,12 +2061,12 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="2500"
           />
-          <div className="spe__hint">Front of house package rate ($2,500)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.frontOfHouseRateHint")}</div>
         </div>
 
         <div className="spe__field-row">
           <div className="spe__field-group">
-            <label className="spe__label">Patio - Standalone</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.patioStandalone")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2067,11 +2078,11 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="800"
             />
-            <div className="spe__hint">Standalone patio service ($800)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.patioStandaloneHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Patio - Upsell/Add-on</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.patioUpsell")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2083,17 +2094,17 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="500"
             />
-            <div className="spe__hint">Patio add-on service ($500)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.patioUpsellHint")}</div>
           </div>
         </div>
       </div>
 
       {}
       <div className="spe__geo-section">
-        <h4 className="spe__subsection-title">Square Footage Pricing</h4>
+        <h4 className="spe__subsection-title">{t("servicePricing.refreshPowerScrub.squareFootagePricing")}</h4>
 
         <div className="spe__field-group">
-          <label className="spe__label">Fixed Fee</label>
+          <label className="spe__label">{t("servicePricing.refreshPowerScrub.fixedFee")}</label>
           <input
             type="number"
             className="spe__input"
@@ -2105,12 +2116,12 @@ const RefreshPowerScrubTab: React.FC<{
             min="0"
             placeholder="200"
           />
-          <div className="spe__hint">Base fixed fee for square footage pricing ($200)</div>
+          <div className="spe__hint">{t("servicePricing.refreshPowerScrub.fixedFeeHint")}</div>
         </div>
 
         <div className="spe__field-row">
           <div className="spe__field-group">
-            <label className="spe__label">Inside Rate (per sq ft)</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.insideRate")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2122,11 +2133,11 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="0.6"
             />
-            <div className="spe__hint">Rate per square foot inside ($0.60/sq ft)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.insideRateHint")}</div>
           </div>
 
           <div className="spe__field-group">
-            <label className="spe__label">Outside Rate (per sq ft)</label>
+            <label className="spe__label">{t("servicePricing.refreshPowerScrub.outsideRate")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2138,18 +2149,18 @@ const RefreshPowerScrubTab: React.FC<{
               min="0"
               placeholder="0.4"
             />
-            <div className="spe__hint">Rate per square foot outside ($0.40/sq ft)</div>
+            <div className="spe__hint">{t("servicePricing.refreshPowerScrub.outsideRateHint")}</div>
           </div>
         </div>
       </div>
 
       <div className="spe__note" style={{ marginTop: "24px" }}>
-        <FaLightbulb /> <strong>Refresh Power Scrub Pricing Rules:</strong>
-        <br />• <strong>Trip Charge:</strong> ${coreRates.tripCharge || 75} per visit
-        <br />• <strong>Hourly Rate:</strong> ${coreRates.defaultHourlyRate || 200}/hour/worker
-        <br />• <strong>Minimum:</strong> ${coreRates.minimumVisit || 475} per visit
-        <br />• <strong>Areas:</strong> Dumpster, Patio, Walkway, Front of House, Back of House, Other
-        <br />• <strong>Pricing Types:</strong> Preset packages, Per worker, Per hour, Square footage, Custom
+        <FaLightbulb /> <strong>{t("servicePricing.refreshPowerScrub.rulesTitle")}</strong>
+        <br />• <strong>{t("servicePricing.refreshPowerScrub.ruleTripCharge")}</strong> {t("servicePricing.refreshPowerScrub.ruleTripChargeValue", { value: coreRates.tripCharge || 75 })}
+        <br />• <strong>{t("servicePricing.refreshPowerScrub.ruleHourlyRate")}</strong> {t("servicePricing.refreshPowerScrub.ruleHourlyRateValue", { value: coreRates.defaultHourlyRate || 200 })}
+        <br />• <strong>{t("servicePricing.refreshPowerScrub.ruleMinimum")}</strong> {t("servicePricing.refreshPowerScrub.ruleMinimumValue", { value: coreRates.minimumVisit || 475 })}
+        <br />• <strong>{t("servicePricing.refreshPowerScrub.ruleAreas")}</strong> {t("servicePricing.refreshPowerScrub.ruleAreasValue")}
+        <br />• <strong>{t("servicePricing.refreshPowerScrub.rulePricingTypes")}</strong> {t("servicePricing.refreshPowerScrub.rulePricingTypesValue")}
       </div>
     </div>
   );
@@ -2159,6 +2170,7 @@ const AdvancedTab: React.FC<{
   editedConfig: Record<string, any>;
   updateConfig: (path: string[], value: any) => void;
 }> = ({ editedConfig, updateConfig }) => {
+  const { t } = useTranslation();
   const [jsonText, setJsonText] = useState(JSON.stringify(editedConfig, null, 2));
   const [jsonError, setJsonError] = useState<string | null>(null);
 
@@ -2181,16 +2193,16 @@ const AdvancedTab: React.FC<{
         }
       });
     } catch (err) {
-      setJsonError("Invalid JSON");
+      setJsonError(t("servicePricing.advanced.invalidJson"));
     }
   };
 
   return (
     <div className="spe__tab-content">
-      <h3 className="spe__section-title">Advanced JSON Editor</h3>
+      <h3 className="spe__section-title">{t("servicePricing.advanced.title")}</h3>
 
       <div className="spe__warning">
-        <FaExclamationTriangle /> Warning: Editing JSON directly can break the pricing calculator. Use the structured tabs above when possible.
+        <FaExclamationTriangle /> {t("servicePricing.advanced.warning")}
       </div>
 
       {jsonError && <div className="spe__error">{jsonError}</div>}
@@ -2222,6 +2234,7 @@ const JanitorialAdminTab: React.FC<{
   updateConfig: (path: string[], value: any) => void;
   getConfigValue: (path: string[]) => any;
 }> = ({ getConfigValue, updateConfig }) => {
+  const { t } = useTranslation();
 
   const num = (path: string[], fallback: number) => {
     const v = getConfigValue(path);
@@ -2232,22 +2245,21 @@ const JanitorialAdminTab: React.FC<{
     <div className="spe__tab-content">
 
       {}
-      <h3 className="spe__section-title">Production Rates (sq ft per hour)</h3>
+      <h3 className="spe__section-title">{t("servicePricing.janitorial.productionRatesTitle")}</h3>
       <p className="spe__hint" style={{ marginBottom: "16px" }}>
-        Sets how many square feet one worker cleans per hour for each place type.
-        Hours Per Visit = Square Feet ÷ Production Rate.
+        {t("servicePricing.janitorial.productionRatesDescription")}
       </p>
       <div className="spe__geo-grid">
         {[
-          { key: "office",        label: "Office",         default: 1000 },
-          { key: "home",          label: "Home",           default: 500  },
-          { key: "restaurant",    label: "Restaurant",     default: 750  },
-          { key: "businessPlace", label: "Business Place", default: 2000 },
+          { key: "office",        label: t("servicePricing.janitorial.office"),         default: 1000 },
+          { key: "home",          label: t("servicePricing.janitorial.home"),           default: 500  },
+          { key: "restaurant",    label: t("servicePricing.janitorial.restaurant"),     default: 750  },
+          { key: "businessPlace", label: t("servicePricing.janitorial.businessPlace"), default: 2000 },
         ].map(pt => (
           <div key={pt.key} className="spe__geo-section">
             <h4 className="spe__subsection-title">{pt.label}</h4>
             <div className="spe__field-group">
-              <label className="spe__label">sq ft / hr</label>
+              <label className="spe__label">{t("servicePricing.janitorial.sqFtPerHr")}</label>
               <input
                 type="number"
                 className="spe__input"
@@ -2256,22 +2268,22 @@ const JanitorialAdminTab: React.FC<{
                 min="1"
                 step="50"
               />
-              <div className="spe__hint">Default: {pt.default} sq ft/hr</div>
+              <div className="spe__hint">{t("servicePricing.janitorial.defaultSqFtHr", { value: pt.default })}</div>
             </div>
           </div>
         ))}
       </div>
 
       {}
-      <h3 className="spe__section-title" style={{ marginTop: "24px" }}>Labor Defaults</h3>
+      <h3 className="spe__section-title" style={{ marginTop: "24px" }}>{t("servicePricing.janitorial.laborDefaultsTitle")}</h3>
       <p className="spe__hint" style={{ marginBottom: "16px" }}>
-        These are the admin-configured baseline values. Salespeople can override them per quote.
+        {t("servicePricing.janitorial.laborDefaultsDescription")}
       </p>
       <div className="spe__geo-grid">
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Cost Per Labor Hour</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.janitorial.costPerLaborHour")}</h4>
           <div className="spe__field-group">
-            <label className="spe__label">$ / hr</label>
+            <label className="spe__label">{t("servicePricing.janitorial.perHr")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2280,14 +2292,14 @@ const JanitorialAdminTab: React.FC<{
               min="0"
               step="0.5"
             />
-            <div className="spe__hint">Default: $20/hr</div>
+            <div className="spe__hint">{t("servicePricing.janitorial.defaultPerHr")}</div>
           </div>
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Labor Tax %</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.janitorial.laborTaxPct")}</h4>
           <div className="spe__field-group">
-            <label className="spe__label">%</label>
+            <label className="spe__label">{t("servicePricing.janitorial.percent")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2297,14 +2309,14 @@ const JanitorialAdminTab: React.FC<{
               max="100"
               step="0.5"
             />
-            <div className="spe__hint">Default: 15%</div>
+            <div className="spe__hint">{t("servicePricing.janitorial.defaultLaborTax")}</div>
           </div>
         </div>
 
         <div className="spe__geo-section">
-          <h4 className="spe__subsection-title">Gross Profit %</h4>
+          <h4 className="spe__subsection-title">{t("servicePricing.janitorial.grossProfitPct")}</h4>
           <div className="spe__field-group">
-            <label className="spe__label">%</label>
+            <label className="spe__label">{t("servicePricing.janitorial.percent")}</label>
             <input
               type="number"
               className="spe__input"
@@ -2315,29 +2327,28 @@ const JanitorialAdminTab: React.FC<{
               step="0.5"
             />
             <div className="spe__hint">
-              Default: 33% — Contract Value = Total Cost ÷ (1 − Gross Profit%)
+              {t("servicePricing.janitorial.defaultGrossProfit")}
             </div>
           </div>
         </div>
       </div>
 
       {}
-      <h3 className="spe__section-title" style={{ marginTop: "24px" }}>Default Supply Line Items (Annual $)</h3>
+      <h3 className="spe__section-title" style={{ marginTop: "24px" }}>{t("servicePricing.janitorial.supplyDefaultsTitle")}</h3>
       <p className="spe__hint" style={{ marginBottom: "16px" }}>
-        These are the default annual supply costs pre-filled when creating a new quote.
-        Salespeople can edit them per quote.
+        {t("servicePricing.janitorial.supplyDefaultsDescription")}
       </p>
       <table className="spe__table">
         <thead>
           <tr>
-            <th>Supply Item</th>
-            <th>Default Annual Amount ($)</th>
+            <th>{t("servicePricing.janitorial.supplyItem")}</th>
+            <th>{t("servicePricing.janitorial.defaultAnnualAmount")}</th>
           </tr>
         </thead>
         <tbody>
           {JANITORIAL_SUPPLY_DEFAULTS.map(item => (
             <tr key={item.key}>
-              <td className="spe__freq-label">{item.label}</td>
+              <td className="spe__freq-label">{t(`servicePricing.janitorial.supplies.${item.key}`)}</td>
               <td>
                 <input
                   type="number"

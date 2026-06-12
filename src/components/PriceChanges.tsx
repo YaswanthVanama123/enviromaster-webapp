@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaStopwatch, FaPlus } from "react-icons/fa";
 import "./PriceChanges.css";
 
@@ -17,7 +18,14 @@ type PriceItem = {
 
 const CATEGORIES: Category[] = ["Small Product", "Dispenser", "Big Product"];
 
+const CATEGORY_LABEL_KEYS: Record<Category, string> = {
+  "Small Product": "misc.pcCatSmallProduct",
+  "Dispenser": "misc.pcCatDispenser",
+  "Big Product": "misc.pcCatBigProduct",
+};
+
 export default function PriceChanges() {
+  const { t } = useTranslation();
   const [data, setData] = useState<PriceItem[]>([
     { id: 1, service: "Restroom",       category: "Small Product", currentPrice: 20, newPrice: 22, effectiveFrom: "2024-05-01", frequency: "Weekly",  lastUpdated: "2024-05-01" },
     { id: 2, service: "Kitchen",        category: "Small Product", currentPrice: 15, newPrice: 15, effectiveFrom: "2024-05-01", frequency: "Weekly",  lastUpdated: "2024-05-01" },
@@ -27,7 +35,7 @@ export default function PriceChanges() {
   ]);
 
   const [alertMessage, setAlertMessage] = useState(
-    "Updated 2 min ago: Pavani changed Hand Sanitizer from $10 to $12 — updates visible for 24 hours."
+    t("misc.pcDefaultAlert")
   );
 
   const handleServiceChange = (id: number, value: string) =>
@@ -55,26 +63,26 @@ export default function PriceChanges() {
   };
 
   const saveChanges = () => {
-    setAlertMessage("Changes saved successfully (dummy action).");
+    setAlertMessage(t("misc.pcSavedAlert"));
   };
 
   return (
     <section className="pc">
-      <div className="pc__hero">Price Changes</div>
-      <div className="pc__breadcrumb">Admin Panel &gt; Price Changes</div>
+      <div className="pc__hero">{t("misc.pcTitle")}</div>
+      <div className="pc__breadcrumb">{t("misc.pcBreadcrumb")}</div>
       <div className="pc__alert">{alertMessage}</div>
 
       <div className="pc__tablewrap">
         <table className="pc__table">
           <thead>
             <tr>
-              <th>Service</th>
-              <th>Type</th>
-              <th>Current Price</th>
-              <th>New Price</th>
-              <th>Effective From</th>
-              <th>Frequency</th>
-              <th>Last Updated</th>
+              <th>{t("misc.pcThService")}</th>
+              <th>{t("misc.pcThType")}</th>
+              <th>{t("misc.pcThCurrentPrice")}</th>
+              <th>{t("misc.pcThNewPrice")}</th>
+              <th>{t("misc.pcThEffectiveFrom")}</th>
+              <th>{t("misc.pcThFrequency")}</th>
+              <th>{t("misc.pcThLastUpdated")}</th>
             </tr>
           </thead>
           <tbody>
@@ -85,7 +93,7 @@ export default function PriceChanges() {
                     type="text"
                     className="service-input"
                     value={item.service}
-                    placeholder="Enter service name"
+                    placeholder={t("misc.pcServicePlaceholder")}
                     onChange={e => handleServiceChange(item.id, e.target.value)}
                   />
                 </td>
@@ -96,7 +104,7 @@ export default function PriceChanges() {
                     onChange={e => handleCategoryChange(item.id, e.target.value as Category)}
                   >
                     {CATEGORIES.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>{t(CATEGORY_LABEL_KEYS[c])}</option>
                     ))}
                   </select>
                 </td>
@@ -120,10 +128,10 @@ export default function PriceChanges() {
 
       <div className="pc__footer">
         <button className="pc__btn pc__btn--light" onClick={addNewService}>
-          <FaPlus /> Add Service
+          <FaPlus /> {t("misc.pcAddService")}
         </button>
         <button className="pc__btn pc__btn--primary" onClick={saveChanges}>
-          Save Changes
+          {t("misc.pcSaveChanges")}
         </button>
       </div>
     </section>

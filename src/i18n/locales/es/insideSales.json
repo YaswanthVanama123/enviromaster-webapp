@@ -1,0 +1,52 @@
+{
+  "title": "Mi Estado de Ventas Internas",
+  "subtitle": "Vea su elegibilidad para Ventas Internas según sus acuerdos en el historial de auditoría de Lisa Rothwell",
+  "checking": "Comprobando...",
+  "notLoggedIn": "Usuario no ha iniciado sesión",
+  "checkFailed": "Error al comprobar la elegibilidad para ventas internas",
+  "checkError": "Error al comprobar la elegibilidad para ventas internas",
+  "loadingCard": "Comprobando su elegibilidad para Ventas Internas...",
+  "statusHasDeduction": "Ventas Internas (deducción del 3%)",
+  "statusNoDeduction": "Sin deducción por Ventas Internas",
+  "statusDetails": "{{total}} acuerdos en total | {{uploaded}} subidos a Bigin | {{matched}} encontrados en la auditoría",
+  "lastChecked": "Última comprobación: {{date}}",
+  "stats": {
+    "totalAgreements": "Total de acuerdos",
+    "uploadedToBigin": "Subidos a Bigin",
+    "foundInAudit": "Encontrados en la auditoría de Lisa"
+  },
+  "matchingRecords": {
+    "title": "Registros de auditoría coincidentes",
+    "subtitle": "Estos acuerdos se encontraron en el historial de auditoría de Lisa Rothwell (último año)",
+    "biginId": "ID de Bigin",
+    "recordName": "Nombre del registro",
+    "action": "Acción",
+    "module": "Módulo",
+    "timestamp": "Marca de tiempo"
+  },
+  "agreementsTable": {
+    "title": "Sus acuerdos ({{total}} en total, {{uploaded}} subidos a Bigin)",
+    "subtitle": "Lista de sus acuerdos y su estado de subida a Bigin",
+    "agreementTitle": "Título del acuerdo",
+    "biginDealId": "ID de negocio de Bigin",
+    "dealName": "Nombre del negocio",
+    "createdAt": "Creado el",
+    "status": "Estado",
+    "notUploaded": "No subido",
+    "badgeNotUploaded": "No subido",
+    "badgeFoundInAudit": "Encontrado en la auditoría",
+    "badgeNotInAudit": "No está en la auditoría",
+    "empty": "No se encontraron acuerdos. Cree acuerdos y súbalos a Bigin para realizar el seguimiento de su elegibilidad para Ventas Internas."
+  },
+  "info": {
+    "title": "Cómo funcionan las Ventas Internas",
+    "item1": "Cuando crea y sube acuerdos a Bigin, estos obtienen un ID de negocio de Bigin",
+    "item2": "Lisa Rothwell procesa estos negocios, creando registros de auditoría",
+    "item3Prefix": "Si alguno de los ID de Bigin de su acuerdo aparece en el historial de auditoría de Lisa durante el último año, se le clasifica como ",
+    "item3Bold": "Ventas Internas",
+    "item4": "Ventas Internas = deducción del 3%",
+    "item4Suffix": " de su comisión",
+    "item5Bold": "Sin coincidencias = sin deducción",
+    "item5Suffix": " - usted conserva su comisión completa"
+  }
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { pdfApi } from '../backendservice/api/pdfApi';
 import './AdminCommissions.css';
 
@@ -93,13 +94,13 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: '#dcfce7', text: '#16a34a' },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Draft',
-  saved: 'Saved',
-  pending_approval: 'Pending',
-  approved_salesman: 'Approved',
-  approved_admin: 'Admin Approved',
-  active: 'Active',
+const STATUS_I18N_KEYS: Record<string, string> = {
+  draft: 'draft',
+  saved: 'saved',
+  pending_approval: 'pending',
+  approved_salesman: 'approved',
+  approved_admin: 'adminApproved',
+  active: 'active',
 };
 
 type TimeFilterType = 'all' | 'thisWeek' | 'last14Days' | 'thisMonth' | 'thisQuarter' | 'thisYear' | 'dateRange';
@@ -200,6 +201,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function AdminCommissions() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [employeesData, setEmployeesData] = useState<EmployeesResponse | null>(null);
@@ -226,7 +228,7 @@ export default function AdminCommissions() {
       const response = await pdfApi.getAllEmployeesCommissions(dateRange);
       setEmployeesData(response);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch employees commissions');
+      setError(err.message || t('adminCommissions.fetchEmployeesError'));
     } finally {
       setLoading(false);
     }
@@ -243,7 +245,7 @@ export default function AdminCommissions() {
       setStatusFilter('all');
       setExpandedId(null);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch employee commissions');
+      setError(err.message || t('adminCommissions.fetchEmployeeError'));
     } finally {
       setEmployeeLoading(false);
     }
@@ -283,7 +285,7 @@ export default function AdminCommissions() {
       <div className="admin-commissions">
         <div className="admin-commissions__loading">
           <div className="admin-commissions__spinner" />
-          <p>Loading employee commissions...</p>
+          <p>{t('adminCommissions.loading')}</p>
         </div>
       </div>
     );
@@ -293,10 +295,10 @@ export default function AdminCommissions() {
     return (
       <div className="admin-commissions">
         <div className="admin-commissions__error">
-          <h2>Error</h2>
+          <h2>{t('adminCommissions.error')}</h2>
           <p>{error}</p>
           <button onClick={fetchEmployees} className="admin-commissions__retry-btn">
-            Retry
+            {t('adminCommissions.retry')}
           </button>
         </div>
       </div>
@@ -309,7 +311,7 @@ export default function AdminCommissions() {
         <div className="admin-commissions">
           <div className="admin-commissions__loading">
             <div className="admin-commissions__spinner" />
-            <p>Loading commissions for {selectedEmployee}...</p>
+            <p>{t('adminCommissions.loadingEmployee', { employee: selectedEmployee })}</p>
           </div>
         </div>
       );
@@ -319,10 +321,10 @@ export default function AdminCommissions() {
       return (
         <div className="admin-commissions">
           <div className="admin-commissions__error">
-            <h2>Error</h2>
+            <h2>{t('adminCommissions.error')}</h2>
             <p>{error}</p>
             <button onClick={goBackToEmployees} className="admin-commissions__back-btn">
-              ← Back to Employees
+              {t('adminCommissions.backToEmployees')}
             </button>
           </div>
         </div>
@@ -333,9 +335,9 @@ export default function AdminCommissions() {
       return (
         <div className="admin-commissions">
           <div className="admin-commissions__empty">
-            <p>No commission data found for this employee.</p>
+            <p>{t('adminCommissions.noEmployeeData')}</p>
             <button onClick={goBackToEmployees} className="admin-commissions__back-btn">
-              ← Back to Employees
+              {t('adminCommissions.backToEmployees')}
             </button>
           </div>
         </div>
@@ -362,12 +364,12 @@ export default function AdminCommissions() {
       <div className="admin-commissions">
         <header className="admin-commissions__header">
           <button onClick={goBackToEmployees} className="admin-commissions__back-btn">
-            ← Back to Employees
+            {t('adminCommissions.backToEmployees')}
           </button>
           <div className="admin-commissions__title-row">
             <h1>
               <span className="admin-commissions__employee-icon">{selectedEmployee.charAt(0).toUpperCase()}</span>
-              {selectedEmployee}'s Commissions
+              {t('adminCommissions.employeeCommissionsTitle', { employee: selectedEmployee })}
             </h1>
           </div>
         </header>
@@ -377,7 +379,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card admin-commissions__summary-card--primary">
             <div className="admin-commissions__summary-icon">$</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Total Contract Commission</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.totalContractCommission')}</span>
               <span className="admin-commissions__summary-value">
                 {formatMoney(totals.totalContractCommission)}
               </span>
@@ -387,7 +389,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card">
             <div className="admin-commissions__summary-icon">M</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Monthly Commission</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.monthlyCommission')}</span>
               <span className="admin-commissions__summary-value">
                 {formatMoney(totals.totalMonthlyCommission)}
               </span>
@@ -397,7 +399,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card">
             <div className="admin-commissions__summary-icon">#</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Total Agreements</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.totalAgreements')}</span>
               <span className="admin-commissions__summary-value">
                 {totals.totalAgreements}
               </span>
@@ -407,7 +409,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card">
             <div className="admin-commissions__summary-icon">%</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Avg Commission Rate</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.avgCommissionRate')}</span>
               <span className="admin-commissions__summary-value">
                 {Number(totals.averageCommissionRate).toFixed(2)}%
               </span>
@@ -417,13 +419,13 @@ export default function AdminCommissions() {
 
         {/* Status Filter */}
         <div className="admin-commissions__status-breakdown">
-          <h3>Filter by Status</h3>
+          <h3>{t('adminCommissions.status.title')}</h3>
           <div className="admin-commissions__status-chips">
             <button
               className={`admin-commissions__status-chip ${statusFilter === 'all' ? 'active' : ''}`}
               onClick={() => setStatusFilter('all')}
             >
-              All ({totals.totalAgreements})
+              {t('adminCommissions.status.all', { count: totals.totalAgreements })}
             </button>
             {Object.entries(byStatus).map(([key, value]) => (
               value.count > 0 && (
@@ -432,7 +434,7 @@ export default function AdminCommissions() {
                   className={`admin-commissions__status-chip ${statusFilter === key ? 'active' : ''}`}
                   onClick={() => setStatusFilter(key)}
                 >
-                  {key.charAt(0).toUpperCase() + key.slice(1)} ({value.count})
+                  {t(`adminCommissions.status.${key}`)} ({value.count})
                   <span className="admin-commissions__chip-amount">
                     {formatMoney(value.commission)}
                   </span>
@@ -444,11 +446,11 @@ export default function AdminCommissions() {
 
         {/* Agreements List */}
         <div className="admin-commissions__list">
-          <h3>Agreements ({filteredCommissions.length})</h3>
+          <h3>{t('adminCommissions.agreements', { count: filteredCommissions.length })}</h3>
 
           {filteredCommissions.length === 0 ? (
             <div className="admin-commissions__no-results">
-              <p>No agreements found for this filter.</p>
+              <p>{t('adminCommissions.noResults')}</p>
             </div>
           ) : (
             <div className="admin-commissions__agreements">
@@ -475,10 +477,10 @@ export default function AdminCommissions() {
                               color: statusStyle.text
                             }}
                           >
-                            {STATUS_LABELS[agreement.status] || agreement.status}
+                            {STATUS_I18N_KEYS[agreement.status] ? t(`adminCommissions.status.${STATUS_I18N_KEYS[agreement.status]}`) : agreement.status}
                           </span>
                           <span className="admin-commissions__meta-sep">·</span>
-                          <span>{agreement.contractMonths} months</span>
+                          <span>{t('adminCommissions.months', { count: agreement.contractMonths })}</span>
                           <span className="admin-commissions__meta-sep">·</span>
                           <span>{formatDate(agreement.createdAt)}</span>
                         </div>
@@ -486,13 +488,13 @@ export default function AdminCommissions() {
 
                       <div className="admin-commissions__agreement-amounts">
                         <div className="admin-commissions__amount-item">
-                          <span className="admin-commissions__amount-label">Contract Value</span>
+                          <span className="admin-commissions__amount-label">{t('adminCommissions.contractValue')}</span>
                           <span className="admin-commissions__amount-value">
                             {formatMoney(agreement.contractValue)}
                           </span>
                         </div>
                         <div className="admin-commissions__amount-item admin-commissions__amount-item--commission">
-                          <span className="admin-commissions__amount-label">Commission</span>
+                          <span className="admin-commissions__amount-label">{t('adminCommissions.commission')}</span>
                           <span className="admin-commissions__amount-value">
                             {formatMoney(agreement.commission.total)}
                           </span>
@@ -510,48 +512,48 @@ export default function AdminCommissions() {
                     {isExpanded && (
                       <div className="admin-commissions__agreement-details">
                         <div className="admin-commissions__breakdown">
-                          <h5>Commission Breakdown</h5>
+                          <h5>{t('adminCommissions.breakdown.title')}</h5>
                           <div className="admin-commissions__breakdown-grid">
                             <div className="admin-commissions__breakdown-item">
-                              <span>Monthly Value</span>
+                              <span>{t('adminCommissions.breakdown.monthlyValue')}</span>
                               <span>{formatMoney(agreement.monthlyValue)}</span>
                             </div>
                             <div className="admin-commissions__breakdown-item">
-                              <span>Base Rate ({agreement.commission.breakdown.agreementTerm})</span>
+                              <span>{t('adminCommissions.breakdown.baseRate', { term: agreement.commission.breakdown.agreementTerm })}</span>
                               <span>{agreement.commission.breakdown.baseRate}%</span>
                             </div>
                             <div className="admin-commissions__breakdown-item">
-                              <span>Agreement Multiplier</span>
+                              <span>{t('adminCommissions.breakdown.multiplier')}</span>
                               <span>{agreement.commission.breakdown.multiplier}%</span>
                             </div>
                             {agreement.commission.breakdown.accountTypeAdjustment !== 0 && (
                               <div className="admin-commissions__breakdown-item">
-                                <span>Account Type Adjustment</span>
+                                <span>{t('adminCommissions.breakdown.accountTypeAdjustment')}</span>
                                 <span>{agreement.commission.breakdown.accountTypeAdjustment > 0 ? '+' : ''}{agreement.commission.breakdown.accountTypeAdjustment}%</span>
                               </div>
                             )}
                             {agreement.commission.breakdown.greenlineBonus > 0 && (
                               <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--bonus">
-                                <span>Greenline Bonus</span>
+                                <span>{t('adminCommissions.breakdown.greenlineBonus')}</span>
                                 <span>+{agreement.commission.breakdown.greenlineBonus}%</span>
                               </div>
                             )}
                             {agreement.commission.breakdown.insideSalesDeduction !== 0 && (
                               <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--deduction">
-                                <span>Inside Sales Deduction</span>
+                                <span>{t('adminCommissions.breakdown.insideSalesDeduction')}</span>
                                 <span>{agreement.commission.breakdown.insideSalesDeduction}%</span>
                               </div>
                             )}
                             <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--total">
-                              <span>Final Rate</span>
+                              <span>{t('adminCommissions.breakdown.finalRate')}</span>
                               <span>{Number(agreement.commission.rate).toFixed(2)}%</span>
                             </div>
                             <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--total">
-                              <span>Monthly Commission</span>
+                              <span>{t('adminCommissions.breakdown.monthlyCommission')}</span>
                               <span>{formatMoney(agreement.commission.monthly)}</span>
                             </div>
                             <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--total">
-                              <span>Total Contract Commission</span>
+                              <span>{t('adminCommissions.breakdown.totalContractCommission')}</span>
                               <span>{formatMoney(agreement.commission.total)}</span>
                             </div>
                           </div>
@@ -573,11 +575,11 @@ export default function AdminCommissions() {
     <div className="admin-commissions">
       <header className="admin-commissions__header">
         <div className="admin-commissions__title-row">
-          <h1>Employee Commissions</h1>
-          <span className="admin-commissions__admin-badge">Admin View</span>
+          <h1>{t('adminCommissions.title')}</h1>
+          <span className="admin-commissions__admin-badge">{t('adminCommissions.adminBadge')}</span>
         </div>
         <p className="admin-commissions__subtitle">
-          View commission earnings for all employees
+          {t('adminCommissions.subtitle')}
         </p>
       </header>
 
@@ -598,7 +600,7 @@ export default function AdminCommissions() {
                 }
               }}
             >
-              {TIME_FILTER_LABELS[filter]}
+              {t(`adminCommissions.timeFilter.${filter}`)}
             </button>
           ))}
         </div>
@@ -607,7 +609,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__date-picker">
             <div className="admin-commissions__date-inputs">
               <div className="admin-commissions__date-field">
-                <label>Start Date</label>
+                <label>{t('adminCommissions.datePicker.startDate')}</label>
                 <input
                   type="date"
                   value={customDateStart}
@@ -616,7 +618,7 @@ export default function AdminCommissions() {
                 />
               </div>
               <div className="admin-commissions__date-field">
-                <label>End Date</label>
+                <label>{t('adminCommissions.datePicker.endDate')}</label>
                 <input
                   type="date"
                   value={customDateEnd}
@@ -627,7 +629,7 @@ export default function AdminCommissions() {
             </div>
             {customDateStart && customDateEnd && (
               <div className="admin-commissions__date-range-label">
-                Showing data from {formatDate(customDateStart)} to {formatDate(customDateEnd)}
+                {t('adminCommissions.datePicker.rangeLabel', { start: formatDate(customDateStart), end: formatDate(customDateEnd) })}
               </div>
             )}
           </div>
@@ -640,7 +642,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card admin-commissions__summary-card--primary">
             <div className="admin-commissions__summary-icon">$</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Total Commission</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.totalCommission')}</span>
               <span className="admin-commissions__summary-value">
                 {formatMoney(employeesData.employees?.reduce((sum, e) => sum + (e.totalCommission || 0), 0) || 0)}
               </span>
@@ -650,7 +652,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card">
             <div className="admin-commissions__summary-icon">E</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Total Employees</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.totalEmployees')}</span>
               <span className="admin-commissions__summary-value">
                 {employeesData.totalEmployees || employeesData.employees?.length || 0}
               </span>
@@ -660,7 +662,7 @@ export default function AdminCommissions() {
           <div className="admin-commissions__summary-card">
             <div className="admin-commissions__summary-icon">#</div>
             <div className="admin-commissions__summary-content">
-              <span className="admin-commissions__summary-label">Total Agreements</span>
+              <span className="admin-commissions__summary-label">{t('adminCommissions.summary.totalAgreements')}</span>
               <span className="admin-commissions__summary-value">
                 {employeesData.employees?.reduce((sum, e) => sum + (e.totalAgreements || 0), 0) || 0}
               </span>
@@ -673,7 +675,7 @@ export default function AdminCommissions() {
       <div className="admin-commissions__search-section">
         <input
           type="text"
-          placeholder="Search employees..."
+          placeholder={t('adminCommissions.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="admin-commissions__search-input"
@@ -682,11 +684,11 @@ export default function AdminCommissions() {
 
       {/* Employee List */}
       <div className="admin-commissions__employees-section">
-        <h3>Employees ({filteredEmployees.length})</h3>
+        <h3>{t('adminCommissions.employees', { count: filteredEmployees.length })}</h3>
 
         {filteredEmployees.length === 0 ? (
           <div className="admin-commissions__no-results">
-            <p>No employees found.</p>
+            <p>{t('adminCommissions.noEmployees')}</p>
           </div>
         ) : (
           <div className="admin-commissions__employees-grid">
@@ -705,9 +707,9 @@ export default function AdminCommissions() {
                     {(employee.userId || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div className="admin-commissions__employee-info">
-                    <h4 className="admin-commissions__employee-name">{employee.userId || 'Unknown'}</h4>
+                    <h4 className="admin-commissions__employee-name">{employee.userId || t('adminCommissions.unknownEmployee')}</h4>
                     <span className="admin-commissions__employee-agreements">
-                      {employee.totalAgreements || 0} agreement{(employee.totalAgreements || 0) !== 1 ? 's' : ''}
+                      {t('adminCommissions.employeeAgreements', { count: employee.totalAgreements || 0 })}
                     </span>
                   </div>
                   <div className="admin-commissions__employee-arrow">→</div>
@@ -715,7 +717,7 @@ export default function AdminCommissions() {
 
                 <div className="admin-commissions__employee-stats">
                   <div className="admin-commissions__employee-stat">
-                    <span className="admin-commissions__stat-label">Commission</span>
+                    <span className="admin-commissions__stat-label">{t('adminCommissions.commission')}</span>
                     <span className="admin-commissions__stat-value admin-commissions__stat-value--commission">
                       {formatMoney(employee.totalCommission || 0)}
                     </span>
@@ -725,27 +727,27 @@ export default function AdminCommissions() {
                 <div className="admin-commissions__employee-status-row">
                   {employee.statusCounts?.draft > 0 && (
                     <span className="admin-commissions__mini-badge admin-commissions__mini-badge--draft">
-                      {employee.statusCounts.draft} Draft
+                      {t('adminCommissions.miniBadge.draft', { count: employee.statusCounts.draft })}
                     </span>
                   )}
                   {employee.statusCounts?.saved > 0 && (
                     <span className="admin-commissions__mini-badge admin-commissions__mini-badge--saved">
-                      {employee.statusCounts.saved} Saved
+                      {t('adminCommissions.miniBadge.saved', { count: employee.statusCounts.saved })}
                     </span>
                   )}
                   {employee.statusCounts?.pending_approval > 0 && (
                     <span className="admin-commissions__mini-badge admin-commissions__mini-badge--pending">
-                      {employee.statusCounts.pending_approval} Pending
+                      {t('adminCommissions.miniBadge.pending', { count: employee.statusCounts.pending_approval })}
                     </span>
                   )}
                   {employee.statusCounts?.approved > 0 && (
                     <span className="admin-commissions__mini-badge admin-commissions__mini-badge--approved">
-                      {employee.statusCounts.approved} Approved
+                      {t('adminCommissions.miniBadge.approved', { count: employee.statusCounts.approved })}
                     </span>
                   )}
                   {employee.statusCounts?.active > 0 && (
                     <span className="admin-commissions__mini-badge admin-commissions__mini-badge--active">
-                      {employee.statusCounts.active} Active
+                      {t('adminCommissions.miniBadge.active', { count: employee.statusCounts.active })}
                     </span>
                   )}
                 </div>

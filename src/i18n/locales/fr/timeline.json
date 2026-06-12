@@ -1,0 +1,21 @@
+{
+  "status": {
+    "yetToStart": "À commencer",
+    "inactive": "Inactif",
+    "expiringSoon": "Expire bientôt",
+    "renewalDue": "Renouvellement à prévoir",
+    "active": "Actif"
+  },
+  "days": {
+    "startsIn_one": "Commence dans {{count}} jour",
+    "startsIn_other": "Commence dans {{count}} jours",
+    "inactiveFor_one": "Inactif {{count}} jour",
+    "inactiveFor_other": "Inactif {{count}} jours",
+    "left_one": "{{count}} jour restant",
+    "left_other": "{{count}} jours restants"
+  },
+  "changeStartDate": "Modifier la date de début",
+  "startDateLabel": "Date de début :",
+  "start": "Début : {{date}}",
+  "expires": "Expire : {{date}}"
+}

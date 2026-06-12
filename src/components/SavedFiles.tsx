@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useRef, lazy, Suspense } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi } from "../backendservice/api";
 import type { SavedFileListItem, SavedFileDetails, SavedFileGroup } from "../backendservice/api/pdfApi";
 import { Toast } from "./admin/Toast";
@@ -48,6 +49,7 @@ const STATUS_LABEL: Record<FileStatus, string> = {
 };
 
 export default function SavedFiles() {
+  const { t } = useTranslation();
   const [groups, setGroups] = useState<SavedFileGroup[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
@@ -123,7 +125,7 @@ export default function SavedFiles() {
       setSelectedFiles({});
     } catch (err) {
       console.error("Error fetching grouped saved files:", err);
-      setError("Unable to load files. Please try again.");
+      setError(t("savedFiles.toast.loadError"));
       setGroups([]);
       setTotalGroups(0);
       setTotalFiles(0);
@@ -271,7 +273,7 @@ export default function SavedFiles() {
       setSelectedFiles({});
 
       setToastMessage({
-        message: `Successfully sent ${ids.length} document${ids.length > 1 ? 's' : ''} for approval!`,
+        message: t("savedFiles.toast.sentForApproval", { count: ids.length }),
         type: "success"
       });
 
@@ -279,7 +281,7 @@ export default function SavedFiles() {
     } catch (err) {
       console.error("Error sending for approval:", err);
       setToastMessage({
-        message: "Failed to update some documents. Please try again.",
+        message: t("savedFiles.toast.approvalUpdateFailed"),
         type: "error"
       });
     } finally {
@@ -302,7 +304,7 @@ export default function SavedFiles() {
     } catch (err) {
       console.error("Error loading file details for view:", err);
       setToastMessage({
-        message: "Unable to load this document. Please try again.",
+        message: t("savedFiles.toast.viewError"),
         type: "error"
       });
     }
@@ -326,7 +328,7 @@ export default function SavedFiles() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading file:", err);
-      setToastMessage({ message: "Unable to download this PDF. Please try again.", type: "error" });
+      setToastMessage({ message: t("savedFiles.toast.downloadError"), type: "error" });
     } finally {
       setDownloadingId(null);
     }
@@ -337,12 +339,12 @@ export default function SavedFiles() {
       setSavingStatusId(id);
 
       await pdfApi.updateDocumentStatus(id, status);
-      setToastMessage({ message: "Status updated successfully!", type: "success" });
+      setToastMessage({ message: t("savedFiles.toast.statusUpdated"), type: "success" });
 
       fetchGroups(currentPage, query);
     } catch (err) {
       console.error("Error updating status:", err);
-      setToastMessage({ message: "Unable to update status. Please try again.", type: "error" });
+      setToastMessage({ message: t("savedFiles.toast.statusUpdateError"), type: "error" });
     } finally {
       setSavingStatusId(null);
     }
@@ -356,7 +358,7 @@ export default function SavedFiles() {
   const handleZohoUpload = (file: SavedFileListItem) => {
     if (!file.hasPdf) {
       setToastMessage({
-        message: "This document doesn't have a PDF to upload. Please generate the PDF first.",
+        message: t("savedFiles.toast.noPdfToUpload"),
         type: "error"
       });
       return;
@@ -373,7 +375,7 @@ export default function SavedFiles() {
     fetchGroups(currentPage, query);
 
     setToastMessage({
-      message: "Successfully uploaded to Bigin!",
+      message: t("savedFiles.toast.uploadedToBigin"),
       type: "success"
     });
   };
@@ -394,7 +396,7 @@ export default function SavedFiles() {
       });
 
       setToastMessage({
-        message: "Email sent successfully with PDF attachment!",
+        message: t("savedFiles.toast.emailSent"),
         type: "success"
       });
 
@@ -429,7 +431,7 @@ export default function SavedFiles() {
 
       if (!parentGroup) {
         setToastMessage({
-          message: "Cannot find agreement for this file.",
+          message: t("savedFiles.toast.cannotFindAgreement"),
           type: "error"
         });
         return;
@@ -450,7 +452,7 @@ export default function SavedFiles() {
     } catch (err) {
       console.error("Error loading file details for edit:", err);
       setToastMessage({
-        message: "Unable to load this document for editing. Please try again.",
+        message: t("savedFiles.toast.editError"),
         type: "error"
       });
     }
@@ -494,11 +496,11 @@ export default function SavedFiles() {
     });
 
     return [
-      { label: 'Draft', count: counts.draft, color: '#6b7280', icon: faFileAlt },
-      { label: 'Saved', count: counts.saved, color: '#3b82f6', icon: faCheckCircle },
-      { label: 'Pending Approval', count: counts.pending_approval, color: '#f59e0b', icon: faClock },
-      { label: 'Approved by Salesman', count: counts.approved_salesman, color: '#3b82f6', icon: faCheckCircle },
-      { label: 'Approved by Admin', count: counts.approved_admin, color: '#10b981', icon: faCheckCircle }
+      { label: t('savedFiles.stats.draft'), count: counts.draft, color: '#6b7280', icon: faFileAlt },
+      { label: t('savedFiles.stats.saved'), count: counts.saved, color: '#3b82f6', icon: faCheckCircle },
+      { label: t('savedFiles.stats.pendingApproval'), count: counts.pending_approval, color: '#f59e0b', icon: faClock },
+      { label: t('savedFiles.stats.approvedSalesman'), count: counts.approved_salesman, color: '#3b82f6', icon: faCheckCircle },
+      { label: t('savedFiles.stats.approvedAdmin'), count: counts.approved_admin, color: '#10b981', icon: faCheckCircle }
     ];
   }, [sorted]);
 
@@ -543,7 +545,7 @@ export default function SavedFiles() {
         <div className="sf__search">
           <input
             type="text"
-            placeholder="Search files..."
+            placeholder={t("savedFiles.searchFiles")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -563,7 +565,7 @@ export default function SavedFiles() {
             }}
             style={sortBy === "date" ? { backgroundColor: "#3b82f6", color: "white" } : {}}
           >
-            Sort by Date {sortBy === "date" && (sortDir === "desc" ? "↓" : "↑")}
+            {t("savedFiles.sortByDate")} {sortBy === "date" && (sortDir === "desc" ? "↓" : "↑")}
           </button>
 
           <button
@@ -579,7 +581,7 @@ export default function SavedFiles() {
             }}
             style={sortBy === "status" ? { backgroundColor: "#3b82f6", color: "white" } : {}}
           >
-            Sort by Status {sortBy === "status" && (sortDir === "asc" ? "↑" : "↓")}
+            {t("savedFiles.sortByStatus")} {sortBy === "status" && (sortDir === "asc" ? "↑" : "↓")}
           </button>
 
           <button
@@ -588,7 +590,7 @@ export default function SavedFiles() {
             disabled={!anySelected}
             onClick={sendForApproval}
           >
-            Send for Approval
+            {t("savedFiles.sendForApproval")}
           </button>
         </div>
       </div>
@@ -604,10 +606,10 @@ export default function SavedFiles() {
                   onChange={toggleSelectAll}
                 />
               </th>
-              <th>File Name</th>
-              <th>Updated</th>
-              <th className="w-220">Status</th>
-              <th className="w-220">Actions</th>
+              <th>{t("savedFiles.table.fileName")}</th>
+              <th>{t("savedFiles.table.updated")}</th>
+              <th className="w-220">{t("savedFiles.table.status")}</th>
+              <th className="w-220">{t("savedFiles.table.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -668,16 +670,16 @@ export default function SavedFiles() {
                         )
                       }
                     >
-                      <option value="saved">Saved</option>
-                      <option value="draft">Draft</option>
+                      <option value="saved">{t("savedFiles.status.saved")}</option>
+                      <option value="draft">{t("savedFiles.status.draft")}</option>
                       <option value="pending_approval">
-                        Pending Approval
+                        {t("savedFiles.status.pendingApproval")}
                       </option>
                       <option value="approved_salesman">
-                        Approved by Salesman
+                        {t("savedFiles.status.approvedSalesman")}
                       </option>
                       <option value="approved_admin">
-                        Approved by Admin
+                        {t("savedFiles.status.approvedAdmin")}
                       </option>
                     </select>
                   </td>
@@ -685,7 +687,7 @@ export default function SavedFiles() {
                     <div className="rowactions">
                       <button
                         className="iconbtn"
-                        title="Edit"
+                        title={t("savedFiles.actions.edit")}
                         type="button"
                         onClick={() => handleEdit(f)}
                       >
@@ -693,7 +695,7 @@ export default function SavedFiles() {
                       </button>
                       <button
                         className="iconbtn"
-                        title="View"
+                        title={t("savedFiles.actions.view")}
                         type="button"
                         onClick={() => handleView(f)}
                         disabled={!f.hasPdf}
@@ -702,7 +704,7 @@ export default function SavedFiles() {
                       </button>
                       <button
                         className="iconbtn"
-                        title="Download"
+                        title={t("savedFiles.actions.download")}
                         type="button"
                         onClick={() => handleDownload(f)}
                         disabled={downloadingId === f.id || !f.hasPdf}
@@ -711,7 +713,7 @@ export default function SavedFiles() {
                       </button>
                       <button
                         className="iconbtn"
-                        title="Share via Email"
+                        title={t("savedFiles.actions.shareViaEmail")}
                         type="button"
                         onClick={() => handleEmail(f)}
                         disabled={!f.hasPdf}
@@ -720,7 +722,7 @@ export default function SavedFiles() {
                       </button>
                       <button
                         className="iconbtn zoho-upload-btn"
-                        title="Upload to Bigin"
+                        title={t("savedFiles.actions.uploadToBigin")}
                         type="button"
                         onClick={() => handleZohoUpload(f)}
                         disabled={!f.hasPdf}
@@ -729,7 +731,7 @@ export default function SavedFiles() {
                       </button>
                       <button
                         className="iconbtn"
-                        title="Status Auto-Saves"
+                        title={t("savedFiles.actions.statusAutoSaves")}
                         type="button"
                         disabled
                       >
@@ -743,7 +745,7 @@ export default function SavedFiles() {
             {!loading && !error && sorted.length === 0 && (
               <tr>
                 <td colSpan={5} className="empty">
-                  {query ? `No files found matching "${query}"` : "No files found."}
+                  {query ? t("savedFiles.empty.noFilesMatching", { query }) : t("savedFiles.empty.noFiles")}
                 </td>
               </tr>
             )}
@@ -761,7 +763,7 @@ export default function SavedFiles() {
 
       <div className="sf__pager">
         <div className="sf__page-info">
-          Showing {Math.min((currentPage - 1) * filesPerPage + 1, totalFiles)}-{Math.min(currentPage * filesPerPage, totalFiles)} of {totalFiles} files
+          {t("savedFiles.pageInfoFiles", { from: Math.min((currentPage - 1) * filesPerPage + 1, totalFiles), to: Math.min(currentPage * filesPerPage, totalFiles), total: totalFiles })}
         </div>
 
         <div className="sf__page-controls">
@@ -771,7 +773,7 @@ export default function SavedFiles() {
             disabled={!canGoPrev || loading}
             onClick={handlePrevPage}
           >
-            Previous
+            {t("savedFiles.previous")}
           </button>
 
           <div className="sf__page-numbers">
@@ -806,7 +808,7 @@ export default function SavedFiles() {
             disabled={!canGoNext || loading}
             onClick={handleNextPage}
           >
-            Next
+            {t("savedFiles.next")}
           </button>
         </div>
       </div>
@@ -830,8 +832,8 @@ export default function SavedFiles() {
             downloadUrl: pdfApi.getPdfDownloadUrl(currentEmailFile.id),
             documentType: getDocumentTypeForSavedFile(currentEmailFile)
           } : undefined}
-          defaultSubject={currentEmailFile ? `${currentEmailFile.title} - ${STATUS_LABEL[currentEmailFile.status as FileStatus]}` : ''}
-          defaultBody={currentEmailFile ? `Hello,\n\nPlease find the customer header document attached.\n\nDocument: ${currentEmailFile.title}\nStatus: ${STATUS_LABEL[currentEmailFile.status as FileStatus]}\n\nBest regards` : ''}
+          defaultSubject={currentEmailFile ? t("savedFiles.email.subject", { name: currentEmailFile.title, status: STATUS_LABEL[currentEmailFile.status as FileStatus] }) : ''}
+          defaultBody={currentEmailFile ? t("savedFiles.email.bodyCustomerHeader", { name: currentEmailFile.title, status: STATUS_LABEL[currentEmailFile.status as FileStatus] }) : ''}
           userEmail=""
         />
 

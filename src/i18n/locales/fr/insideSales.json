@@ -1,0 +1,52 @@
+{
+  "title": "Mon Statut de Ventes Internes",
+  "subtitle": "Consultez votre éligibilité aux Ventes Internes en fonction de vos contrats dans l'historique d'audit de Lisa Rothwell",
+  "checking": "Vérification...",
+  "notLoggedIn": "Utilisateur non connecté",
+  "checkFailed": "Échec de la vérification de l'éligibilité aux ventes internes",
+  "checkError": "Erreur lors de la vérification de l'éligibilité aux ventes internes",
+  "loadingCard": "Vérification de votre éligibilité aux Ventes Internes...",
+  "statusHasDeduction": "Ventes Internes (déduction de 3 %)",
+  "statusNoDeduction": "Aucune déduction pour Ventes Internes",
+  "statusDetails": "{{total}} contrats au total | {{uploaded}} téléchargés vers Bigin | {{matched}} trouvés dans l'audit",
+  "lastChecked": "Dernière vérification : {{date}}",
+  "stats": {
+    "totalAgreements": "Total des contrats",
+    "uploadedToBigin": "Téléchargés vers Bigin",
+    "foundInAudit": "Trouvés dans l'audit de Lisa"
+  },
+  "matchingRecords": {
+    "title": "Enregistrements d'audit correspondants",
+    "subtitle": "Ces contrats ont été trouvés dans l'historique d'audit de Lisa Rothwell (dernière année)",
+    "biginId": "ID Bigin",
+    "recordName": "Nom de l'enregistrement",
+    "action": "Action",
+    "module": "Module",
+    "timestamp": "Horodatage"
+  },
+  "agreementsTable": {
+    "title": "Vos contrats ({{total}} au total, {{uploaded}} téléchargés vers Bigin)",
+    "subtitle": "Liste de vos contrats et de leur statut de téléchargement vers Bigin",
+    "agreementTitle": "Titre du contrat",
+    "biginDealId": "ID d'affaire Bigin",
+    "dealName": "Nom de l'affaire",
+    "createdAt": "Créé le",
+    "status": "Statut",
+    "notUploaded": "Non téléchargé",
+    "badgeNotUploaded": "Non téléchargé",
+    "badgeFoundInAudit": "Trouvé dans l'audit",
+    "badgeNotInAudit": "Pas dans l'audit",
+    "empty": "Aucun contrat trouvé. Créez des contrats et téléchargez-les vers Bigin pour suivre votre éligibilité aux Ventes Internes."
+  },
+  "info": {
+    "title": "Comment fonctionnent les Ventes Internes",
+    "item1": "Lorsque vous créez et téléchargez des contrats vers Bigin, ils reçoivent un ID d'affaire Bigin",
+    "item2": "Lisa Rothwell traite ces affaires, créant des enregistrements d'audit",
+    "item3Prefix": "Si l'un des ID Bigin de votre contrat apparaît dans l'historique d'audit de Lisa au cours de la dernière année, vous êtes classé comme ",
+    "item3Bold": "Ventes Internes",
+    "item4": "Ventes Internes = déduction de 3 %",
+    "item4Suffix": " de votre commission",
+    "item5Bold": "Aucune correspondance = aucune déduction",
+    "item5Suffix": " - vous conservez l'intégralité de votre commission"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Perfil",
+  "subtitle": "Información de su cuenta y detalles del perfil.",
+  "fullName": "Nombre completo",
+  "username": "Usuario",
+  "email": "Correo electrónico",
+  "role": "Rol",
+  "admin": "Administrador",
+  "employee": "Empleado"
+}

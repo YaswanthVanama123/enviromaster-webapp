@@ -1,0 +1,28 @@
+{
+  "tabs": {
+    "pricing": "Pricing Tables",
+    "services": "Service Configs",
+    "products": "Product Catalog",
+    "backup": "Backup Management",
+    "workflow": "Workflow",
+    "commissions": "Commissions",
+    "quota": "Quota Tracking",
+    "customers": "Customers",
+    "audit": "Audit History",
+    "biginCompanies": "Bigin Companies",
+    "companyMapping": "Company Mapping",
+    "mapDistance": "Map Distance",
+    "mapDistanceUpdate": "Update Distance",
+    "insideSales": "Inside Sales",
+    "accountType": "Account Type",
+    "payroll": "Payroll"
+  },
+  "header": {
+    "logo": "Enviro-Master Admin",
+    "logout": "Logout"
+  },
+  "actions": {
+    "exportPricingPdf": "Export Pricing PDF",
+    "generating": "Generating..."
+  }
+}

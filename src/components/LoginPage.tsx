@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuthContext } from "./auth";
 import { Spinner } from "./atoms/Spinner";
 import type { UserRole } from "../backendservice/types/api.types";
@@ -8,6 +9,7 @@ import logo from "../assets/em-logo.png";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { login, loading, isAuthenticated } = useAuthContext();
 
   const [activeTab, setActiveTab] = useState<UserRole>("employee");
@@ -43,7 +45,7 @@ export const LoginPage: React.FC = () => {
       await login({ username, password }, activeTab);
       
     } catch (err: any) {
-      setLoginError(err?.message || 'Login failed. Please check your credentials.');
+      setLoginError(err?.message || t("auth.loginFailed"));
     }
   };
 
@@ -56,7 +58,7 @@ export const LoginPage: React.FC = () => {
             <img src={logo} alt="EnviroMaster" style={styles.logo} />
           </div>
           <h1 style={styles.title}>EnviroMaster</h1>
-          <p style={styles.subtitle}>Sign in to your account</p>
+          <p style={styles.subtitle}>{t("auth.subtitle")}</p>
         </div>
 
         {}
@@ -69,7 +71,7 @@ export const LoginPage: React.FC = () => {
             }}
             onClick={() => setActiveTab("employee")}
           >
-            Employee
+            {t("auth.tabs.employee")}
           </button>
           <button
             type="button"
@@ -79,34 +81,34 @@ export const LoginPage: React.FC = () => {
             }}
             onClick={() => setActiveTab("admin")}
           >
-            Admin
+            {t("auth.tabs.admin")}
           </button>
         </div>
 
         {}
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
-            <label style={styles.label}>Username</label>
+            <label style={styles.label}>{t("auth.username")}</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               style={styles.input}
-              placeholder="Enter your username"
+              placeholder={t("auth.usernamePlaceholder")}
               required
               autoComplete="username"
             />
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Password</label>
+            <label style={styles.label}>{t("auth.password")}</label>
             <div style={styles.passwordContainer}>
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={styles.passwordInput}
-                placeholder="Enter your password"
+                placeholder={t("auth.passwordPlaceholder")}
                 required
                 autoComplete="current-password"
               />
@@ -144,10 +146,10 @@ export const LoginPage: React.FC = () => {
             {loading ? (
               <span style={styles.buttonContent}>
                 <Spinner size="sm" className="em-spinner--inline" />
-                Signing in...
+                {t("auth.signingIn")}
               </span>
             ) : (
-              `Sign in as ${activeTab === "admin" ? "Admin" : "Employee"}`
+              t("auth.signInAs", { role: activeTab === "admin" ? t("auth.tabs.admin") : t("auth.tabs.employee") })
             )}
           </button>
         </form>
@@ -155,8 +157,8 @@ export const LoginPage: React.FC = () => {
         {}
         <p style={styles.infoText}>
           {activeTab === "admin"
-            ? "Admin accounts have full system access including user management."
-            : "Employee accounts can create and manage service agreements."}
+            ? t("auth.info.admin")
+            : t("auth.info.employee")}
         </p>
       </div>
     </div>

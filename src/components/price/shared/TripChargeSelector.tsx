@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const inputStyle = {
   border: "1px solid #e6e6e6",
@@ -12,27 +13,30 @@ export default function TripChargeSelector({
   setTripType,
   parkingAmt,
   setParkingAmt,
-  label = "Trip Charge",
-  options = [
-    { value: "beltway8", label: "Beltway $8" },
-    { value: "standard6", label: "Standard $6" },
-    { value: "paid7", label: "Paid $7 + parking" },
-    { value: "waived", label: "Waived" },
-  ],
+  label = undefined,
+  options = undefined,
 }) {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("pricingCalc.tripCharge.label");
+  const resolvedOptions = options ?? [
+    { value: "beltway8", label: t("pricingCalc.tripCharge.options.beltway8") },
+    { value: "standard6", label: t("pricingCalc.tripCharge.options.standard6") },
+    { value: "paid7", label: t("pricingCalc.tripCharge.options.paid7") },
+    { value: "waived", label: t("pricingCalc.tripCharge.options.waived") },
+  ];
   return (
     <>
       <div style={{ gridColumn: "span 3", display: "flex", flexDirection: "column", gap: 6 }}>
-        <label>{label}</label>
+        <label>{resolvedLabel}</label>
         <select style={inputStyle} value={tripType} onChange={(e) => setTripType(e.target.value)}>
-          {options.map((o) => (
+          {resolvedOptions.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
       </div>
 
       <div style={{ gridColumn: "span 3", display: "flex", flexDirection: "column", gap: 6 }}>
-        <label>Parking (only for paid)</label>
+        <label>{t("pricingCalc.tripCharge.parkingLabel")}</label>
         <input
           style={inputStyle}
           type="number"

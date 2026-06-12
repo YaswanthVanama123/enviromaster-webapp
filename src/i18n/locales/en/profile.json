@@ -1,0 +1,10 @@
+{
+  "title": "Profile",
+  "subtitle": "Your account information and profile details.",
+  "fullName": "Full Name",
+  "username": "Username",
+  "email": "Email",
+  "role": "Role",
+  "admin": "Admin",
+  "employee": "Employee"
+}

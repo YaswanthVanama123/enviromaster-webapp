@@ -1,0 +1,39 @@
+{
+  "title": "Trash",
+  "description": "View and manage deleted agreements and files. Items in trash can be restored or permanently deleted.",
+  "searchPlaceholder": "Search deleted items...",
+  "selectAll": "Select All",
+  "noResults": "No deleted items found matching \"{{query}}\"",
+  "empty": "Trash is empty",
+  "pageInfo": "Showing {{from}}-{{to}} of {{total}} deleted agreements",
+  "stats": {
+    "deletedFiles": "Deleted Files",
+    "deletedFolders": "Deleted Folders"
+  },
+  "toast": {
+    "viewFailed": "Failed to view file. Please try again.",
+    "downloaded": "Downloaded: {{name}}",
+    "downloadFailed": "Failed to download file. Please try again.",
+    "restoredAgreement": "Restored agreement: {{title}}",
+    "restoredFile": "Restored file: {{title}}",
+    "restoreFailedFolder": "Failed to restore folder. Please try again.",
+    "restoreFailedFile": "Failed to restore file. Please try again.",
+    "adminRequired": "Admin access required to permanently delete items. Please access this page from the Admin Panel to perform permanent deletions.",
+    "deletedAgreement": "Permanently deleted agreement: {{title}}",
+    "deletedFile": "Permanently deleted file: {{title}}",
+    "deleteFailedFolder": "Failed to permanently delete folder. Please try again.",
+    "deleteFailedFile": "Failed to permanently delete file. Please try again.",
+    "emailSent": "Email sent successfully!"
+  },
+  "deleteModal": {
+    "titleAgreement": "Permanently Delete Agreement?",
+    "titleFile": "Permanently Delete File?",
+    "warningPrefix": "This will",
+    "permanentlyDelete": "permanently delete",
+    "cannotBeUndone": "This action cannot be undone!",
+    "understandAgreement": "I understand this will permanently delete this agreement",
+    "understandFile": "I understand this will permanently delete this file",
+    "typeToConfirm": "to confirm:",
+    "typeDeletePlaceholder": "Type DELETE"
+  }
+}

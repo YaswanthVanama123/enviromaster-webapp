@@ -1,0 +1,6 @@
+{
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "processing": "Processing...",
+  "typeToConfirm": "Please type \"{{text}}\" to confirm"
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt, faDownload, faTrash, faUpload, faCheckCircle, faTimes, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { manualUploadApi } from "../backendservice/api";
@@ -29,6 +30,7 @@ interface ManualUpload {
 }
 
 export default function ManualUploads() {
+  const { t } = useTranslation();
   const [uploads, setUploads] = useState<ManualUpload[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -75,7 +77,7 @@ export default function ManualUploads() {
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-      alert("Please select at least one file");
+      alert(t("manualUploads.selectAtLeastOne"));
       return;
     }
 
@@ -109,11 +111,11 @@ export default function ManualUploads() {
       }
 
       if (failCount > 0) {
-        alert(`${successCount} file(s) uploaded successfully. ${failCount} file(s) failed.`);
+        alert(t("manualUploads.uploadPartial", { success: successCount, failed: failCount }));
       }
     } catch (err) {
       console.error("Error uploading files:", err);
-      alert("Failed to upload files. Please try again.");
+      alert(t("manualUploads.uploadFailed"));
     } finally {
       setUploading(false);
       setUploadProgress(null);
@@ -133,19 +135,19 @@ export default function ManualUploads() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading file:", err);
-      alert("Failed to download file. Please try again.");
+      alert(t("manualUploads.downloadFailed"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this upload?")) return;
+    if (!confirm(t("manualUploads.confirmDelete"))) return;
 
     try {
       await manualUploadApi.deleteFile(id);
       fetchUploads();
     } catch (err) {
       console.error("Error deleting upload:", err);
-      alert("Failed to delete upload. Please try again.");
+      alert(t("manualUploads.deleteFailed"));
     }
   };
 
@@ -168,15 +170,15 @@ export default function ManualUploads() {
   return (
     <div className="manual-uploads">
       <div className="manual-uploads-header">
-        <h2>Manual Uploads</h2>
-        <p className="subtitle">Upload PDFs manually to Bigin</p>
+        <h2>{t("manualUploads.title")}</h2>
+        <p className="subtitle">{t("manualUploads.subtitle")}</p>
       </div>
 
       <div className="upload-section-card">
-        <h3>Upload New PDF(s)</h3>
+        <h3>{t("manualUploads.uploadNewTitle")}</h3>
         <div className="upload-form">
           <div className="form-group">
-            <label>Select PDF File(s):</label>
+            <label>{t("manualUploads.selectFilesLabel")}</label>
             <div className="file-input-wrapper">
               <input
                 id="file-input"
@@ -194,16 +196,16 @@ export default function ManualUploads() {
                 disabled={uploading}
               >
                 <FontAwesomeIcon icon={faFileAlt} style={{ marginRight: "10px" }} />
-                Choose PDF Files
+                {t("manualUploads.chooseFiles")}
               </button>
               {selectedFiles.length === 0 && (
-                <span className="no-files-text">No files selected</span>
+                <span className="no-files-text">{t("manualUploads.noFilesSelected")}</span>
               )}
             </div>
             {selectedFiles.length > 0 && (
               <div className="selected-files-container">
                 <div className="selected-files-header">
-                  Selected {selectedFiles.length} file(s):
+                  {t("manualUploads.selectedFilesHeader", { count: selectedFiles.length })}
                 </div>
                 {selectedFiles.map((file, index) => (
                   <div key={index} className="selected-file-item">
@@ -215,7 +217,7 @@ export default function ManualUploads() {
                       className="remove-file-btn"
                       onClick={() => removeFile(index)}
                       disabled={uploading}
-                      title="Remove file"
+                      title={t("manualUploads.removeFileTitle")}
                     >
                       <FontAwesomeIcon icon={faTrash} size="sm" />
                     </button>
@@ -226,12 +228,12 @@ export default function ManualUploads() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description (optional):</label>
+            <label htmlFor="description">{t("manualUploads.descriptionLabel")}</label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter a description for these uploads..."
+              placeholder={t("manualUploads.descriptionPlaceholder")}
               rows={3}
               disabled={uploading}
             />
@@ -244,36 +246,36 @@ export default function ManualUploads() {
           >
             <FontAwesomeIcon icon={faUpload} style={{ marginRight: "8px" }} />
             {uploading
-              ? `Uploading ${uploadProgress?.current || 0}/${uploadProgress?.total || 0}...`
-              : `Upload ${selectedFiles.length > 0 ? `${selectedFiles.length} file(s)` : 'to Zoho'}`}
+              ? t("manualUploads.uploadingProgress", { current: uploadProgress?.current || 0, total: uploadProgress?.total || 0 })
+              : (selectedFiles.length > 0 ? t("manualUploads.uploadFiles", { count: selectedFiles.length }) : t("manualUploads.uploadToZoho"))}
           </button>
 
           {uploadSuccess && (
             <div className="success-message">
               <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: "8px" }} />
-              Files uploaded successfully! Zoho sync in progress...
+              {t("manualUploads.uploadSuccessBanner")}
             </div>
           )}
         </div>
       </div>
 
       <div className="uploads-list-card">
-        <h3>Uploaded Files</h3>
+        <h3>{t("manualUploads.uploadedFilesTitle")}</h3>
         {loading ? (
-          <div className="loading">Loading uploads...</div>
+          <div className="loading">{t("manualUploads.loadingUploads")}</div>
         ) : uploads.length === 0 ? (
-          <div className="empty-state">No uploads yet. Upload your first PDF above.</div>
+          <div className="empty-state">{t("manualUploads.emptyState")}</div>
         ) : (
           <div className="uploads-table-container">
             <table className="uploads-table">
               <thead>
                 <tr>
-                  <th>File Name</th>
-                  <th>Size</th>
-                  <th>Status</th>
-                  <th>Uploaded</th>
-                  <th>Bigin Status</th>
-                  <th>Actions</th>
+                  <th>{t("manualUploads.colFileName")}</th>
+                  <th>{t("manualUploads.colSize")}</th>
+                  <th>{t("manualUploads.colStatus")}</th>
+                  <th>{t("manualUploads.colUploaded")}</th>
+                  <th>{t("manualUploads.colBiginStatus")}</th>
+                  <th>{t("manualUploads.colActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -300,17 +302,17 @@ export default function ManualUploads() {
                     <td>
                       <div className="zoho-status">
                         {upload.zoho?.bigin?.fileId && (
-                          <span className="zoho-tag zoho-bigin" title="Uploaded to Zoho Bigin">
+                          <span className="zoho-tag zoho-bigin" title={t("manualUploads.biginTitle")}>
                             Bigin <FontAwesomeIcon icon={faCheckCircle} size="xs" style={{ marginLeft: "2px" }} />
                           </span>
                         )}
                         {upload.zoho?.crm?.fileId && (
-                          <span className="zoho-tag zoho-crm" title="Uploaded to Zoho CRM">
+                          <span className="zoho-tag zoho-crm" title={t("manualUploads.crmTitle")}>
                             CRM <FontAwesomeIcon icon={faCheckCircle} size="xs" style={{ marginLeft: "2px" }} />
                           </span>
                         )}
                         {!upload.zoho?.bigin?.fileId && !upload.zoho?.crm?.fileId && (
-                          <span className="zoho-tag zoho-pending">Pending</span>
+                          <span className="zoho-tag zoho-pending">{t("manualUploads.pending")}</span>
                         )}
                       </div>
                     </td>
@@ -319,14 +321,14 @@ export default function ManualUploads() {
                         <button
                           className="action-btn download-btn"
                           onClick={() => handleDownload(upload._id, upload.fileName)}
-                          title="Download PDF"
+                          title={t("manualUploads.downloadTitle")}
                         >
                           <FontAwesomeIcon icon={faDownload} />
                         </button>
                         <button
                           className="action-btn delete-btn"
                           onClick={() => handleDelete(upload._id)}
-                          title="Delete"
+                          title={t("manualUploads.deleteTitle")}
                         >
                           <FontAwesomeIcon icon={faTrash} />
                         </button>

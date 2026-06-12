@@ -8,6 +8,7 @@ import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
 import { FaCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const formatNumber = (num: number | undefined): string => {
   if (num === undefined || num === null || isNaN(num)) {
@@ -43,6 +44,8 @@ const FIELD_ORDER = {
 export const RpmWindowsForm: React.FC<
   ServiceInitialData<RpmWindowsFormState>
 > = ({ initialData, onRemove }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -366,7 +369,7 @@ export const RpmWindowsForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="RPM WINDOW"
+      title={t("serviceForms.rpmWindows.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -376,7 +379,7 @@ export const RpmWindowsForm: React.FC<
             type="button"
             className="svc-mini"
             onClick={addExtraCharge}
-            title="Add extra charge"
+            title={t("serviceForms.rpmWindows.addExtraCharge")}
             style={{ fontSize: '12px' }}
           >
             $
@@ -395,7 +398,7 @@ export const RpmWindowsForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -403,23 +406,23 @@ export const RpmWindowsForm: React.FC<
             value={form.frequency}
             onChange={onChange}
           >
-            <option value="oneTime">One Time</option>
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Bi-Weekly</option>
-            <option value="twicePerMonth">2× / Month</option>
-            <option value="monthly">Monthly</option>
-            <option value="everyFourWeeks">Every 4 Weeks</option>
-            <option value="bimonthly">Every 2 Months</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="biannual">Bi-Annual</option>
-            <option value="annual">Annual</option>
+            <option value="oneTime">{t("serviceForms.rpmWindows.freq.oneTime")}</option>
+            <option value="weekly">{t("serviceForms.rpmWindows.freq.weekly")}</option>
+            <option value="biweekly">{t("serviceForms.rpmWindows.freq.biweekly")}</option>
+            <option value="twicePerMonth">{t("serviceForms.rpmWindows.freq.twicePerMonth")}</option>
+            <option value="monthly">{t("serviceForms.rpmWindows.freq.monthly")}</option>
+            <option value="everyFourWeeks">{t("serviceForms.rpmWindows.freq.everyFourWeeks")}</option>
+            <option value="bimonthly">{t("serviceForms.rpmWindows.freq.bimonthly")}</option>
+            <option value="quarterly">{t("serviceForms.rpmWindows.freq.quarterly")}</option>
+            <option value="biannual">{t("serviceForms.rpmWindows.freq.biannual")}</option>
+            <option value="annual">{t("serviceForms.rpmWindows.freq.annual")}</option>
           </select>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Small Windows</label>
+        <label>{t("serviceForms.rpmWindows.smallWindows")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -439,7 +442,7 @@ export const RpmWindowsForm: React.FC<
             step="1"
             value={form.smallWindowRate || ""}
             onChange={onChange}
-            title="Base weekly rate (from backend)"
+            title={t("serviceForms.rpmWindows.baseWeeklyRateTitle")}
             style={getOverrideStyle(hasPricingOverride("smallWindowRate"))}
           />
           <span>=</span>
@@ -462,14 +465,14 @@ export const RpmWindowsForm: React.FC<
             onFocus={handleFocus}
             onBlur={handleBlur}
             style={{ backgroundColor: form.customSmallTotal !== undefined ? '#fffacd' : 'white' }}
-            title={`Calculated total (Qty × $${formatNumber(calc.effSmall)} effective rate)`}
+            title={t("serviceForms.rpmWindows.calculatedTotalTitle", { rate: formatNumber(calc.effSmall) })}
           />
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Medium Windows</label>
+        <label>{t("serviceForms.rpmWindows.mediumWindows")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -489,7 +492,7 @@ export const RpmWindowsForm: React.FC<
             step="1"
             value={form.mediumWindowRate || ""}
             onChange={onChange}
-            title="Base weekly rate (from backend)"
+            title={t("serviceForms.rpmWindows.baseWeeklyRateTitle")}
             style={getOverrideStyle(hasPricingOverride("mediumWindowRate"))}
           />
           <span>=</span>
@@ -512,14 +515,14 @@ export const RpmWindowsForm: React.FC<
             onFocus={handleFocus}
             onBlur={handleBlur}
             style={{ backgroundColor: form.customMediumTotal !== undefined ? '#fffacd' : 'white' }}
-            title={`Calculated total (Qty × $${formatNumber(calc.effMedium)} effective rate)`}
+            title={t("serviceForms.rpmWindows.calculatedTotalTitle", { rate: formatNumber(calc.effMedium) })}
           />
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Large Windows</label>
+        <label>{t("serviceForms.rpmWindows.largeWindows")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -539,7 +542,7 @@ export const RpmWindowsForm: React.FC<
             step="1"
             value={form.largeWindowRate || ""}
             onChange={onChange}
-            title="Base weekly rate (from backend)"
+            title={t("serviceForms.rpmWindows.baseWeeklyRateTitle")}
             style={getOverrideStyle(hasPricingOverride("largeWindowRate"))}
           />
           <span>=</span>
@@ -562,7 +565,7 @@ export const RpmWindowsForm: React.FC<
             onFocus={handleFocus}
             onBlur={handleBlur}
             style={{ backgroundColor: form.customLargeTotal !== undefined ? '#fffacd' : 'white' }}
-            title={`Calculated total (Qty × $${formatNumber(calc.effLarge)} effective rate)`}
+            title={t("serviceForms.rpmWindows.calculatedTotalTitle", { rate: formatNumber(calc.effLarge) })}
           />
         </div>
       </div>
@@ -574,7 +577,7 @@ export const RpmWindowsForm: React.FC<
             <input
               className="svc-in"
               type="text"
-              placeholder="Calc"
+              placeholder={t("serviceForms.rpmWindows.calcPlaceholder")}
               value={line.calcText}
               onChange={(e) =>
                 updateExtraCharge(line.id, "calcText", e.target.value)
@@ -583,7 +586,7 @@ export const RpmWindowsForm: React.FC<
             <input
               className="svc-in"
               type="text"
-              placeholder="Text"
+              placeholder={t("serviceForms.rpmWindows.textPlaceholder")}
               value={line.description}
               onChange={(e) =>
                 updateExtraCharge(line.id, "description", e.target.value)
@@ -612,7 +615,7 @@ export const RpmWindowsForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Install Type</label>
+        <label>{t("serviceForms.rpmWindows.installType")}</label>
         <div className="svc-row-right">
           <label className="svc-inline">
             <input
@@ -621,7 +624,7 @@ export const RpmWindowsForm: React.FC<
               checked={form.isFirstTimeInstall}
               onChange={() => handleInstallTypeChange("first")}
             />
-            <span>First Time (Install)</span>
+            <span>{t("serviceForms.rpmWindows.firstTimeInstall")}</span>
           </label>
           <label className="svc-inline">
             <input
@@ -630,16 +633,16 @@ export const RpmWindowsForm: React.FC<
               checked={!form.isFirstTimeInstall}
               onChange={() => handleInstallTypeChange("clean")}
             />
-            <span>Ongoing / Clean</span>
+            <span>{t("serviceForms.rpmWindows.ongoingClean")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Install Multipliers</label>
+        <label>{t("serviceForms.rpmWindows.installMultipliers")}</label>
         <div className="svc-row-right">
-          <span className="svc-small">Dirty (</span>
+          <span className="svc-small">{t("serviceForms.rpmWindows.dirty")}</span>
           <input
             name="installMultiplierFirstTime"
             type="number"
@@ -649,10 +652,10 @@ export const RpmWindowsForm: React.FC<
             value={form.installMultiplierFirstTime}
             onChange={onChange}
             style={getOverrideStyle(hasPricingOverride("installMultiplierFirstTime"), { display: "inline", width: "60px" })}
-            title="Multiplier for dirty/first-time installations (typically 3×)"
+            title={t("serviceForms.rpmWindows.dirtyMultiplierTitle")}
           />
-          <span className="svc-small">×)</span>
-          <span className="svc-small" style={{ marginLeft: '12px' }}>Clean (</span>
+          <span className="svc-small">{t("serviceForms.rpmWindows.multiplierClose")}</span>
+          <span className="svc-small" style={{ marginLeft: '12px' }}>{t("serviceForms.rpmWindows.clean")}</span>
           <input
             name="installMultiplierClean"
             type="number"
@@ -662,9 +665,9 @@ export const RpmWindowsForm: React.FC<
             value={form.installMultiplierClean}
             onChange={onChange}
             style={getOverrideStyle(hasPricingOverride("installMultiplierClean"), { display: "inline", width: "60px" })}
-            title="Multiplier for clean installations (typically 1×)"
+            title={t("serviceForms.rpmWindows.cleanMultiplierTitle")}
           />
-          <span className="svc-small">×)</span>
+          <span className="svc-small">{t("serviceForms.rpmWindows.multiplierClose")}</span>
         </div>
       </div>
 
@@ -673,7 +676,7 @@ export const RpmWindowsForm: React.FC<
 
             {}
       <div className="svc-row svc-row-charge">
-        <label>Installation + First Visit</label>
+        <label>{t("serviceForms.rpmWindows.installationFirstVisit")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -703,7 +706,7 @@ export const RpmWindowsForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Minimum Per Visit</label>
+        <label>{t("serviceForms.common.minimumPerVisit")}</label>
         <div className="svc-row-right">
           <span className="svc-small">${calc.minimumChargePerVisit != null ? calc.minimumChargePerVisit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00"}</span>
           <label className="svc-inline" style={{ marginLeft: '10px' }}>
@@ -713,14 +716,14 @@ export const RpmWindowsForm: React.FC<
               checked={form.applyMinimum !== false}
               onChange={onChange}
             />
-            <span>Apply Minimum</span>
+            <span>{t("serviceForms.common.applyMinimum")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row svc-row-charge">
-        <label>Per Visit Price</label>
+        <label>{t("serviceForms.rpmWindows.perVisitPrice")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -750,7 +753,7 @@ export const RpmWindowsForm: React.FC<
         form.frequency === "biannual" || form.frequency === "annual" ||
         form.frequency === "everyFourWeeks") && (
         <div className="svc-row svc-row-charge">
-          <label>Recurring Visit Total</label>
+          <label>{t("serviceForms.common.recurringVisitTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -760,7 +763,7 @@ export const RpmWindowsForm: React.FC<
                 readOnly
                 value={formatNumber(calc.recurringPerVisitRated ?? 0)}
                 style={{ backgroundColor: 'white' }}
-                title="Cost per recurring visit (after first visit)"
+                title={t("serviceForms.rpmWindows.recurringVisitTitle")}
               />
             </div>
           </div>
@@ -782,7 +785,7 @@ export const RpmWindowsForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                <FaCircle color="#16a34a" /> Greenline Pricing
+                <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
               </span>
             ) : (
               <span style={{
@@ -794,7 +797,7 @@ export const RpmWindowsForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                <FaCircle color="#dc2626" /> Redline Pricing
+                <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
               </span>
             )}
           </div>
@@ -804,7 +807,7 @@ export const RpmWindowsForm: React.FC<
       {}
       {form.frequency !== "oneTime" && form.frequency !== "quarterly" && form.frequency !== "biannual" && form.frequency !== "annual" && form.frequency !== "bimonthly" && form.frequency !== "everyFourWeeks" && (
         <div className="svc-row svc-row-charge">
-          <label>First Month Total</label>
+          <label>{t("serviceForms.common.firstMonthTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -814,7 +817,7 @@ export const RpmWindowsForm: React.FC<
                 readOnly
                 value={formatNumber(calc.firstMonthBillRated ?? 0)}
                 style={{ backgroundColor: 'white', border: 'none', width: '100px' }}
-                title={form.isFirstTimeInstall ? "First month including installation + service" : "First month (ongoing service only)"}
+                title={form.isFirstTimeInstall ? t("serviceForms.rpmWindows.firstMonthInstallTitle") : t("serviceForms.rpmWindows.firstMonthOngoingTitle")}
               />
             </div>
             {}
@@ -826,7 +829,7 @@ export const RpmWindowsForm: React.FC<
       {(form.frequency === "weekly" || form.frequency === "biweekly" ||
         form.frequency === "twicePerMonth" || form.frequency === "monthly") && (
         <div className="svc-row svc-row-charge">
-          <label>Monthly Recurring</label>
+          <label>{t("serviceForms.common.monthlyRecurring")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -848,7 +851,7 @@ export const RpmWindowsForm: React.FC<
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 style={{ backgroundColor: form.customMonthlyRecurring !== undefined ? '#fffacd' : 'white' }}
-                title="Override monthly recurring calculation (clear to use auto-calculated value)"
+                title={t("serviceForms.saniscrub.monthlyRecurringTitle")}
               />
             </div>
           </div>
@@ -858,7 +861,7 @@ export const RpmWindowsForm: React.FC<
       {}
       {(form.frequency === "oneTime" || form.frequency === "quarterly" || form.frequency === "biannual" || form.frequency === "annual" || form.frequency === "bimonthly" || form.frequency === "everyFourWeeks") && (
         <div className="svc-row svc-row-charge">
-          <label>{form.frequency === "oneTime" ? "Total Price" : "First Visit Total"}</label>
+          <label>{form.frequency === "oneTime" ? t("serviceForms.common.totalPrice") : t("serviceForms.common.firstVisitTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -882,7 +885,7 @@ export const RpmWindowsForm: React.FC<
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 style={{ backgroundColor: form.customFirstMonthTotal !== undefined ? '#fffacd' : 'white' }}
-                title={form.isFirstTimeInstall ? "First visit including installation + service" : "First visit (service only)"}
+                title={form.isFirstTimeInstall ? t("serviceForms.rpmWindows.firstVisitInstallTitle") : t("serviceForms.rpmWindows.firstVisitServiceTitle")}
               />
             </div>
           </div>
@@ -892,7 +895,7 @@ export const RpmWindowsForm: React.FC<
       {}
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-charge">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div className="svc-row-right">
             <select
               className="svc-in"
@@ -902,22 +905,22 @@ export const RpmWindowsForm: React.FC<
             >
               {form.frequency === "quarterly"
                 ? Array.from({ length: 12 }, (_, i) => (i + 1) * 3).map((m) => (
-                    <option key={m} value={m}>{m} months</option>
+                    <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                   ))
                 : form.frequency === "bimonthly"
                 ? [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36].map((m) => (
-                    <option key={m} value={m}>{m} months</option>
+                    <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                   ))
                 : form.frequency === "biannual"
                 ? [6, 12, 18, 24, 30, 36].map((m) => (
-                    <option key={m} value={m}>{m} months</option>
+                    <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                   ))
                 : form.frequency === "annual"
                 ? [12, 24, 36].map((m) => (
-                    <option key={m} value={m}>{m} months</option>
+                    <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                   ))
                 : Array.from({ length: 35 }, (_, i) => i + 2).map((m) => (
-                    <option key={m} value={m}>{m} months</option>
+                    <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                   ))
               }
             </select>

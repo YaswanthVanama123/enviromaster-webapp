@@ -8,6 +8,7 @@ import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { FaCircle, FaPen } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const formatMoney = (n: number): string => `$${(isNaN(n) ? 0 : n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 const safeNumber = (n: any): number => (typeof n === "number" && !isNaN(n)) ? n : 0;
@@ -94,6 +95,7 @@ function IncludedItemsEditor({
   onChange: (items: string[]) => void;
   onReset: () => void;
 }) {
+  const { t } = useTranslation();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
   const [addingNew, setAddingNew] = useState(false);
@@ -150,8 +152,8 @@ function IncludedItemsEditor({
                 onKeyDown={e => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
                 autoFocus
               />
-              <button className="svc-btn svc-btn--small" onClick={saveEdit} title="Save">✓</button>
-              <button className="svc-btn svc-btn--small" onClick={cancelEdit} title="Cancel" style={{ opacity: 0.6 }}>✕</button>
+              <button className="svc-btn svc-btn--small" onClick={saveEdit} title={t("serviceForms.common.save")}>✓</button>
+              <button className="svc-btn svc-btn--small" onClick={cancelEdit} title={t("serviceForms.common.cancel")} style={{ opacity: 0.6 }}>✕</button>
             </>
           ) : (
             <>
@@ -159,7 +161,7 @@ function IncludedItemsEditor({
               <button
                 className="svc-btn svc-btn--small"
                 onClick={() => startEdit(index)}
-                title="Edit item"
+                title={t("serviceForms.saniclean.editItem")}
                 style={{ opacity: 0.55, fontSize: 11 }}
               >
                 <FaPen />
@@ -167,7 +169,7 @@ function IncludedItemsEditor({
               <button
                 className="svc-btn svc-btn--small"
                 onClick={() => removeItem(index)}
-                title="Remove item"
+                title={t("serviceForms.saniclean.removeItem")}
                 style={{ opacity: 0.55, fontSize: 11 }}
               >
                 ✕
@@ -185,11 +187,11 @@ function IncludedItemsEditor({
             value={newText}
             onChange={e => setNewText(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") saveNew(); if (e.key === "Escape") cancelNew(); }}
-            placeholder="New item…"
+            placeholder={t("serviceForms.saniclean.newItemPlaceholder")}
             autoFocus
           />
-          <button className="svc-btn svc-btn--small" onClick={saveNew} title="Add">✓</button>
-          <button className="svc-btn svc-btn--small" onClick={cancelNew} title="Cancel" style={{ opacity: 0.6 }}>✕</button>
+          <button className="svc-btn svc-btn--small" onClick={saveNew} title={t("serviceForms.saniclean.addTitle")}>✓</button>
+          <button className="svc-btn svc-btn--small" onClick={cancelNew} title={t("serviceForms.common.cancel")} style={{ opacity: 0.6 }}>✕</button>
         </div>
       ) : (
         <div style={{ marginTop: 4, display: "flex", gap: 8, alignItems: "center" }}>
@@ -197,16 +199,16 @@ function IncludedItemsEditor({
             className="svc-btn svc-btn--small"
             onClick={() => setAddingNew(true)}
           >
-            + Add item
+            {t("serviceForms.saniclean.addItem")}
           </button>
           {isCustomized && (
             <button
               className="svc-btn svc-btn--small"
               onClick={onReset}
               style={{ opacity: 0.65 }}
-              title="Restore the default calculated list"
+              title={t("serviceForms.saniclean.resetToDefaultsTitle")}
             >
-              Reset to defaults
+              {t("serviceForms.saniclean.resetToDefaults")}
             </button>
           )}
         </div>
@@ -218,6 +220,8 @@ function IncludedItemsEditor({
 export const SanicleanForm: React.FC<
   ServiceInitialData<SanicleanFormState>
 > = ({ initialData, onRemove }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -690,7 +694,7 @@ export const SanicleanForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="SANI CLEAN"
+      title={t("serviceForms.saniclean.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -700,9 +704,9 @@ export const SanicleanForm: React.FC<
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
-            <span className="svc-sr-only">Loading configuration...</span>
+            <span className="svc-sr-only">{t("serviceForms.common.loadingConfiguration")}</span>
           </div>
-          <p className="svc-loading-text">Loading configuration...</p>
+          <p className="svc-loading-text">{t("serviceForms.common.loadingConfiguration")}</p>
         </div>
       )}
 
@@ -715,7 +719,7 @@ export const SanicleanForm: React.FC<
       />
 
       <div className="svc-row">
-        <label>Pricing Mode</label>
+        <label>{t("serviceForms.saniclean.pricingMode")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -723,15 +727,15 @@ export const SanicleanForm: React.FC<
             value={form.pricingMode}
             onChange={onChange}
           >
-            <option value="all_inclusive">All Inclusive</option>
-            <option value="per_item_charge">Per Item Charge</option>
+            <option value="all_inclusive">{t("serviceForms.saniclean.allInclusive")}</option>
+            <option value="per_item_charge">{t("serviceForms.saniclean.perItemCharge")}</option>
           </select>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Main Service Frequency</label>
+        <label>{t("serviceForms.saniclean.mainServiceFrequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -739,10 +743,10 @@ export const SanicleanForm: React.FC<
             value={form.mainServiceFrequency}
             onChange={(e) => setMainServiceFrequency(e.target.value as SanicleanFrequency)}
           >
-            {Object.entries(sanicleanFrequencyLabels).map(
-              ([value, label]) => (
+            {Object.keys(sanicleanFrequencyLabels).map(
+              (value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(`serviceForms.saniclean.freq.${value}`)}
                 </option>
               )
             )}
@@ -752,7 +756,7 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Restroom Fixtures</label>
+        <label>{t("serviceForms.common.restroomFixtures")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in"
@@ -768,7 +772,7 @@ export const SanicleanForm: React.FC<
       {}
        {form.pricingMode === "per_item_charge" && (
         <div className="svc-row">
-          <label>Location</label>
+          <label>{t("serviceForms.common.location")}</label>
           <div className="svc-row-right">
             <select
               className="svc-in"
@@ -776,24 +780,24 @@ export const SanicleanForm: React.FC<
               value={form.location}
               onChange={onChange}
             >
-              <option value="insideBeltway">Inside Beltway</option>
-              <option value="outsideBeltway">Outside Beltway</option>
+              <option value="insideBeltway">{t("serviceForms.common.insideBeltway")}</option>
+              <option value="outsideBeltway">{t("serviceForms.common.outsideBeltway")}</option>
             </select>
           </div>
         </div>
-      )} 
+      )}
 
       {}
       {}
 
       {}
       <div className="svc-h-sub" style={{ marginTop: 10 }}>
-        FIXTURE BREAKDOWN
+        {t("serviceForms.saniclean.fixtureBreakdown")}
       </div>
 
       {}
       <div className="svc-row">
-        <label>Sinks</label>
+        <label>{t("serviceForms.saniclean.sinks")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -813,7 +817,7 @@ export const SanicleanForm: React.FC<
             value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
                   (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
             onChange={onChange}
-            title="Rate per sink - editable"
+            title={t("serviceForms.saniclean.ratePerSinkTitle")}
             style={getOverrideStyle(fixtureRateOverride)}
           />
           <span>=</span>
@@ -830,7 +834,7 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Urinals</label>
+        <label>{t("serviceForms.saniclean.urinals")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -850,7 +854,7 @@ export const SanicleanForm: React.FC<
             value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
                   (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
             onChange={onChange}
-            title="Rate per urinal - editable"
+            title={t("serviceForms.saniclean.ratePerUrinalTitle")}
             style={getOverrideStyle(fixtureRateOverride)}
           />
           <span>=</span>
@@ -867,7 +871,7 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Male Toilets</label>
+        <label>{t("serviceForms.saniclean.maleToilets")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -887,7 +891,7 @@ export const SanicleanForm: React.FC<
             value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
                   (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
             onChange={onChange}
-            title="Rate per male toilet - editable"
+            title={t("serviceForms.saniclean.ratePerMaleToiletTitle")}
             style={getOverrideStyle(fixtureRateOverride)}
           />
           <span>=</span>
@@ -904,7 +908,7 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Female Toilets</label>
+        <label>{t("serviceForms.saniclean.femaleToilets")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -924,7 +928,7 @@ export const SanicleanForm: React.FC<
             value={isAllInclusive ? form.allInclusiveWeeklyRatePerFixture :
                   (form.location === "insideBeltway" ? form.insideBeltwayRatePerFixture : form.outsideBeltwayRatePerFixture)}
             onChange={onChange}
-            title="Rate per female toilet - editable"
+            title={t("serviceForms.saniclean.ratePerFemaleToiletTitle")}
             style={getOverrideStyle(fixtureRateOverride)}
           />
           <span>=</span>
@@ -941,12 +945,12 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-h-sub" style={{ marginTop: 10 }}>
-        SOAP &amp; UPGRADES
+        {t("serviceForms.saniclean.soapAndUpgrades")}
       </div>
 
       {}
       <div className="svc-row">
-        <label>Soap Type</label>
+        <label>{t("serviceForms.saniclean.soapType")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -954,15 +958,15 @@ export const SanicleanForm: React.FC<
             value={form.soapType}
             onChange={onChange}
           >
-            <option value="standard">Standard (included)</option>
-            <option value="luxury">Luxury (+${form.luxuryUpgradePerDispenser}/disp/wk)</option>
+            <option value="standard">{t("serviceForms.saniclean.standardIncluded")}</option>
+            <option value="luxury">{t("serviceForms.saniclean.luxuryOption", { rate: form.luxuryUpgradePerDispenser })}</option>
           </select>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Luxury Upgrade</label>
+        <label>{t("serviceForms.saniclean.luxuryUpgrade")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -981,8 +985,8 @@ export const SanicleanForm: React.FC<
               color: form.soapType !== "luxury" ? "#999" : "black"
             }}
             title={form.soapType === "luxury"
-              ? "Override the number of dispensers used for the luxury upgrade"
-              : "Luxury soap upgrade quantity (enable luxury soap to edit)"}
+              ? t("serviceForms.saniclean.luxuryQtyTitleEnabled")
+              : t("serviceForms.saniclean.luxuryQtyTitleDisabled")}
           />
           <span>@</span>
           <input
@@ -1002,8 +1006,8 @@ export const SanicleanForm: React.FC<
               color: form.soapType !== "luxury" ? "#999" : "black"
             }}
             title={form.soapType === "luxury"
-              ? "Luxury soap upgrade rate per dispenser per week - editable"
-              : "Luxury soap upgrade (disabled - select luxury soap type to edit)"}
+              ? t("serviceForms.saniclean.luxuryRateTitleEnabled")
+              : t("serviceForms.saniclean.luxuryRateTitleDisabled")}
           />
           <span>=</span>
           <input
@@ -1018,7 +1022,7 @@ export const SanicleanForm: React.FC<
       {}
       {isAllInclusive && (
         <div className="svc-row">
-          <label>Extra Soap</label>
+          <label>{t("serviceForms.saniclean.extraSoap")}</label>
           <div className="svc-row-right">
             <input
               className="svc-in field-qty"
@@ -1037,7 +1041,7 @@ export const SanicleanForm: React.FC<
               name={form.soapType === "luxury" ? "excessLuxurySoapRate" : "excessStandardSoapRate"}
               value={extraSoapRatePerGallon}
               onChange={onChange}
-              title={`Excess ${form.soapType} soap rate per gallon - editable`}
+              title={t("serviceForms.saniclean.extraSoapRateTitle", { type: form.soapType })}
               style={getOverrideStyle(excessSoapRateOverride)}
             />
             <span>=</span>
@@ -1055,16 +1059,16 @@ export const SanicleanForm: React.FC<
       {!isAllInclusive && (
         <>
           <div className="svc-h-sub" style={{ marginTop: 10 }}>
-            FACILITY COMPONENTS (Monthly Charges)
+            {t("serviceForms.saniclean.facilityComponents")}
           </div>
 
           {}
           {form.pricingMode === "per_item_charge" && form.mainServiceFrequency !== "oneTime" && (
             <div className="svc-row">
               <label>
-                Facility Components Frequency
+                {t("serviceForms.saniclean.facilityComponentsFrequency")}
                 <small style={{ display: 'block', fontSize: '11px', color: '#666', fontWeight: 'normal' }}>
-                  Independent of main service frequency
+                  {t("serviceForms.saniclean.independentOfMain")}
                 </small>
               </label>
               <div className="svc-row-right">
@@ -1074,9 +1078,9 @@ export const SanicleanForm: React.FC<
             value={form.facilityComponentsFrequency}
             onChange={(e) => setFacilityComponentsFrequency(e.target.value as SanicleanFrequency)}
           >
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Bi Weekly</option>
-            <option value="monthly">Monthly</option>
+            <option value="weekly">{t("serviceForms.common.weekly")}</option>
+            <option value="biweekly">{t("serviceForms.common.biweeklyAlt")}</option>
+            <option value="monthly">{t("serviceForms.common.monthly")}</option>
           </select>
         </div>
       </div>
@@ -1086,7 +1090,7 @@ export const SanicleanForm: React.FC<
           {form.urinals > 0 && (
             <>
               <div className="svc-row">
-                <label>Urinal Components</label>
+                <label>{t("serviceForms.saniclean.urinalComponents")}</label>
                 <div className="svc-row-right">
                   <label className="svc-inline">
                     <input
@@ -1095,7 +1099,7 @@ export const SanicleanForm: React.FC<
                       checked={form.addUrinalComponents}
                       onChange={onChange}
                     />
-                    <span>Include screens & mats</span>
+                    <span>{t("serviceForms.saniclean.includeScreensMats")}</span>
                   </label>
                 </div>
               </div>
@@ -1104,7 +1108,7 @@ export const SanicleanForm: React.FC<
               {form.addUrinalComponents && (
                 <>
                   <div className="svc-row" style={{ paddingLeft: '20px' }}>
-                    <label>Urinal Screens</label>
+                    <label>{t("serviceForms.saniclean.urinalScreens")}</label>
                     <div className="svc-row-right">
                       <input
                         className="svc-in field-qty"
@@ -1114,7 +1118,7 @@ export const SanicleanForm: React.FC<
                         value={form.urinalScreensQty || ""}
                         onChange={onChange}
                         placeholder="0"
-                        title="Number of urinal screens (manually entered by salesman)"
+                        title={t("serviceForms.saniclean.urinalScreensQtyTitle")}
                       />
                       <span>@</span>
                       <input
@@ -1125,7 +1129,7 @@ export const SanicleanForm: React.FC<
                         name="urinalScreenMonthly"
                         value={form.urinalScreenMonthly}
                         onChange={onChange}
-                        title="Urinal screen rate per month - editable"
+                        title={t("serviceForms.saniclean.urinalScreensRateTitle")}
                         style={getOverrideStyle(hasPricingOverride("urinalScreenMonthly"))}
                       />
                       <span>=</span>
@@ -1139,7 +1143,7 @@ export const SanicleanForm: React.FC<
                   </div>
 
                   <div className="svc-row" style={{ paddingLeft: '20px' }}>
-                    <label>Urinal Mats</label>
+                    <label>{t("serviceForms.saniclean.urinalMats")}</label>
                     <div className="svc-row-right">
                       <input
                         className="svc-in field-qty"
@@ -1149,7 +1153,7 @@ export const SanicleanForm: React.FC<
                         value={form.urinalMatsQty || ""}
                         onChange={onChange}
                         placeholder="0"
-                        title="Number of urinal mats (manually entered by salesman)"
+                        title={t("serviceForms.saniclean.urinalMatsQtyTitle")}
                       />
                       <span>@</span>
                       <input
@@ -1160,7 +1164,7 @@ export const SanicleanForm: React.FC<
                         name="urinalMatMonthly"
                         value={form.urinalMatMonthly}
                         onChange={onChange}
-                        title="Urinal mat rate per month - editable"
+                        title={t("serviceForms.saniclean.urinalMatsRateTitle")}
                         style={getOverrideStyle(hasPricingOverride("urinalMatMonthly"))}
                       />
                       <span>=</span>
@@ -1181,7 +1185,7 @@ export const SanicleanForm: React.FC<
           {form.maleToilets > 0 && (
             <>
               <div className="svc-row">
-                <label>Male Toilet Components</label>
+                <label>{t("serviceForms.saniclean.maleToiletComponents")}</label>
                 <div className="svc-row-right">
                   <label className="svc-inline">
                     <input
@@ -1190,7 +1194,7 @@ export const SanicleanForm: React.FC<
                       checked={form.addMaleToiletComponents}
                       onChange={onChange}
                     />
-                    <span>Include clips & seat covers</span>
+                    <span>{t("serviceForms.saniclean.includeClipsSeatCovers")}</span>
                   </label>
                 </div>
               </div>
@@ -1199,7 +1203,7 @@ export const SanicleanForm: React.FC<
               {form.addMaleToiletComponents && (
                 <>
                   <div className="svc-row" style={{ paddingLeft: '20px' }}>
-                    <label>Toilet Clips</label>
+                    <label>{t("serviceForms.saniclean.toiletClips")}</label>
                     <div className="svc-row-right">
                       <input
                         className="svc-in field-qty"
@@ -1209,7 +1213,7 @@ export const SanicleanForm: React.FC<
                         value={form.toiletClipsQty || ""}
                         onChange={onChange}
                         placeholder="0"
-                        title="Number of toilet clips (manually entered by salesman)"
+                        title={t("serviceForms.saniclean.toiletClipsQtyTitle")}
                       />
                       <span>@</span>
                       <input
@@ -1220,7 +1224,7 @@ export const SanicleanForm: React.FC<
                         name="toiletClipsMonthly"
                         value={form.toiletClipsMonthly}
                         onChange={onChange}
-                        title="Toilet clips rate per month - editable"
+                        title={t("serviceForms.saniclean.toiletClipsRateTitle")}
                         style={getOverrideStyle(hasPricingOverride("toiletClipsMonthly"))}
                       />
                       <span>=</span>
@@ -1234,7 +1238,7 @@ export const SanicleanForm: React.FC<
                   </div>
 
                   <div className="svc-row" style={{ paddingLeft: '20px' }}>
-                    <label>Seat Cover Dispensers</label>
+                    <label>{t("serviceForms.saniclean.seatCoverDispensers")}</label>
                     <div className="svc-row-right">
                       <input
                         className="svc-in field-qty"
@@ -1244,7 +1248,7 @@ export const SanicleanForm: React.FC<
                         value={form.seatCoverDispensersQty || ""}
                         onChange={onChange}
                         placeholder="0"
-                        title="Number of seat cover dispensers (manually entered by salesman)"
+                        title={t("serviceForms.saniclean.seatCoverQtyTitle")}
                       />
                       <span>@</span>
                       <input
@@ -1255,7 +1259,7 @@ export const SanicleanForm: React.FC<
                         name="seatCoverDispenserMonthly"
                         value={form.seatCoverDispenserMonthly}
                         onChange={onChange}
-                        title="Seat cover dispenser rate per month - editable"
+                        title={t("serviceForms.saniclean.seatCoverRateTitle")}
                         style={getOverrideStyle(hasPricingOverride("seatCoverDispenserMonthly"))}
                       />
                       <span>=</span>
@@ -1276,7 +1280,7 @@ export const SanicleanForm: React.FC<
           {form.femaleToilets > 0 && (
             <>
               <div className="svc-row">
-                <label>Female Toilet Components</label>
+                <label>{t("serviceForms.saniclean.femaleToiletComponents")}</label>
                 <div className="svc-row-right">
                   <label className="svc-inline">
                     <input
@@ -1285,7 +1289,7 @@ export const SanicleanForm: React.FC<
                       checked={form.addFemaleToiletComponents}
                       onChange={onChange}
                     />
-                    <span>Include SaniPods</span>
+                    <span>{t("serviceForms.saniclean.includeSanipods")}</span>
                   </label>
                 </div>
               </div>
@@ -1293,7 +1297,7 @@ export const SanicleanForm: React.FC<
               {}
               {form.addFemaleToiletComponents && (
                 <div className="svc-row" style={{ paddingLeft: '20px' }}>
-                  <label>SaniPods</label>
+                  <label>{t("serviceForms.saniclean.sanipods")}</label>
                   <div className="svc-row-right">
                     <input
                       className="svc-in field-qty"
@@ -1303,7 +1307,7 @@ export const SanicleanForm: React.FC<
                       value={form.sanipodsQty || ""}
                       onChange={onChange}
                       placeholder="0"
-                      title="Number of SaniPods (manually entered by salesman)"
+                      title={t("serviceForms.saniclean.sanipodsQtyTitle")}
                     />
                     <span>@</span>
                     <input
@@ -1314,7 +1318,7 @@ export const SanicleanForm: React.FC<
                       name="sanipodServiceMonthly"
                       value={form.sanipodServiceMonthly}
                       onChange={onChange}
-                      title="SaniPod service rate per month - editable"
+                      title={t("serviceForms.saniclean.sanipodsRateTitle")}
                       style={getOverrideStyle(hasPricingOverride("sanipodServiceMonthly"))}
                     />
                     <span>=</span>
@@ -1337,8 +1341,8 @@ export const SanicleanForm: React.FC<
             <>
               <div className="svc-row">
                 <label>
-                  Total Facility Components
-                  {form.mainServiceFrequency !== "oneTime" ? ` (at ${form.facilityComponentsFrequency} frequency)` : ""}
+                  {t("serviceForms.saniclean.totalFacilityComponents")}
+                  {form.mainServiceFrequency !== "oneTime" ? t("serviceForms.saniclean.atFrequency", { frequency: form.facilityComponentsFrequency }) : ""}
                 </label>
                 <div className="svc-row-right">
                   <input
@@ -1350,7 +1354,7 @@ export const SanicleanForm: React.FC<
                       (form.addMaleToiletComponents ? (form.toiletClipsQty * form.toiletClipsMonthly + form.seatCoverDispensersQty * form.seatCoverDispenserMonthly) : 0) +
                       (form.addFemaleToiletComponents ? form.sanipodsQty * form.sanipodServiceMonthly : 0)
                     )}
-                    title={`Component rates treated as ${form.facilityComponentsFrequency} rates - no conversion applied`}
+                    title={t("serviceForms.saniclean.facilityComponentRatesTitle", { frequency: form.facilityComponentsFrequency })}
                   />
                 </div>
               </div>
@@ -1358,14 +1362,14 @@ export const SanicleanForm: React.FC<
               {}
               {form.mainServiceFrequency !== "oneTime" && (
                 <div className="svc-row">
-                  <label>Facility Component Monthly Total</label>
+                  <label>{t("serviceForms.saniclean.facilityComponentMonthlyTotal")}</label>
                   <div className="svc-row-right">
                     <input
                       className="svc-in-box"
                       type="text"
                       readOnly
                       value={formatMoney(quote.breakdown.facilityComponents)}
-                      title="Facility components monthly recurring cost (includes frequency multiplier)"
+                      title={t("serviceForms.saniclean.facilityComponentMonthlyTitle")}
                     />
                   </div>
                 </div>
@@ -1378,7 +1382,7 @@ export const SanicleanForm: React.FC<
       {}
       {!isAllInclusive && form.sinks > 0 && (
         <div className="svc-row">
-          <label>Warranty</label>
+          <label>{t("serviceForms.saniclean.warranty")}</label>
           <div className="svc-row-right">
             <input
               className="svc-in field-qty"
@@ -1388,7 +1392,7 @@ export const SanicleanForm: React.FC<
               value={form.warrantyDispensers || ""}
               onChange={onChange}
               placeholder="0"
-              title="Number of dispensers for warranty (manually entered by salesman)"
+              title={t("serviceForms.saniclean.warrantyQtyTitle")}
             />
             <span>@</span>
             <input
@@ -1399,7 +1403,7 @@ export const SanicleanForm: React.FC<
               name="warrantyFeePerDispenserPerWeek"
               value={form.warrantyFeePerDispenserPerWeek}
               onChange={onChange}
-              title="Warranty rate per dispenser per week - editable"
+              title={t("serviceForms.saniclean.warrantyRateTitle")}
               style={getOverrideStyle(hasPricingOverride("warrantyFeePerDispenserPerWeek"))}
             />
             <span>=</span>
@@ -1410,7 +1414,7 @@ export const SanicleanForm: React.FC<
               value={formatMoney(form.warrantyDispensers * form.warrantyFeePerDispenserPerWeek)}
             />
             <span className="svc-note" style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
-              Suggested: {Math.ceil(form.sinks * 1.5)} dispensers (soap + air freshener)
+              {t("serviceForms.saniclean.warrantySuggested", { count: Math.ceil(form.sinks * 1.5) })}
             </span>
           </div>
         </div>
@@ -1421,24 +1425,24 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-h-sub" style={{ marginTop: 10 }}>
-        MICROFIBER MOPPING
+        {t("serviceForms.saniclean.microfiberMopping")}
       </div>
 
       {isAllInclusive ? (
         <div className="svc-row">
-          <label>Microfiber Mopping</label>
+          <label>{t("serviceForms.saniclean.microfiberMoppingLabel")}</label>
           <div className="svc-row-right">
             <input
               className="svc-in field-qty"
               type="text"
               readOnly
-              value="Included in All-Inclusive bundle"
+              value={t("serviceForms.saniclean.includedInBundle")}
             />
           </div>
         </div>
       ) : (
         <div className="svc-row">
-          <label>Microfiber Mopping</label>
+          <label>{t("serviceForms.saniclean.microfiberMoppingLabel")}</label>
           <div className="svc-row-right">
             <label className="svc-inline">
               <input
@@ -1447,7 +1451,7 @@ export const SanicleanForm: React.FC<
                 checked={form.addMicrofiberMopping}
                 onChange={onChange}
               />
-              <span>Include</span>
+              <span>{t("serviceForms.saniclean.include")}</span>
             </label>
             <input
               className="svc-in field-qty"
@@ -1467,7 +1471,7 @@ export const SanicleanForm: React.FC<
               name="microfiberMoppingPerBathroom"
               value={form.addMicrofiberMopping ? form.microfiberMoppingPerBathroom : 0}
               onChange={onChange}
-              title="Microfiber mopping rate per bathroom per week - editable"
+              title={t("serviceForms.saniclean.microfiberRateTitle")}
               style={getOverrideStyle(hasPricingOverride("microfiberMoppingPerBathroom"))}
             />
             <span>=</span>
@@ -1489,11 +1493,11 @@ export const SanicleanForm: React.FC<
       {isAllInclusive && (
         <>
           <div className="svc-h-sub" style={{ marginTop: 10 }}>
-            PAPER
+            {t("serviceForms.saniclean.paper")}
           </div>
 
           <div className="svc-row">
-            <label>Paper Spend - Credit = Overage</label>
+            <label>{t("serviceForms.saniclean.paperSpendCreditOverage")}</label>
             <div className="svc-row-right">
               <input
                 className="svc-in"
@@ -1524,11 +1528,11 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-h-sub" style={{ marginTop: 10 }}>
-        WHAT&apos;S INCLUDED
+        {t("serviceForms.saniclean.whatsIncluded")}
       </div>
 
       <div className="svc-row">
-        <label>{isAllInclusive ? "All-Inclusive Bundle" : "Standard Package"}</label>
+        <label>{isAllInclusive ? t("serviceForms.saniclean.allInclusiveBundle") : t("serviceForms.saniclean.standardPackage")}</label>
         <div className="svc-row-right">
           <IncludedItemsEditor
             items={quote.included}
@@ -1547,12 +1551,12 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-h-sub" style={{ marginTop: 16 }}>
-        PRICE BREAKDOWN
+        {t("serviceForms.saniclean.priceBreakdown")}
       </div>
 
       {}
       <div className="svc-row">
-        <label>Minimum Per Visit</label>
+        <label>{t("serviceForms.common.minimumPerVisit")}</label>
         <div className="svc-row-right">
           <span className="svc-small">${quote.minimumChargePerWeek != null ? quote.minimumChargePerWeek.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00"}</span>
           <label className="svc-inline" style={{ marginLeft: '10px' }}>
@@ -1562,14 +1566,14 @@ export const SanicleanForm: React.FC<
               checked={form.applyMinimum !== false}
               onChange={onChange}
             />
-            <span>Apply Minimum</span>
+            <span>{t("serviceForms.common.applyMinimum")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Base Service</label>
+        <label>{t("serviceForms.saniclean.baseService")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -1606,7 +1610,7 @@ export const SanicleanForm: React.FC<
       {}
       {form.pricingMode === "per_item_charge" && quote.breakdown.facilityComponents > 0 && (
         <div className="svc-row">
-          <label>Facility Components</label>
+          <label>{t("serviceForms.saniclean.facilityComponentsLabel")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1631,7 +1635,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customFacilityComponents !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Facility components (urinals, toilets, sanipods) - editable"
+                title={t("serviceForms.saniclean.facilityComponentsBreakdownTitle")}
               />
             </div>
           </div>
@@ -1641,7 +1645,7 @@ export const SanicleanForm: React.FC<
       {}
       {quote.breakdown.soapUpgrade > 0 && (
         <div className="svc-row">
-          <label>Soap Upgrade</label>
+          <label>{t("serviceForms.saniclean.soapUpgrade")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1665,7 +1669,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customSoapUpgrade !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Soap upgrade (luxury) - editable"
+                title={t("serviceForms.saniclean.soapUpgradeTitle")}
               />
             </div>
           </div>
@@ -1675,7 +1679,7 @@ export const SanicleanForm: React.FC<
       {}
       {quote.breakdown.excessSoap > 0 && (
         <div className="svc-row">
-          <label>Excess Soap</label>
+          <label>{t("serviceForms.saniclean.excessSoap")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1698,7 +1702,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customExcessSoap !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Excess soap charges - editable"
+                title={t("serviceForms.saniclean.excessSoapTitle")}
               />
             </div>
           </div>
@@ -1708,7 +1712,7 @@ export const SanicleanForm: React.FC<
       {}
       {quote.breakdown.microfiberMopping > 0 && (
         <div className="svc-row">
-          <label>Microfiber Mopping</label>
+          <label>{t("serviceForms.saniclean.microfiberMoppingLabel")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1732,7 +1736,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customMicrofiberMopping !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Microfiber mopping - editable"
+                title={t("serviceForms.saniclean.microfiberMoppingTitle")}
               />
             </div>
           </div>
@@ -1742,7 +1746,7 @@ export const SanicleanForm: React.FC<
       {}
       {form.pricingMode === "per_item_charge" && quote.breakdown.warrantyFees > 0 && (
         <div className="svc-row">
-          <label>Warranty Fees</label>
+          <label>{t("serviceForms.saniclean.warrantyFees")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1766,7 +1770,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customWarrantyFees !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Warranty fees - editable"
+                title={t("serviceForms.saniclean.warrantyFeesTitle")}
               />
             </div>
           </div>
@@ -1776,7 +1780,7 @@ export const SanicleanForm: React.FC<
       {}
       {form.pricingMode === "all_inclusive" && quote.breakdown.paperOverage > 0 && (
         <div className="svc-row">
-          <label>Paper Overage</label>
+          <label>{t("serviceForms.saniclean.paperOverage")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1799,7 +1803,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: form.customPaperOverage !== undefined ? '#fffacd' : 'white',
                   width: '100px'
                 }}
-                title="Paper overage - editable"
+                title={t("serviceForms.saniclean.paperOverageTitle")}
               />
             </div>
           </div>
@@ -1827,7 +1831,7 @@ export const SanicleanForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                <FaCircle color="#16a34a" /> Greenline Pricing
+                <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
               </span>
             ) : (
               <span style={{
@@ -1839,7 +1843,7 @@ export const SanicleanForm: React.FC<
                 borderRadius: '4px',
                 display: 'inline-block'
               }}>
-                <FaCircle color="#dc2626" /> Redline Pricing
+                <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
               </span>
             )}
           </div>
@@ -1849,7 +1853,7 @@ export const SanicleanForm: React.FC<
       {}
       {['weekly', 'biweekly', 'twicePerMonth', 'monthly', 'everyFourWeeks'].includes(form.mainServiceFrequency) && (
         <div className="svc-row">
-          <label>Base Service Monthly Total</label>
+          <label>{t("serviceForms.saniclean.baseServiceMonthlyTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1862,7 +1866,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: 'white',
                   width: '100px'
                 }}
-                title="Base service monthly total (service × frequency)"
+                title={t("serviceForms.saniclean.baseServiceMonthlyTitle")}
               />
             </div>
           </div>
@@ -1874,7 +1878,7 @@ export const SanicleanForm: React.FC<
        (form.addUrinalComponents || form.addMaleToiletComponents || form.addFemaleToiletComponents) &&
        ['weekly', 'biweekly', 'twicePerMonth', 'monthly', 'everyFourWeeks'].includes(form.mainServiceFrequency) && (
         <div className="svc-row">
-          <label>Facility Component Monthly Total</label>
+          <label>{t("serviceForms.saniclean.facilityComponentMonthlyTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1887,7 +1891,7 @@ export const SanicleanForm: React.FC<
                   backgroundColor: 'white',
                   width: '100px'
                 }}
-                title="Facility components monthly total (components × facility frequency)"
+                title={t("serviceForms.saniclean.facilityMonthlyTitle")}
               />
             </div>
           </div>
@@ -1896,7 +1900,7 @@ export const SanicleanForm: React.FC<
 
       {form.mainServiceFrequency !== "oneTime" && (
         <div className="svc-row">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div className="svc-row-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <select
               className="svc-in"
@@ -1906,7 +1910,7 @@ export const SanicleanForm: React.FC<
             >
               {Array.from({ length: 35 }, (_, i) => i + 2).map((m) => (
                 <option key={m} value={m}>
-                  {m} mo
+                  {t("serviceForms.common.monthsShort", { count: m })}
                 </option>
               ))}
             </select>
@@ -1938,14 +1942,14 @@ export const SanicleanForm: React.FC<
                 padding: '4px',
                 width: '140px'
               }}
-              title="Contract total - editable"
+              title={t("serviceForms.saniclean.contractTotalTitle")}
             />
           </div>
         </div>
       )}
       {totalPriceValue !== undefined && (
         <div className="svc-row svc-row-charge">
-          <label>Total Price</label>
+          <label>{t("serviceForms.common.totalPrice")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -1963,7 +1967,7 @@ export const SanicleanForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Notes</label>
+        <label>{t("serviceForms.common.notes")}</label>
         <div className="svc-row-right">
           <textarea
             className="svc-in"

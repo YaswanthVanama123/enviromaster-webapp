@@ -1,0 +1,52 @@
+{
+  "title": "My Inside Sales Status",
+  "subtitle": "View your Inside Sales eligibility based on your agreements in Lisa Rothwell's audit history",
+  "checking": "Checking...",
+  "notLoggedIn": "User not logged in",
+  "checkFailed": "Failed to check inside sales eligibility",
+  "checkError": "Error checking inside sales eligibility",
+  "loadingCard": "Checking your Inside Sales eligibility...",
+  "statusHasDeduction": "Inside Sales (3% Deduction)",
+  "statusNoDeduction": "No Inside Sales Deduction",
+  "statusDetails": "{{total}} total agreements | {{uploaded}} uploaded to Bigin | {{matched}} found in audit",
+  "lastChecked": "Last checked: {{date}}",
+  "stats": {
+    "totalAgreements": "Total Agreements",
+    "uploadedToBigin": "Uploaded to Bigin",
+    "foundInAudit": "Found in Lisa's Audit"
+  },
+  "matchingRecords": {
+    "title": "Matching Audit Records",
+    "subtitle": "These agreements were found in Lisa Rothwell's audit history (last 1 year)",
+    "biginId": "Bigin ID",
+    "recordName": "Record Name",
+    "action": "Action",
+    "module": "Module",
+    "timestamp": "Timestamp"
+  },
+  "agreementsTable": {
+    "title": "Your Agreements ({{total}} total, {{uploaded}} uploaded to Bigin)",
+    "subtitle": "List of your agreements and their Bigin upload status",
+    "agreementTitle": "Agreement Title",
+    "biginDealId": "Bigin Deal ID",
+    "dealName": "Deal Name",
+    "createdAt": "Created At",
+    "status": "Status",
+    "notUploaded": "Not uploaded",
+    "badgeNotUploaded": "Not Uploaded",
+    "badgeFoundInAudit": "Found in Audit",
+    "badgeNotInAudit": "Not in Audit",
+    "empty": "No agreements found. Create agreements and upload them to Bigin to track your Inside Sales eligibility."
+  },
+  "info": {
+    "title": "How Inside Sales Works",
+    "item1": "When you create and upload agreements to Bigin, they get a Bigin Deal ID",
+    "item2": "Lisa Rothwell processes these deals, creating audit records",
+    "item3Prefix": "If any of your agreement's Bigin IDs appear in Lisa's audit history within the last year, you are classified as ",
+    "item3Bold": "Inside Sales",
+    "item4": "Inside Sales = 3% deduction",
+    "item4Suffix": " from your commission",
+    "item5Bold": "No matches = No deduction",
+    "item5Suffix": " - you keep your full commission"
+  }
+}

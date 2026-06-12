@@ -8,6 +8,7 @@ import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
 import { FaCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -32,6 +33,8 @@ const formatNumber = (num: number): string => {
 export const SaniscrubForm: React.FC<
   ServiceInitialData<SaniscrubFormState>
 > = ({ initialData, onRemove }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -288,7 +291,7 @@ export const SaniscrubForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="SANISCRUB"
+      title={t("serviceForms.saniscrub.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -299,9 +302,9 @@ export const SaniscrubForm: React.FC<
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
-            <span className="svc-sr-only">Loading configuration...</span>
+            <span className="svc-sr-only">{t("serviceForms.common.loadingConfiguration")}</span>
           </div>
-          <p className="svc-loading-text">Loading configuration...</p>
+          <p className="svc-loading-text">{t("serviceForms.common.loadingConfiguration")}</p>
         </div>
       )}
 
@@ -326,18 +329,17 @@ export const SaniscrubForm: React.FC<
           }}
         >
           <div style={{ fontWeight: "bold", color: "#2e7d32", fontSize: "14px" }}>
-            ✓ INCLUDED in SaniClean All-Inclusive Package
+            {t("serviceForms.saniscrub.includedTitle")}
           </div>
           <div style={{ fontSize: "13px", color: "#555", marginTop: "4px" }}>
-            Monthly SaniScrub is already included at no additional charge. This
-            form is for reference only.
+            {t("serviceForms.saniscrub.includedBody")}
           </div>
         </div>
       )}
 
       {}
       <div className="svc-row">
-        <label>Combined with SaniClean?</label>
+        <label>{t("serviceForms.saniscrub.combinedWithSaniClean")}</label>
         <div className="svc-row-right">
           <label className="svc-inline">
             <input
@@ -346,14 +348,14 @@ export const SaniscrubForm: React.FC<
               checked={form.hasSaniClean}
               onChange={onChange}
             />
-            <span>Yes</span>
+            <span>{t("serviceForms.saniscrub.yes")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -361,10 +363,10 @@ export const SaniscrubForm: React.FC<
             value={form.frequency}
             onChange={onChange}
           >
-            {Object.entries(saniscrubFrequencyLabels).map(
-              ([value, label]) => (
+            {Object.keys(saniscrubFrequencyLabels).map(
+              (value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(`serviceForms.saniscrub.freq.${value}`)}
                 </option>
               )
             )}
@@ -374,7 +376,7 @@ export const SaniscrubForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Restroom Fixtures</label>
+        <label>{t("serviceForms.common.restroomFixtures")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -417,7 +419,7 @@ export const SaniscrubForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>First {calc.nonBathroomUnitSqFt} sq ft Rate</label>
+        <label>{t("serviceForms.saniscrub.firstSqftRate", { units: calc.nonBathroomUnitSqFt })}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -430,15 +432,15 @@ export const SaniscrubForm: React.FC<
               value={form.nonBathroomFirstUnitRate || ""}
               onChange={onChange}
               style={{ backgroundColor: pricingOverrides?.nonBathroomFirstUnitRate ? '#fffacd' : 'white' }}
-              title={`Rate for first ${calc.nonBathroomUnitSqFt} sq ft (from backend, editable)`}
+              title={t("serviceForms.saniscrub.firstSqftRateTitle", { units: calc.nonBathroomUnitSqFt })}
             />
           </div>
-          <span className="svc-small">/ {calc.nonBathroomUnitSqFt} sq ft (${((form.nonBathroomFirstUnitRate || 250) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)</span>
+          <span className="svc-small">{t("serviceForms.saniscrub.perUnitSqft", { units: calc.nonBathroomUnitSqFt, perSqFt: ((form.nonBathroomFirstUnitRate || 250) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}</span>
         </div>
       </div>
 
       <div className="svc-row">
-        <label>Additional Rate</label>
+        <label>{t("serviceForms.saniscrub.additionalRate")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -451,16 +453,16 @@ export const SaniscrubForm: React.FC<
               value={form.nonBathroomAdditionalUnitRate || ""}
               onChange={onChange}
               style={{ backgroundColor: pricingOverrides?.nonBathroomAdditionalUnitRate ? '#fffacd' : 'white' }}
-              title={`Rate per additional ${calc.nonBathroomUnitSqFt} sq ft block (from backend, editable)`}
+              title={t("serviceForms.saniscrub.additionalRateTitle", { units: calc.nonBathroomUnitSqFt })}
             />
           </div>
-          <span className="svc-small">/ {calc.nonBathroomUnitSqFt} sq ft (${((form.nonBathroomAdditionalUnitRate || 125) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)</span>
+          <span className="svc-small">{t("serviceForms.saniscrub.perUnitSqft", { units: calc.nonBathroomUnitSqFt, perSqFt: ((form.nonBathroomAdditionalUnitRate || 125) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}</span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Non-Bathroom Area</label>
+        <label>{t("serviceForms.saniscrub.nonBathroomArea")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -470,9 +472,9 @@ export const SaniscrubForm: React.FC<
             value={form.nonBathroomSqFt || ""}
             onChange={onChange}
           />
-          <span className="svc-small">sq ft</span>
+          <span className="svc-small">{t("serviceForms.common.sqFt")}</span>
           <span>@</span>
-          <span className="svc-small">calculated rate</span>
+          <span className="svc-small">{t("serviceForms.saniscrub.calculatedRate")}</span>
           <span>=</span>
           <div className="svc-dollar field-qty">
             <span>$</span>
@@ -481,7 +483,7 @@ export const SaniscrubForm: React.FC<
               type="text"
               readOnly
               value={nonBathroomLineDisplayAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              title="Calculated non-bathroom area total per visit"
+              title={t("serviceForms.saniscrub.nonBathroomTotalTitle")}
             />
           </div>
         </div>
@@ -489,7 +491,7 @@ export const SaniscrubForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Calculation Method</label>
+        <label>{t("serviceForms.common.calculationMethod")}</label>
         <div className="svc-row-right">
           <label className="svc-inline">
             <input
@@ -498,12 +500,12 @@ export const SaniscrubForm: React.FC<
               checked={form.useExactNonBathroomSqft}
               onChange={onChange}
             />
-            <span>Exact SqFt Calculation</span>
+            <span>{t("serviceForms.common.exactSqftCalculation")}</span>
           </label>
           <span className="svc-small">
             {form.useExactNonBathroomSqft
-              ? `(Exact: $${form.nonBathroomFirstUnitRate} + extra sq ft × $${((form.nonBathroomAdditionalUnitRate || 125) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/sq ft)`
-              : `(Block: $${form.nonBathroomFirstUnitRate} + blocks × $${form.nonBathroomAdditionalUnitRate})`}
+              ? t("serviceForms.saniscrub.exactCalcInfo", { base: form.nonBathroomFirstUnitRate, perSqFt: ((form.nonBathroomAdditionalUnitRate || 125) / calc.nonBathroomUnitSqFt).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) })
+              : t("serviceForms.saniscrub.blockCalcInfo", { base: form.nonBathroomFirstUnitRate, block: form.nonBathroomAdditionalUnitRate })}
           </span>
         </div>
       </div>
@@ -516,7 +518,7 @@ export const SaniscrubForm: React.FC<
 
       {}
       <div className="svc-row svc-row-install">
-        <label>Install (First Visit Only)</label>
+        <label>{t("serviceForms.saniscrub.install")}</label>
         <div className="svc-row-right">
           <label className="svc-inline">
             <input
@@ -525,7 +527,7 @@ export const SaniscrubForm: React.FC<
               checked={form.includeInstall}
               onChange={onChange}
             />
-            <span>Install</span>
+            <span>{t("serviceForms.saniscrub.installLabel")}</span>
           </label>
           <label className="svc-inline">
             <input
@@ -534,7 +536,7 @@ export const SaniscrubForm: React.FC<
               checked={form.isDirtyInstall}
               onChange={onChange}
             />
-            <span>Dirty (</span>
+            <span>{t("serviceForms.saniscrub.dirty")}</span>
             <input
               className="svc-in multiplier-field"
               type="number"
@@ -545,9 +547,9 @@ export const SaniscrubForm: React.FC<
               onChange={onChange}
               style={{ display: "inline", backgroundColor: pricingOverrides?.installMultiplierDirty ? '#fffacd' : 'white' }}
             />
-            <span>×)</span>
+            <span>{t("serviceForms.saniscrub.multiplierClose")}</span>
           </label>
-          <span className="svc-small">or Clean (</span>
+          <span className="svc-small">{t("serviceForms.saniscrub.clean")}</span>
           <input
             className="svc-in multiplier-field"
             type="number"
@@ -558,14 +560,14 @@ export const SaniscrubForm: React.FC<
               onChange={onChange}
               style={{ display: "inline", backgroundColor: pricingOverrides?.installMultiplierClean ? '#fffacd' : 'white' }}
             />
-          <span className="svc-small">×)</span>
+          <span className="svc-small">{t("serviceForms.saniscrub.multiplierClose")}</span>
         </div>
       </div>
 
       {}
       {form.includeInstall && (
         <div className="svc-row svc-row-charge">
-          <label>Installation Total</label>
+          <label>{t("serviceForms.common.installationTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -591,14 +593,14 @@ export const SaniscrubForm: React.FC<
                 }}
               />
             </div>
-            <span className="svc-small"> one-time</span>
+            <span className="svc-small">{t("serviceForms.saniscrub.oneTime")}</span>
           </div>
         </div>
       )}
 
                   {}
       <div className="svc-row svc-row-charge">
-        <label>Minimum Per Visit</label>
+        <label>{t("serviceForms.common.minimumPerVisit")}</label>
         <div className="svc-row-right">
           <span className="svc-small">${(form.frequency === "monthly" || form.frequency === "twicePerMonth" ? form.minimumMonthly : form.minimumBimonthly) != null ? (form.frequency === "monthly" || form.frequency === "twicePerMonth" ? form.minimumMonthly : form.minimumBimonthly)!.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "0.00"}</span>
           <label className="svc-inline" style={{ marginLeft: '10px' }}>
@@ -608,13 +610,13 @@ export const SaniscrubForm: React.FC<
               checked={form.applyMinimum !== false}
               onChange={onChange}
             />
-            <span>Apply Minimum</span>
+            <span>{t("serviceForms.common.applyMinimum")}</span>
           </label>
         </div>
       </div>
 
       <div className="svc-row svc-row-charge">
-        <label>Per-Visit Total</label>
+        <label>{t("serviceForms.common.perVisitTotalShort")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -630,7 +632,7 @@ export const SaniscrubForm: React.FC<
 
       {}
       <div className="svc-row svc-row-charge">
-        <label>{calc.isVisitBasedFrequency ? "First Visit Total" : "First Month Total"}</label>
+        <label>{calc.isVisitBasedFrequency ? t("serviceForms.common.firstVisitTotal") : t("serviceForms.common.firstMonthTotal")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -652,7 +654,7 @@ export const SaniscrubForm: React.FC<
               onFocus={handleFocus}
               onBlur={handleBlur}
               style={{ backgroundColor: form.customFirstMonthPrice !== undefined ? '#fffacd' : 'white' }}
-              title="Override first month calculation (clear to use auto-calculated value)"
+              title={t("serviceForms.saniscrub.installFirstMonthTitle")}
             />
           </div>
         </div>
@@ -668,11 +670,11 @@ export const SaniscrubForm: React.FC<
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
                 <span className="em-pricing-tier em-pricing-tier--green">
-                  <FaCircle color="#16a34a" /> Greenline Pricing
+                  <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
                 </span>
               ) : (
                 <span className="em-pricing-tier em-pricing-tier--red">
-                  <FaCircle color="#dc2626" /> Redline Pricing
+                  <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
                 </span>
               )}
           </div>
@@ -683,7 +685,7 @@ export const SaniscrubForm: React.FC<
       {(form.frequency === "weekly" || form.frequency === "biweekly" ||
         form.frequency === "twicePerMonth" || form.frequency === "monthly") && (
         <div className="svc-row svc-row-charge">
-          <label>Monthly Recurring</label>
+          <label>{t("serviceForms.common.monthlyRecurring")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -704,7 +706,7 @@ export const SaniscrubForm: React.FC<
                   }
                 }}
                 style={{ backgroundColor: form.customMonthlyRecurring !== undefined ? '#fffacd' : 'white' }}
-                title="Override monthly recurring calculation (clear to use auto-calculated value)"
+                title={t("serviceForms.saniscrub.monthlyRecurringTitle")}
               />
             </div>
           </div>
@@ -716,7 +718,7 @@ export const SaniscrubForm: React.FC<
         form.frequency === "biannual" || form.frequency === "annual" ||
         form.frequency === "everyFourWeeks") && (
         <div className="svc-row svc-row-charge">
-          <label>Recurring Visit Total</label>
+          <label>{t("serviceForms.common.recurringVisitTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -725,7 +727,7 @@ export const SaniscrubForm: React.FC<
                 type="text"
                 readOnly
                 value={calc.perVisitEffective.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                title="Cost per recurring visit (after first visit)"
+                title={t("serviceForms.saniscrub.recurringVisitTitle")}
               />
             </div>
           </div>
@@ -735,7 +737,7 @@ export const SaniscrubForm: React.FC<
       {}
       {form.frequency === "oneTime" && (
         <div className="svc-row svc-row-charge">
-          <label>Total Price</label>
+          <label>{t("serviceForms.common.totalPrice")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -755,7 +757,7 @@ export const SaniscrubForm: React.FC<
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 style={{ backgroundColor: form.customFirstMonthPrice !== undefined ? '#fffacd' : 'white' }}
-                title="Total price for one-time service (includes installation if selected)"
+                title={t("serviceForms.saniscrub.oneTimeTotalTitle")}
               />
             </div>
           </div>
@@ -768,7 +770,7 @@ export const SaniscrubForm: React.FC<
       {}
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-charge">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div className="svc-row-right">
             <select
               className="svc-in"
@@ -790,7 +792,7 @@ export const SaniscrubForm: React.FC<
                   for (let months = 2; months <= 36; months++) options.push(months);
                 }
                 return options.map((months) => (
-                  <option key={months} value={months}>{months} mo</option>
+                  <option key={months} value={months}>{t("serviceForms.common.monthsShort", { count: months })}</option>
                 ));
               })()}
             </select>
@@ -823,7 +825,7 @@ export const SaniscrubForm: React.FC<
                   padding: '4px',
                   width: '140px'
                 }}
-                title="Contract total - editable"
+                title={t("serviceForms.saniscrub.contractTotalTitle")}
               />
             </div>
           </div>

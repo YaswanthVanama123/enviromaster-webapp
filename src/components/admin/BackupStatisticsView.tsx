@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faBox,
   faHdd,
@@ -24,6 +25,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
   error,
   onRefresh
 }) => {
+  const { t } = useTranslation();
   const processedStats = useMemo(() => {
     if (!statistics || !statistics.sizeStatistics) return null;
 
@@ -248,9 +250,9 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
     return (
       <div className="bsv-loading-state" style={styles.loadingState}>
         <div className="bsv-spinner-inline">
-          <span className="bsv-sr-only">Loading statistics…</span>
+          <span className="bsv-sr-only">{t("adminTools.backup.statistics.loadingStatistics")}</span>
         </div>
-        <p className="bsv-loading-text">Loading statistics...</p>
+        <p className="bsv-loading-text">{t("adminTools.backup.statistics.loadingStatistics")}</p>
       </div>
     );
   }
@@ -258,7 +260,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
   if (error) {
     return (
       <div className="bsv-error-state" style={styles.errorState}>
-        <strong>Error loading statistics:</strong> {error}
+        <strong>{t("adminTools.backup.statistics.errorLoading")}</strong> {error}
         <button
           onClick={onRefresh}
           style={{
@@ -272,7 +274,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
             cursor: 'pointer'
           }}
         >
-          Retry
+          {t("adminTools.backup.statistics.retry")}
         </button>
       </div>
     );
@@ -281,7 +283,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
   if (!processedStats) {
     return (
       <div className="bsv-loading-state" style={styles.loadingState}>
-        <div>No statistics available</div>
+        <div>{t("adminTools.backup.statistics.noStatistics")}</div>
       </div>
     );
   }
@@ -304,11 +306,11 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
       <div className="bsv-grid" style={styles.grid}>
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-card-header" style={styles.cardHeader}>
-            <h3 className="bsv-card-title" style={styles.cardTitle}>Total Backups</h3>
+            <h3 className="bsv-card-title" style={styles.cardTitle}>{t("adminTools.backup.statistics.totalBackups")}</h3>
             <div className="bsv-card-icon" style={styles.cardIcon}><FontAwesomeIcon icon={faBox} /></div>
           </div>
           <div className="bsv-stat-value" style={styles.statValue}>{processedStats?.totalBackups || 0}</div>
-          <div className="bsv-stat-label" style={styles.statLabel}>Across {processedStats?.uniqueChangeDays || 0} change days</div>
+          <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.acrossChangeDays", { count: processedStats?.uniqueChangeDays || 0 })}</div>
           {(processedStats?.uniqueChangeDays || 0) <= 10 && (
             <div className="bsv-progress-bar" style={styles.progressBar}>
               <div
@@ -321,17 +323,17 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
             </div>
           )}
           <div className="bsv-stat-subtext" style={styles.statSubtext}>
-            {processedStats?.retentionCompliance ? 'Within retention limit' : 'Exceeds retention limit'}
+            {processedStats?.retentionCompliance ? t("adminTools.backup.statistics.withinRetention") : t("adminTools.backup.statistics.exceedsRetention")}
           </div>
         </div>
 
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-card-header" style={styles.cardHeader}>
-            <h3 className="bsv-card-title" style={styles.cardTitle}>Storage Efficiency</h3>
+            <h3 className="bsv-card-title" style={styles.cardTitle}>{t("adminTools.backup.statistics.storageEfficiency")}</h3>
             <div className="bsv-card-icon" style={styles.cardIcon}><FontAwesomeIcon icon={faHdd} /></div>
           </div>
           <div className="bsv-stat-value" style={styles.statValue}>{processedStats?.avgSavingsPercent || 0}%</div>
-          <div className="bsv-stat-label" style={styles.statLabel}>Average compression savings</div>
+          <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.averageCompressionSavings")}</div>
           <div className="bsv-progress-bar" style={styles.progressBar}>
             <div
               className="bsv-progress-fill"
@@ -342,30 +344,30 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
             />
           </div>
           <div className="bsv-stat-subtext" style={styles.statSubtext}>
-            Saved {backupUtils.formatFileSize(processedStats?.totalSavings || 0)} total
+            {t("adminTools.backup.statistics.savedTotal", { size: backupUtils.formatFileSize(processedStats?.totalSavings || 0) })}
           </div>
         </div>
 
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-card-header" style={styles.cardHeader}>
-            <h3 className="bsv-card-title" style={styles.cardTitle}>Storage Usage</h3>
+            <h3 className="bsv-card-title" style={styles.cardTitle}>{t("adminTools.backup.statistics.storageUsage")}</h3>
             <div className="bsv-card-icon" style={styles.cardIcon}><FontAwesomeIcon icon={faChartBar} /></div>
           </div>
           <div className="bsv-stat-value" style={styles.statValue}>
             {backupUtils.formatFileSize(processedStats?.sizeStatistics?.totalCompressedSize || 0)}
           </div>
-          <div className="bsv-stat-label" style={styles.statLabel}>Total compressed storage</div>
+          <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.totalCompressedStorage")}</div>
           <div className="bsv-stat-subtext" style={styles.statSubtext}>
-            Average: {backupUtils.formatFileSize(processedStats?.avgBackupSize || 0)} per backup
+            {t("adminTools.backup.statistics.averagePerBackup", { size: backupUtils.formatFileSize(processedStats?.avgBackupSize || 0) })}
           </div>
           <div className="bsv-stat-subtext" style={styles.statSubtext}>
-            Original size: {backupUtils.formatFileSize(processedStats?.sizeStatistics?.totalOriginalSize || 0)}
+            {t("adminTools.backup.statistics.originalSize", { size: backupUtils.formatFileSize(processedStats?.sizeStatistics?.totalOriginalSize || 0) })}
           </div>
         </div>
 
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-card-header" style={styles.cardHeader}>
-            <h3 className="bsv-card-title" style={styles.cardTitle}>System Health</h3>
+            <h3 className="bsv-card-title" style={styles.cardTitle}>{t("adminTools.backup.statistics.systemHealth")}</h3>
             <div className="bsv-card-icon" style={styles.cardIcon}><FontAwesomeIcon icon={faHeartbeat} /></div>
           </div>
           <div>
@@ -381,7 +383,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
                 )
               }}
             >
-              ● {processedStats?.systemHealth?.isHealthy ? 'Healthy' : 'Warning'}
+              ● {processedStats?.systemHealth?.isHealthy ? t("adminTools.backup.statistics.healthy") : t("adminTools.backup.statistics.warning")}
             </span>
           </div>
           {(processedStats?.systemHealth?.warnings?.length || 0) > 0 && (
@@ -398,7 +400,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
       </div>
 
       <div className="bsv-chart-container" style={styles.chartContainer}>
-        <h3 className="bsv-chart-title" style={styles.chartTitle}>Backup Triggers</h3>
+        <h3 className="bsv-chart-title" style={styles.chartTitle}>{t("adminTools.backup.statistics.backupTriggers")}</h3>
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-trigger-chart" style={styles.triggerChart}>
             {(processedStats?.triggerStatistics || []).map((trigger, index) => (
@@ -424,11 +426,11 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
       </div>
 
       <div className="bsv-recent-backups-container" style={styles.recentBackupsContainer}>
-        <h3 className="bsv-chart-title" style={styles.chartTitle}>Recent Backups</h3>
+        <h3 className="bsv-chart-title" style={styles.chartTitle}>{t("adminTools.backup.statistics.recentBackups")}</h3>
         <div className="bsv-card" style={styles.card}>
           {(processedStats?.recentBackups?.length || 0) === 0 ? (
             <div style={{ textAlign: 'center', color: '#6b7280', padding: '24px' }}>
-              No recent backups available
+              {t("adminTools.backup.statistics.noRecentBackups")}
             </div>
           ) : (
             <div className="bsv-recent-backups-list" style={styles.recentBackupsList}>
@@ -457,40 +459,40 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
       </div>
 
       <div className="bsv-chart-container" style={styles.chartContainer}>
-        <h3 className="bsv-chart-title" style={styles.chartTitle}>Compression Analysis</h3>
+        <h3 className="bsv-chart-title" style={styles.chartTitle}>{t("adminTools.backup.statistics.compressionAnalysis")}</h3>
         <div className="bsv-card" style={styles.card}>
           <div className="bsv-grid" style={styles.grid}>
             <div>
-              <div className="bsv-stat-label" style={styles.statLabel}>Best Compression</div>
+              <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.bestCompression")}</div>
               <div className="bsv-stat-value" style={styles.statValue}>
                 {processedStats?.sizeStatistics?.minCompressionRatio
                   ? Math.round((1 - processedStats.sizeStatistics.minCompressionRatio) * 100)
                   : 0}%
               </div>
               <div className="bsv-stat-subtext" style={styles.statSubtext}>
-                Ratio: {processedStats?.sizeStatistics?.minCompressionRatio?.toFixed(2) || 'N/A'}
+                {t("adminTools.backup.statistics.ratio", { value: processedStats?.sizeStatistics?.minCompressionRatio?.toFixed(2) || 'N/A' })}
               </div>
             </div>
             <div>
-              <div className="bsv-stat-label" style={styles.statLabel}>Worst Compression</div>
+              <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.worstCompression")}</div>
               <div className="bsv-stat-value" style={styles.statValue}>
                 {processedStats?.sizeStatistics?.maxCompressionRatio
                   ? Math.round((1 - processedStats.sizeStatistics.maxCompressionRatio) * 100)
                   : 0}%
               </div>
               <div className="bsv-stat-subtext" style={styles.statSubtext}>
-                Ratio: {processedStats?.sizeStatistics?.maxCompressionRatio?.toFixed(2) || 'N/A'}
+                {t("adminTools.backup.statistics.ratio", { value: processedStats?.sizeStatistics?.maxCompressionRatio?.toFixed(2) || 'N/A' })}
               </div>
             </div>
             <div>
-              <div className="bsv-stat-label" style={styles.statLabel}>Average Compression</div>
+              <div className="bsv-stat-label" style={styles.statLabel}>{t("adminTools.backup.statistics.averageCompression")}</div>
               <div className="bsv-stat-value" style={styles.statValue}>
                 {processedStats?.sizeStatistics?.avgCompressionRatio
                   ? Math.round((1 - processedStats.sizeStatistics.avgCompressionRatio) * 100)
                   : 0}%
               </div>
               <div className="bsv-stat-subtext" style={styles.statSubtext}>
-                Ratio: {processedStats?.sizeStatistics?.avgCompressionRatio?.toFixed(2) || 'N/A'}
+                {t("adminTools.backup.statistics.ratio", { value: processedStats?.sizeStatistics?.avgCompressionRatio?.toFixed(2) || 'N/A' })}
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import {
   companyMappingApi,
@@ -19,6 +20,7 @@ interface PendingChange {
 }
 
 export const CompanyMappingTab: React.FC = () => {
+  const { t } = useTranslation();
   const [mappings, setMappings] = useState<CompanyMapping[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<MappingStats | null>(null);
@@ -237,9 +239,9 @@ export const CompanyMappingTab: React.FC = () => {
   const getDisplayValue = (mapping: CompanyMapping): string => {
     const pending = pendingChanges.get(mapping.biginId);
     if (pending) {
-      return pending.routeStarCustomerName || 'Not mapped';
+      return pending.routeStarCustomerName || t('adminTools.mapping.notMapped');
     }
-    return mapping.routeStarCustomerName || 'Select customer...';
+    return mapping.routeStarCustomerName || t('adminTools.mapping.selectCustomer');
   };
 
   const hasPendingChange = (mapping: CompanyMapping): boolean => {
@@ -259,8 +261,8 @@ export const CompanyMappingTab: React.FC = () => {
       {}
       <div className="cm-header">
         <div className="cm-header-content">
-          <h2>Company Mapping</h2>
-          <p className="cm-subtitle">Map Bigin Companies to RouteStar Customers</p>
+          <h2>{t('adminTools.mapping.title')}</h2>
+          <p className="cm-subtitle">{t('adminTools.mapping.subtitle')}</p>
         </div>
         <div className="cm-header-actions">
           <button
@@ -268,7 +270,7 @@ export const CompanyMappingTab: React.FC = () => {
             onClick={handleInitialize}
             disabled={initializing}
           >
-            {initializing ? 'Initializing...' : 'Initialize Mappings'}
+            {initializing ? t('adminTools.mapping.initializing') : t('adminTools.mapping.initializeMappings')}
           </button>
           <button
             className="cm-refresh-btn"
@@ -277,14 +279,14 @@ export const CompanyMappingTab: React.FC = () => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
             </svg>
-            Refresh
+            {t('adminTools.mapping.refresh')}
           </button>
           <button
             className={`cm-save-btn ${pendingChanges.size > 0 ? 'has-changes' : ''}`}
             onClick={handleSaveAll}
             disabled={pendingChanges.size === 0 || saving}
           >
-            {saving ? 'Saving...' : `Save All (${pendingChanges.size})`}
+            {saving ? t('adminTools.mapping.saving') : t('adminTools.mapping.saveAll', { count: pendingChanges.size })}
           </button>
         </div>
       </div>
@@ -296,38 +298,38 @@ export const CompanyMappingTab: React.FC = () => {
             className={`cm-tab ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => handleTabChange('all')}
           >
-            All Companies
+            {t('adminTools.mapping.allCompanies')}
           </button>
           <button
             className={`cm-tab ${activeTab === 'mapped' ? 'active' : ''}`}
             onClick={() => handleTabChange('mapped')}
           >
-            Mapped
+            {t('adminTools.mapping.mapped')}
           </button>
           <button
             className={`cm-tab ${activeTab === 'unmapped' ? 'active' : ''}`}
             onClick={() => handleTabChange('unmapped')}
           >
-            Unmapped
+            {t('adminTools.mapping.unmapped')}
           </button>
         </div>
         <form onSubmit={handleSearch} className="cm-search-form">
           <input
             type="text"
-            placeholder="Search companies..."
+            placeholder={t('adminTools.mapping.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="cm-search-input"
           />
-          <button type="submit" className="cm-search-btn">Search</button>
+          <button type="submit" className="cm-search-btn">{t('adminTools.mapping.search')}</button>
         </form>
       </div>
 
       {}
       <div className="cm-stats-bar">
-        <span className="cm-stat">{stats?.total || 0} total</span>
-        <span className="cm-stat cm-stat-mapped">{stats?.mapped || 0} mapped</span>
-        <span className="cm-stat cm-stat-unmapped">{stats?.unmapped || 0} unmapped</span>
+        <span className="cm-stat">{t('adminTools.mapping.total', { count: stats?.total || 0 })}</span>
+        <span className="cm-stat cm-stat-mapped">{t('adminTools.mapping.mappedCount', { count: stats?.mapped || 0 })}</span>
+        <span className="cm-stat cm-stat-unmapped">{t('adminTools.mapping.unmappedCount', { count: stats?.unmapped || 0 })}</span>
       </div>
 
       {}

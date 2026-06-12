@@ -1,0 +1,75 @@
+{
+  "loading": "Chargement des commissions des employés...",
+  "error": "Erreur",
+  "retry": "Réessayer",
+  "backToEmployees": "← Retour aux employés",
+  "fetchEmployeesError": "Échec de la récupération des commissions des employés",
+  "fetchEmployeeError": "Échec de la récupération des commissions de l'employé",
+  "loadingEmployee": "Chargement des commissions de {{employee}}...",
+  "noEmployeeData": "Aucune donnée de commission trouvée pour cet employé.",
+  "employeeCommissionsTitle": "Commissions de {{employee}}",
+  "title": "Commissions des Employés",
+  "adminBadge": "Vue administrateur",
+  "subtitle": "Consultez les commissions de tous les employés",
+  "timeFilter": {
+    "all": "Tout le temps",
+    "thisWeek": "Cette semaine",
+    "last14Days": "14 derniers jours",
+    "thisMonth": "Ce mois-ci",
+    "thisQuarter": "Ce trimestre",
+    "thisYear": "Cette année",
+    "dateRange": "Plage de dates"
+  },
+  "datePicker": {
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "rangeLabel": "Affichage des données du {{start}} au {{end}}"
+  },
+  "summary": {
+    "totalContractCommission": "Commission totale du contrat",
+    "monthlyCommission": "Commission mensuelle",
+    "totalAgreements": "Total des contrats",
+    "avgCommissionRate": "Taux de commission moyen",
+    "totalCommission": "Commission totale",
+    "totalEmployees": "Total des employés"
+  },
+  "status": {
+    "title": "Filtrer par statut",
+    "all": "Tous ({{count}})",
+    "draft": "Brouillon",
+    "saved": "Enregistré",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "adminApproved": "Approuvé par l'administrateur",
+    "active": "Actif"
+  },
+  "agreements": "Contrats ({{count}})",
+  "noResults": "Aucun contrat trouvé pour ce filtre.",
+  "months": "{{count}} mois",
+  "contractValue": "Valeur du contrat",
+  "commission": "Commission",
+  "breakdown": {
+    "title": "Détail de la commission",
+    "monthlyValue": "Valeur mensuelle",
+    "baseRate": "Taux de base ({{term}})",
+    "multiplier": "Multiplicateur du contrat",
+    "accountTypeAdjustment": "Ajustement par type de compte",
+    "greenlineBonus": "Bonus Greenline",
+    "insideSalesDeduction": "Déduction des ventes internes",
+    "finalRate": "Taux final",
+    "monthlyCommission": "Commission mensuelle",
+    "totalContractCommission": "Commission totale du contrat"
+  },
+  "searchPlaceholder": "Rechercher des employés...",
+  "employees": "Employés ({{count}})",
+  "noEmployees": "Aucun employé trouvé.",
+  "unknownEmployee": "Inconnu",
+  "employeeAgreements": "{{count}} contrats",
+  "miniBadge": {
+    "draft": "{{count}} Brouillon",
+    "saved": "{{count}} Enregistré",
+    "pending": "{{count}} En attente",
+    "approved": "{{count}} Approuvé",
+    "active": "{{count}} Actif"
+  }
+}

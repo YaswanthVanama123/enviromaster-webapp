@@ -1,0 +1,15 @@
+{
+  "activeDaysRemaining": "Jours actifs restants",
+  "active": "Actifs",
+  "expiring": "Bientôt expirés",
+  "expired": "Expirés",
+  "noActiveAgreements": "Aucun contrat actif avec des dates de contrat",
+  "monthContract": "Contrat de {{count}} mois",
+  "daysLeft": "{{count}} j restants",
+  "started": "Début : {{date}}",
+  "trashStatus": "État de la corbeille",
+  "approvalStatus": "État d'approbation",
+  "documentStatus": "État du document",
+  "totalDocuments": "Total des documents",
+  "noStatusInfo": "Aucune information d'état disponible"
+}

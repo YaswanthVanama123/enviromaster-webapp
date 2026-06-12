@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import "./CustomerSection.css";
 import logo from "../assets/em-logo.png";
 
@@ -111,6 +112,7 @@ export default function CustomerSection({
   headerRows,
   onHeaderRowsChange,
 }: CustomerSectionProps) {
+  const { t } = useTranslation();
   const fields = useMemo(() => headerRowsToFields(headerRows), [headerRows]);
 
   const updateFields = (nextFields: Field[]) => {
@@ -153,7 +155,7 @@ export default function CustomerSection({
       <div className="cua2__logo">
         <img
           src={logo}
-          alt="Enviro-Master Logo"
+          alt={t("customer.logoAlt")}
           className="cua2__logo-img"
           width="150"
           height="100"
@@ -165,7 +167,7 @@ export default function CustomerSection({
         <div className="cua2__headerRow">
           <h1 className="cua2__title">{headerTitle}</h1>
           <button type="button" className="cua2__addBtn" onClick={addField}>
-            + Add field
+            {t("customer.addField")}
           </button>
         </div>
 
@@ -193,6 +195,7 @@ type FieldRowProps = {
 };
 
 function FieldRow({ field, onChangeLabel, onChangeValue, onRemove }: FieldRowProps) {
+  const { t } = useTranslation();
   return (
     <div className="cua2__field">
       <div className="cua2__labelCell">
@@ -223,9 +226,9 @@ function FieldRow({ field, onChangeLabel, onChangeValue, onRemove }: FieldRowPro
         {!field.builtIn && (
           <button
             type="button"
-            aria-label="Remove"
+            aria-label={t("customer.removeAriaLabel")}
             className="cua2__removeBtn"
-            title="Remove this field"
+            title={t("customer.removeTitle")}
             onClick={onRemove}
           >
             –

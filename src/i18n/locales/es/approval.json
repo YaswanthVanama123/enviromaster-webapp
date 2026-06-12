@@ -1,0 +1,29 @@
+{
+  "searchPlaceholder": "Buscar",
+  "agreementsCount": "{{count}} acuerdos",
+  "filesPendingApproval": "{{count}} archivos pendientes de aprobación",
+  "approveSelected": "Aprobar seleccionados ({{count}})",
+  "loading": "Cargando documentos de aprobación…",
+  "loadError": "No se pueden cargar los documentos de aprobación. Inténtalo de nuevo.",
+  "noneFound": "No se encontraron documentos pendientes de aprobación.",
+  "pageInfo": "Mostrando {{from}}-{{to}} de {{agreements}} acuerdos ({{files}} archivos)",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "statusUpdated": "¡Estado actualizado correctamente!",
+  "statusUpdateError": "No se puede actualizar el estado. Inténtalo de nuevo.",
+  "downloadError": "No se puede descargar este PDF. Inténtalo de nuevo.",
+  "emailSent": "¡Correo de solicitud de aprobación enviado correctamente con el PDF adjunto!",
+  "stats": {
+    "pendingApproval": "Pendiente de aprobación",
+    "approvedSalesman": "Aprobado por el vendedor",
+    "approvedAdmin": "Aprobado por el administrador"
+  },
+  "email": {
+    "subject": "{{name}} - Solicitud de aprobación",
+    "body": "Hola,\n\nPor favor, revise el siguiente documento para su aprobación.\n\nDocumento: {{name}}\nTipo: {{type}}\nEstado: {{status}}\nActualizado: {{updated}}\n\nSaludos cordiales",
+    "typeMainPdf": "PDF del acuerdo principal",
+    "typeVersionPdf": "PDF de la versión {{version}}",
+    "typeAttachedPdf": "PDF adjunto",
+    "typeDocument": "Documento"
+  }
+}

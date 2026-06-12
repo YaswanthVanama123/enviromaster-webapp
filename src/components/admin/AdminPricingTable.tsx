@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaPlus, FaArrowUp, FaDownload, FaTrashAlt } from "react-icons/fa";
 import { usePricing } from "../../pricing/pricingStore";
 import type { PriceRow, Frequency, UnitType, Category } from "../../pricing/pricingTypes";
@@ -33,6 +34,7 @@ const UNITS: UnitType[] = [
 ];
 
 export default function AdminPricingTable() {
+  const { t } = useTranslation();
   const { rows, upsertRow, removeRow, exportRows, importRows } = usePricing();
   const [filter, setFilter] = useState("");
 
@@ -49,7 +51,7 @@ export default function AdminPricingTable() {
     const row: PriceRow = {
       id,
       serviceKey: id,
-      displayName: "New Service",
+      displayName: t("adminPricing.table.newService"),
       category: "Service",
       unitType: "per_item",
       base: { Weekly: 0 },
@@ -93,22 +95,22 @@ export default function AdminPricingTable() {
 
   return (
     <section className="pc">
-      <div className="pc__hero">Admin · Pricing</div>
-      <div className="pc__breadcrumb">Admin Panel &gt; Pricing</div>
+      <div className="pc__hero">{t("adminPricing.table.hero")}</div>
+      <div className="pc__breadcrumb">{t("adminPricing.table.breadcrumb")}</div>
 
       <div className="pc__toolbar">
         <input
           className="pc__search"
-          placeholder="Search service..."
+          placeholder={t("adminPricing.table.searchPlaceholder")}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
         <div className="pc__spacer" />
         <button className="pc__btn pc__btn--light" onClick={addRow}>
-          <FaPlus /> Add Service
+          <FaPlus /> {t("adminPricing.table.addService")}
         </button>
         <label className="pc__btn pc__btn--light" style={{ cursor: "pointer" }}>
-          <FaArrowUp /> Import CSV
+          <FaArrowUp /> {t("adminPricing.table.importCsv")}
           <input
             type="file"
             accept=".csv"
@@ -117,7 +119,7 @@ export default function AdminPricingTable() {
           />
         </label>
         <button className="pc__btn pc__btn--primary" onClick={onExport}>
-          <FaDownload /> Export CSV
+          <FaDownload /> {t("adminPricing.table.exportCsv")}
         </button>
       </div>
 
@@ -125,16 +127,16 @@ export default function AdminPricingTable() {
         <table className="pc__table">
           <thead>
             <tr>
-              <th>Service Name</th>
-              <th>Key</th>
-              <th>Category</th>
-              <th>Unit</th>
+              <th>{t("adminPricing.table.thServiceName")}</th>
+              <th>{t("adminPricing.table.thKey")}</th>
+              <th>{t("adminPricing.table.thCategory")}</th>
+              <th>{t("adminPricing.table.thUnit")}</th>
               {FREQS.map((f) => (
                 <th key={f}>{f}</th>
               ))}
-              <th>Min</th>
-              <th>Install ×</th>
-              <th>Actions</th>
+              <th>{t("adminPricing.table.thMin")}</th>
+              <th>{t("adminPricing.table.thInstall")}</th>
+              <th>{t("adminPricing.table.thActions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -247,7 +249,7 @@ export default function AdminPricingTable() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={5 + FREQS.length + 3} style={{ textAlign: "center", color: "#888" }}>
-                  No services match your search.
+                  {t("adminPricing.table.noResults")}
                 </td>
               </tr>
             )}

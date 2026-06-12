@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from "react-i18next";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { backupUtils } from '../../backendservice/api/pricingBackupApi';
 import type { PricingBackup } from '../../backendservice/types/pricingBackup.types';
@@ -16,6 +17,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
   onRestore,
   loading
 }) => {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState('');
   const [confirmationText, setConfirmationText] = useState('');
   const [understood, setUnderstood] = useState(false);
@@ -243,7 +245,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
-          <h2 style={styles.title}>Restore Pricing Backup</h2>
+          <h2 style={styles.title}>{t("adminTools.backup.restore.title")}</h2>
           <button
             style={styles.closeButton}
             onClick={onClose}
@@ -256,62 +258,61 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
         <div style={styles.content}>
           <div style={styles.warningBox}>
             <h3 style={styles.warningTitle}>
-              <FaExclamationTriangle /> Important Warning
+              <FaExclamationTriangle /> {t("adminTools.backup.restore.importantWarning")}
             </h3>
             <p style={styles.warningText}>
-              This action will <strong>completely replace</strong> all current pricing data with the backup from {backupUtils.formatChangeDay(backup.changeDay)}.
-              All recent changes made since this backup will be permanently lost. This action cannot be undone.
+              <Trans i18nKey="adminTools.backup.restore.warningText" values={{ date: backupUtils.formatChangeDay(backup.changeDay) }} components={[<span />, <strong />]} />
             </p>
           </div>
 
           <div style={styles.backupDetails}>
-            <h3 style={styles.backupTitle}>Backup Details</h3>
+            <h3 style={styles.backupTitle}>{t("adminTools.backup.restore.detailsTitle")}</h3>
 
             <div style={styles.detailsGrid}>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Change Day</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.changeDay")}</span>
                 <span style={styles.detailValue}>{backupUtils.formatChangeDay(backup.changeDay)}</span>
               </div>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Created</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.created")}</span>
                 <span style={styles.detailValue}>{backupUtils.formatDate(backup.createdAt)}</span>
               </div>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Trigger</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.trigger")}</span>
                 <span style={styles.detailValue}>{backupUtils.formatBackupTrigger(backup.backupTrigger)}</span>
               </div>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Size</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.size")}</span>
                 <span style={styles.detailValue}>{backupUtils.formatFileSize(backup.snapshotMetadata.compressedSize)}</span>
               </div>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Compression</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.compression")}</span>
                 <span style={styles.detailValue}>{backupUtils.formatCompressionRatio(backup.snapshotMetadata.compressionRatio)}</span>
               </div>
               <div style={styles.detailItem}>
-                <span style={styles.detailLabel}>Days Ago</span>
-                <span style={styles.detailValue}>{backupUtils.getDaysAgo(backup.changeDay)} days</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.daysAgo")}</span>
+                <span style={styles.detailValue}>{backupUtils.getDaysAgo(backup.changeDay)} {t("adminTools.backup.restore.daysSuffix")}</span>
               </div>
             </div>
 
             <div style={styles.dataCountsGrid}>
               <div style={styles.dataCountItem}>
                 <div style={styles.countValue}>{backup.snapshotMetadata.documentCounts.priceFixCount}</div>
-                <div style={styles.countLabel}>PriceFixes</div>
+                <div style={styles.countLabel}>{t("adminTools.backup.restore.priceFixes")}</div>
               </div>
               <div style={styles.dataCountItem}>
                 <div style={styles.countValue}>{backup.snapshotMetadata.documentCounts.productCatalogCount}</div>
-                <div style={styles.countLabel}>Products</div>
+                <div style={styles.countLabel}>{t("adminTools.backup.restore.products")}</div>
               </div>
               <div style={styles.dataCountItem}>
                 <div style={styles.countValue}>{backup.snapshotMetadata.documentCounts.serviceConfigCount}</div>
-                <div style={styles.countLabel}>Services</div>
+                <div style={styles.countLabel}>{t("adminTools.backup.restore.services")}</div>
               </div>
             </div>
 
             {backup.changeContext.changeDescription && (
               <div style={{ marginTop: '12px' }}>
-                <span style={styles.detailLabel}>Change Description</span>
+                <span style={styles.detailLabel}>{t("adminTools.backup.restore.changeDescription")}</span>
                 <div style={{ fontSize: '14px', color: '#374151', marginTop: '4px' }}>
                   {backup.changeContext.changeDescription}
                 </div>
@@ -322,18 +323,18 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
           <form onSubmit={handleSubmit}>
             <div style={styles.formGroup}>
               <label style={styles.label} htmlFor="notes">
-                Restoration Notes
+                {t("adminTools.backup.restore.notesLabel")}
               </label>
               <textarea
                 id="notes"
                 style={styles.textarea}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Describe why you're restoring this backup..."
+                placeholder={t("adminTools.backup.restore.notesPlaceholder")}
                 disabled={loading}
               />
               <div style={styles.helpText}>
-                Optional: Document the reason for this restoration
+                {t("adminTools.backup.restore.notesHelp")}
               </div>
             </div>
 
@@ -347,13 +348,13 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
                 disabled={loading}
               />
               <label style={styles.checkboxLabel} htmlFor="understood">
-                I understand that this will <strong>permanently replace all current pricing data</strong> and that this action cannot be undone.
+                <Trans i18nKey="adminTools.backup.restore.understoodLabel" components={[<span />, <strong />]} />
               </label>
             </div>
 
             <div style={styles.formGroup}>
               <label style={styles.label} htmlFor="confirmation">
-                Type "RESTORE" to confirm
+                {t("adminTools.backup.restore.confirmationLabel")}
               </label>
               <input
                 type="text"
@@ -361,11 +362,11 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
                 style={styles.input}
                 value={confirmationText}
                 onChange={(e) => setConfirmationText(e.target.value)}
-                placeholder="Type RESTORE to confirm"
+                placeholder={t("adminTools.backup.restore.confirmationPlaceholder")}
                 disabled={loading || !understood}
               />
               <div style={styles.helpText}>
-                This confirmation is required to proceed with the restoration
+                {t("adminTools.backup.restore.confirmationHelp")}
               </div>
             </div>
 
@@ -380,7 +381,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
                 onClick={onClose}
                 disabled={loading}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
@@ -391,7 +392,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
                 }}
                 disabled={loading || !canRestore}
               >
-                {loading ? 'Restoring...' : 'Restore Backup'}
+                {loading ? t("adminTools.backup.restore.restoring") : t("adminTools.backup.restore.restoreButton")}
               </button>
             </div>
           </form>

@@ -1,0 +1,139 @@
+{
+  "tables": {
+    "title": "Tablas de precios",
+    "subtitle": "Elige un servicio para configurar sus tarifas, reglas y totales del acuerdo.",
+    "tabs": {
+      "saniClean": "SaniClean",
+      "rpmWindows": "Ventanas RPM"
+    }
+  },
+  "common": {
+    "agreementMonths": "Meses del acuerdo",
+    "masterRatesTable": {
+      "item": "Concepto",
+      "key": "Clave",
+      "value": "Valor",
+      "notes": "Notas"
+    }
+  },
+  "tripCharge": {
+    "label": "Cargo por desplazamiento",
+    "parkingLabel": "Estacionamiento (solo si es pagado)",
+    "options": {
+      "beltway8": "Beltway $8",
+      "standard6": "Estándar $6",
+      "paid7": "Pagado $7 + estacionamiento",
+      "waived": "Exento"
+    }
+  },
+  "totals": {
+    "heading": "Totales",
+    "perVisit": "Por visita",
+    "perMonth": "Por mes",
+    "agreement": "Acuerdo ({{months}} meses)"
+  },
+  "inlineMoney": {
+    "editTooltip": "Haz clic para editar"
+  },
+  "saniClean": {
+    "region": {
+      "label": "Región",
+      "inside": "Dentro del Beltway",
+      "outside": "Fuera del Beltway"
+    },
+    "fixtures": "Accesorios (cantidad)",
+    "allInclusive": {
+      "label": "¿Todo incluido?",
+      "no": "No",
+      "yes": "Sí (desplazamiento exento, $20/accesorio)"
+    },
+    "smallThreshold": {
+      "label": "Umbral de cuenta pequeña",
+      "hint": "≤ umbral → visita de $50 con desplazamiento incluido"
+    },
+    "masterRatesHeading": "Tarifas maestras",
+    "monthlyLabel": "Por mes (×4.33)",
+    "rates": {
+      "insidePrice": "Dentro del Beltway (por accesorio)",
+      "insideMin": "Mínimo interior (por visita)",
+      "beltwayTrip": "Desplazamiento — Beltway",
+      "outsidePrice": "Fuera del Beltway (por accesorio)",
+      "outsideMin": "Mínimo exterior (por visita)",
+      "outsideTripPDF": "Desplazamiento — Exterior (línea PDF)",
+      "paidBase": "Desplazamiento — Base pagada",
+      "smallMin": "Mínimo de cuenta pequeña (≤ umbral)",
+      "allIncPrice": "Todo incluido (por accesorio)"
+    },
+    "notes": {
+      "insidePrice": "Tarifa base dentro del beltway",
+      "insideMin": "Mínimo regional",
+      "beltwayTrip": "Estándar $8",
+      "outsidePrice": "Tarifa base fuera del beltway",
+      "outsideMin": "— si no hay",
+      "outsideTripPDF": "La línea de SaniClean indica $8",
+      "paidBase": "+ estacionamiento traspasado",
+      "smallMin": "Incluye desplazamiento",
+      "allIncPrice": "Desplazamiento exento"
+    },
+    "rules": {
+      "allInclusive": "Todo incluido: desplazamiento exento; otros servicios agrupados.",
+      "standard": "Desplazamiento = {{trip}}; Mínimo regional = {{min}}.",
+      "smallAccount": "Regla de cuenta pequeña: accesorios ≤ {{threshold}}, mínimo {{min}} (desplazamiento incluido)."
+    }
+  },
+  "rpm": {
+    "frequency": {
+      "label": "Frecuencia",
+      "weekly": "Semanal (×1.00)",
+      "biweekly": "Quincenal (×1.25)",
+      "monthly": "Mensual (×1.25)",
+      "quarterly": "Trimestral (×2.00 después de la primera)",
+      "weeklyShort": "Semanal",
+      "biweeklyShort": "Quincenal",
+      "monthlyShort": "Mensual",
+      "quarterlyShort": "Trimestral"
+    },
+    "firstTime": {
+      "label": "Primera vez (Instalación 300%)",
+      "no": "No",
+      "yes": "Sí (lo gestionan los instaladores)"
+    },
+    "countsHeading": "Conteos (ambos lados)",
+    "smallWindows": "Ventanas pequeñas",
+    "mediumWindows": "Ventanas medianas",
+    "largeWindows": "Ventanas grandes / de puerta",
+    "includeMirrors": {
+      "label": "¿Incluir espejos?",
+      "no": "No",
+      "yes": "Sí (mismo precio)"
+    },
+    "smallMirrors": "Espejos pequeños",
+    "mediumMirrors": "Espejos medianos",
+    "largeMirrors": "Espejos grandes",
+    "mirrorNote": "Química/técnica de espejos igual que ventanas → mismo precio por tamaño.",
+    "masterRatesHeading": "Tarifas maestras y multiplicadores",
+    "rates": {
+      "rateSmall": "Pequeña (semanal, ambos lados)",
+      "rateMedium": "Mediana (semanal, ambos lados)",
+      "rateLarge": "Grande/Puerta (semanal, ambos lados)",
+      "multInstall": "Multiplicador de primera vez",
+      "mult125": "Multiplicador quincenal/mensual",
+      "multQuarterly": "Multiplicador trimestral (después de la primera)",
+      "tripBeltway": "Desplazamiento — Beltway",
+      "tripStandard": "Desplazamiento — Estándar",
+      "tripPaidBase": "Desplazamiento — Base pagada"
+    },
+    "notes": {
+      "rateSmall": "Por panel",
+      "rateMedium": "Por panel",
+      "rateLarge": "Por panel",
+      "multInstall": "300% (instaladores)",
+      "mult125": "125% del semanal",
+      "multQuarterly": "200%",
+      "tripBeltway": "Generalmente $8",
+      "tripStandard": "Generalmente $6",
+      "tripPaidBase": "+ estacionamiento"
+    },
+    "rule": "{{freq}} ×{{mult}}. Desplazamiento = {{trip}}."
+  }
+}

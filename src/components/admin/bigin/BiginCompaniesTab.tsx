@@ -1,11 +1,13 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginCompanyApi, type BiginCompany, type FetchStatus, type CompanyStats } from '../../../backendservice/api/biginCompanyApi';
 import './BiginCompaniesTab.css';
 
 export const BiginCompaniesTab: React.FC = () => {
+  const { t } = useTranslation();
   const [companies, setCompanies] = useState<BiginCompany[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchStatus, setFetchStatus] = useState<FetchStatus | null>(null);
@@ -96,8 +98,8 @@ export const BiginCompaniesTab: React.FC = () => {
       {}
       <div className="bc-header">
         <div className="bc-header-content">
-          <h2>Bigin Companies</h2>
-          <p className="bc-subtitle">View and sync companies from Zoho Bigin CRM</p>
+          <h2>{t('adminTools.bigin.companies.title')}</h2>
+          <p className="bc-subtitle">{t('adminTools.bigin.companies.subtitle')}</p>
         </div>
         <div className="bc-header-actions">
           <button
@@ -108,14 +110,14 @@ export const BiginCompaniesTab: React.FC = () => {
             {fetchStatus?.isRunning ? (
               <>
                 <span className="fetch-spinner"></span>
-                Fetching... {fetchStatus.progress}%
+                {t('adminTools.bigin.companies.fetching', { progress: fetchStatus.progress })}
               </>
             ) : (
               <>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
                 </svg>
-                Fetch Companies
+                {t('adminTools.bigin.companies.fetchCompanies')}
               </>
             )}
           </button>
@@ -126,19 +128,19 @@ export const BiginCompaniesTab: React.FC = () => {
       <div className="bc-stats-grid">
         <div className="bc-stat-card">
           <div className="bc-stat-value">{stats?.total || 0}</div>
-          <div className="bc-stat-label">Total Companies</div>
+          <div className="bc-stat-label">{t('adminTools.bigin.companies.totalCompanies')}</div>
         </div>
         <div className="bc-stat-card">
           <div className="bc-stat-value bc-stat-cities">{stats?.uniqueCities || 0}</div>
-          <div className="bc-stat-label">Cities</div>
+          <div className="bc-stat-label">{t('adminTools.bigin.companies.cities')}</div>
         </div>
         <div className="bc-stat-card">
           <div className="bc-stat-value bc-stat-states">{stats?.uniqueStates || 0}</div>
-          <div className="bc-stat-label">States</div>
+          <div className="bc-stat-label">{t('adminTools.bigin.companies.states')}</div>
         </div>
         <div className="bc-stat-card">
           <div className="bc-stat-value">{stats?.uniqueOwners || 0}</div>
-          <div className="bc-stat-label">Owners</div>
+          <div className="bc-stat-label">{t('adminTools.bigin.companies.owners')}</div>
         </div>
       </div>
 
@@ -146,15 +148,15 @@ export const BiginCompaniesTab: React.FC = () => {
       {fetchStatus && (
         <div className={`bc-fetch-status ${fetchStatus.lastFetchResult || ''}`}>
           <div className="bc-fetch-info">
-            <span className="bc-fetch-label">Last Sync:</span>
+            <span className="bc-fetch-label">{t('adminTools.bigin.companies.lastSync')}</span>
             <span className="bc-fetch-time">{formatDate(fetchStatus.lastFetchAt)}</span>
             {fetchStatus.lastFetchResult && (
               <span className={`bc-fetch-result ${fetchStatus.lastFetchResult}`}>
-                {fetchStatus.lastFetchResult === 'success' ? <><FaCheckCircle /> Success</> : <><FaTimesCircle /> Failed</>}
+                {fetchStatus.lastFetchResult === 'success' ? <><FaCheckCircle /> {t('adminTools.bigin.companies.success')}</> : <><FaTimesCircle /> {t('adminTools.bigin.companies.failed')}</>}
               </span>
             )}
             {fetchStatus.totalCompanies > 0 && (
-              <span className="bc-total-companies">{fetchStatus.totalCompanies} companies stored</span>
+              <span className="bc-total-companies">{t('adminTools.bigin.companies.companiesStored', { count: fetchStatus.totalCompanies })}</span>
             )}
           </div>
           {fetchStatus.isRunning && (
@@ -173,12 +175,12 @@ export const BiginCompaniesTab: React.FC = () => {
         <form onSubmit={handleSearch} className="bc-search-form">
           <input
             type="text"
-            placeholder="Search companies..."
+            placeholder={t('adminTools.bigin.companies.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="bc-search-input"
           />
-          <button type="submit" className="bc-search-btn">Search</button>
+          <button type="submit" className="bc-search-btn">{t('adminTools.bigin.companies.search')}</button>
         </form>
 
         <select
@@ -189,7 +191,7 @@ export const BiginCompaniesTab: React.FC = () => {
           }}
           className="bc-filter-select"
         >
-          <option value="">All Cities</option>
+          <option value="">{t('adminTools.bigin.companies.allCities')}</option>
           {stats?.cities?.map(city => (
             <option key={city} value={city}>{city}</option>
           ))}
@@ -203,7 +205,7 @@ export const BiginCompaniesTab: React.FC = () => {
           }}
           className="bc-filter-select"
         >
-          <option value="">All States</option>
+          <option value="">{t('adminTools.bigin.companies.allStates')}</option>
           {stats?.states?.map(state => (
             <option key={state} value={state}>{state}</option>
           ))}
@@ -217,14 +219,14 @@ export const BiginCompaniesTab: React.FC = () => {
           }}
           className="bc-filter-select"
         >
-          <option value="">All Owners</option>
+          <option value="">{t('adminTools.bigin.companies.allOwners')}</option>
           {stats?.owners?.map(owner => (
             <option key={owner} value={owner}>{owner}</option>
           ))}
         </select>
 
         <span className="bc-results-count">
-          {pagination.total} companies found
+          {t('adminTools.bigin.companies.companiesFound', { count: pagination.total })}
         </span>
       </div>
 
@@ -232,7 +234,7 @@ export const BiginCompaniesTab: React.FC = () => {
       {loading ? (
         <div className="bc-loading">
           <div className="bc-loading-spinner"></div>
-          <p>Loading companies...</p>
+          <p>{t('adminTools.bigin.companies.loadingCompanies')}</p>
         </div>
       ) : companies.length === 0 ? (
         <div className="bc-empty">
@@ -242,22 +244,22 @@ export const BiginCompaniesTab: React.FC = () => {
               <path d="M8 14v3M12 14v3M16 14v3" />
             </svg>
           </div>
-          <h3>No Companies Found</h3>
-          <p>Click "Fetch Companies" to sync companies from your Bigin account.</p>
+          <h3>{t('adminTools.bigin.companies.noCompaniesTitle')}</h3>
+          <p>{t('adminTools.bigin.companies.noCompaniesText')}</p>
         </div>
       ) : (
         <div className="bc-table-container">
           <table className="bc-table">
             <thead>
               <tr>
-                <th>Company Name</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Owner</th>
-                <th>Last Synced</th>
-                <th>Actions</th>
+                <th>{t('adminTools.bigin.companies.colCompanyName')}</th>
+                <th>{t('adminTools.bigin.companies.colPhone')}</th>
+                <th>{t('adminTools.bigin.companies.colAddress')}</th>
+                <th>{t('adminTools.bigin.companies.colCity')}</th>
+                <th>{t('adminTools.bigin.companies.colState')}</th>
+                <th>{t('adminTools.bigin.companies.colOwner')}</th>
+                <th>{t('adminTools.bigin.companies.colLastSynced')}</th>
+                <th>{t('adminTools.bigin.companies.colActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -278,7 +280,7 @@ export const BiginCompaniesTab: React.FC = () => {
                       className="bc-view-btn"
                       onClick={() => setSelectedCompany(company)}
                     >
-                      View
+                      {t('adminTools.bigin.companies.view')}
                     </button>
                   </td>
                 </tr>
@@ -296,17 +298,17 @@ export const BiginCompaniesTab: React.FC = () => {
             disabled={pagination.skip === 0}
             className="bc-page-btn"
           >
-            Previous
+            {t('adminTools.bigin.companies.previous')}
           </button>
           <span className="bc-page-info">
-            {pagination.skip + 1} - {Math.min(pagination.skip + pagination.limit, pagination.total)} of {pagination.total}
+            {t('adminTools.bigin.companies.pageInfo', { from: pagination.skip + 1, to: Math.min(pagination.skip + pagination.limit, pagination.total), total: pagination.total })}
           </span>
           <button
             onClick={() => setPagination(prev => ({ ...prev, skip: prev.skip + prev.limit }))}
             disabled={pagination.skip + pagination.limit >= pagination.total}
             className="bc-page-btn"
           >
-            Next
+            {t('adminTools.bigin.companies.next')}
           </button>
         </div>
       )}
@@ -322,23 +324,23 @@ export const BiginCompaniesTab: React.FC = () => {
             <div className="bc-modal-body">
               <div className="bc-detail-grid">
                 <div className="bc-detail-item">
-                  <label>Bigin ID</label>
+                  <label>{t('adminTools.bigin.companies.biginId')}</label>
                   <span className="bc-mono">{selectedCompany.biginId || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Company Name</label>
+                  <label>{t('adminTools.bigin.companies.companyName')}</label>
                   <span>{selectedCompany.companyName}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Phone</label>
+                  <label>{t('adminTools.bigin.companies.phone')}</label>
                   <span>{selectedCompany.phone || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Email</label>
+                  <label>{t('adminTools.bigin.companies.email')}</label>
                   <span>{selectedCompany.email || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Website</label>
+                  <label>{t('adminTools.bigin.companies.website')}</label>
                   <span>{selectedCompany.website ? (
                     <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer">
                       {selectedCompany.website}
@@ -346,19 +348,19 @@ export const BiginCompaniesTab: React.FC = () => {
                   ) : '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Industry</label>
+                  <label>{t('adminTools.bigin.companies.industry')}</label>
                   <span>{selectedCompany.industry || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Account Type</label>
+                  <label>{t('adminTools.bigin.companies.accountType')}</label>
                   <span>{selectedCompany.accountType || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Owner</label>
+                  <label>{t('adminTools.bigin.companies.owner')}</label>
                   <span>{selectedCompany.owner || '-'}</span>
                 </div>
                 <div className="bc-detail-item full-width">
-                  <label>Address</label>
+                  <label>{t('adminTools.bigin.companies.address')}</label>
                   <span>
                     {[
                       selectedCompany.street,
@@ -370,29 +372,29 @@ export const BiginCompaniesTab: React.FC = () => {
                   </span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Pipeline</label>
+                  <label>{t('adminTools.bigin.companies.pipeline')}</label>
                   <span>{selectedCompany.pipeline || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Stage</label>
+                  <label>{t('adminTools.bigin.companies.stage')}</label>
                   <span>{selectedCompany.stage || '-'}</span>
                 </div>
                 <div className="bc-detail-item full-width">
-                  <label>Description</label>
+                  <label>{t('adminTools.bigin.companies.description')}</label>
                   <span>{selectedCompany.description || '-'}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Last Synced</label>
+                  <label>{t('adminTools.bigin.companies.lastSynced')}</label>
                   <span>{formatDate(selectedCompany.lastSyncedAt)}</span>
                 </div>
                 <div className="bc-detail-item">
-                  <label>Created At</label>
+                  <label>{t('adminTools.bigin.companies.createdAt')}</label>
                   <span>{formatDate(selectedCompany.createdAt)}</span>
                 </div>
               </div>
               {selectedCompany.rawData && Object.keys(selectedCompany.rawData).length > 0 && (
                 <div className="bc-raw-data">
-                  <label>Raw Data</label>
+                  <label>{t('adminTools.bigin.companies.rawData')}</label>
                   <pre>{JSON.stringify(selectedCompany.rawData, null, 2)}</pre>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faCheckCircle,
   faExclamationTriangle,
@@ -28,6 +29,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
   error,
   onRefresh
 }) => {
+  const { t } = useTranslation();
   const styles: Record<string, React.CSSProperties> = {
     container: {
       width: '100%'
@@ -225,9 +227,9 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
     return (
       <div className="bhv-loading-state" style={styles.loadingState}>
         <div className="bhv-spinner-inline">
-          <span className="bhv-sr-only">Checking system health…</span>
+          <span className="bhv-sr-only">{t("adminTools.backup.health.checkingSystem")}</span>
         </div>
-        <p className="bhv-loading-text">Checking system health...</p>
+        <p className="bhv-loading-text">{t("adminTools.backup.health.checkingSystem")}</p>
       </div>
     );
   }
@@ -235,7 +237,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
   if (error) {
     return (
       <div className="bhv-error-state" style={styles.errorState}>
-        <strong>Error checking system health:</strong> {error}
+        <strong>{t("adminTools.backup.health.errorChecking")}</strong> {error}
         <button
           onClick={onRefresh}
           style={{
@@ -249,7 +251,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
             cursor: 'pointer'
           }}
         >
-          Retry
+          {t("adminTools.backup.health.retry")}
         </button>
       </div>
     );
@@ -258,9 +260,9 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
   if (!health) {
     return (
       <div className="bhv-loading-state" style={styles.loadingState}>
-        <div>No health information available</div>
+        <div>{t("adminTools.backup.health.noHealthInfo")}</div>
         <button className="bhv-refresh-button" style={styles.refreshButton} onClick={onRefresh}>
-          Check System Health
+          {t("adminTools.backup.health.checkSystemHealth")}
         </button>
       </div>
     );
@@ -309,7 +311,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
           ...(isGood ? styles.statusPass : styles.statusFail)
         }}
       >
-        {isGood ? <><FontAwesomeIcon icon={faCheck} /> Pass</> : <><FontAwesomeIcon icon={faTimes} /> Fail</>}
+        {isGood ? <><FontAwesomeIcon icon={faCheck} /> {t("adminTools.backup.health.pass")}</> : <><FontAwesomeIcon icon={faTimes} /> {t("adminTools.backup.health.fail")}</>}
       </span>
     );
   };
@@ -319,23 +321,23 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
       <div className="bhv-overall-health" style={{ ...styles.overallHealth, ...getHealthColor() }}>
         <div className="bhv-health-icon" style={styles.healthIcon}>{getHealthIcon()}</div>
         <div className="bhv-health-text" style={{ ...styles.healthText, ...getHealthColor() }}>
-          System {health.status}
+          {t("adminTools.backup.health.systemStatus", { status: health.status })}
         </div>
       </div>
 
       <div className="bhv-grid" style={styles.grid}>
         <div className="bhv-card" style={styles.card}>
           <h3 className="bhv-card-title" style={styles.cardTitle}>
-            <FontAwesomeIcon icon={faDatabase} /> Database Connectivity
+            <FontAwesomeIcon icon={faDatabase} /> {t("adminTools.backup.health.databaseConnectivity")}
           </h3>
 
           <div className="bhv-check-item" style={styles.checkItem}>
-            <span className="bhv-check-label" style={styles.checkLabel}>Backup Model Accessible</span>
+            <span className="bhv-check-label" style={styles.checkLabel}>{t("adminTools.backup.health.backupModelAccessible")}</span>
             {renderCheckStatus(health.checks.backupModelAccessible, true)}
           </div>
 
           <div className="bhv-check-item" style={styles.checkItem}>
-            <span className="bhv-check-label" style={styles.checkLabel}>Total Backups Available</span>
+            <span className="bhv-check-label" style={styles.checkLabel}>{t("adminTools.backup.health.totalBackupsAvailable")}</span>
             <span className="bhv-check-value" style={{ ...styles.checkValue, ...styles.checkNeutral }}>
               {health.checks.totalBackups}
             </span>
@@ -344,11 +346,11 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
 
         <div className="bhv-card" style={styles.card}>
           <h3 className="bhv-card-title" style={styles.cardTitle}>
-            <FontAwesomeIcon icon={faClipboard} /> Retention Policy
+            <FontAwesomeIcon icon={faClipboard} /> {t("adminTools.backup.health.retentionPolicy")}
           </h3>
 
           <div className="bhv-check-item" style={styles.checkItem}>
-            <span className="bhv-check-label" style={styles.checkLabel}>Change Days Stored</span>
+            <span className="bhv-check-label" style={styles.checkLabel}>{t("adminTools.backup.health.changeDaysStored")}</span>
             <span className="bhv-check-value" style={{
               ...styles.checkValue,
               ...(health.checks.retentionPolicyCompliant ? styles.checkPass : styles.checkWarning)
@@ -358,7 +360,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
           </div>
 
           <div className="bhv-check-item" style={styles.checkItem}>
-            <span className="bhv-check-label" style={styles.checkLabel}>Policy Compliant</span>
+            <span className="bhv-check-label" style={styles.checkLabel}>{t("adminTools.backup.health.policyCompliant")}</span>
             {renderCheckStatus(health.checks.retentionPolicyCompliant, true)}
           </div>
 
@@ -375,32 +377,32 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
 
         <div className="bhv-card" style={styles.card}>
           <h3 className="bhv-card-title" style={styles.cardTitle}>
-            <FontAwesomeIcon icon={faChartLine} /> Backup Activity
+            <FontAwesomeIcon icon={faChartLine} /> {t("adminTools.backup.health.backupActivity")}
           </h3>
 
           <div className="bhv-check-item" style={styles.checkItem}>
-            <span className="bhv-check-label" style={styles.checkLabel}>Backup Created Today</span>
+            <span className="bhv-check-label" style={styles.checkLabel}>{t("adminTools.backup.health.backupCreatedToday")}</span>
             {renderCheckStatus(health.checks.hasBackupToday, true)}
           </div>
 
           {health.checks.mostRecentBackup && (
             <div className="bhv-recent-backup-container" style={styles.recentBackupContainer}>
-              <div className="bhv-recent-backup-title" style={styles.recentBackupTitle}>Most Recent Backup</div>
+              <div className="bhv-recent-backup-title" style={styles.recentBackupTitle}>{t("adminTools.backup.health.mostRecentBackup")}</div>
               <div className="bhv-recent-backup-details" style={styles.recentBackupDetails}>
                 <div className="bhv-recent-backup-row" style={styles.recentBackupRow}>
-                  <span>Date:</span>
+                  <span>{t("adminTools.backup.health.date")}</span>
                   <span>{backupUtils.formatChangeDay(health.checks.mostRecentBackup.changeDay)}</span>
                 </div>
                 <div className="bhv-recent-backup-row" style={styles.recentBackupRow}>
-                  <span>Time:</span>
+                  <span>{t("adminTools.backup.health.time")}</span>
                   <span>{backupUtils.formatDate(health.checks.mostRecentBackup.createdAt)}</span>
                 </div>
                 <div className="bhv-recent-backup-row" style={styles.recentBackupRow}>
-                  <span>Trigger:</span>
+                  <span>{t("adminTools.backup.health.trigger")}</span>
                   <span>{backupUtils.formatBackupTrigger(health.checks.mostRecentBackup.trigger)}</span>
                 </div>
                 <div className="bhv-recent-backup-row" style={styles.recentBackupRow}>
-                  <span>Days Ago:</span>
+                  <span>{t("adminTools.backup.health.daysAgo")}</span>
                   <span>{backupUtils.getDaysAgo(health.checks.mostRecentBackup.changeDay)}</span>
                 </div>
               </div>
@@ -412,7 +414,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
       {health.warnings.length > 0 && (
         <div className="bhv-warnings-container" style={styles.warningsContainer}>
           <h3 className="bhv-card-title" style={styles.cardTitle}>
-            <FontAwesomeIcon icon={faExclamationTriangle} /> System Warnings
+            <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.health.systemWarnings")}
           </h3>
           <div className="bhv-card" style={styles.card}>
             <div className="bhv-warnings-list" style={styles.warningsList}>
@@ -434,7 +436,7 @@ export const BackupHealthView: React.FC<BackupHealthViewProps> = ({
           onClick={onRefresh}
           disabled={loading}
         >
-          {loading ? 'Refreshing...' : 'Refresh Health Status'}
+          {loading ? t("adminTools.backup.health.refreshing") : t("adminTools.backup.health.refreshHealthStatus")}
         </button>
       </div>
     </div>

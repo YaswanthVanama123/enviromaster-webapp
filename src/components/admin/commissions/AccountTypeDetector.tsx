@@ -1,6 +1,7 @@
 
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { accountTypeApi } from '../../../backendservice/api/accountTypeApi';
 import {
   detectAccountTypeClient,
@@ -27,7 +28,8 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
   initialGreenline = false,
   compact = false,
 }) => {
-  
+  const { t } = useTranslation();
+
   const [perVisitRevenue, setPerVisitRevenue] = useState<string>(
     initialRevenue?.toString() || ''
   );
@@ -71,13 +73,13 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
 
   const handleDetect = useCallback(async () => {
     if (!perVisitRevenue) {
-      setError('Please enter per-visit revenue');
+      setError(t('adminCommissionTools.detector.enterRevenue'));
       return;
     }
 
     const revenue = parseFloat(perVisitRevenue);
     if (isNaN(revenue) || revenue <= 0) {
-      setError('Please enter a valid revenue amount');
+      setError(t('adminCommissionTools.detector.enterValidRevenue'));
       return;
     }
 
@@ -100,11 +102,11 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
         }
       }
     } catch (err) {
-      setError('Failed to detect account type');
+      setError(t('adminCommissionTools.detector.detectFailed'));
     } finally {
       setDetecting(false);
     }
-  }, [perVisitRevenue, distanceToAnchor, isGreenline, onAccountTypeDetected]);
+  }, [perVisitRevenue, distanceToAnchor, isGreenline, onAccountTypeDetected, t]);
 
   const handleClear = useCallback(() => {
     setPerVisitRevenue('');
@@ -147,24 +149,24 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
       <div className="account-type-detector compact">
         <div className="detector-row">
           <div className="detector-input-group">
-            <label>Revenue/Visit ($)</label>
+            <label>{t('adminCommissionTools.detector.revenuePerVisit')}</label>
             <input
               type="number"
               value={perVisitRevenue}
               onChange={(e) => setPerVisitRevenue(e.target.value)}
-              placeholder="Enter revenue"
+              placeholder={t('adminCommissionTools.detector.revenuePlaceholder')}
               min="0"
               step="0.01"
             />
           </div>
 
           <div className="detector-input-group">
-            <label>Distance to Anchor (mi)</label>
+            <label>{t('adminCommissionTools.detector.distanceToAnchor')}</label>
             <input
               type="number"
               value={distanceToAnchor}
               onChange={(e) => setDistanceToAnchor(e.target.value)}
-              placeholder="Optional"
+              placeholder={t('adminCommissionTools.detector.distanceOptional')}
               min="0"
               step="0.01"
             />
@@ -177,7 +179,7 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
                 checked={isGreenline}
                 onChange={(e) => setIsGreenline(e.target.checked)}
               />
-              Greenline
+              {t('adminCommissionTools.detector.greenline')}
             </label>
           </div>
 
@@ -197,38 +199,38 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
   return (
     <div className="account-type-detector">
       <div className="detector-header">
-        <h4>Account Type Detector</h4>
-        <p>Auto-detect account type based on revenue and distance to nearest anchor</p>
+        <h4>{t('adminCommissionTools.detector.title')}</h4>
+        <p>{t('adminCommissionTools.detector.subtitle')}</p>
       </div>
 
       <div className="detector-form">
         <div className="detector-grid">
           <div className="detector-input-group">
-            <label>Per-Visit Revenue ($) *</label>
+            <label>{t('adminCommissionTools.detector.perVisitRevenue')}</label>
             <input
               type="number"
               value={perVisitRevenue}
               onChange={(e) => setPerVisitRevenue(e.target.value)}
-              placeholder="Enter per-visit revenue"
+              placeholder={t('adminCommissionTools.detector.perVisitPlaceholder')}
               min="0"
               step="0.01"
             />
             <small>
-              Anchor threshold: ${isGreenline ? thresholds.anchorMinRevenueGreenline : thresholds.anchorMinRevenue}
+              {t('adminCommissionTools.detector.anchorThresholdHint', { threshold: isGreenline ? thresholds.anchorMinRevenueGreenline : thresholds.anchorMinRevenue })}
             </small>
           </div>
 
           <div className="detector-input-group">
-            <label>Distance to Nearest Anchor (miles)</label>
+            <label>{t('adminCommissionTools.detector.distanceToNearestAnchor')}</label>
             <input
               type="number"
               value={distanceToAnchor}
               onChange={(e) => setDistanceToAnchor(e.target.value)}
-              placeholder="Enter distance (optional)"
+              placeholder={t('adminCommissionTools.detector.distancePlaceholder')}
               min="0"
               step="0.01"
             />
-            <small>Get from RouteSTAR Map Distance</small>
+            <small>{t('adminCommissionTools.detector.distanceHint')}</small>
           </div>
         </div>
 
@@ -239,9 +241,9 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
               checked={isGreenline}
               onChange={(e) => setIsGreenline(e.target.checked)}
             />
-            Greenline Pricing (130%+ premium)
+            {t('adminCommissionTools.detector.greenlinePricing')}
           </label>
-          <small>Lowers Anchor threshold to ${thresholds.anchorMinRevenueGreenline}</small>
+          <small>{t('adminCommissionTools.detector.greenlineHint', { threshold: thresholds.anchorMinRevenueGreenline })}</small>
         </div>
 
         <div className="detector-actions">
@@ -250,12 +252,12 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
             onClick={handleDetect}
             disabled={detecting || !perVisitRevenue}
           >
-            {detecting ? 'Detecting...' : 'Detect Account Type'}
+            {detecting ? t('adminCommissionTools.detector.detecting') : t('adminCommissionTools.detector.detectButton')}
           </button>
 
           {(detectionResult || perVisitRevenue) && (
             <button className="clear-btn" onClick={handleClear}>
-              Clear
+              {t('adminCommissionTools.detector.clear')}
             </button>
           )}
         </div>
@@ -279,26 +281,26 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
               className="confidence-badge"
               style={{ color: getConfidenceColor(detectionResult.confidence) }}
             >
-              {detectionResult.confidence} confidence
+              {t('adminCommissionTools.detector.confidenceSuffix', { confidence: detectionResult.confidence })}
             </div>
           </div>
 
           <div className="result-reason">
-            <strong>Reason:</strong> {detectionResult.reason}
+            <strong>{t('adminCommissionTools.detector.reason')}</strong> {detectionResult.reason}
           </div>
 
           {detectionResult.drivingTimeMinutes !== null && (
             <div className="result-details">
               <div className="detail-item">
-                <span className="detail-label">Distance:</span>
+                <span className="detail-label">{t('adminCommissionTools.detector.distance')}</span>
                 <span className="detail-value">
-                  {detectionResult.distanceMiles?.toFixed(2)} miles
+                  {t('adminCommissionTools.detector.distanceMiles', { miles: detectionResult.distanceMiles?.toFixed(2) })}
                 </span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Est. Driving Time:</span>
+                <span className="detail-label">{t('adminCommissionTools.detector.drivingTime')}</span>
                 <span className="detail-value">
-                  {detectionResult.drivingTimeMinutes?.toFixed(1)} minutes
+                  {t('adminCommissionTools.detector.drivingTimeMinutes', { minutes: detectionResult.drivingTimeMinutes?.toFixed(1) })}
                 </span>
               </div>
             </div>
@@ -307,7 +309,7 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
       )}
 
       <div className="account-type-reference">
-        <h5>Account Type Reference</h5>
+        <h5>{t('adminCommissionTools.detector.referenceTitle')}</h5>
         <div className="reference-grid">
           {ACCOUNT_TYPE_INFO.map((info) => (
             <div
@@ -319,7 +321,7 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
               <div className="reference-description">{info.description}</div>
               <div className="reference-criteria">{info.criteria}</div>
               <div className="reference-deduction">
-                Deduction: ${info.deduction}
+                {t('adminCommissionTools.detector.deduction', { amount: info.deduction })}
               </div>
             </div>
           ))}

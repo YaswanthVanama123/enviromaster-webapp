@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
 import {
   FiHome,
@@ -20,20 +21,16 @@ import {
 import "./NavBar.css";
 import logo from "../assets/em-logo.png";
 import { useAuthContext } from "./auth";
+import { SUPPORTED_LANGUAGES } from "../i18n";
 
 type NavLink = { path: string; label: string; icon: ReactNode };
 
-const LANGUAGES = [
-  { code: "EN", label: "English" },
-  { code: "ES", label: "Español" },
-  { code: "FR", label: "Français" },
-];
-
 export default function NavBar() {
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<string>(() => localStorage.getItem("em_lang") || "EN");
+  const language = (i18n.language || "en").slice(0, 2);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, logout } = useAuthContext();
@@ -75,27 +72,26 @@ export default function NavBar() {
   };
 
   const selectLanguage = (code: string) => {
-    setLanguage(code);
-    localStorage.setItem("em_lang", code);
+    i18n.changeLanguage(code);
     setLangMenuOpen(false);
   };
 
   const links: NavLink[] = [
-    { path: "/home", label: "Home", icon: <FiHome /> },
-    { path: "/form-filling", label: "Form Filling", icon: <FiFileText /> },
-    { path: "/saved-pdfs", label: "Saved PDFs", icon: <FiFolder /> },
+    { path: "/home", label: t("nav.home"), icon: <FiHome /> },
+    { path: "/form-filling", label: t("nav.formFilling"), icon: <FiFileText /> },
+    { path: "/saved-pdfs", label: t("nav.savedPdfs"), icon: <FiFolder /> },
     ...(!isAdmin
       ? [
-          { path: "/my-commissions", label: "My Commissions", icon: <FiDollarSign /> },
-          { path: "/my-quota", label: "My Quota", icon: <FiTrendingUp /> },
+          { path: "/my-commissions", label: t("nav.myCommissions"), icon: <FiDollarSign /> },
+          { path: "/my-quota", label: t("nav.myQuota"), icon: <FiTrendingUp /> },
         ]
       : []),
-    { path: "/my-inside-sales", label: "Inside Sales", icon: <FiPhone /> },
-    { path: "/trash", label: "Trash", icon: <FiTrash2 /> },
+    { path: "/my-inside-sales", label: t("nav.insideSales"), icon: <FiPhone /> },
+    { path: "/trash", label: t("nav.trash"), icon: <FiTrash2 /> },
     ...(isAdmin
       ? [
-          { path: "/admin-commissions", label: "Employee Commissions", icon: <FiUsers /> },
-          { path: "/admin-panel", label: "Admin Panel", icon: <FiSettings /> },
+          { path: "/admin-commissions", label: t("nav.employeeCommissions"), icon: <FiUsers /> },
+          { path: "/admin-panel", label: t("nav.adminPanel"), icon: <FiSettings /> },
         ]
       : []),
   ];
@@ -137,21 +133,21 @@ export default function NavBar() {
             className="topnav__lang-btn"
             onClick={() => setLangMenuOpen((o) => !o)}
             type="button"
-            aria-label="Language"
+            aria-label={t("nav.language")}
             aria-expanded={langMenuOpen}
           >
             <FiGlobe />
-            <span>{language}</span>
+            <span>{language.toUpperCase()}</span>
           </button>
           <div className={`topnav__dropdown topnav__dropdown--lang ${langMenuOpen ? "topnav__dropdown--open" : ""}`}>
-            {LANGUAGES.map((lang) => (
+            {SUPPORTED_LANGUAGES.map((lang) => (
               <button
                 key={lang.code}
                 className="topnav__dropdown-item"
                 onClick={() => selectLanguage(lang.code)}
                 type="button"
               >
-                <span>{lang.label} ({lang.code})</span>
+                <span>{lang.label} ({lang.code.toUpperCase()})</span>
                 {language === lang.code && <FiCheck className="topnav__dropdown-check" />}
               </button>
             ))}
@@ -164,7 +160,7 @@ export default function NavBar() {
               className="topnav__avatar"
               onClick={() => setUserMenuOpen((o) => !o)}
               type="button"
-              aria-label="User menu"
+              aria-label={t("nav.userMenu")}
               aria-expanded={userMenuOpen}
             >
               {initials}
@@ -176,7 +172,7 @@ export default function NavBar() {
                 <div className="topnav__usermenu-info">
                   <div className="topnav__usermenu-name">{displayName}</div>
                   <span className={`topnav__role-badge topnav__role-badge--${isAdmin ? "admin" : "employee"}`}>
-                    {isAdmin ? "Admin" : "Employee"}
+                    {isAdmin ? t("nav.admin") : t("nav.employee")}
                   </span>
                 </div>
               </div>
@@ -189,7 +185,7 @@ export default function NavBar() {
                 type="button"
               >
                 <FiUser />
-                <span>Profile</span>
+                <span>{t("nav.profile")}</span>
               </button>
               <button
                 className="topnav__dropdown-item topnav__dropdown-item--danger"
@@ -197,7 +193,7 @@ export default function NavBar() {
                 type="button"
               >
                 <FiLogOut />
-                <span>Logout</span>
+                <span>{t("nav.logout")}</span>
               </button>
             </div>
           </div>
@@ -206,7 +202,7 @@ export default function NavBar() {
 
       <button
         className="topnav__hamburger mobile"
-        aria-label="Menu"
+        aria-label={t("nav.menu")}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
         type="button"
@@ -221,7 +217,7 @@ export default function NavBar() {
           <img src={logo} alt="EM" className="mobilemenu__logo" />
           <button
             className="mobilemenu__close"
-            aria-label="Close menu"
+            aria-label={t("nav.closeMenu")}
             onClick={() => setOpen(false)}
             type="button"
           >
@@ -236,7 +232,7 @@ export default function NavBar() {
               <div className="topnav__usermenu-info">
                 <span className="mobilemenu__username">{displayName}</span>
                 <span className={`mobilemenu__role-badge mobilemenu__role-badge--${isAdmin ? "admin" : "employee"}`}>
-                  {isAdmin ? "Admin" : "Employee"}
+                  {isAdmin ? t("nav.admin") : t("nav.employee")}
                 </span>
               </div>
             </div>
@@ -260,20 +256,20 @@ export default function NavBar() {
             onClick={() => setOpen(false)}
           >
             <span className="topnav__item-icon"><FiUser /></span>
-            <span>Profile</span>
+            <span>{t("nav.profile")}</span>
           </Link>
 
           <div className="mobilemenu__lang">
-            <span className="mobilemenu__lang-label"><FiGlobe /> Language</span>
+            <span className="mobilemenu__lang-label"><FiGlobe /> {t("nav.language")}</span>
             <div className="mobilemenu__lang-options">
-              {LANGUAGES.map((lang) => (
+              {SUPPORTED_LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
                   className={`mobilemenu__lang-chip ${language === lang.code ? "active" : ""}`}
                   onClick={() => selectLanguage(lang.code)}
                   type="button"
                 >
-                  {lang.code}
+                  {lang.code.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -289,7 +285,7 @@ export default function NavBar() {
               type="button"
             >
               <FiLogOut />
-              <span>Logout</span>
+              <span>{t("nav.logout")}</span>
             </button>
           )}
         </div>

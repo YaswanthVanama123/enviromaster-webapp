@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useRef, useCallback, ChangeEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
 import { emailTemplateApi } from "../backendservice/api/emailTemplateApi";
 import { useAuthContext } from "./auth/AuthProvider";
@@ -49,6 +50,19 @@ const STATUS_LABEL: Record<FileStatus, string> = {
   attached: "Attached File",
 };
 
+const STATUS_KEY: Record<string, string> = {
+  saved: "saved",
+  draft: "draft",
+  uploaded: "uploaded",
+  processing: "processing",
+  completed: "completed",
+  failed: "failed",
+  pending_approval: "pendingApproval",
+  approved_salesman: "approvedSalesman",
+  approved_admin: "approvedAdmin",
+  attached: "attached",
+};
+
 const getStatusConfig = (status: string) => {
   const EXISTING_STATUSES = [
     { value: 'draft', label: 'Draft', color: '#6b7280', canManuallySelect: false },
@@ -73,6 +87,7 @@ let cachedEmailTemplate: { subject: string; body: string } | null = null;
 let isLoadingEmailTemplate = false;
 
 export default function SavedFilesAgreements() {
+  const { t } = useTranslation();
   const [agreements, setAgreements] = useState<SavedFileGroup[]>([]);
   const [expandedAgreements, setExpandedAgreements] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -165,7 +180,7 @@ export default function SavedFilesAgreements() {
       })));
 
       setToastMessage({
-        message: `Status updated to "${getStatusConfig(newStatus).label}" successfully!`,
+        message: t("savedFiles.toast.statusUpdatedTo", { status: t(`savedFiles.status.${STATUS_KEY[newStatus] || 'saved'}`) }),
         type: "success"
       });
 
@@ -187,7 +202,7 @@ export default function SavedFilesAgreements() {
         newStatus
       });
       setToastMessage({
-        message: "Failed to update status. Please try again.",
+        message: t("savedFiles.toast.statusUpdateFailed"),
         type: "error"
       });
     } finally {
@@ -343,7 +358,7 @@ export default function SavedFilesAgreements() {
       console.log(`✅ [API-CALL] Loaded ${filteredAgreements.length}/${allAgreements.length} agreements (timeline filter: ${timelineFilter}), ${groupedResponse.totalGroups} total`);
     } catch (err) {
       console.error("❌ [API-CALL] Error fetching agreements:", err);
-      setError("Unable to load agreements. Please try again.");
+      setError(t("savedFiles.toast.loadAgreementsError"));
       setAgreements([]);
       setTotalAgreements(0);
       setTotalFiles(0);
@@ -420,8 +435,8 @@ export default function SavedFilesAgreements() {
         console.error('❌ [EMAIL-TEMPLATE] Failed to load template:', error);
 
         const fallbackTemplate = {
-          subject: 'Document from EnviroMaster NVA',
-          body: `Hello,\n\nPlease find the attached document.\n\nBest regards,\nEnviroMaster NVA Team`
+          subject: t("savedFiles.email.fallbackSubject"),
+          body: t("savedFiles.email.fallbackBody")
         };
 
         cachedEmailTemplate = fallbackTemplate;
@@ -494,7 +509,7 @@ export default function SavedFilesAgreements() {
 
     if (uploadableFiles.length === 0) {
       setToastMessage({
-        message: "Please select files (PDFs or TXT logs) to upload to bigin.",
+        message: t("savedFiles.toast.selectUploadableFiles"),
         type: "error"
       });
       return;
@@ -549,7 +564,7 @@ export default function SavedFilesAgreements() {
       });
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this document. Please try again.",
+        message: t("savedFiles.toast.viewError"),
         type: "error"
       });
     }
@@ -594,7 +609,7 @@ export default function SavedFilesAgreements() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setToastMessage({ message: "Unable to download this file. Please try again.", type: "error" });
+      setToastMessage({ message: t("savedFiles.toast.downloadFileError"), type: "error" });
     }
   }, []);
 
@@ -607,7 +622,7 @@ export default function SavedFilesAgreements() {
     const isUploadableFile = file.hasPdf || file.fileType === 'version_log' || file.fileType === 'attached_pdf';
     if (!isUploadableFile) {
       setToastMessage({
-        message: "This document doesn't have a file to upload. Please generate a PDF or ensure the file exists.",
+        message: t("savedFiles.toast.noFileToUpload"),
         type: "error"
       });
       return;
@@ -628,7 +643,7 @@ export default function SavedFilesAgreements() {
 
     if (uploadableFiles.length === 0) {
       setToastMessage({
-        message: "This agreement has no uploadable files. Please generate PDFs first or ensure log files exist.",
+        message: t("savedFiles.toast.noUploadableFilesAgreement"),
         type: "error"
       });
       return;
@@ -656,7 +671,7 @@ export default function SavedFilesAgreements() {
 
       if (!canEdit) {
         setToastMessage({
-          message: "Only the latest version of agreements can be edited.",
+          message: t("savedFiles.toast.onlyLatestEditable"),
           type: "error"
         });
         return;
@@ -688,7 +703,7 @@ export default function SavedFilesAgreements() {
       });
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this document for editing. Please try again.",
+        message: t("savedFiles.toast.editError"),
         type: "error"
       });
     }
@@ -707,7 +722,7 @@ export default function SavedFilesAgreements() {
       });
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this agreement for editing. Please try again.",
+        message: t("savedFiles.toast.editAgreementError"),
         type: "error"
       });
     }
@@ -725,7 +740,7 @@ export default function SavedFilesAgreements() {
 
     try {
       setToastMessage({
-        message: "Uploading files...",
+        message: t("savedFiles.toast.uploadingFiles"),
         type: "success"
       });
 
@@ -751,7 +766,7 @@ export default function SavedFilesAgreements() {
       const response = await pdfApi.addFilesToAgreement(currentUploadAgreement.id, request);
 
       setToastMessage({
-        message: `Successfully added ${response.addedFiles.length} file(s) to ${currentUploadAgreement.agreementTitle}`,
+        message: t("savedFiles.toast.addedFiles", { count: response.addedFiles.length, title: currentUploadAgreement.agreementTitle }),
         type: "success"
       });
 
@@ -762,7 +777,7 @@ export default function SavedFilesAgreements() {
     } catch (error) {
       console.error('File upload error:', error);
       setToastMessage({
-        message: "Failed to add files to agreement. Please try again.",
+        message: t("savedFiles.toast.addFilesError"),
         type: "error"
       });
     } finally {
@@ -779,7 +794,7 @@ export default function SavedFilesAgreements() {
   const confirmDelete = async () => {
     if (!itemToDelete || !isDeleteConfirmed) {
       setToastMessage({
-        message: "Please type 'DELETE' to confirm",
+        message: t("savedFiles.toast.typeDeleteToConfirm"),
         type: "error"
       });
       return;
@@ -801,21 +816,21 @@ export default function SavedFilesAgreements() {
         setDeleteConfirmText('');
 
         setToastMessage({
-          message: `${itemToDelete.type === 'folder' ? 'Agreement' : 'File'} moved to trash successfully!`,
+          message: itemToDelete.type === 'folder' ? t("savedFiles.toast.movedToTrashAgreement") : t("savedFiles.toast.movedToTrashFile"),
           type: "success"
         });
 
         await fetchAgreements(currentPage, query);
       } else {
         setToastMessage({
-          message: result.message || "Failed to delete. Please try again.",
+          message: result.message || t("savedFiles.toast.deleteFailed"),
           type: "error"
         });
       }
     } catch (error) {
       console.error("Failed to delete:", error);
       setToastMessage({
-        message: "Failed to delete. Please try again.",
+        message: t("savedFiles.toast.deleteFailed"),
         type: "error"
       });
     }
@@ -858,7 +873,7 @@ export default function SavedFilesAgreements() {
         <div className="sf__search">
           <input
             type="text"
-            placeholder="Search agreements..."
+            placeholder={t("savedFiles.searchAgreements")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -882,8 +897,8 @@ export default function SavedFilesAgreements() {
               minWidth: '160px'
             }}
           >
-            <option value="all">All Agreements</option>
-            <option value="mine">My Agreements</option>
+            <option value="all">{t("savedFiles.filters.allAgreements")}</option>
+            <option value="mine">{t("savedFiles.filters.myAgreements")}</option>
           </select>
 
           <select
@@ -903,10 +918,10 @@ export default function SavedFilesAgreements() {
               minWidth: '160px'
             }}
           >
-            <option value="all">All Status</option>
-            <option value="yet-to-start">Yet to Start</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="all">{t("savedFiles.filters.allStatus")}</option>
+            <option value="yet-to-start">{t("savedFiles.filters.yetToStart")}</option>
+            <option value="active">{t("savedFiles.filters.active")}</option>
+            <option value="inactive">{t("savedFiles.filters.inactive")}</option>
           </select>
         </div>
 
@@ -919,7 +934,7 @@ export default function SavedFilesAgreements() {
                 fontWeight: '500',
                 padding: '0 8px'
               }}>
-                {selectedFileIds.length} file{selectedFileIds.length !== 1 ? 's' : ''} selected
+                {t("savedFiles.filesSelected", { count: selectedFileIds.length })}
               </div>
 
               <button
@@ -927,7 +942,7 @@ export default function SavedFilesAgreements() {
                 className="sf__btn sf__btn--light"
                 onClick={clearAllSelections}
               >
-                Clear Selection
+                {t("savedFiles.clearSelection")}
               </button>
 
             </>
@@ -941,13 +956,13 @@ export default function SavedFilesAgreements() {
               disabled={totalFiles === 0}
             >
               <FontAwesomeIcon icon={faCheckSquare} style={{ marginRight: '6px' }} />
-              Select All
+              {t("savedFiles.selectAll")}
             </button>
           )}
         </div>
 
         <div className="sf__stats">
-          {totalAgreements} agreements • {totalFiles} files
+          {t("savedFiles.agreementsAndFiles", { agreements: totalAgreements, files: totalFiles })}
         </div>
       </div>
 
@@ -1039,7 +1054,7 @@ export default function SavedFilesAgreements() {
 
         {!loading && !error && agreements.length === 0 && (
           <div className="sf__empty">
-            {query ? `No agreements found matching "${query}"` : "No agreements found."}
+            {query ? t("savedFiles.empty.noAgreementsMatching", { query }) : t("savedFiles.empty.noAgreements")}
           </div>
         )}
 
@@ -1073,14 +1088,14 @@ export default function SavedFilesAgreements() {
                     agreement: { startDate: newDate }
                   } as any);
                   setToastMessage({
-                    message: "Agreement start date updated successfully!",
+                    message: t("savedFiles.toast.startDateUpdated"),
                     type: "success"
                   });
                   fetchAgreements(currentPage, query);
                 } catch (error) {
                   console.error("Failed to update start date:", error);
                   setToastMessage({
-                    message: "Failed to update start date. Please try again.",
+                    message: t("savedFiles.toast.startDateUpdateFailed"),
                     type: "error"
                   });
                 }
@@ -1102,7 +1117,7 @@ export default function SavedFilesAgreements() {
 
       <div className="sf__pager">
         <div className="sf__page-info">
-          Showing {Math.min((currentPage - 1) * agreementsPerPage + 1, totalAgreements)}-{Math.min(currentPage * agreementsPerPage, totalAgreements)} of {totalAgreements} agreements
+          {t("savedFiles.pageInfoAgreements", { from: Math.min((currentPage - 1) * agreementsPerPage + 1, totalAgreements), to: Math.min(currentPage * agreementsPerPage, totalAgreements), total: totalAgreements })}
         </div>
 
         <div className="sf__page-controls">
@@ -1112,7 +1127,7 @@ export default function SavedFilesAgreements() {
             disabled={!canGoPrev || loading}
             onClick={handlePrevPage}
           >
-            Previous
+            {t("savedFiles.previous")}
           </button>
 
           <div style={{ display: 'flex', gap: '4px' }}>
@@ -1147,7 +1162,7 @@ export default function SavedFilesAgreements() {
             disabled={!canGoNext || loading}
             onClick={handleNextPage}
           >
-            Next
+            {t("savedFiles.next")}
           </button>
         </div>
       </div>
@@ -1178,7 +1193,7 @@ export default function SavedFilesAgreements() {
               watermark: emailData.attachment?.watermark || false
             });
             setToastMessage({
-              message: "Email sent successfully with PDF attachment!",
+              message: t("savedFiles.toast.emailSent"),
               type: "success"
             });
             setEmailComposerOpen(false);
@@ -1190,8 +1205,8 @@ export default function SavedFilesAgreements() {
             documentType: getDocumentTypeForSavedFile(currentEmailFile),
             watermark: currentEmailFile.fileType === 'version_pdf' ? (fileWatermarkStates.get(currentEmailFile.id) || false) : false
           } : undefined}
-        defaultSubject={defaultEmailTemplate?.subject || (currentEmailFile ? `${currentEmailFile.title} - ${STATUS_LABEL[currentEmailFile.status as FileStatus]}` : '')}
-        defaultBody={defaultEmailTemplate?.body || (currentEmailFile ? `Hello,\n\nPlease find the document attached.\n\nDocument: ${currentEmailFile.title}\n\nBest regards` : '')}
+        defaultSubject={defaultEmailTemplate?.subject || (currentEmailFile ? t("savedFiles.email.subject", { name: currentEmailFile.title, status: STATUS_LABEL[currentEmailFile.status as FileStatus] }) : '')}
+        defaultBody={defaultEmailTemplate?.body || (currentEmailFile ? t("savedFiles.email.bodyDocument", { name: currentEmailFile.title }) : '')}
       />
 
       {zohoUploadOpen && currentZohoFile && (
@@ -1213,7 +1228,7 @@ export default function SavedFilesAgreements() {
             setCurrentZohoFile(null);
             fetchAgreements(currentPage, query);
             setToastMessage({
-              message: "Successfully uploaded to Zoho Bigin!",
+              message: t("savedFiles.toast.uploadedToZohoBigin"),
               type: "success"
             });
           }}
@@ -1226,7 +1241,7 @@ export default function SavedFilesAgreements() {
           agreementTitle={currentTaskAgreement.title}
           onClose={() => { setTaskModalOpen(false); setCurrentTaskAgreement(null); }}
           onSuccess={() => {
-            setToastMessage({ message: "Task created in Bigin!", type: "success" });
+            setToastMessage({ message: t("savedFiles.toast.taskCreated"), type: "success" });
           }}
         />
       )}
@@ -1251,7 +1266,7 @@ export default function SavedFilesAgreements() {
             clearAllSelections();
             fetchAgreements(currentPage, query);
             setToastMessage({
-              message: `Successfully uploaded ${selectedFilesForBulkUpload.length} files to Bigin!`,
+              message: t("savedFiles.toast.bulkUploaded", { count: selectedFilesForBulkUpload.length }),
               type: "success"
             });
           }}
@@ -1267,7 +1282,7 @@ export default function SavedFilesAgreements() {
           <div className="file-upload-modal__content">
             <h3 className="file-upload-modal__title">
               <FontAwesomeIcon icon={faFileAlt} className="file-upload-modal__icon" />
-              Add Files to: <span className="file-upload-modal__agreement-name">{currentUploadAgreement.agreementTitle}</span>
+              {t("savedFiles.uploadModal.title")} <span className="file-upload-modal__agreement-name">{currentUploadAgreement.agreementTitle}</span>
             </h3>
 
             <div className="file-upload-modal__section">
@@ -1311,12 +1326,12 @@ export default function SavedFilesAgreements() {
                 >
                   <FontAwesomeIcon icon={faFileAlt} className="file-upload-modal__file-icon" />
                   <span className="file-upload-modal__file-text">
-                    Choose PDF Files or Drag & Drop
+                    {t("savedFiles.uploadModal.chooseFiles")}
                   </span>
                 </label>
               </div>
               <p className="file-upload-modal__hint">
-                Select one or more PDF files to attach to this agreement
+                {t("savedFiles.uploadModal.hint")}
               </p>
             </div>
 
@@ -1329,7 +1344,7 @@ export default function SavedFilesAgreements() {
                   setCurrentUploadAgreement(null);
                 }}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
             </div>
           </div>
@@ -1387,14 +1402,14 @@ export default function SavedFilesAgreements() {
                   fontWeight: '600',
                   color: '#374151'
                 }}>
-                  Delete {itemToDelete.type === 'folder' ? 'Agreement' : 'File'}
+                  {itemToDelete.type === 'folder' ? t("savedFiles.deleteModal.titleAgreement") : t("savedFiles.deleteModal.titleFile")}
                 </h3>
                 <p style={{
                   margin: 0,
                   fontSize: '14px',
                   color: '#6b7280'
                 }}>
-                  This action will move the item to trash
+                  {t("savedFiles.deleteModal.subtitle")}
                 </p>
               </div>
             </div>
@@ -1412,7 +1427,7 @@ export default function SavedFilesAgreements() {
                 fontWeight: '500',
                 color: '#374151'
               }}>
-                {itemToDelete.type === 'folder' ? 'Agreement' : 'File'}: {itemToDelete.title}
+                {itemToDelete.type === 'folder' ? t("savedFiles.deleteModal.agreementLabel", { title: itemToDelete.title }) : t("savedFiles.deleteModal.fileLabel", { title: itemToDelete.title })}
               </p>
               <p style={{
                 margin: 0,
@@ -1420,8 +1435,8 @@ export default function SavedFilesAgreements() {
                 color: '#6b7280'
               }}>
                 {itemToDelete.type === 'folder'
-                  ? 'This will move the entire agreement and all its files to trash.'
-                  : 'This will move only this file to trash.'
+                  ? t("savedFiles.deleteModal.noteAgreement")
+                  : t("savedFiles.deleteModal.noteFile")
                 }
               </p>
             </div>
@@ -1434,7 +1449,7 @@ export default function SavedFilesAgreements() {
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Type "DELETE" to confirm:
+                {t("savedFiles.deleteModal.typeToConfirm")}
               </label>
               <input
                 type="text"
@@ -1477,7 +1492,7 @@ export default function SavedFilesAgreements() {
                   setDeleteConfirmText('');
                 }}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
@@ -1496,7 +1511,7 @@ export default function SavedFilesAgreements() {
                 disabled={!isDeleteConfirmed}
               >
                 <FontAwesomeIcon icon={faTrash} style={{ marginRight: '6px' }} />
-                Move to Trash
+                {t("savedFiles.deleteModal.moveToTrash")}
               </button>
             </div>
           </div>

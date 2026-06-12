@@ -1,0 +1,66 @@
+{
+  "title": "Mes Commissions",
+  "subtitle": "Suivez vos gains de commission sur tous les contrats",
+  "loading": "Chargement de vos commissions...",
+  "error": "Erreur",
+  "noData": "Aucune donnée",
+  "noDataMessage": "Aucune donnée de commission disponible.",
+  "noResults": "Aucun contrat trouvé pour ce filtre.",
+  "fetchError": "Échec de la récupération des commissions",
+  "quotaLevel": {
+    "below": "Sous le quota",
+    "above": "Au-dessus du quota",
+    "double": "Double quota"
+  },
+  "quotaBadgeTitle": "Votre statut de quota actuel. Ventes : {{actual}} / Objectif : {{target}}. Les nouveaux contrats utiliseront un taux de base de {{rate}} %.",
+  "rateNote": "Remarque : le taux de chaque contrat est verrouillé lors de l'enregistrement. Votre taux actuel ({{rate}} %) s'applique aux nouveaux contrats.",
+  "rateNoteMonth": " Ce mois-ci : {{actual}} sur un objectif de {{target}}.",
+  "timePeriod": {
+    "all": "Tout le temps",
+    "weekly": "Cette semaine",
+    "14days": "14 derniers jours",
+    "monthly": "Ce mois-ci",
+    "quarterly": "Ce trimestre",
+    "annually": "Cette année",
+    "custom": "Plage de dates"
+  },
+  "dateRange": {
+    "from": "Du",
+    "to": "Au",
+    "separator": "à",
+    "clear": "Effacer"
+  },
+  "summary": {
+    "annualCommission": "Commission annuelle",
+    "monthlyCommission": "Commission mensuelle",
+    "totalAgreements": "Total des contrats",
+    "avgCommissionRate": "Taux de commission moyen"
+  },
+  "status": {
+    "title": "Par statut",
+    "all": "Tous ({{count}})",
+    "draft": "Brouillon",
+    "saved": "Enregistré",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "adminApproved": "Approuvé par l'administrateur",
+    "active": "Actif"
+  },
+  "agreements": "Contrats ({{count}})",
+  "months": "{{count}} mois",
+  "contractValue": "Valeur du contrat",
+  "annualCommissionLabel": "Commission annuelle",
+  "breakdown": {
+    "title": "Détail de la commission",
+    "monthlyValue": "Valeur mensuelle",
+    "baseRate": "Taux de base ({{term}})",
+    "quotaLevel": "Niveau de quota",
+    "multiplier": "Multiplicateur du contrat",
+    "accountTypeAdjustment": "Ajustement par type de compte",
+    "greenlineBonus": "Bonus Greenline",
+    "insideSalesDeduction": "Déduction des ventes internes",
+    "finalRate": "Taux final",
+    "monthlyCommission": "Commission mensuelle",
+    "annualCommission": "Commission annuelle"
+  }
+}

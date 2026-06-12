@@ -1,0 +1,15 @@
+{
+  "activeDaysRemaining": "Active Days Remaining",
+  "active": "Active",
+  "expiring": "Expiring",
+  "expired": "Expired",
+  "noActiveAgreements": "No active agreements with contract dates",
+  "monthContract": "{{count}} month contract",
+  "daysLeft": "{{count}}d left",
+  "started": "Started: {{date}}",
+  "trashStatus": "Trash Status",
+  "approvalStatus": "Approval Status",
+  "documentStatus": "Document Status",
+  "totalDocuments": "Total Documents",
+  "noStatusInfo": "No status information available"
+}

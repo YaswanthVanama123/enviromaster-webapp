@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FaCog } from "react-icons/fa";
 import { commissionApi } from "../../../backendservice/api/commissionApi";
 import type { CommissionRules } from "../../../backendservice/types/commission.types";
@@ -47,6 +48,7 @@ function hydrateV2Fields(rules: CommissionRules): CommissionRules {
 }
 
 export const CommissionRulesManager: React.FC = () => {
+  const { t } = useTranslation();
   const [rules, setRules] = useState<CommissionRules | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -65,7 +67,7 @@ export const CommissionRulesManager: React.FC = () => {
         setRules(hydrateV2Fields(response.data));
       }
     } catch (err) {
-      setError("Failed to load commission rules");
+      setError(t("adminCommissionTools.rules.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -83,11 +85,11 @@ export const CommissionRulesManager: React.FC = () => {
       if (response.error) {
         setError(response.error);
       } else {
-        setSuccess("Commission rules updated successfully!");
+        setSuccess(t("adminCommissionTools.rules.saveSuccess"));
         setTimeout(() => setSuccess(null), 3000);
       }
     } catch (err) {
-      setError("Failed to save commission rules");
+      setError(t("adminCommissionTools.rules.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -191,7 +193,7 @@ export const CommissionRulesManager: React.FC = () => {
   if (loading) {
     return (
       <div className="loading-state">
-        <span>Loading commission rules...</span>
+        <span>{t("adminCommissionTools.rules.loading")}</span>
       </div>
     );
   }
@@ -199,7 +201,7 @@ export const CommissionRulesManager: React.FC = () => {
   if (!rules) {
     return (
       <div className="empty-state">
-        <p>No commission rules found. Please contact an administrator.</p>
+        <p>{t("adminCommissionTools.rules.notFound")}</p>
       </div>
     );
   }
@@ -207,7 +209,7 @@ export const CommissionRulesManager: React.FC = () => {
   return (
     <div className="commission-rules-manager">
       <h3 className="calculator-section-title">
-        <span><FaCog /></span> Commission Rules Configuration
+        <span><FaCog /></span> {t("adminCommissionTools.rules.title")}
       </h3>
 
       {error && <div className="error-message">{error}</div>}
@@ -222,10 +224,10 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Quota Achievement Rates (%)</h3>
+        <h3>{t("adminCommissionTools.rules.quotaRatesTitle")}</h3>
         <div className="rules-grid">
           <div className="rules-input-group">
-            <label>Below Quota</label>
+            <label>{t("adminCommissionTools.rules.belowQuota")}</label>
             <input
               type="number"
               value={rules.quotaRates.below}
@@ -234,7 +236,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Above Quota</label>
+            <label>{t("adminCommissionTools.rules.aboveQuota")}</label>
             <input
               type="number"
               value={rules.quotaRates.above}
@@ -243,7 +245,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Double Quota</label>
+            <label>{t("adminCommissionTools.rules.doubleQuota")}</label>
             <input
               type="number"
               value={rules.quotaRates.double}
@@ -256,10 +258,10 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Agreement Term Multipliers (%)</h3>
+        <h3>{t("adminCommissionTools.rules.agreementMultipliersTitle")}</h3>
         <div className="rules-grid rules-grid-4">
           <div className="rules-input-group">
-            <label>3-Year</label>
+            <label>{t("adminCommissionTools.rules.threeYear")}</label>
             <input
               type="number"
               value={rules.agreementMultipliers["3-year"]}
@@ -268,7 +270,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>1-Year</label>
+            <label>{t("adminCommissionTools.rules.oneYear")}</label>
             <input
               type="number"
               value={rules.agreementMultipliers["1-year"]}
@@ -277,7 +279,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>MTM + Install</label>
+            <label>{t("adminCommissionTools.rules.mtmWithInstall")}</label>
             <input
               type="number"
               value={rules.agreementMultipliers["MTM-with-install"]}
@@ -286,7 +288,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>MTM No Install</label>
+            <label>{t("adminCommissionTools.rules.mtmNoInstall")}</label>
             <input
               type="number"
               value={rules.agreementMultipliers["MTM-no-install"]}
@@ -299,14 +301,13 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Per-Visit Penalties (V2 — $)</h3>
+        <h3>{t("adminCommissionTools.rules.perVisitPenaltiesTitle")}</h3>
         <p style={{ fontSize: "0.85em", color: "#6b7280", marginTop: -4 }}>
-          Subtracted from per-visit revenue for <strong>new</strong> Bread / Pit accounts.
-          Existing accounts pay no penalty.
+          {t("adminCommissionTools.rules.perVisitPenaltiesHint")}
         </p>
         <div className="rules-grid rules-grid-4">
           <div className="rules-input-group">
-            <label>Bread5 (5 min from Anchor)</label>
+            <label>{t("adminCommissionTools.rules.bread5Label")}</label>
             <input
               type="number"
               value={rules.perVisitPenalties?.Bread5 ?? 50}
@@ -316,7 +317,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Bread15 (15 min from Anchor)</label>
+            <label>{t("adminCommissionTools.rules.bread15Label")}</label>
             <input
               type="number"
               value={rules.perVisitPenalties?.Bread15 ?? 75}
@@ -326,7 +327,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Pit (no nearby Anchor)</label>
+            <label>{t("adminCommissionTools.rules.pitLabel")}</label>
             <input
               type="number"
               value={rules.perVisitPenalties?.Pit ?? 100}
@@ -340,10 +341,10 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Anchor Thresholds (V2 — per visit $)</h3>
+        <h3>{t("adminCommissionTools.rules.anchorThresholdsTitle")}</h3>
         <div className="rules-grid rules-grid-4">
           <div className="rules-input-group">
-            <label>Anchor Min ($)</label>
+            <label>{t("adminCommissionTools.rules.anchorMin")}</label>
             <input
               type="number"
               value={rules.anchorMinPerVisit ?? 200}
@@ -355,7 +356,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Anchor Min Greenline ($)</label>
+            <label>{t("adminCommissionTools.rules.anchorMinGreenline")}</label>
             <input
               type="number"
               value={rules.anchorMinGreenline ?? 100}
@@ -367,7 +368,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Pit Threshold ($)</label>
+            <label>{t("adminCommissionTools.rules.pitThreshold")}</label>
             <input
               type="number"
               value={rules.pitPerVisitThreshold ?? 100}
@@ -379,7 +380,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Anchor Threshold ($)</label>
+            <label>{t("adminCommissionTools.rules.anchorThreshold")}</label>
             <input
               type="number"
               value={rules.anchorPerVisitThreshold ?? 200}
@@ -391,7 +392,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Anchor Bonus Multiplier (×)</label>
+            <label>{t("adminCommissionTools.rules.anchorBonusMultiplier")}</label>
             <input
               type="number"
               value={rules.anchorBonusMultiplier ?? 1.5}
@@ -407,10 +408,9 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Pricing Tiers (V2 — % range → multiplier)</h3>
+        <h3>{t("adminCommissionTools.rules.pricingTiersTitle")}</h3>
         <p style={{ fontSize: "0.85em", color: "#6b7280", marginTop: -4, marginBottom: 12 }}>
-          Drives both quota credit and commission base. Range is the agreement's
-          current/redline ratio expressed as a percentage. Spec: <em>Redline $1 per $1, Greenline $2 per dollar.</em>
+          {t("adminCommissionTools.rules.pricingTiersHint")}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {(rules.pricingTiers || []).map((tier, idx) => {
@@ -433,7 +433,7 @@ export const CommissionRulesManager: React.FC = () => {
                 }}
               >
                 <div className="rules-input-group" style={{ marginBottom: 0 }}>
-                  <label>Label</label>
+                  <label>{t("adminCommissionTools.rules.label")}</label>
                   <input
                     type="text"
                     value={tier.label}
@@ -441,7 +441,7 @@ export const CommissionRulesManager: React.FC = () => {
                   />
                 </div>
                 <div className="rules-input-group" style={{ marginBottom: 0 }}>
-                  <label>Min %</label>
+                  <label>{t("adminCommissionTools.rules.minPct")}</label>
                   <input
                     type="number"
                     value={minPct}
@@ -450,7 +450,7 @@ export const CommissionRulesManager: React.FC = () => {
                   />
                 </div>
                 <div className="rules-input-group" style={{ marginBottom: 0 }}>
-                  <label>Max %</label>
+                  <label>{t("adminCommissionTools.rules.maxPct")}</label>
                   <input
                     type="number"
                     value={maxPct}
@@ -459,7 +459,7 @@ export const CommissionRulesManager: React.FC = () => {
                   />
                 </div>
                 <div className="rules-input-group" style={{ marginBottom: 0 }}>
-                  <label>Multiplier (×)</label>
+                  <label>{t("adminCommissionTools.rules.multiplier")}</label>
                   <input
                     type="number"
                     value={tier.quotaMultiplier}
@@ -486,7 +486,7 @@ export const CommissionRulesManager: React.FC = () => {
                       letterSpacing: "0.04em",
                     }}
                   >
-                    Approval?
+                    {t("adminCommissionTools.rules.approval")}
                   </label>
                   <input
                     type="checkbox"
@@ -503,13 +503,13 @@ export const CommissionRulesManager: React.FC = () => {
 
       {/* V2 — Frequency visits per year */}
       <div className="rules-section">
-        <h3>Visits Per Year by Frequency (V2)</h3>
+        <h3>{t("adminCommissionTools.rules.frequencyVisitsTitle")}</h3>
         <p style={{ fontSize: "0.85em", color: "#6b7280", marginTop: -4 }}>
-          Spec: weekly billing uses <strong>50</strong> weeks (holidays excluded), monthly 12, quarterly 4.
+          {t("adminCommissionTools.rules.frequencyVisitsHint")}
         </p>
         <div className="rules-grid rules-grid-4">
           <div className="rules-input-group">
-            <label>Weekly</label>
+            <label>{t("adminCommissionTools.rules.weekly")}</label>
             <input
               type="number"
               value={rules.frequencyVisitsPerYear?.weekly ?? 50}
@@ -519,7 +519,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Bi-Weekly</label>
+            <label>{t("adminCommissionTools.rules.biweekly")}</label>
             <input
               type="number"
               value={rules.frequencyVisitsPerYear?.biweekly ?? 25}
@@ -529,7 +529,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Monthly</label>
+            <label>{t("adminCommissionTools.rules.monthly")}</label>
             <input
               type="number"
               value={rules.frequencyVisitsPerYear?.monthly ?? 12}
@@ -539,7 +539,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Quarterly</label>
+            <label>{t("adminCommissionTools.rules.quarterly")}</label>
             <input
               type="number"
               value={rules.frequencyVisitsPerYear?.quarterly ?? 4}
@@ -549,7 +549,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>One-Time</label>
+            <label>{t("adminCommissionTools.rules.oneTime")}</label>
             <input
               type="number"
               value={rules.frequencyVisitsPerYear?.["one-time"] ?? 1}
@@ -561,7 +561,7 @@ export const CommissionRulesManager: React.FC = () => {
         </div>
         <div className="rules-grid" style={{ marginTop: 12 }}>
           <div className="rules-input-group">
-            <label>Weeks Per Annual Commission (display divisor)</label>
+            <label>{t("adminCommissionTools.rules.weeksPerAnnual")}</label>
             <input
               type="number"
               value={rules.weeksPerAnnualCommission ?? 52}
@@ -572,9 +572,7 @@ export const CommissionRulesManager: React.FC = () => {
               step="1"
             />
             <small style={{ display: "block", color: "#6b7280", marginTop: 4 }}>
-              Used when converting annual → weekly commission for display.
-              Default 52 (calendar weeks). Set to 50 to align with the spec's
-              billed-week count.
+              {t("adminCommissionTools.rules.weeksPerAnnualHint")}
             </small>
           </div>
         </div>
@@ -582,16 +580,19 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Weekly Quota Target ($)</h3>
+        <h3>{t("adminCommissionTools.rules.weeklyQuotaTargetTitle")}</h3>
         <p style={{ fontSize: "0.85em", color: "#6b7280", marginTop: -4 }}>
-          Quota resets weekly. The commission rate is split by quota-credit position:
-          first ${(rules.quotaTarget ?? DEFAULT_QUOTA_TARGET).toLocaleString()} (below target)
-          at {rules.quotaRates.below}%, up to ${((rules.quotaTarget ?? DEFAULT_QUOTA_TARGET) * 2).toLocaleString()} (2× target)
-          at {rules.quotaRates.above}%, and everything above at {rules.quotaRates.double}%.
+          {t("adminCommissionTools.rules.weeklyQuotaTargetHint", {
+            target: (rules.quotaTarget ?? DEFAULT_QUOTA_TARGET).toLocaleString(),
+            belowRate: rules.quotaRates.below,
+            doubleTarget: ((rules.quotaTarget ?? DEFAULT_QUOTA_TARGET) * 2).toLocaleString(),
+            aboveRate: rules.quotaRates.above,
+            doubleRate: rules.quotaRates.double,
+          })}
         </p>
         <div className="rules-grid">
           <div className="rules-input-group">
-            <label>Weekly Quota Target ($)</label>
+            <label>{t("adminCommissionTools.rules.weeklyQuotaTargetLabel")}</label>
             <input
               type="number"
               value={rules.quotaTarget ?? DEFAULT_QUOTA_TARGET}
@@ -607,10 +608,10 @@ export const CommissionRulesManager: React.FC = () => {
 
       {}
       <div className="rules-section">
-        <h3>Other Settings</h3>
+        <h3>{t("adminCommissionTools.rules.otherSettingsTitle")}</h3>
         <div className="rules-grid">
           <div className="rules-input-group">
-            <label>Greenline Bonus (%)</label>
+            <label>{t("adminCommissionTools.rules.greenlineBonus")}</label>
             <input
               type="number"
               value={rules.greenlineBonus}
@@ -621,7 +622,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Renewal Bonus Rate (%)</label>
+            <label>{t("adminCommissionTools.rules.renewalBonusRate")}</label>
             <input
               type="number"
               value={rules.renewalBonusRate}
@@ -632,7 +633,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Renewal Min Years</label>
+            <label>{t("adminCommissionTools.rules.renewalMinYears")}</label>
             <input
               type="number"
               value={rules.renewalMinYears}
@@ -643,7 +644,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Inside Sales Deduction (%)</label>
+            <label>{t("adminCommissionTools.rules.insideSalesDeduction")}</label>
             <input
               type="number"
               value={rules.insideSalesDeduction}
@@ -654,7 +655,7 @@ export const CommissionRulesManager: React.FC = () => {
             />
           </div>
           <div className="rules-input-group">
-            <label>Anchor Min Monthly Value ($)</label>
+            <label>{t("adminCommissionTools.rules.anchorMinMonthlyValue")}</label>
             <input
               type="number"
               value={rules.anchorMinMonthlyValue}
@@ -671,7 +672,7 @@ export const CommissionRulesManager: React.FC = () => {
       </div>
 
       <button className="save-rules-btn" onClick={handleSave} disabled={saving}>
-        {saving ? "Saving..." : "Save Commission Rules"}
+        {saving ? t("adminCommissionTools.rules.saving") : t("adminCommissionTools.rules.saveRules")}
       </button>
     </div>
   );

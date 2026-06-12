@@ -1,0 +1,19 @@
+{
+  "title": "Options d'enregistrement du PDF",
+  "agreementLabel": "Contrat :",
+  "currentVersions": "Versions actuelles : {{count}}",
+  "latestVersion": " (dernière : v{{number}})",
+  "howToSave": "Comment souhaitez-vous enregistrer ce PDF ?",
+  "createVersionTitle": "Créer une nouvelle version",
+  "createVersionDescription": "Créer la version {{number}}. Recommandé pour suivre les modifications.",
+  "replaceRecentTitle": "Remplacer la version récente",
+  "replaceRecentDescription": "Remplacer la version {{number}} par ce contenu mis à jour. Économise de l'espace de stockage.",
+  "recommended": "Recommandé",
+  "notesLabel": "Qu'est-ce qui a changé ? *",
+  "notesPlaceholder": "Décrivez ce qui a changé dans cette version (p. ex. tarifs mis à jour, services ajoutés, modifications suite aux retours du client)",
+  "existingVersions": "Versions existantes ({{count}})",
+  "moreVersions": "+{{count}} versions de plus",
+  "saving": "Enregistrement...",
+  "createVersionButton": "Créer la version {{number}}",
+  "replaceVersionButton": "Remplacer la version {{number}}"
+}

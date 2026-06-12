@@ -1,0 +1,35 @@
+{
+  "title": "Bienvenido a Enviro-Master",
+  "subtitle": "Sistema profesional de gestión de acuerdos",
+  "description": "Cree, gestione y mantenga acuerdos de servicio al cliente con facilidad. Nuestra plataforma integral agiliza su flujo de trabajo y garantiza la precisión.",
+  "sectionTitle": "Gestión de acuerdos",
+  "filter": {
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "thisYear": "Este año",
+    "dateRange": "Rango de fechas"
+  },
+  "legend": {
+    "done": "Hecho",
+    "pending": "Pendiente",
+    "saved": "Guardado",
+    "drafts": "Borradores"
+  },
+  "cards": {
+    "create": {
+      "title": "Crear acuerdo",
+      "description": "Cree un nuevo acuerdo de cliente con detalles de servicio completos y selección de productos",
+      "button": "Comenzar →"
+    },
+    "extend": {
+      "title": "Extender acuerdo",
+      "description": "Extienda un acuerdo de cliente existente con nuevos términos y paquetes de servicio actualizados",
+      "button": "Haga clic para extender"
+    },
+    "edit": {
+      "title": "Editar acuerdo",
+      "description": "Modifique los detalles del acuerdo existente, actualice servicios o ajuste las configuraciones de productos",
+      "button": "Comenzar →"
+    }
+  }
+}

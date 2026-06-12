@@ -13,6 +13,7 @@ import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
 import { FaCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -57,6 +58,8 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
   initialData,
   onRemove,
 }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -489,15 +492,15 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
     const standardRate = formatNumber(stdRate);
 
     if (breakdown.usedBigAccountAlt) {
-      return `Volume – $${volumeWeekly}/week per drain, install waived (${minimumDrains}+ drains)`;
+      return t("serviceForms.foamingDrain.pricingVolumeWaived", { rate: volumeWeekly, min: minimumDrains });
     }
     if (breakdown.volumePricingApplied) {
-      return `Volume (${minimumDrains}+ drains, separate $${volumeWeekly}/$${volumeBimonthly} install-drain)`;
+      return t("serviceForms.foamingDrain.pricingVolumeSeparate", { min: minimumDrains, weekly: volumeWeekly, bimonthly: volumeBimonthly });
     }
     if (breakdown.usedSmallAlt) {
-      return `Alternative (weekly: $${altBase} + $${altPerDrain}/drain)`;
+      return t("serviceForms.foamingDrain.pricingAlternative", { base: altBase, perDrain: altPerDrain });
     }
-    return `Standard ($${standardRate}/drain)`;
+    return t("serviceForms.foamingDrain.pricingStandard", { rate: standardRate });
   })();
 
   const installQty = isInstallLevelUi ? state.installDrainCount : 0;
@@ -518,7 +521,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
 
   return (
     <ServiceCardShell
-      title="FOAMING DRAIN SERVICE"
+      title={t("serviceForms.foamingDrain.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -537,7 +540,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
         {}
         <div className="svc-row">
           <div className="svc-label">
-            <span>Service Frequency</span>
+            <span>{t("serviceForms.foamingDrain.serviceFrequency")}</span>
           </div>
           <div className="svc-field">
             <select
@@ -545,16 +548,16 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
               value={state.frequency}
               onChange={handleFrequencyChange}
             >
-              <option value="oneTime">One Time</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Bi-weekly</option>
-              <option value="twicePerMonth">2× / Month</option>
-              <option value="monthly">Monthly</option>
-              <option value="everyFourWeeks">Every 4 Weeks</option>
-              <option value="bimonthly">Bi-monthly</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="biannual">Bi-annual</option>
-              <option value="annual">Annual</option>
+              <option value="oneTime">{t("serviceForms.foamingDrain.freq.oneTime")}</option>
+              <option value="weekly">{t("serviceForms.foamingDrain.freq.weekly")}</option>
+              <option value="biweekly">{t("serviceForms.foamingDrain.freq.biweekly")}</option>
+              <option value="twicePerMonth">{t("serviceForms.foamingDrain.freq.twicePerMonth")}</option>
+              <option value="monthly">{t("serviceForms.foamingDrain.freq.monthly")}</option>
+              <option value="everyFourWeeks">{t("serviceForms.foamingDrain.freq.everyFourWeeks")}</option>
+              <option value="bimonthly">{t("serviceForms.foamingDrain.freq.bimonthly")}</option>
+              <option value="quarterly">{t("serviceForms.foamingDrain.freq.quarterly")}</option>
+              <option value="biannual">{t("serviceForms.foamingDrain.freq.biannual")}</option>
+              <option value="annual">{t("serviceForms.foamingDrain.freq.annual")}</option>
             </select>
           </div>
         </div>
@@ -568,7 +571,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
         {}
         <div className="svc-row">
           <div className="svc-label">
-            <span>Extras</span>
+            <span>{t("serviceForms.foamingDrain.extras")}</span>
           </div>
           <div className="svc-field">
             <div className="svc-inline">
@@ -585,7 +588,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     }
                   }}
                 />{" "}
-                Plumbing (+$
+                {t("serviceForms.foamingDrain.plumbing")}
                 <input
                   type="number"
                   min={0}
@@ -607,9 +610,9 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onChange={handleLocalChange}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
-                  title="Plumbing addon rate per drain (editable with yellow highlight if overridden)"
+                  title={t("serviceForms.foamingDrain.plumbingAddonTitle")}
                 />
-                /drain) – Drains:{" "}
+                {t("serviceForms.foamingDrain.perDrainDrains")}
                 {state.needsPlumbing && (
                   <input
                     type="number"
@@ -644,9 +647,9 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     }
                   }}
                 />{" "}
-                Small-job alt:{" "}
+                {t("serviceForms.foamingDrain.smallJobAlt")}
                 <span className="svc-note">
-                  weekly &lt; {backendConfig?.volumePricing?.minimumDrains ?? 10} drains → $
+                  {t("serviceForms.foamingDrain.weeklyLessThan", { count: backendConfig?.volumePricing?.minimumDrains ?? 10 })}
                 </span>
                 <input
                   type="number"
@@ -663,7 +666,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onChange={handleLocalChange}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
-                  title="Alt base charge (editable with yellow highlight if overridden)"
+                  title={t("serviceForms.foamingDrain.altBaseTitle")}
                   style={{
                     backgroundColor: state.customAltBaseCharge !== undefined ? '#fffacd' : 'white'
                   }}
@@ -684,12 +687,12 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onChange={handleLocalChange}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
-                  title="Alt per drain charge (editable with yellow highlight if overridden)"
+                  title={t("serviceForms.foamingDrain.altPerDrainTitle")}
                   style={{
                     backgroundColor: state.customAltExtraPerDrain !== undefined ? '#fffacd' : 'white'
                   }}
                 />
-                <span className="svc-note">/drain</span>
+                <span className="svc-note">{t("serviceForms.foamingDrain.perDrain")}</span>
               </label>
             </div>
             <div className="svc-inline">
@@ -708,9 +711,9 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     }
                   }}
                 />{" "}
-                Big account:{" "}
+                {t("serviceForms.foamingDrain.bigAccount")}
                 <span className="svc-note">
-                  weekly {backendConfig?.volumePricing?.minimumDrains ?? 10}+ drains → ${state.standardDrainRate}/week, install waived
+                  {t("serviceForms.foamingDrain.bigAccountNote", { count: backendConfig?.volumePricing?.minimumDrains ?? 10, rate: state.standardDrainRate })}
                 </span>
               </label>
             </div>
@@ -735,7 +738,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   )
                 }
               />{" "}
-              Grease Trap Install (min $
+              {t("serviceForms.foamingDrain.greaseTrapInstall")}
               <input
                 type="number"
                 min={0}
@@ -757,9 +760,9 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                 onChange={handleLocalChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                title="Grease trap installation rate per trap (editable with yellow highlight if overridden)"
+                title={t("serviceForms.foamingDrain.greaseInstallTitle")}
               />
-              if possible)
+              {t("serviceForms.foamingDrain.ifPossible")}
             </label>
           </div>
         </div>
@@ -769,7 +772,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Standard Drains</span>
+              <span>{t("serviceForms.foamingDrain.standardDrains")}</span>
             </div>
             <div className="svc-field">
               <div className="svc-inline">
@@ -783,7 +786,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                 />
                 {isInstallLevelUi && state.installDrainCount > 0 && (
                   <span className="svc-note" style={{ marginLeft: "8px" }}>
-                    Service drains: {stdQtyForRateCalc}
+                    {t("serviceForms.foamingDrain.serviceDrains", { count: stdQtyForRateCalc })}
                   </span>
                 )}
 
@@ -807,10 +810,10 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   title={breakdown.usedSmallAlt
-                    ? `Effective rate (from alt pricing: $${state.altBaseCharge} + $${state.altExtraPerDrain}/drain) - NOT EDITABLE`
+                    ? t("serviceForms.foamingDrain.standardRateAltTitle", { base: state.altBaseCharge, perDrain: state.altExtraPerDrain })
                     : breakdown.usedBigAccountAlt
-                    ? "Effective rate (big account: $10/week per drain) - editable with yellow highlight if overridden"
-                    : "Standard drain rate - editable with yellow highlight if overridden"}
+                    ? t("serviceForms.foamingDrain.standardRateBigTitle")
+                    : t("serviceForms.foamingDrain.standardRateTitle")}
                   style={{
                     backgroundColor: breakdown.usedSmallAlt
                       ? '#f0f0f0'
@@ -831,7 +834,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
 
           <div className="svc-row">
             <div className="svc-label">
-              <span>Pricing Model</span>
+              <span>{t("serviceForms.foamingDrain.pricingModel")}</span>
             </div>
             <div className="svc-field">
               <span className="svc-red">{pricingLabel}</span>
@@ -843,24 +846,24 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
             <div>
                     <div className="svc-row">
           <div className="svc-label">
-            <span>Install Frequency</span>
+            <span>{t("serviceForms.foamingDrain.installFrequency")}</span>
           </div>
           <div className="svc-field">
             <select
               className="svc-in"
               value={state.installFrequency}
               onChange={handleInstallFrequencyChange}
-              key="install-frequency-select" 
+              key="install-frequency-select"
             >
               {}
-              <option value="weekly">Weekly</option>
-              <option value="bimonthly">Bimonthly</option>
+              <option value="weekly">{t("serviceForms.foamingDrain.installWeekly")}</option>
+              <option value="bimonthly">{t("serviceForms.foamingDrain.installBimonthly")}</option>
             </select>
           </div>
         </div>
             <div className="svc-row">
               <div className="svc-label">
-                <span>Install Drains (10+)</span>
+                <span>{t("serviceForms.foamingDrain.installDrains")}</span>
               </div>
               <div className="svc-field">
                 <div className="svc-inline">
@@ -890,7 +893,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     onChange={handleLocalChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
-                    title={`Volume ${state.installFrequency} rate (editable with yellow highlight if overridden)`}
+                    title={t("serviceForms.foamingDrain.volumeRateTitle", { frequency: state.installFrequency })}
                     style={{
                       backgroundColor: state.installFrequency === "weekly"
                         ? (state.customVolumeWeeklyRate !== undefined ? '#fffacd' : 'white')
@@ -915,7 +918,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Grease Traps</span>
+              <span>{t("serviceForms.foamingDrain.greaseTraps")}</span>
             </div>
             <div className="svc-field">
               <div className="svc-inline">
@@ -947,7 +950,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onChange={handleLocalChange}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
-                  title="Grease trap weekly rate (editable with yellow highlight if overridden)"
+                  title={t("serviceForms.foamingDrain.greaseWeeklyTitle")}
                   style={{
                     backgroundColor: state.customGreaseWeeklyRate !== undefined ? '#fffacd' : 'white'
                   }}
@@ -968,7 +971,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Green Drains</span>
+              <span>{t("serviceForms.foamingDrain.greenDrains")}</span>
             </div>
             <div className="svc-field">
               <div className="svc-inline">
@@ -1000,7 +1003,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   onChange={handleLocalChange}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
-                  title="Green drain weekly rate (editable with yellow highlight if overridden)"
+                  title={t("serviceForms.foamingDrain.greenWeeklyTitle")}
                   style={{
                     backgroundColor: state.customGreenWeeklyRate !== undefined ? '#fffacd' : 'white'
                   }}
@@ -1022,7 +1025,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {state.needsPlumbing && state.plumbingDrainCount > 0 && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Extra Plumbing Work</span>
+                <span>{t("serviceForms.foamingDrain.extraPlumbingWork")}</span>
               </div>
               <div className="svc-field">
                 <div className="svc-inline">
@@ -1063,7 +1066,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     style={{
                       backgroundColor: state.customPlumbingTotal !== undefined ? '#fffacd' : 'white',
                     }}
-                    title="Extra plumbing work total"
+                    title={t("serviceForms.foamingDrain.extraPlumbingTotalTitle")}
                   />
                 </div>
               </div>
@@ -1077,7 +1080,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Facility Condition</span>
+              <span>{t("serviceForms.foamingDrain.facilityCondition")}</span>
             </div>
             <div className="svc-field">
               <select
@@ -1085,8 +1088,8 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                 value={state.facilityCondition}
                 onChange={handleConditionChange}
               >
-                <option value="normal">Normal</option>
-                <option value="filthy">Filthy (3× install)</option>
+                <option value="normal">{t("serviceForms.foamingDrain.normal")}</option>
+                <option value="filthy">{t("serviceForms.foamingDrain.filthy")}</option>
               </select>
             </div>
           </div>
@@ -1095,7 +1098,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {state.facilityCondition === "filthy" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Filthy Multiplier</span>
+                <span>{t("serviceForms.foamingDrain.filthyMultiplier")}</span>
               </div>
               <div className="svc-field">
                 <div className="svc-inline">
@@ -1114,13 +1117,13 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                     onChange={handleLocalChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
-                    title="Filthy installation multiplier (editable with yellow highlight if overridden)"
+                    title={t("serviceForms.foamingDrain.filthyMultiplierTitle")}
                     style={{
                       backgroundColor: state.customFilthyMultiplier !== undefined ? '#fffacd' : 'white'
                     }}
                   />
                   <span className="svc-note" style={{ marginLeft: 8 }}>
-                    × weekly cost = installation fee (usually 3×)
+                    {t("serviceForms.foamingDrain.filthyMultiplierNote")}
                   </span>
                 </div>
               </div>
@@ -1130,7 +1133,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Installation Total</span>
+              <span>{t("serviceForms.common.installationTotal")}</span>
             </div>
             <div className="svc-field svc-dollar">
               <span>$</span>
@@ -1151,7 +1154,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                 style={{
                   backgroundColor: state.customInstallationTotal !== undefined ? '#fffacd' : 'white',
                 }}
-                title="Installation total"
+                title={t("serviceForms.foamingDrain.installationTotalTitle")}
               />
             </div>
           </div>
@@ -1165,7 +1168,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {state.frequency !== "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>First Visit Total</span>
+                <span>{t("serviceForms.common.firstVisitTotal")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -1186,7 +1189,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   style={{
                     backgroundColor: state.customFirstMonthPrice !== undefined ? '#fffacd' : 'white',
                   }}
-                  title="First visit total"
+                  title={t("serviceForms.foamingDrain.firstVisitTotalTitle")}
                 />
               </div>
             </div>
@@ -1195,7 +1198,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {}
           <div className="svc-row">
             <div className="svc-label">
-              <span>Minimum Per Visit</span>
+              <span>{t("serviceForms.common.minimumPerVisit")}</span>
             </div>
             <div className="svc-field">
               <span className="svc-small">${quote.minimumChargePerVisit?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? "0.00"}</span>
@@ -1205,7 +1208,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   checked={state.applyMinimum !== false}
                   onChange={(e) => updateField("applyMinimum", e.target.checked)}
                 />
-                <span>Apply Minimum</span>
+                <span>{t("serviceForms.common.applyMinimum")}</span>
               </label>
             </div>
           </div>
@@ -1219,8 +1222,8 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                  state.frequency === "biannual" ||
                  state.frequency === "annual" ||
                  state.frequency === "everyFourWeeks"
-                  ? "Recurring Visit Total"
-                  : "Per Visit Total"}
+                  ? t("serviceForms.common.recurringVisitTotal")
+                  : t("serviceForms.foamingDrain.perVisitTotal")}
               </span>
             </div>
             <div className="svc-field svc-dollar">
@@ -1242,7 +1245,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                 style={{
                   backgroundColor: state.customWeeklyService !== undefined ? '#fffacd' : 'white',
                 }}
-                title="Per visit total - editable"
+                title={t("serviceForms.foamingDrain.perVisitTotalTitle")}
               />
             </div>
           </div>
@@ -1254,11 +1257,11 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
               <div className="svc-field">
                 {quote.annualRecurring > quote.originalContractTotal * 1.30 ? (
                   <span className="em-pricing-tier em-pricing-tier--green">
-                    <FaCircle color="#16a34a" /> Greenline Pricing
+                    <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
                   </span>
                 ) : (
                   <span className="em-pricing-tier em-pricing-tier--red">
-                    <FaCircle color="#dc2626" /> Redline Pricing
+                    <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
                   </span>
                 )}
               </div>
@@ -1269,7 +1272,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {state.frequency === "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Total Price</span>
+                <span>{t("serviceForms.common.totalPrice")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -1290,7 +1293,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   style={{
                     backgroundColor: state.customWeeklyService !== undefined ? '#fffacd' : 'white',
                   }}
-                  title="Total price for one-time service"
+                  title={t("serviceForms.foamingDrain.totalPriceOneTimeTitle")}
                 />
               </div>
             </div>
@@ -1305,7 +1308,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
            state.frequency !== "everyFourWeeks" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>First Month Total</span>
+                <span>{t("serviceForms.common.firstMonthTotal")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -1326,7 +1329,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   style={{
                     backgroundColor: state.customFirstMonthPrice !== undefined ? '#fffacd' : 'white',
                   }}
-                  title="First month total - editable"
+                  title={t("serviceForms.foamingDrain.firstMonthTotalTitle")}
                 />
               </div>
             </div>
@@ -1341,7 +1344,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
            state.frequency !== "everyFourWeeks" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Monthly Recurring</span>
+                <span>{t("serviceForms.common.monthlyRecurring")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -1362,7 +1365,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   style={{
                     backgroundColor: state.customMonthlyRecurring !== undefined ? '#fffacd' : 'white',
                   }}
-                  title="Monthly recurring"
+                  title={t("serviceForms.foamingDrain.monthlyRecurringTitle")}
                 />
               </div>
             </div>
@@ -1372,7 +1375,7 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
           {state.frequency !== "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Contract Total</span>
+                <span>{t("serviceForms.common.contractTotal")}</span>
               </div>
               <div className="svc-field">
                 <div className="svc-inline">
@@ -1385,24 +1388,24 @@ export const FoamingDrainForm: React.FC<FoamingDrainFormProps> = ({
                   {state.frequency === "quarterly" ? (
                     Array.from({ length: 12 }, (_, i) => {
                       const months = (i + 1) * 3;
-                      return <option key={months} value={months}>{months} mo</option>;
+                      return <option key={months} value={months}>{t("serviceForms.common.monthsShort", { count: months })}</option>;
                     })
                   ) : state.frequency === "biannual" ? (
                     Array.from({ length: 6 }, (_, i) => {
                       const months = (i + 1) * 6;
-                      return <option key={months} value={months}>{months} mo</option>;
+                      return <option key={months} value={months}>{t("serviceForms.common.monthsShort", { count: months })}</option>;
                     })
                   ) : state.frequency === "annual" ? (
                     Array.from({ length: 3 }, (_, i) => {
                       const months = (i + 1) * 12;
-                      return <option key={months} value={months}>{months} mo</option>;
+                      return <option key={months} value={months}>{t("serviceForms.common.monthsShort", { count: months })}</option>;
                     })
                   ) : (
                     Array.from(
                       { length: cfg.contract.maxMonths - cfg.contract.minMonths + 1 },
                       (_, i) => {
                         const m = cfg.contract.minMonths + i;
-                        return <option key={m} value={m}>{m} mo</option>;
+                        return <option key={m} value={m}>{t("serviceForms.common.monthsShort", { count: m })}</option>;
                       }
                     )
                   )}

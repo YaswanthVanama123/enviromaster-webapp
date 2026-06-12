@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { commissionApi, CommissionRecordsResponse } from "../../../backendservice/api/commissionApi";
 import type { CommissionRecord } from "../../../backendservice/types/commission.types";
 
 export const CommissionHistory: React.FC = () => {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<CommissionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export const CommissionHistory: React.FC = () => {
         setTotalPages(response.data.totalPages);
       }
     } catch (err) {
-      setError("Failed to load commission history");
+      setError(t("adminCommissionTools.history.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export const CommissionHistory: React.FC = () => {
   if (loading && records.length === 0) {
     return (
       <div className="loading-state">
-        <span>Loading commission history...</span>
+        <span>{t("adminCommissionTools.history.loading")}</span>
       </div>
     );
   }
@@ -66,7 +68,7 @@ export const CommissionHistory: React.FC = () => {
     <div className="commission-history">
       <div className="history-header">
         <h3 className="calculator-section-title">
-          <span>H</span> Commission History
+          <span>H</span> {t("adminCommissionTools.history.title")}
         </h3>
 
         <div className="history-filters">
@@ -77,11 +79,11 @@ export const CommissionHistory: React.FC = () => {
               setPage(1);
             }}
           >
-            <option value="all">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="submitted">Submitted</option>
-            <option value="approved">Approved</option>
-            <option value="paid">Paid</option>
+            <option value="all">{t("adminCommissionTools.history.allStatuses")}</option>
+            <option value="draft">{t("adminCommissionTools.history.draft")}</option>
+            <option value="submitted">{t("adminCommissionTools.history.submitted")}</option>
+            <option value="approved">{t("adminCommissionTools.history.approved")}</option>
+            <option value="paid">{t("adminCommissionTools.history.paid")}</option>
           </select>
         </div>
       </div>
@@ -90,20 +92,20 @@ export const CommissionHistory: React.FC = () => {
 
       {records.length === 0 ? (
         <div className="empty-state">
-          <p>No commission records found.</p>
+          <p>{t("adminCommissionTools.history.noRecords")}</p>
         </div>
       ) : (
         <>
           <table className="history-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Sales Person</th>
-                <th>Monthly Value</th>
-                <th>Commission Rate</th>
-                <th>Weekly Commission</th>
-                <th>Status</th>
+                <th>{t("adminCommissionTools.history.colDate")}</th>
+                <th>{t("adminCommissionTools.history.colCustomer")}</th>
+                <th>{t("adminCommissionTools.history.colSalesPerson")}</th>
+                <th>{t("adminCommissionTools.history.colMonthlyValue")}</th>
+                <th>{t("adminCommissionTools.history.colCommissionRate")}</th>
+                <th>{t("adminCommissionTools.history.colWeeklyCommission")}</th>
+                <th>{t("adminCommissionTools.history.colStatus")}</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +123,7 @@ export const CommissionHistory: React.FC = () => {
                   </td>
                   <td>
                     <span className={getStatusBadgeClass(record.status)}>
-                      {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                      {t(`adminCommissionTools.history.${record.status}`)}
                     </span>
                   </td>
                 </tr>
@@ -149,10 +151,10 @@ export const CommissionHistory: React.FC = () => {
                   cursor: page === 1 ? "not-allowed" : "pointer",
                 }}
               >
-                Previous
+                {t("adminCommissionTools.history.previous")}
               </button>
               <span style={{ padding: "8px 16px", color: "#6b7280" }}>
-                Page {page} of {totalPages}
+                {t("adminCommissionTools.history.pageOf", { page, totalPages })}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
@@ -165,7 +167,7 @@ export const CommissionHistory: React.FC = () => {
                   cursor: page === totalPages ? "not-allowed" : "pointer",
                 }}
               >
-                Next
+                {t("adminCommissionTools.history.next")}
               </button>
             </div>
           )}

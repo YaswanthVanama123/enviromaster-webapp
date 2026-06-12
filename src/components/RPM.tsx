@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const card = {
   border: "1px solid #e6e6e6",
@@ -35,6 +36,7 @@ const unmoney = (s) =>
   s && `${s}`.trim() !== "—" ? Number(String(s).replace(/[^0-9.\-]/g, "")) || 0 : null;
 
 function SaniCleanCalculator() {
+  const { t } = useTranslation();
   const [master, setMaster] = useState({
     insidePrice: 7,
     insideMin: 40,
@@ -79,12 +81,12 @@ function SaniCleanCalculator() {
     let perVisitCalc = Math.max(unit * fx + trip, regMin || 0);
 
     let rule = isAllInc
-      ? "All-Inclusive: trip waived; other services bundled."
-      : `Trip = ${money(trip)}; Regional minimum = ${regMin ? money(regMin) : "—"}.`;
+      ? t("misc.rpmRuleAllInclusive")
+      : t("misc.rpmRuleTrip", { trip: money(trip), min: regMin ? money(regMin) : "—" });
 
     if (!isAllInc && fx > 0 && fx <= Math.max(0, Number(smallThreshold) || 0)) {
       perVisitCalc = Math.max(perVisitCalc, master.smallMin);
-      rule = `Small-account rule: fixtures ≤ ${smallThreshold}, minimum ${money(master.smallMin)} (trip included).`;
+      rule = t("misc.rpmRuleSmallAccount", { threshold: smallThreshold, min: money(master.smallMin) });
     }
 
     const perMonthCalc = perVisitCalc * 4.33;
@@ -97,7 +99,7 @@ function SaniCleanCalculator() {
       agreement: agreementCalc,
       ruleText: rule,
     };
-  }, [master, region, fixtures, agreementMonths, tripType, parkingAmt, allInclusive, smallThreshold]);
+  }, [master, region, fixtures, agreementMonths, tripType, parkingAmt, allInclusive, smallThreshold, t]);
 
   const updateMaster = (k, raw) => {
     const val = unmoney(raw);
@@ -122,15 +124,15 @@ function SaniCleanCalculator() {
       <div style={card}>
         <div style={grid}>
           <div style={field}>
-            <label>Region</label>
+            <label>{t("misc.rpmRegion")}</label>
             <select style={inputStyle} value={region} onChange={(e) => setRegion(e.target.value)}>
-              <option value="inside">Inside Beltway</option>
-              <option value="outside">Outside Beltway</option>
+              <option value="inside">{t("misc.rpmInsideBeltway")}</option>
+              <option value="outside">{t("misc.rpmOutsideBeltway")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>Fixtures (count)</label>
+            <label>{t("misc.rpmFixturesCount")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -141,7 +143,7 @@ function SaniCleanCalculator() {
           </div>
 
           <div style={field}>
-            <label>Agreement Months</label>
+            <label>{t("misc.rpmAgreementMonths")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -152,17 +154,17 @@ function SaniCleanCalculator() {
           </div>
 
           <div style={field}>
-            <label>Trip Charge</label>
+            <label>{t("misc.rpmTripCharge")}</label>
             <select style={inputStyle} value={tripType} onChange={(e) => setTripType(e.target.value)}>
-              <option value="beltway8">Beltway $8</option>
-              <option value="standard6">Standard $6</option>
-              <option value="paid7">Paid $7 + parking</option>
-              <option value="waived">Waived</option>
+              <option value="beltway8">{t("misc.rpmTripBeltway8")}</option>
+              <option value="standard6">{t("misc.rpmTripStandard6")}</option>
+              <option value="paid7">{t("misc.rpmTripPaid7")}</option>
+              <option value="waived">{t("misc.rpmTripWaived")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>Parking (only for paid)</label>
+            <label>{t("misc.rpmParking")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -174,15 +176,15 @@ function SaniCleanCalculator() {
           </div>
 
           <div style={field}>
-            <label>All-Inclusive?</label>
+            <label>{t("misc.rpmAllInclusive")}</label>
             <select style={inputStyle} value={allInclusive} onChange={(e) => setAllInclusive(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (Trip waived, $20/fixture)</option>
+              <option value="no">{t("misc.rpmNo")}</option>
+              <option value="yes">{t("misc.rpmAllInclusiveYes")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>Small-Account Threshold</label>
+            <label>{t("misc.rpmSmallAccountThreshold")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -190,38 +192,38 @@ function SaniCleanCalculator() {
               value={smallThreshold}
               onChange={(e) => setSmallThreshold(Number(e.target.value) || 0)}
             />
-            <small style={{ color: "#4a4a4a" }}>≤ threshold → $50 visit incl. trip</small>
+            <small style={{ color: "#4a4a4a" }}>{t("misc.rpmSmallAccountHint")}</small>
           </div>
         </div>
       </div>
 
       <div style={card}>
-        <h3 style={{ margin: "0 0 10px" }}>Master Rates</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmMasterRates")}</h3>
         <table style={tableStyle}>
           <thead>
             <tr>
-              <th style={thtd}>Item</th>
-              <th style={thtd}>Key</th>
-              <th style={thtd}>Value</th>
-              <th style={thtd}>Notes</th>
+              <th style={thtd}>{t("misc.rpmThItem")}</th>
+              <th style={thtd}>{t("misc.rpmThKey")}</th>
+              <th style={thtd}>{t("misc.rpmThValue")}</th>
+              <th style={thtd}>{t("misc.rpmThNotes")}</th>
             </tr>
           </thead>
           <tbody>
             {[
-              ["Inside Beltway (per fixture)", "insidePrice", "price", "Base rate inside beltway"],
-              ["Inside Min (per visit)", "insideMin", "money", "Regional minimum"],
-              ["Trip — Beltway", "beltwayTrip", "money", "Standard $8"],
+              ["rpmRowInsidePrice", "insidePrice", "price", "rpmRowInsidePriceNote"],
+              ["rpmRowInsideMin", "insideMin", "money", "rpmRowInsideMinNote"],
+              ["rpmRowBeltwayTrip", "beltwayTrip", "money", "rpmRowBeltwayTripNote"],
 
-              ["Outside Beltway (per fixture)", "outsidePrice", "price", "Base rate outside beltway"],
-              ["Outside Min (per visit)", "outsideMin", "moneyOrDash", "— if none"],
-              ["Trip — Outside (PDF line)", "outsideTripPDF", "money", "SaniClean section shows $8"],
+              ["rpmRowOutsidePrice", "outsidePrice", "price", "rpmRowOutsidePriceNote"],
+              ["rpmRowOutsideMin", "outsideMin", "moneyOrDash", "rpmRowOutsideMinNote"],
+              ["rpmRowOutsideTripPDF", "outsideTripPDF", "money", "rpmRowOutsideTripPDFNote"],
 
-              ["Trip — Paid base", "paidBase", "money", "+ parking pass-through"],
-              ["Small-Account Minimum (≤ threshold)", "smallMin", "money", "Includes trip"],
-              ["All-Inclusive (per fixture)", "allIncPrice", "price", "Trip waived"],
-            ].map(([label, key, mode, note]) => (
+              ["rpmRowPaidBase", "paidBase", "money", "rpmRowPaidBaseNote"],
+              ["rpmRowSmallMin", "smallMin", "money", "rpmRowSmallMinNote"],
+              ["rpmRowAllIncPrice", "allIncPrice", "price", "rpmRowAllIncPriceNote"],
+            ].map(([labelKey, key, mode, noteKey]) => (
               <tr key={key}>
-                <td style={thtd}>{label}</td>
+                <td style={thtd}>{t(`misc.${labelKey}`)}</td>
                 <td style={thtd}>{key}</td>
                 <td style={thtd}>
                   <InlineMoneyEditor
@@ -230,7 +232,7 @@ function SaniCleanCalculator() {
                     onCommit={(v) => updateMaster(key, v)}
                   />
                 </td>
-                <td style={thtd}>{note}</td>
+                <td style={thtd}>{t(`misc.${noteKey}`)}</td>
               </tr>
             ))}
           </tbody>
@@ -238,11 +240,11 @@ function SaniCleanCalculator() {
       </div>
 
       <div style={card}>
-        <h3 style={{ margin: "0 0 10px" }}>Totals</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmTotals")}</h3>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <div style={pill}>Per Visit: <strong>{money(perVisit)}</strong></div>
-          <div style={pill}>Per Month (×4.33): <strong>{money(perMonth)}</strong></div>
-          <div style={pill}>Agreement ({agreementMonths} mo): <strong>{money(agreement)}</strong></div>
+          <div style={pill}>{t("misc.rpmPerVisit")} <strong>{money(perVisit)}</strong></div>
+          <div style={pill}>{t("misc.rpmPerMonth433")} <strong>{money(perMonth)}</strong></div>
+          <div style={pill}>{t("misc.rpmAgreementMo", { months: agreementMonths })} <strong>{money(agreement)}</strong></div>
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: "#4a4a4a" }}>{ruleText}</div>
       </div>
@@ -252,7 +254,7 @@ function SaniCleanCalculator() {
           onClick={reset}
           style={{ border: "1px solid #ff4500", color: "#ff4500", background: "#fff", borderRadius: 10, padding: "10px 14px", fontWeight: 600 }}
         >
-          Reset
+          {t("misc.rpmReset")}
         </button>
       </div>
     </div>
@@ -260,6 +262,7 @@ function SaniCleanCalculator() {
 }
 
 function RpmWindowsCalculator() {
+  const { t } = useTranslation();
   const [master, setMaster] = useState({
     rateSmall: 1.5,
     rateMedium: 3,
@@ -322,10 +325,10 @@ function RpmWindowsCalculator() {
 
     const freqTxt =
       firstTime === "yes"
-        ? `${labelForFreq(freq)} ×3.00 (first-time install)`
-        : `${labelForFreq(freq)} ×${mult.toFixed(2)}`;
+        ? t("misc.rpmRuleFreqInstall", { freq: labelForFreq(freq, t) })
+        : t("misc.rpmRuleFreq", { freq: labelForFreq(freq, t), mult: mult.toFixed(2) });
 
-    const rule = `${freqTxt}. Trip = ${money(tripCharge(tripType, parkingAmt))}.`;
+    const rule = t("misc.rpmRuleWindows", { freqText: freqTxt, trip: money(tripCharge(tripType, parkingAmt)) });
 
     return { perVisit: perVisitCalc, perMonth: perMonthCalc, agreement: agreementCalc, ruleText: rule };
   }, [
@@ -342,6 +345,7 @@ function RpmWindowsCalculator() {
     sm,
     mm,
     lm,
+    t,
   ]);
 
   const updateMaster = (k, raw) => {
@@ -380,35 +384,35 @@ function RpmWindowsCalculator() {
       <div style={card}>
         <div style={grid}>
           <div style={field}>
-            <label>Frequency</label>
+            <label>{t("misc.rpmFrequency")}</label>
             <select style={inputStyle} value={freq} onChange={(e) => setFreq(e.target.value)}>
-              <option value="weekly">Weekly (×1.00)</option>
-              <option value="biweekly">Biweekly (×1.25)</option>
-              <option value="monthly">Monthly (×1.25)</option>
-              <option value="quarterly">Quarterly (×2.00 after first)</option>
+              <option value="weekly">{t("misc.rpmWeekly")}</option>
+              <option value="biweekly">{t("misc.rpmBiweekly")}</option>
+              <option value="monthly">{t("misc.rpmMonthly")}</option>
+              <option value="quarterly">{t("misc.rpmQuarterly")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>First Time (Install 300%)</label>
+            <label>{t("misc.rpmFirstTimeInstall")}</label>
             <select style={inputStyle} value={firstTime} onChange={(e) => setFirstTime(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (installers handle)</option>
+              <option value="no">{t("misc.rpmNo")}</option>
+              <option value="yes">{t("misc.rpmFirstTimeYes")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>Trip Charge</label>
+            <label>{t("misc.rpmTripCharge")}</label>
             <select style={inputStyle} value={tripType} onChange={(e) => setTripType(e.target.value)}>
-              <option value="beltway8">Beltway $8</option>
-              <option value="standard6">Standard $6</option>
-              <option value="paid7">Paid $7 + parking</option>
-              <option value="waived">Waived</option>
+              <option value="beltway8">{t("misc.rpmTripBeltway8")}</option>
+              <option value="standard6">{t("misc.rpmTripStandard6")}</option>
+              <option value="paid7">{t("misc.rpmTripPaid7")}</option>
+              <option value="waived">{t("misc.rpmTripWaived")}</option>
             </select>
           </div>
 
           <div style={field}>
-            <label>Parking (only for paid)</label>
+            <label>{t("misc.rpmParking")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -420,7 +424,7 @@ function RpmWindowsCalculator() {
           </div>
 
           <div style={field}>
-            <label>Agreement Months</label>
+            <label>{t("misc.rpmAgreementMonths")}</label>
             <input
               style={inputStyle}
               type="number"
@@ -433,70 +437,70 @@ function RpmWindowsCalculator() {
       </div>
 
       <div style={card}>
-        <h3 style={{ margin: "0 0 10px" }}>Counts (both sides)</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmCountsBothSides")}</h3>
         <div style={grid}>
           <div style={field}>
-            <label>Small Windows</label>
+            <label>{t("misc.rpmSmallWindows")}</label>
             <input style={inputStyle} type="number" min={0} value={small} onChange={(e) => setSmall(Number(e.target.value) || 0)} />
           </div>
           <div style={field}>
-            <label>Medium Windows</label>
+            <label>{t("misc.rpmMediumWindows")}</label>
             <input style={inputStyle} type="number" min={0} value={medium} onChange={(e) => setMedium(Number(e.target.value) || 0)} />
           </div>
           <div style={field}>
-            <label>Large / Door Windows</label>
+            <label>{t("misc.rpmLargeWindows")}</label>
             <input style={inputStyle} type="number" min={0} value={large} onChange={(e) => setLarge(Number(e.target.value) || 0)} />
           </div>
           <div style={field}>
-            <label>Include Mirrors?</label>
+            <label>{t("misc.rpmIncludeMirrors")}</label>
             <select style={inputStyle} value={includeMirrors} onChange={(e) => setIncludeMirrors(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (same pricing)</option>
+              <option value="no">{t("misc.rpmNo")}</option>
+              <option value="yes">{t("misc.rpmIncludeMirrorsYes")}</option>
             </select>
           </div>
           <div style={field}>
-            <label>Small Mirrors</label>
+            <label>{t("misc.rpmSmallMirrors")}</label>
             <input style={inputStyle} type="number" min={0} value={sm} onChange={(e) => setSm(Number(e.target.value) || 0)} />
           </div>
           <div style={field}>
-            <label>Medium Mirrors</label>
+            <label>{t("misc.rpmMediumMirrors")}</label>
             <input style={inputStyle} type="number" min={0} value={mm} onChange={(e) => setMm(Number(e.target.value) || 0)} />
           </div>
           <div style={field}>
-            <label>Large Mirrors</label>
+            <label>{t("misc.rpmLargeMirrors")}</label>
             <input style={inputStyle} type="number" min={0} value={lm} onChange={(e) => setLm(Number(e.target.value) || 0)} />
           </div>
         </div>
         <div style={{ fontSize: 12, color: "#4a4a4a", marginTop: 6 }}>
-          Mirror chem/technique same as windows → priced the same per size.
+          {t("misc.rpmMirrorNote")}
         </div>
       </div>
 
       <div style={card}>
-        <h3 style={{ margin: "0 0 10px" }}>Master Rates & Multipliers</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmMasterRatesMultipliers")}</h3>
         <table style={tableStyle}>
           <thead>
             <tr>
-              <th style={thtd}>Item</th>
-              <th style={thtd}>Key</th>
-              <th style={thtd}>Value</th>
-              <th style={thtd}>Notes</th>
+              <th style={thtd}>{t("misc.rpmThItem")}</th>
+              <th style={thtd}>{t("misc.rpmThKey")}</th>
+              <th style={thtd}>{t("misc.rpmThValue")}</th>
+              <th style={thtd}>{t("misc.rpmThNotes")}</th>
             </tr>
           </thead>
           <tbody>
             {[
-              ["Small (weekly, both sides)", "rateSmall", "Per pane"],
-              ["Medium (weekly, both sides)", "rateMedium", "Per pane"],
-              ["Large/Door (weekly, both sides)", "rateLarge", "Per pane"],
-              ["First Time Multiplier", "multInstall", "300% (installers)"],
-              ["Biweekly/Monthly Multiplier", "mult125", "125% of weekly"],
-              ["Quarterly Multiplier (after first)", "multQuarterly", "200%"],
-              ["Trip — Beltway", "tripBeltway", "Usually $8"],
-              ["Trip — Standard", "tripStandard", "Usually $6"],
-              ["Trip — Paid base", "tripPaidBase", "+ parking"],
-            ].map(([label, key, note]) => (
+              ["rpmRowRateSmall", "rateSmall", "rpmRowRateSmallNote"],
+              ["rpmRowRateMedium", "rateMedium", "rpmRowRateMediumNote"],
+              ["rpmRowRateLarge", "rateLarge", "rpmRowRateLargeNote"],
+              ["rpmRowMultInstall", "multInstall", "rpmRowMultInstallNote"],
+              ["rpmRowMult125", "mult125", "rpmRowMult125Note"],
+              ["rpmRowMultQuarterly", "multQuarterly", "rpmRowMultQuarterlyNote"],
+              ["rpmRowTripBeltway", "tripBeltway", "rpmRowTripBeltwayNote"],
+              ["rpmRowTripStandard", "tripStandard", "rpmRowTripStandardNote"],
+              ["rpmRowTripPaidBase", "tripPaidBase", "rpmRowTripPaidBaseNote"],
+            ].map(([labelKey, key, noteKey]) => (
               <tr key={key}>
-                <td style={thtd}>{label}</td>
+                <td style={thtd}>{t(`misc.${labelKey}`)}</td>
                 <td style={thtd}>{key}</td>
                 <td style={thtd}>
                   <InlineMoneyEditor
@@ -505,7 +509,7 @@ function RpmWindowsCalculator() {
                     onCommit={(v) => updateMaster(key, v, setMaster)}
                   />
                 </td>
-                <td style={thtd}>{note}</td>
+                <td style={thtd}>{t(`misc.${noteKey}`)}</td>
               </tr>
             ))}
           </tbody>
@@ -513,11 +517,11 @@ function RpmWindowsCalculator() {
       </div>
 
       <div style={card}>
-        <h3 style={{ margin: "0 0 10px" }}>Totals</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmTotals")}</h3>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <div style={pill}>Per Visit: <strong>{money(perVisit)}</strong></div>
-          <div style={pill}>Per Month: <strong>{money(perMonth)}</strong></div>
-          <div style={pill}>Agreement ({agreementMonths} mo): <strong>{money(agreement)}</strong></div>
+          <div style={pill}>{t("misc.rpmPerVisit")} <strong>{money(perVisit)}</strong></div>
+          <div style={pill}>{t("misc.rpmPerMonth")} <strong>{money(perMonth)}</strong></div>
+          <div style={pill}>{t("misc.rpmAgreementMo", { months: agreementMonths })} <strong>{money(agreement)}</strong></div>
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: "#4a4a4a" }}>{ruleText}</div>
       </div>
@@ -527,20 +531,18 @@ function RpmWindowsCalculator() {
           onClick={reset}
           style={{ border: "1px solid #ff4500", color: "#ff4500", background: "#fff", borderRadius: 10, padding: "10px 14px", fontWeight: 600 }}
         >
-          Reset
+          {t("misc.rpmReset")}
         </button>
       </div>
 
       <div style={{ ...card }}>
-        <h3 style={{ margin: "0 0 10px" }}>Value Proposition</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("misc.rpmValueProposition")}</h3>
         <ul style={{ margin: "6px 0 0 18px" }}>
           <li>
-            <strong>Protects glass:</strong> Janitorial crews often seal grime causing haze. We acid wash, seal, and
-            maintain so the glass looks new.
+            <strong>{t("misc.rpmValueProtectsGlassTitle")}</strong> {t("misc.rpmValueProtectsGlass")}
           </li>
           <li>
-            <strong>Lower weekday costs:</strong> No extra chemicals between visits—microfiber towels and water (we can
-            include towels).
+            <strong>{t("misc.rpmValueLowerCostsTitle")}</strong> {t("misc.rpmValueLowerCosts")}
           </li>
         </ul>
       </div>
@@ -548,11 +550,13 @@ function RpmWindowsCalculator() {
   );
 }
 
-function labelForFreq(freq) {
-  return { weekly: "Weekly", biweekly: "Biweekly", monthly: "Monthly", quarterly: "Quarterly" }[freq] || "Weekly";
+function labelForFreq(freq: string, t: (key: string) => string) {
+  const keys: Record<string, string> = { weekly: "rpmFreqWeekly", biweekly: "rpmFreqBiweekly", monthly: "rpmFreqMonthly", quarterly: "rpmFreqQuarterly" };
+  return t(`misc.${keys[freq] || "rpmFreqWeekly"}`);
 }
 
 function InlineMoneyEditor({ value, display, onCommit }) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(display ?? money(value ?? 0));
 
@@ -587,7 +591,7 @@ function InlineMoneyEditor({ value, display, onCommit }) {
         cursor: "pointer",
         background: "#fff",
       }}
-      title="Click to edit"
+      title={t("misc.rpmClickToEdit")}
     >
       {display ?? money(value ?? 0)}
     </button>
@@ -595,40 +599,41 @@ function InlineMoneyEditor({ value, display, onCommit }) {
 }
 
 export default function PricingTables() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState("SaniClean");
 
   const tabs = [
-    { key: "SaniClean", component: <SaniCleanCalculator /> },
-    { key: "RPM Windows", component: <RpmWindowsCalculator /> },
+    { key: "SaniClean", label: t("misc.rpmTabSaniClean"), component: <SaniCleanCalculator /> },
+    { key: "RPM Windows", label: t("misc.rpmTabRpmWindows"), component: <RpmWindowsCalculator /> },
   ];
 
   return (
     <div style={{ maxWidth: 1100, margin: "28px auto", padding: "0 16px 48px" }}>
-      <h1 style={{ fontSize: 24, margin: 0 }}>Pricing Tables</h1>
+      <h1 style={{ fontSize: 24, margin: 0 }}>{t("misc.rpmPricingTables")}</h1>
       <p style={{ color: "#4a4a4a", marginTop: 8, marginBottom: 16 }}>
-        Choose a service to configure its rates, rules, and agreement totals.
+        {t("misc.rpmPricingIntro")}
       </p>
 
       <div style={{ ...card, display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {tabs.map((t) => (
+        {tabs.map((tabItem) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+            key={tabItem.key}
+            onClick={() => setTab(tabItem.key)}
             style={{
               padding: "8px 12px",
               borderRadius: 999,
               border: "1px solid #e6e6e6",
-              background: tab === t.key ? "#fff1eb" : "#fff",
-              color: tab === t.key ? "#ff4500" : "#212121",
+              background: tab === tabItem.key ? "#fff1eb" : "#fff",
+              color: tab === tabItem.key ? "#ff4500" : "#212121",
               fontWeight: 600,
             }}
           >
-            {t.key}
+            {tabItem.label}
           </button>
         ))}
       </div>
 
-      {tabs.find((t) => t.key === tab)?.component}
+      {tabs.find((tabItem) => tabItem.key === tab)?.component}
     </div>
   );
 }

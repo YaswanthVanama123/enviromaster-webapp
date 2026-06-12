@@ -1,11 +1,13 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginAuditApi, type BiginAuditLog, type ScrapeStatus, type AuditStats } from '../../../backendservice/api/biginAuditApi';
 import './BiginAuditTab.css';
 
 export const BiginAuditTab: React.FC = () => {
+  const { t } = useTranslation();
   const [auditLogs, setAuditLogs] = useState<BiginAuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [scrapeStatus, setScrapeStatus] = useState<ScrapeStatus | null>(null);
@@ -129,13 +131,13 @@ export const BiginAuditTab: React.FC = () => {
       } else {
         setUploadResult({
           success: false,
-          message: 'Failed to upload CSV file',
+          message: t('adminTools.bigin.audit.uploadFailedMessage'),
         });
       }
     } catch (error) {
       setUploadResult({
         success: false,
-        message: 'Error uploading file: ' + (error as Error).message,
+        message: t('adminTools.bigin.audit.uploadErrorMessage', { message: (error as Error).message }),
       });
     } finally {
       setUploading(false);
@@ -161,10 +163,10 @@ export const BiginAuditTab: React.FC = () => {
         loadAuditLogs();
         loadStats();
       } else {
-        setDeleteResult({ success: false, message: 'Failed to delete audit logs' });
+        setDeleteResult({ success: false, message: t('adminTools.bigin.audit.deleteAllFailed') });
       }
     } catch (error) {
-      setDeleteResult({ success: false, message: 'Error deleting audit logs' });
+      setDeleteResult({ success: false, message: t('adminTools.bigin.audit.deleteAllError') });
     } finally {
       setDeleting(false);
     }
@@ -180,10 +182,10 @@ export const BiginAuditTab: React.FC = () => {
         loadAuditLogs();
         loadStats();
       } else {
-        setDeleteResult({ success: false, message: 'Failed to delete unnecessary audit logs' });
+        setDeleteResult({ success: false, message: t('adminTools.bigin.audit.deleteUnnecessaryFailed') });
       }
     } catch (error) {
-      setDeleteResult({ success: false, message: 'Error deleting unnecessary audit logs' });
+      setDeleteResult({ success: false, message: t('adminTools.bigin.audit.deleteUnnecessaryError') });
     } finally {
       setDeleting(false);
     }
@@ -223,8 +225,8 @@ export const BiginAuditTab: React.FC = () => {
       {}
       <div className="ba-header">
         <div className="ba-header-content">
-          <h2>Bigin Audit History</h2>
-          <p className="ba-subtitle">View audit logs from Zoho Bigin CRM</p>
+          <h2>{t('adminTools.bigin.audit.title')}</h2>
+          <p className="ba-subtitle">{t('adminTools.bigin.audit.subtitle')}</p>
         </div>
         <div className="ba-header-actions">
           <button
@@ -236,7 +238,7 @@ export const BiginAuditTab: React.FC = () => {
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
-            Upload CSV
+            {t('adminTools.bigin.audit.uploadCsv')}
           </button>
           <button
             className={`ba-scrape-btn ${scrapeStatus?.isRunning ? 'scraping' : ''}`}
@@ -246,14 +248,14 @@ export const BiginAuditTab: React.FC = () => {
             {scrapeStatus?.isRunning ? (
               <>
                 <span className="scrape-spinner"></span>
-                Scraping... {scrapeStatus.progress}%
+                {t('adminTools.bigin.audit.scraping', { progress: scrapeStatus.progress })}
               </>
             ) : (
               <>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
                 </svg>
-                Fetch Audit Logs
+                {t('adminTools.bigin.audit.fetchAuditLogs')}
               </>
             )}
           </button>
@@ -264,7 +266,7 @@ export const BiginAuditTab: React.FC = () => {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
             </svg>
-            Delete Unnecessary
+            {t('adminTools.bigin.audit.deleteUnnecessary')}
           </button>
           <button
             className="ba-delete-all-btn"
@@ -273,7 +275,7 @@ export const BiginAuditTab: React.FC = () => {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
             </svg>
-            Delete All
+            {t('adminTools.bigin.audit.deleteAll')}
           </button>
         </div>
       </div>
@@ -282,23 +284,23 @@ export const BiginAuditTab: React.FC = () => {
       <div className="ba-stats-grid">
         <div className="ba-stat-card">
           <div className="ba-stat-value">{stats?.total || 0}</div>
-          <div className="ba-stat-label">Total Logs</div>
+          <div className="ba-stat-label">{t('adminTools.bigin.audit.totalLogs')}</div>
         </div>
         <div className="ba-stat-card">
           <div className="ba-stat-value ba-stat-storage">{formatBytes(stats?.storageSize || 0)}</div>
-          <div className="ba-stat-label">Storage Size</div>
+          <div className="ba-stat-label">{t('adminTools.bigin.audit.storageSize')}</div>
         </div>
         <div className="ba-stat-card">
           <div className="ba-stat-value ba-stat-24h">{stats?.last24Hours || 0}</div>
-          <div className="ba-stat-label">Last 24 Hours</div>
+          <div className="ba-stat-label">{t('adminTools.bigin.audit.last24Hours')}</div>
         </div>
         <div className="ba-stat-card">
           <div className="ba-stat-value ba-stat-7d">{stats?.last7Days || 0}</div>
-          <div className="ba-stat-label">Last 7 Days</div>
+          <div className="ba-stat-label">{t('adminTools.bigin.audit.last7Days')}</div>
         </div>
         <div className="ba-stat-card">
           <div className="ba-stat-value">{stats?.uniqueUsers || 0}</div>
-          <div className="ba-stat-label">Unique Users</div>
+          <div className="ba-stat-label">{t('adminTools.bigin.audit.uniqueUsers')}</div>
         </div>
       </div>
 
@@ -306,15 +308,15 @@ export const BiginAuditTab: React.FC = () => {
       {scrapeStatus && (
         <div className={`ba-scrape-status ${scrapeStatus.lastScrapeResult || ''}`}>
           <div className="ba-scrape-info">
-            <span className="ba-scrape-label">Last Scrape:</span>
+            <span className="ba-scrape-label">{t('adminTools.bigin.audit.lastScrape')}</span>
             <span className="ba-scrape-time">{formatDate(scrapeStatus.lastScrapeAt)}</span>
             {scrapeStatus.lastScrapeResult && (
               <span className={`ba-scrape-result ${scrapeStatus.lastScrapeResult}`}>
-                {scrapeStatus.lastScrapeResult === 'success' ? <><FaCheckCircle /> Success</> : <><FaTimesCircle /> Failed</>}
+                {scrapeStatus.lastScrapeResult === 'success' ? <><FaCheckCircle /> {t('adminTools.bigin.audit.success')}</> : <><FaTimesCircle /> {t('adminTools.bigin.audit.failed')}</>}
               </span>
             )}
             {scrapeStatus.totalLogs > 0 && (
-              <span className="ba-total-logs">{scrapeStatus.totalLogs} logs stored</span>
+              <span className="ba-total-logs">{t('adminTools.bigin.audit.logsStored', { count: scrapeStatus.totalLogs })}</span>
             )}
           </div>
           {scrapeStatus.isRunning && (
@@ -333,12 +335,12 @@ export const BiginAuditTab: React.FC = () => {
         <form onSubmit={handleSearch} className="ba-search-form">
           <input
             type="text"
-            placeholder="Search logs..."
+            placeholder={t('adminTools.bigin.audit.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="ba-search-input"
           />
-          <button type="submit" className="ba-search-btn">Search</button>
+          <button type="submit" className="ba-search-btn">{t('adminTools.bigin.audit.search')}</button>
         </form>
 
         <select
@@ -349,7 +351,7 @@ export const BiginAuditTab: React.FC = () => {
           }}
           className="ba-filter-select"
         >
-          <option value="">All Users</option>
+          <option value="">{t('adminTools.bigin.audit.allUsers')}</option>
           {stats?.users.map(user => (
             <option key={user} value={user}>{user}</option>
           ))}
@@ -363,7 +365,7 @@ export const BiginAuditTab: React.FC = () => {
           }}
           className="ba-filter-select"
         >
-          <option value="">All Actions</option>
+          <option value="">{t('adminTools.bigin.audit.allActions')}</option>
           {stats?.actions.map(action => (
             <option key={action} value={action}>{action}</option>
           ))}
@@ -377,7 +379,7 @@ export const BiginAuditTab: React.FC = () => {
           }}
           className="ba-filter-select"
         >
-          <option value="">All Modules</option>
+          <option value="">{t('adminTools.bigin.audit.allModules')}</option>
           {stats?.modules.map(module => (
             <option key={module} value={module}>{module}</option>
           ))}
@@ -391,14 +393,14 @@ export const BiginAuditTab: React.FC = () => {
           }}
           className="ba-filter-select"
         >
-          <option value="">All Pipelines</option>
+          <option value="">{t('adminTools.bigin.audit.allPipelines')}</option>
           {stats?.pipelines?.map(pipeline => (
             <option key={pipeline} value={pipeline}>{pipeline}</option>
           ))}
         </select>
 
         <span className="ba-results-count">
-          {pagination.total} logs found
+          {t('adminTools.bigin.audit.logsFound', { count: pagination.total })}
         </span>
       </div>
 
@@ -406,7 +408,7 @@ export const BiginAuditTab: React.FC = () => {
       {loading ? (
         <div className="ba-loading">
           <div className="ba-loading-spinner"></div>
-          <p>Loading audit logs...</p>
+          <p>{t('adminTools.bigin.audit.loadingLogs')}</p>
         </div>
       ) : auditLogs.length === 0 ? (
         <div className="ba-empty">
@@ -419,22 +421,22 @@ export const BiginAuditTab: React.FC = () => {
               <polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <h3>No Audit Logs Found</h3>
-          <p>Click "Fetch Audit Logs" to scrape audit history from your Bigin account.</p>
+          <h3>{t('adminTools.bigin.audit.noLogsTitle')}</h3>
+          <p>{t('adminTools.bigin.audit.noLogsText')}</p>
         </div>
       ) : (
         <div className="ba-table-container">
           <table className="ba-table">
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>Module</th>
-                <th>Record</th>
-                <th>Details</th>
-                <th>IP Address</th>
-                <th>Actions</th>
+                <th>{t('adminTools.bigin.audit.colTimestamp')}</th>
+                <th>{t('adminTools.bigin.audit.colUser')}</th>
+                <th>{t('adminTools.bigin.audit.colAction')}</th>
+                <th>{t('adminTools.bigin.audit.colModule')}</th>
+                <th>{t('adminTools.bigin.audit.colRecord')}</th>
+                <th>{t('adminTools.bigin.audit.colDetails')}</th>
+                <th>{t('adminTools.bigin.audit.colIpAddress')}</th>
+                <th>{t('adminTools.bigin.audit.colActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -459,7 +461,7 @@ export const BiginAuditTab: React.FC = () => {
                       className="ba-view-btn"
                       onClick={() => setSelectedLog(log)}
                     >
-                      View
+                      {t('adminTools.bigin.audit.view')}
                     </button>
                   </td>
                 </tr>
@@ -477,17 +479,17 @@ export const BiginAuditTab: React.FC = () => {
             disabled={pagination.skip === 0}
             className="ba-page-btn"
           >
-            Previous
+            {t('adminTools.bigin.audit.previous')}
           </button>
           <span className="ba-page-info">
-            {pagination.skip + 1} - {Math.min(pagination.skip + pagination.limit, pagination.total)} of {pagination.total}
+            {t('adminTools.bigin.audit.pageInfo', { from: pagination.skip + 1, to: Math.min(pagination.skip + pagination.limit, pagination.total), total: pagination.total })}
           </span>
           <button
             onClick={() => setPagination(prev => ({ ...prev, skip: prev.skip + prev.limit }))}
             disabled={pagination.skip + pagination.limit >= pagination.total}
             className="ba-page-btn"
           >
-            Next
+            {t('adminTools.bigin.audit.next')}
           </button>
         </div>
       )}
@@ -497,63 +499,63 @@ export const BiginAuditTab: React.FC = () => {
         <div className="ba-modal-overlay" onClick={() => setSelectedLog(null)}>
           <div className="ba-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header">
-              <h3>Audit Log Details</h3>
+              <h3>{t('adminTools.bigin.audit.logDetailsTitle')}</h3>
               <button className="ba-close-btn" onClick={() => setSelectedLog(null)}>x</button>
             </div>
             <div className="ba-modal-body">
               <div className="ba-detail-grid">
                 <div className="ba-detail-item">
-                  <label>Timestamp</label>
+                  <label>{t('adminTools.bigin.audit.timestamp')}</label>
                   <span>{formatDate(selectedLog.timestamp)}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>User</label>
+                  <label>{t('adminTools.bigin.audit.user')}</label>
                   <span>{selectedLog.user}</span>
                 </div>
                 {selectedLog.userEmail && (
                   <div className="ba-detail-item">
-                    <label>User Email</label>
+                    <label>{t('adminTools.bigin.audit.userEmail')}</label>
                     <span>{selectedLog.userEmail}</span>
                   </div>
                 )}
                 <div className="ba-detail-item">
-                  <label>Action</label>
+                  <label>{t('adminTools.bigin.audit.action')}</label>
                   <span className={`ba-action-badge ${getActionColor(selectedLog.action)}`}>
                     {selectedLog.action}
                   </span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>Module</label>
+                  <label>{t('adminTools.bigin.audit.module')}</label>
                   <span>{selectedLog.module || '-'}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>Record Name</label>
+                  <label>{t('adminTools.bigin.audit.recordName')}</label>
                   <span>{selectedLog.recordName || '-'}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>Record ID</label>
+                  <label>{t('adminTools.bigin.audit.recordId')}</label>
                   <span className="ba-mono">{selectedLog.recordId || '-'}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>IP Address</label>
+                  <label>{t('adminTools.bigin.audit.ipAddress')}</label>
                   <span>{selectedLog.ipAddress || '-'}</span>
                 </div>
                 <div className="ba-detail-item full-width">
-                  <label>Details</label>
+                  <label>{t('adminTools.bigin.audit.details')}</label>
                   <span>{selectedLog.details || '-'}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>Bigin ID</label>
+                  <label>{t('adminTools.bigin.audit.biginId')}</label>
                   <span className="ba-mono">{selectedLog.biginId || '-'}</span>
                 </div>
                 <div className="ba-detail-item">
-                  <label>Scraped At</label>
+                  <label>{t('adminTools.bigin.audit.scrapedAt')}</label>
                   <span>{formatDate(selectedLog.scrapedAt)}</span>
                 </div>
               </div>
               {selectedLog.rawData && Object.keys(selectedLog.rawData).length > 0 && (
                 <div className="ba-raw-data">
-                  <label>Raw Data</label>
+                  <label>{t('adminTools.bigin.audit.rawData')}</label>
                   <pre>{JSON.stringify(selectedLog.rawData, null, 2)}</pre>
                 </div>
               )}
@@ -567,7 +569,7 @@ export const BiginAuditTab: React.FC = () => {
         <div className="ba-modal-overlay" onClick={closeUploadModal}>
           <div className="ba-modal ba-upload-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header">
-              <h3>Upload Audit Logs CSV</h3>
+              <h3>{t('adminTools.bigin.audit.uploadModalTitle')}</h3>
               <button className="ba-close-btn" onClick={closeUploadModal}>x</button>
             </div>
             <div className="ba-modal-body">
@@ -579,20 +581,20 @@ export const BiginAuditTab: React.FC = () => {
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
                 </div>
-                <h4>Upload CSV File</h4>
+                <h4>{t('adminTools.bigin.audit.uploadFileTitle')}</h4>
                 <p className="ba-upload-hint">
-                  Upload a CSV file exported from Bigin with the following columns:
+                  {t('adminTools.bigin.audit.uploadHint')}
                 </p>
                 <div className="ba-csv-columns">
-                  <span>Done By</span>
-                  <span>Action</span>
-                  <span>Module</span>
-                  <span>Record Name</span>
-                  <span>Related Module</span>
-                  <span>Related Name</span>
-                  <span>Account Name</span>
-                  <span>Audited Time</span>
-                  <span>Pipeline</span>
+                  <span>{t('adminTools.bigin.audit.colDoneBy')}</span>
+                  <span>{t('adminTools.bigin.audit.colAction')}</span>
+                  <span>{t('adminTools.bigin.audit.colModule')}</span>
+                  <span>{t('adminTools.bigin.audit.recordName')}</span>
+                  <span>{t('adminTools.bigin.audit.colRelatedModule')}</span>
+                  <span>{t('adminTools.bigin.audit.colRelatedName')}</span>
+                  <span>{t('adminTools.bigin.audit.colAccountName')}</span>
+                  <span>{t('adminTools.bigin.audit.colAuditedTime')}</span>
+                  <span>{t('adminTools.bigin.audit.colPipeline')}</span>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -607,10 +609,10 @@ export const BiginAuditTab: React.FC = () => {
                   {uploading ? (
                     <>
                       <span className="scrape-spinner"></span>
-                      Uploading...
+                      {t('adminTools.bigin.audit.uploading')}
                     </>
                   ) : (
-                    <>Choose CSV File</>
+                    <>{t('adminTools.bigin.audit.chooseCsvFile')}</>
                   )}
                 </label>
               </div>
@@ -621,14 +623,14 @@ export const BiginAuditTab: React.FC = () => {
                     {uploadResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
-                    <strong>{uploadResult.success ? 'Upload Successful' : 'Upload Failed'}</strong>
+                    <strong>{uploadResult.success ? t('adminTools.bigin.audit.uploadSuccessful') : t('adminTools.bigin.audit.uploadFailed')}</strong>
                     <p>{uploadResult.message}</p>
                     {uploadResult.success && (
                       <div className="ba-result-stats">
-                        <span className="ba-stat-saved">{uploadResult.saved} saved</span>
-                        <span className="ba-stat-skipped">{uploadResult.skipped} skipped</span>
+                        <span className="ba-stat-saved">{t('adminTools.bigin.audit.saved', { count: uploadResult.saved })}</span>
+                        <span className="ba-stat-skipped">{t('adminTools.bigin.audit.skipped', { count: uploadResult.skipped })}</span>
                         {uploadResult.errors ? (
-                          <span className="ba-stat-errors">{uploadResult.errors} errors</span>
+                          <span className="ba-stat-errors">{t('adminTools.bigin.audit.errors', { count: uploadResult.errors })}</span>
                         ) : null}
                       </div>
                     )}
@@ -645,7 +647,7 @@ export const BiginAuditTab: React.FC = () => {
         <div className="ba-modal-overlay" onClick={closeDeleteModal}>
           <div className="ba-modal ba-delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header ba-modal-header-danger">
-              <h3>Delete All Audit Logs</h3>
+              <h3>{t('adminTools.bigin.audit.deleteAllTitle')}</h3>
               <button className="ba-close-btn" onClick={closeDeleteModal}>x</button>
             </div>
             <div className="ba-modal-body">
@@ -658,20 +660,20 @@ export const BiginAuditTab: React.FC = () => {
                       <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
                   </div>
-                  <h4>Are you sure?</h4>
-                  <p>This action will permanently delete <strong>ALL {stats?.total || 0} audit logs</strong> from the database. This action cannot be undone.</p>
+                  <h4>{t('adminTools.bigin.audit.areYouSure')}</h4>
+                  <p><Trans i18nKey="adminTools.bigin.audit.deleteAllWarning" values={{ count: stats?.total || 0 }} components={[<span />, <strong />]} /></p>
                   <div className="ba-delete-actions">
                     <button className="ba-cancel-btn" onClick={closeDeleteModal} disabled={deleting}>
-                      Cancel
+                      {t('adminTools.bigin.audit.cancel')}
                     </button>
                     <button className="ba-confirm-delete-btn" onClick={handleDeleteAll} disabled={deleting}>
                       {deleting ? (
                         <>
                           <span className="scrape-spinner"></span>
-                          Deleting...
+                          {t('adminTools.bigin.audit.deleting')}
                         </>
                       ) : (
-                        'Yes, Delete All'
+                        t('adminTools.bigin.audit.yesDeleteAll')
                       )}
                     </button>
                   </div>
@@ -682,10 +684,10 @@ export const BiginAuditTab: React.FC = () => {
                     {deleteResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
-                    <strong>{deleteResult.success ? 'Deletion Successful' : 'Deletion Failed'}</strong>
+                    <strong>{deleteResult.success ? t('adminTools.bigin.audit.deletionSuccessful') : t('adminTools.bigin.audit.deletionFailed')}</strong>
                     <p>{deleteResult.message}</p>
                   </div>
-                  <button className="ba-close-result-btn" onClick={closeDeleteModal}>Close</button>
+                  <button className="ba-close-result-btn" onClick={closeDeleteModal}>{t('adminTools.bigin.audit.close')}</button>
                 </div>
               )}
             </div>
@@ -698,7 +700,7 @@ export const BiginAuditTab: React.FC = () => {
         <div className="ba-modal-overlay" onClick={closeDeleteModal}>
           <div className="ba-modal ba-delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header ba-modal-header-warning">
-              <h3>Delete Unnecessary Data</h3>
+              <h3>{t('adminTools.bigin.audit.deleteUnnecessaryTitle')}</h3>
               <button className="ba-close-btn" onClick={closeDeleteModal}>x</button>
             </div>
             <div className="ba-modal-body">
@@ -709,21 +711,21 @@ export const BiginAuditTab: React.FC = () => {
                       <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
                   </div>
-                  <h4>Delete Unnecessary Records?</h4>
-                  <p>This will delete all audit logs <strong>except</strong> records created by <strong>Lisa Rothwell</strong>.</p>
-                  <p className="ba-keep-note">Lisa Rothwell's records will be preserved.</p>
+                  <h4>{t('adminTools.bigin.audit.deleteUnnecessaryQuestion')}</h4>
+                  <p><Trans i18nKey="adminTools.bigin.audit.deleteUnnecessaryWarning" components={[<span />, <strong />, <span />, <strong />]} /></p>
+                  <p className="ba-keep-note">{t('adminTools.bigin.audit.deleteUnnecessaryNote')}</p>
                   <div className="ba-delete-actions">
                     <button className="ba-cancel-btn" onClick={closeDeleteModal} disabled={deleting}>
-                      Cancel
+                      {t('adminTools.bigin.audit.cancel')}
                     </button>
                     <button className="ba-confirm-delete-unnecessary-btn" onClick={handleDeleteUnnecessary} disabled={deleting}>
                       {deleting ? (
                         <>
                           <span className="scrape-spinner"></span>
-                          Deleting...
+                          {t('adminTools.bigin.audit.deleting')}
                         </>
                       ) : (
-                        'Yes, Delete Unnecessary'
+                        t('adminTools.bigin.audit.yesDeleteUnnecessary')
                       )}
                     </button>
                   </div>
@@ -734,10 +736,10 @@ export const BiginAuditTab: React.FC = () => {
                     {deleteResult.success ? <FaCheckCircle /> : <FaTimesCircle />}
                   </div>
                   <div className="ba-result-content">
-                    <strong>{deleteResult.success ? 'Deletion Successful' : 'Deletion Failed'}</strong>
+                    <strong>{deleteResult.success ? t('adminTools.bigin.audit.deletionSuccessful') : t('adminTools.bigin.audit.deletionFailed')}</strong>
                     <p>{deleteResult.message}</p>
                   </div>
-                  <button className="ba-close-result-btn" onClick={closeDeleteModal}>Close</button>
+                  <button className="ba-close-result-btn" onClick={closeDeleteModal}>{t('adminTools.bigin.audit.close')}</button>
                 </div>
               )}
             </div>

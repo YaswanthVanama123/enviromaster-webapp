@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { money, unmoney } from "../shared/money";
 import InlineMoneyEditor from "../shared/InlineMoneyEditor";
 import TripChargeSelector from "../shared/TripChargeSelector";
 import TotalsBar from "../shared/TotalsBar";
 import { RW_DEFAULTS, RW_UI as UI } from "./constants";
 
-const labelForFreq = (f) => ({ weekly: "Weekly", biweekly: "Biweekly", monthly: "Monthly", quarterly: "Quarterly" }[f] || "Weekly");
 const visitsPerMonth = (f) => ({ weekly: 4.33, biweekly: 2.165, monthly: 1.0, quarterly: 0.25 }[f] ?? 4.33);
 
 export default function RpmWindowsCalculator() {
+  const { t } = useTranslation();
   const [master, setMaster] = useState(RW_DEFAULTS);
 
   const [freq, setFreq] = useState("weekly");
@@ -40,6 +41,13 @@ export default function RpmWindowsCalculator() {
     return 0;
   };
 
+  const labelForFreq = (f) => ({
+    weekly: t("pricingCalc.rpm.frequency.weeklyShort"),
+    biweekly: t("pricingCalc.rpm.frequency.biweeklyShort"),
+    monthly: t("pricingCalc.rpm.frequency.monthlyShort"),
+    quarterly: t("pricingCalc.rpm.frequency.quarterlyShort"),
+  }[f] || t("pricingCalc.rpm.frequency.weeklyShort"));
+
   const { perVisit, perMonth, agreement, ruleText } = useMemo(() => {
     const totalSmall = Number(small) + (includeMirrors === "yes" ? Number(sm) : 0);
     const totalMedium = Number(medium) + (includeMirrors === "yes" ? Number(mm) : 0);
@@ -56,8 +64,12 @@ export default function RpmWindowsCalculator() {
     const months = Math.max(1, Number(agreementMonths) || 1);
     const agreementCalc = perMonthCalc * months;
 
-    const freqTxt = `${labelForFreq(freq)} ×${(firstTime === "yes" ? master.multInstall : mult).toFixed(2)}`;
-    const rule = `${freqTxt}. Trip = ${money(tripCharge(tripType, parkingAmt))}.`;
+    const ruleMult = (firstTime === "yes" ? master.multInstall : mult).toFixed(2);
+    const rule = t("pricingCalc.rpm.rule", {
+      freq: labelForFreq(freq),
+      mult: ruleMult,
+      trip: money(tripCharge(tripType, parkingAmt)),
+    });
 
     return { perVisit: perVisitCalc, perMonth: perMonthCalc, agreement: agreementCalc, ruleText: rule };
   }, [
@@ -75,20 +87,20 @@ export default function RpmWindowsCalculator() {
       <div style={UI.card}>
         <div style={UI.grid}>
           <div style={UI.field}>
-            <label>Frequency</label>
+            <label>{t("pricingCalc.rpm.frequency.label")}</label>
             <select style={UI.input} value={freq} onChange={(e) => setFreq(e.target.value)}>
-              <option value="weekly">Weekly (×1.00)</option>
-              <option value="biweekly">Biweekly (×1.25)</option>
-              <option value="monthly">Monthly (×1.25)</option>
-              <option value="quarterly">Quarterly (×2.00 after first)</option>
+              <option value="weekly">{t("pricingCalc.rpm.frequency.weekly")}</option>
+              <option value="biweekly">{t("pricingCalc.rpm.frequency.biweekly")}</option>
+              <option value="monthly">{t("pricingCalc.rpm.frequency.monthly")}</option>
+              <option value="quarterly">{t("pricingCalc.rpm.frequency.quarterly")}</option>
             </select>
           </div>
 
           <div style={UI.field}>
-            <label>First Time (Install 300%)</label>
+            <label>{t("pricingCalc.rpm.firstTime.label")}</label>
             <select style={UI.input} value={firstTime} onChange={(e) => setFirstTime(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (installers handle)</option>
+              <option value="no">{t("pricingCalc.rpm.firstTime.no")}</option>
+              <option value="yes">{t("pricingCalc.rpm.firstTime.yes")}</option>
             </select>
           </div>
 
@@ -100,72 +112,72 @@ export default function RpmWindowsCalculator() {
           />
 
           <div style={UI.field}>
-            <label>Agreement Months</label>
+            <label>{t("pricingCalc.common.agreementMonths")}</label>
             <input style={UI.input} type="number" min={1} value={agreementMonths} onChange={(e) => setAgreementMonths(e.target.value)} />
           </div>
         </div>
       </div>
 
       <div style={UI.card}>
-        <h3 style={{ margin: "0 0 10px" }}>Counts (both sides)</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("pricingCalc.rpm.countsHeading")}</h3>
         <div style={UI.grid}>
           <div style={UI.field}>
-            <label>Small Windows</label>
+            <label>{t("pricingCalc.rpm.smallWindows")}</label>
             <input style={UI.input} type="number" min={0} value={small} onChange={(e) => setSmall(e.target.value)} />
           </div>
           <div style={UI.field}>
-            <label>Medium Windows</label>
+            <label>{t("pricingCalc.rpm.mediumWindows")}</label>
             <input style={UI.input} type="number" min={0} value={medium} onChange={(e) => setMedium(e.target.value)} />
           </div>
           <div style={UI.field}>
-            <label>Large / Door Windows</label>
+            <label>{t("pricingCalc.rpm.largeWindows")}</label>
             <input style={UI.input} type="number" min={0} value={large} onChange={(e) => setLarge(e.target.value)} />
           </div>
           <div style={UI.field}>
-            <label>Include Mirrors?</label>
+            <label>{t("pricingCalc.rpm.includeMirrors.label")}</label>
             <select style={UI.input} value={includeMirrors} onChange={(e) => setIncludeMirrors(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (same pricing)</option>
+              <option value="no">{t("pricingCalc.rpm.includeMirrors.no")}</option>
+              <option value="yes">{t("pricingCalc.rpm.includeMirrors.yes")}</option>
             </select>
           </div>
           <div style={UI.field}>
-            <label>Small Mirrors</label>
+            <label>{t("pricingCalc.rpm.smallMirrors")}</label>
             <input style={UI.input} type="number" min={0} value={sm} onChange={(e) => setSm(e.target.value)} />
           </div>
           <div style={UI.field}>
-            <label>Medium Mirrors</label>
+            <label>{t("pricingCalc.rpm.mediumMirrors")}</label>
             <input style={UI.input} type="number" min={0} value={mm} onChange={(e) => setMm(e.target.value)} />
           </div>
           <div style={UI.field}>
-            <label>Large Mirrors</label>
+            <label>{t("pricingCalc.rpm.largeMirrors")}</label>
             <input style={UI.input} type="number" min={0} value={lm} onChange={(e) => setLm(e.target.value)} />
           </div>
         </div>
         <div style={{ fontSize: 12, color: "#4a4a4a", marginTop: 6 }}>
-          Mirror chem/technique same as windows → priced the same per size.
+          {t("pricingCalc.rpm.mirrorNote")}
         </div>
       </div>
 
       <div style={UI.card}>
-        <h3 style={{ margin: "0 0 10px" }}>Master Rates & Multipliers</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("pricingCalc.rpm.masterRatesHeading")}</h3>
         <table style={UI.table}>
           <thead>
-            <tr><th style={UI.thtd}>Item</th><th style={UI.thtd}>Key</th><th style={UI.thtd}>Value</th><th style={UI.thtd}>Notes</th></tr>
+            <tr><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.item")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.key")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.value")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.notes")}</th></tr>
           </thead>
           <tbody>
             {[
-              ["Small (weekly, both sides)", "rateSmall", "Per pane"],
-              ["Medium (weekly, both sides)", "rateMedium", "Per pane"],
-              ["Large/Door (weekly, both sides)", "rateLarge", "Per pane"],
-              ["First Time Multiplier", "multInstall", "300% (installers)"],
-              ["Biweekly/Monthly Multiplier", "mult125", "125% of weekly"],
-              ["Quarterly Multiplier (after first)", "multQuarterly", "200%"],
-              ["Trip — Beltway", "tripBeltway", "Usually $8"],
-              ["Trip — Standard", "tripStandard", "Usually $6"],
-              ["Trip — Paid base", "tripPaidBase", "+ parking"],
-            ].map(([label, key, note]) => (
+              "rateSmall",
+              "rateMedium",
+              "rateLarge",
+              "multInstall",
+              "mult125",
+              "multQuarterly",
+              "tripBeltway",
+              "tripStandard",
+              "tripPaidBase",
+            ].map((key) => (
               <tr key={key}>
-                <td style={UI.thtd}>{label}</td>
+                <td style={UI.thtd}>{t(`pricingCalc.rpm.rates.${key}`)}</td>
                 <td style={UI.thtd}>{key}</td>
                 <td style={UI.thtd}>
                   <InlineMoneyEditor
@@ -174,7 +186,7 @@ export default function RpmWindowsCalculator() {
                     onCommit={(v) => updateMaster(key, v)}
                   />
                 </td>
-                <td style={UI.thtd}>{note}</td>
+                <td style={UI.thtd}>{t(`pricingCalc.rpm.notes.${key}`)}</td>
               </tr>
             ))}
           </tbody>

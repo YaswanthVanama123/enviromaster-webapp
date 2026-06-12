@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from './auth';
 import { pdfApi } from '../backendservice/api/pdfApi';
 import { quotaApi } from '../backendservice/api/quotaApi';
@@ -92,13 +93,13 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   active: { bg: '#dcfce7', text: '#16a34a' },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Draft',
-  saved: 'Saved',
-  pending_approval: 'Pending',
-  approved_salesman: 'Approved',
-  approved_admin: 'Admin Approved',
-  active: 'Active',
+const STATUS_I18N_KEYS: Record<string, string> = {
+  draft: 'draft',
+  saved: 'saved',
+  pending_approval: 'pending',
+  approved_salesman: 'approved',
+  approved_admin: 'adminApproved',
+  active: 'active',
 };
 
 function formatMoney(amount: number): string {
@@ -195,6 +196,7 @@ function isWithinTimePeriod(
 }
 
 export default function MyCommissions() {
+  const { t } = useTranslation();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -244,7 +246,7 @@ export default function MyCommissions() {
         const response = await pdfApi.getUserCommissions();
         setData(response);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch commissions');
+        setError(err.message || t('commissions.fetchError'));
       } finally {
         setLoading(false);
       }
@@ -345,7 +347,7 @@ export default function MyCommissions() {
       <div className="my-commissions">
         <div className="my-commissions__loading">
           <div className="my-commissions__spinner" />
-          <p>Loading your commissions...</p>
+          <p>{t('commissions.loading')}</p>
         </div>
       </div>
     );
@@ -355,7 +357,7 @@ export default function MyCommissions() {
     return (
       <div className="my-commissions">
         <div className="my-commissions__error">
-          <h2>Error</h2>
+          <h2>{t('commissions.error')}</h2>
           <p>{error}</p>
         </div>
       </div>
@@ -366,8 +368,8 @@ export default function MyCommissions() {
     return (
       <div className="my-commissions">
         <div className="my-commissions__empty">
-          <h2>No Data</h2>
-          <p>No commission data available.</p>
+          <h2>{t('commissions.noData')}</h2>
+          <p>{t('commissions.noDataMessage')}</p>
         </div>
       </div>
     );
@@ -395,7 +397,7 @@ export default function MyCommissions() {
     <div className="my-commissions">
       <header className="my-commissions__header">
         <div className="my-commissions__title-row">
-          <h1>My Commissions</h1>
+          <h1>{t('commissions.title')}</h1>
           <span className="my-commissions__user-badge">
             {user?.fullName || user?.username}
           </span>
@@ -407,9 +409,13 @@ export default function MyCommissions() {
                 backgroundColor: QUOTA_LEVEL_CONFIG[currentQuotaLevel].bgColor,
                 color: QUOTA_LEVEL_CONFIG[currentQuotaLevel].color,
               }}
-              title={`Your current quota status. Sales: ${actualSales !== null ? formatMoney(actualSales) : '—'} / Target: ${quotaTarget !== null ? formatMoney(quotaTarget) : '—'}. New agreements will use ${QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate}% base rate.`}
+              title={t('commissions.quotaBadgeTitle', {
+                actual: actualSales !== null ? formatMoney(actualSales) : '—',
+                target: quotaTarget !== null ? formatMoney(quotaTarget) : '—',
+                rate: QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate,
+              })}
             >
-              {QUOTA_LEVEL_CONFIG[currentQuotaLevel].label} ({QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate}%)
+              {t(`commissions.quotaLevel.${currentQuotaLevel}`)} ({QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate}%)
               {quotaPercentage !== null && (
                 <span className="my-commissions__quota-pct">
                   · {quotaPercentage.toFixed(0)}%
@@ -419,12 +425,12 @@ export default function MyCommissions() {
           )}
         </div>
         <p className="my-commissions__subtitle">
-          Track your commission earnings across all agreements
+          {t('commissions.subtitle')}
         </p>
         <p className="my-commissions__rate-note">
-          Note: Each agreement's rate is locked when saved. Your current rate ({QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate}%) applies to new agreements.
+          {t('commissions.rateNote', { rate: QUOTA_LEVEL_CONFIG[currentQuotaLevel].rate })}
           {actualSales !== null && quotaTarget !== null && (
-            <> This month: {formatMoney(actualSales)} of {formatMoney(quotaTarget)} target.</>
+            <>{t('commissions.rateNoteMonth', { actual: formatMoney(actualSales), target: formatMoney(quotaTarget) })}</>
           )}
         </p>
       </header>
@@ -438,7 +444,7 @@ export default function MyCommissions() {
               className={`my-commissions__time-tab ${timePeriod === period ? 'active' : ''}`}
               onClick={() => setTimePeriod(period)}
             >
-              {TIME_PERIOD_LABELS[period]}
+              {t(`commissions.timePeriod.${period}`)}
             </button>
           ))}
         </div>
@@ -447,7 +453,7 @@ export default function MyCommissions() {
         {timePeriod === 'custom' && (
           <div className="my-commissions__date-range">
             <div className="my-commissions__date-input-group">
-              <label>From</label>
+              <label>{t('commissions.dateRange.from')}</label>
               <input
                 type="date"
                 value={customStartDate}
@@ -455,9 +461,9 @@ export default function MyCommissions() {
                 className="my-commissions__date-input"
               />
             </div>
-            <span className="my-commissions__date-separator">to</span>
+            <span className="my-commissions__date-separator">{t('commissions.dateRange.separator')}</span>
             <div className="my-commissions__date-input-group">
-              <label>To</label>
+              <label>{t('commissions.dateRange.to')}</label>
               <input
                 type="date"
                 value={customEndDate}
@@ -473,7 +479,7 @@ export default function MyCommissions() {
                   setCustomEndDate('');
                 }}
               >
-                Clear
+                {t('commissions.dateRange.clear')}
               </button>
             )}
           </div>
@@ -485,7 +491,7 @@ export default function MyCommissions() {
         <div className="my-commissions__summary-card my-commissions__summary-card--primary">
           <div className="my-commissions__summary-icon">$</div>
           <div className="my-commissions__summary-content">
-            <span className="my-commissions__summary-label">Annual Commission</span>
+            <span className="my-commissions__summary-label">{t('commissions.summary.annualCommission')}</span>
             <span className="my-commissions__summary-value">
               {formatMoney(filteredTotals.totalAnnualCommission)}
             </span>
@@ -495,7 +501,7 @@ export default function MyCommissions() {
         <div className="my-commissions__summary-card">
           <div className="my-commissions__summary-icon">M</div>
           <div className="my-commissions__summary-content">
-            <span className="my-commissions__summary-label">Monthly Commission</span>
+            <span className="my-commissions__summary-label">{t('commissions.summary.monthlyCommission')}</span>
             <span className="my-commissions__summary-value">
               {formatMoney(filteredTotals.totalMonthlyCommission)}
             </span>
@@ -505,7 +511,7 @@ export default function MyCommissions() {
         <div className="my-commissions__summary-card">
           <div className="my-commissions__summary-icon">#</div>
           <div className="my-commissions__summary-content">
-            <span className="my-commissions__summary-label">Total Agreements</span>
+            <span className="my-commissions__summary-label">{t('commissions.summary.totalAgreements')}</span>
             <span className="my-commissions__summary-value">
               {filteredTotals.totalAgreements}
             </span>
@@ -515,7 +521,7 @@ export default function MyCommissions() {
         <div className="my-commissions__summary-card">
           <div className="my-commissions__summary-icon">%</div>
           <div className="my-commissions__summary-content">
-            <span className="my-commissions__summary-label">Avg Commission Rate</span>
+            <span className="my-commissions__summary-label">{t('commissions.summary.avgCommissionRate')}</span>
             <span className="my-commissions__summary-value">
               {formatPercent(filteredTotals.averageCommissionRate)}%
             </span>
@@ -525,13 +531,13 @@ export default function MyCommissions() {
 
       {/* Status Breakdown */}
       <div className="my-commissions__status-breakdown">
-        <h3>By Status</h3>
+        <h3>{t('commissions.status.title')}</h3>
         <div className="my-commissions__status-chips">
           <button
             className={`my-commissions__status-chip ${statusFilter === 'all' ? 'active' : ''}`}
             onClick={() => setStatusFilter('all')}
           >
-            All ({timeFilteredCommissions.length})
+            {t('commissions.status.all', { count: timeFilteredCommissions.length })}
           </button>
           {Object.entries(filteredByStatus).map(([key, value]) => (
             value.count > 0 && (
@@ -540,7 +546,7 @@ export default function MyCommissions() {
                 className={`my-commissions__status-chip ${statusFilter === key ? 'active' : ''}`}
                 onClick={() => setStatusFilter(key)}
               >
-                {key.charAt(0).toUpperCase() + key.slice(1)} ({value.count})
+                {t(`commissions.status.${key}`)} ({value.count})
                 <span className="my-commissions__chip-amount">
                   {formatMoney(value.commission)}
                 </span>
@@ -552,11 +558,11 @@ export default function MyCommissions() {
 
       {/* Agreements List */}
       <div className="my-commissions__list">
-        <h3>Agreements ({filteredCommissions.length})</h3>
+        <h3>{t('commissions.agreements', { count: filteredCommissions.length })}</h3>
 
         {filteredCommissions.length === 0 ? (
           <div className="my-commissions__no-results">
-            <p>No agreements found for this filter.</p>
+            <p>{t('commissions.noResults')}</p>
           </div>
         ) : (
           <div className="my-commissions__agreements">
@@ -590,10 +596,10 @@ export default function MyCommissions() {
                             color: statusStyle.text
                           }}
                         >
-                          {STATUS_LABELS[agreement.status] || agreement.status}
+                          {STATUS_I18N_KEYS[agreement.status] ? t(`commissions.status.${STATUS_I18N_KEYS[agreement.status]}`) : agreement.status}
                         </span>
                         <span className="my-commissions__meta-sep">·</span>
-                        <span>{agreement.contractMonths} months</span>
+                        <span>{t('commissions.months', { count: agreement.contractMonths })}</span>
                         <span className="my-commissions__meta-sep">·</span>
                         <span>{formatDate(agreement.createdAt)}</span>
                       </div>
@@ -601,13 +607,13 @@ export default function MyCommissions() {
 
                     <div className="my-commissions__agreement-amounts">
                       <div className="my-commissions__amount-item">
-                        <span className="my-commissions__amount-label">Contract Value</span>
+                        <span className="my-commissions__amount-label">{t('commissions.contractValue')}</span>
                         <span className="my-commissions__amount-value">
                           {formatMoney(agreement.contractValue)}
                         </span>
                       </div>
                       <div className="my-commissions__amount-item my-commissions__amount-item--commission">
-                        <span className="my-commissions__amount-label">Annual Commission</span>
+                        <span className="my-commissions__amount-label">{t('commissions.annualCommissionLabel')}</span>
                         <span className="my-commissions__amount-value">
                           {formatMoney(annualCommission)}
                         </span>
@@ -625,54 +631,54 @@ export default function MyCommissions() {
                   {isExpanded && (
                     <div className="my-commissions__agreement-details">
                       <div className="my-commissions__breakdown">
-                        <h5>Commission Breakdown</h5>
+                        <h5>{t('commissions.breakdown.title')}</h5>
                         <div className="my-commissions__breakdown-grid">
                           <div className="my-commissions__breakdown-item">
-                            <span>Monthly Value</span>
+                            <span>{t('commissions.breakdown.monthlyValue')}</span>
                             <span>{formatMoney(agreement.monthlyValue)}</span>
                           </div>
                           <div className="my-commissions__breakdown-item">
-                            <span>Base Rate ({breakdown.agreementTerm || `${agreement.contractMonths} months`})</span>
+                            <span>{t('commissions.breakdown.baseRate', { term: breakdown.agreementTerm || t('commissions.months', { count: agreement.contractMonths }) })}</span>
                             <span>{formatPercent(breakdown.baseRate ?? rate)}%</span>
                           </div>
                           {breakdown.quotaLevel && (
                             <div className={`my-commissions__breakdown-item my-commissions__breakdown-item--quota my-commissions__breakdown-item--quota-${breakdown.quotaLevel.toLowerCase().replace(/\s+/g, '-')}`}>
-                              <span>Quota Level</span>
-                              <span>{formatQuotaLevel(breakdown.quotaLevel)}</span>
+                              <span>{t('commissions.breakdown.quotaLevel')}</span>
+                              <span>{QUOTA_LEVEL_CONFIG[breakdown.quotaLevel.toLowerCase() as QuotaLevel] ? `${t(`commissions.quotaLevel.${breakdown.quotaLevel.toLowerCase()}`)} (${QUOTA_LEVEL_CONFIG[breakdown.quotaLevel.toLowerCase() as QuotaLevel].rate}%)` : formatQuotaLevel(breakdown.quotaLevel)}</span>
                             </div>
                           )}
                           <div className="my-commissions__breakdown-item">
-                            <span>Agreement Multiplier</span>
+                            <span>{t('commissions.breakdown.multiplier')}</span>
                             <span>{formatPercent(breakdown.multiplier ?? 100)}%</span>
                           </div>
                           {(breakdown.accountTypeAdjustment ?? 0) !== 0 && (
                             <div className="my-commissions__breakdown-item">
-                              <span>Account Type Adjustment</span>
+                              <span>{t('commissions.breakdown.accountTypeAdjustment')}</span>
                               <span>{(breakdown.accountTypeAdjustment ?? 0) > 0 ? '+' : ''}{formatPercent(breakdown.accountTypeAdjustment ?? 0)}%</span>
                             </div>
                           )}
                           {(breakdown.greenlineBonus ?? 0) > 0 && (
                             <div className="my-commissions__breakdown-item my-commissions__breakdown-item--bonus">
-                              <span>Greenline Bonus</span>
+                              <span>{t('commissions.breakdown.greenlineBonus')}</span>
                               <span>+{formatPercent(breakdown.greenlineBonus ?? 0)}%</span>
                             </div>
                           )}
                           {(breakdown.insideSalesDeduction ?? 0) !== 0 && (
                             <div className="my-commissions__breakdown-item my-commissions__breakdown-item--deduction">
-                              <span>Inside Sales Deduction</span>
+                              <span>{t('commissions.breakdown.insideSalesDeduction')}</span>
                               <span>{formatPercent(breakdown.insideSalesDeduction ?? 0)}%</span>
                             </div>
                           )}
                           <div className="my-commissions__breakdown-item my-commissions__breakdown-item--total">
-                            <span>Final Rate</span>
+                            <span>{t('commissions.breakdown.finalRate')}</span>
                             <span>{formatPercent(rate)}%</span>
                           </div>
                           <div className="my-commissions__breakdown-item my-commissions__breakdown-item--total">
-                            <span>Monthly Commission</span>
+                            <span>{t('commissions.breakdown.monthlyCommission')}</span>
                             <span>{formatMoney(monthly)}</span>
                           </div>
                           <div className="my-commissions__breakdown-item my-commissions__breakdown-item--total">
-                            <span>Annual Commission</span>
+                            <span>{t('commissions.breakdown.annualCommission')}</span>
                             <span>{formatMoney(annualCommission)}</span>
                           </div>
                         </div>

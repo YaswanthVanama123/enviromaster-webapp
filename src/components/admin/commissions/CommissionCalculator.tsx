@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { FaDollarSign, FaExclamationTriangle } from "react-icons/fa";
 import { commissionApi } from "../../../backendservice/api/commissionApi";
 import {
@@ -17,30 +18,30 @@ interface CommissionCalculatorProps {
   onRecordSaved?: () => void;
 }
 
-const ACCOUNT_TYPES: { value: AccountType; label: string; description: string }[] = [
-  { value: "Anchor", label: "Anchor", description: "$200+/visit, high-revenue location" },
-  { value: "Bread5", label: "Bread5", description: "Within 5 minutes of Anchor" },
-  { value: "Bread15", label: "Bread15", description: "Within 15 minutes of Anchor" },
-  { value: "Pit", label: "Pit", description: "Not near an Anchor" },
+const ACCOUNT_TYPES: { value: AccountType; labelKey: string; descKey: string }[] = [
+  { value: "Anchor", labelKey: "anchor", descKey: "anchorDesc" },
+  { value: "Bread5", labelKey: "bread5", descKey: "bread5Desc" },
+  { value: "Bread15", labelKey: "bread15", descKey: "bread15Desc" },
+  { value: "Pit", labelKey: "pit", descKey: "pitDesc" },
 ];
 
-const FREQUENCIES: { value: ServiceFrequency; label: string }[] = [
-  { value: "weekly", label: "Weekly" },
-  { value: "biweekly", label: "Bi-Weekly" },
-  { value: "monthly", label: "Monthly" },
-  { value: "quarterly", label: "Quarterly" },
-  { value: "one-time", label: "One-Time" },
+const FREQUENCIES: { value: ServiceFrequency; labelKey: string }[] = [
+  { value: "weekly", labelKey: "weekly" },
+  { value: "biweekly", labelKey: "biweekly" },
+  { value: "monthly", labelKey: "monthly" },
+  { value: "quarterly", labelKey: "quarterly" },
+  { value: "one-time", labelKey: "oneTime" },
 ];
 
-const QUOTA_LEVELS: { value: QuotaLevel; label: string; rate: number }[] = [
-  { value: "below", label: "Below Quota", rate: 3 },
-  { value: "above", label: "Above Quota", rate: 6 },
-  { value: "double", label: "Double Quota", rate: 9 },
+const QUOTA_LEVELS: { value: QuotaLevel; labelKey: string; rate: number }[] = [
+  { value: "below", labelKey: "below", rate: 3 },
+  { value: "above", labelKey: "above", rate: 6 },
+  { value: "double", labelKey: "double", rate: 9 },
 ];
 
-const BUSINESS_TYPES: { value: BusinessType; label: string }[] = [
-  { value: "new", label: "New Business" },
-  { value: "renewal", label: "Renewal" },
+const BUSINESS_TYPES: { value: BusinessType; labelKey: string }[] = [
+  { value: "new", labelKey: "new" },
+  { value: "renewal", labelKey: "renewal" },
 ];
 
 const formatCurrency = (n: number) =>
@@ -49,7 +50,8 @@ const formatCurrency = (n: number) =>
 const formatPercent = (n: number, digits = 2) => `${n.toFixed(digits)}%`;
 
 export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRecordSaved }) => {
-  
+  const { t } = useTranslation();
+
   const [customerName, setCustomerName] = useState<string>("");
   const [salesPersonName, setSalesPersonName] = useState<string>("");
 
@@ -247,11 +249,11 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
 
   const handleSave = async () => {
     if (!result) {
-      setError("Enter a current contract value greater than 0 first");
+      setError(t("adminCommissionTools.calculator.enterContractFirst"));
       return;
     }
     if (!salesPersonName) {
-      setError("Sales Person Name is required to save the record");
+      setError(t("adminCommissionTools.calculator.salesPersonRequired"));
       return;
     }
     setSaving(true);
@@ -268,11 +270,11 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
       const response = await commissionApi.saveRecord(recordData);
       if (response.error) setError(response.error);
       else {
-        setSuccessMessage("Commission record saved successfully!");
+        setSuccessMessage(t("adminCommissionTools.calculator.saveSuccess"));
         if (onRecordSaved) onRecordSaved();
       }
     } catch {
-      setError("Failed to save commission record. Please try again.");
+      setError(t("adminCommissionTools.calculator.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -281,60 +283,59 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
   return (
     <div className="commission-calculator">
       <h3 className="calculator-section-title">
-        <span><FaDollarSign /></span> Deal Information
+        <span><FaDollarSign /></span> {t("adminCommissionTools.calculator.dealInformation")}
       </h3>
       <p style={{ color: "#6b7280", fontSize: "0.85em", marginTop: -8 }}>
-        Same V2 spec-faithful pipeline as FormFilling — pricing tier from current/redline ratio,
-        admin-editable per-visit penalties + thresholds + tier rates, piecewise quota tier rate split.
+        {t("adminCommissionTools.calculator.intro")}
       </p>
 
       <div className="calculator-grid">
         <div className="form-group">
-          <label>Customer Name (Optional)</label>
+          <label>{t("adminCommissionTools.calculator.customerName")}</label>
           <input
             type="text"
             value={customerName}
             onChange={e => setCustomerName(e.target.value)}
-            placeholder="Enter customer name"
+            placeholder={t("adminCommissionTools.calculator.customerNamePlaceholder")}
           />
         </div>
         <div className="form-group">
-          <label>Sales Person Name (Optional)</label>
+          <label>{t("adminCommissionTools.calculator.salesPersonName")}</label>
           <input
             type="text"
             value={salesPersonName}
             onChange={e => setSalesPersonName(e.target.value)}
-            placeholder="Enter sales person name"
+            placeholder={t("adminCommissionTools.calculator.salesPersonNamePlaceholder")}
           />
         </div>
 
         <div className="form-group">
-          <label>Current Contract Total ($)</label>
+          <label>{t("adminCommissionTools.calculator.currentContractTotal")}</label>
           <input
             type="number"
             value={currentContract}
             onChange={e => setCurrentContract(e.target.value)}
-            placeholder="What customer is being charged"
+            placeholder={t("adminCommissionTools.calculator.currentContractPlaceholder")}
             min="0"
             step="0.01"
           />
-          <small>Multi-year total — calc auto-prorates to 1 year.</small>
+          <small>{t("adminCommissionTools.calculator.currentContractHint")}</small>
         </div>
         <div className="form-group">
-          <label>Original (Redline) Contract Total ($)</label>
+          <label>{t("adminCommissionTools.calculator.originalContractTotal")}</label>
           <input
             type="number"
             value={originalContract}
             onChange={e => setOriginalContract(e.target.value)}
-            placeholder="Standard / redline price"
+            placeholder={t("adminCommissionTools.calculator.originalContractPlaceholder")}
             min="0"
             step="0.01"
           />
-          <small>Drives the pricing tier ratio. Leave blank to default to Current.</small>
+          <small>{t("adminCommissionTools.calculator.originalContractHint")}</small>
         </div>
 
         <div className="form-group">
-          <label>Contract Months</label>
+          <label>{t("adminCommissionTools.calculator.contractMonths")}</label>
           <input
             type="number"
             value={contractMonths}
@@ -342,30 +343,30 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
             min="1"
             step="1"
           />
-          <small>Auto-derives Agreement Term: ≥36 → 3-year (135%), ≥12 → 1-year (100%), else MTM.</small>
+          <small>{t("adminCommissionTools.calculator.contractMonthsHint")}</small>
         </div>
         <div className="form-group">
-          <label>Service Frequency</label>
+          <label>{t("adminCommissionTools.calculator.serviceFrequency")}</label>
           <select value={frequency} onChange={e => setFrequency(e.target.value as ServiceFrequency)}>
             {FREQUENCIES.map(f => (
               <option key={f.value} value={f.value}>
-                {f.label} ({activeRules.frequencyVisitsPerYear[f.value]} visits/yr)
+                {t("adminCommissionTools.calculator.frequencyOption", { label: t(`adminCommissionTools.calculator.frequencies.${f.labelKey}`), visits: activeRules.frequencyVisitsPerYear[f.value] })}
               </option>
             ))}
           </select>
-          <small>Drives annualized per-visit penalty thresholds.</small>
+          <small>{t("adminCommissionTools.calculator.frequencyHint")}</small>
         </div>
 
         <div className="form-group">
-          <label>Account Type</label>
+          <label>{t("adminCommissionTools.calculator.accountType")}</label>
           <select value={accountType} onChange={e => setAccountType(e.target.value as AccountType)}>
-            {ACCOUNT_TYPES.map(t => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+            {ACCOUNT_TYPES.map(at => (
+              <option key={at.value} value={at.value}>
+                {t(`adminCommissionTools.calculator.accountTypes.${at.labelKey}`)}
               </option>
             ))}
           </select>
-          <small>{ACCOUNT_TYPES.find(t => t.value === accountType)?.description}</small>
+          <small>{t(`adminCommissionTools.calculator.accountTypes.${ACCOUNT_TYPES.find(at => at.value === accountType)?.descKey}`)}</small>
         </div>
         <div className="form-group">
           <label
@@ -383,44 +384,43 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
               checked={isNewLocation}
               onChange={e => setIsNewLocation(e.target.checked)}
             />
-            New Location (applies Pit zone / Bread+Pit penalty)
+            {t("adminCommissionTools.calculator.newLocation")}
           </label>
-          <small>Existing locations skip the per-visit penalty.</small>
+          <small>{t("adminCommissionTools.calculator.newLocationHint")}</small>
         </div>
 
         <div className="form-group">
-          <label>Quota Achievement (informational)</label>
+          <label>{t("adminCommissionTools.calculator.quotaAchievement")}</label>
           <select value={quotaLevel} onChange={e => setQuotaLevel(e.target.value as QuotaLevel)}>
             {QUOTA_LEVELS.map(l => (
               <option key={l.value} value={l.value}>
-                {l.label} ({l.rate}% base)
+                {t("adminCommissionTools.calculator.quotaOption", { label: t(`adminCommissionTools.calculator.quotaLevels.${l.labelKey}`), rate: l.rate })}
               </option>
             ))}
           </select>
-          <small>Final rate uses piecewise tier split — see Existing Sales Position.</small>
+          <small>{t("adminCommissionTools.calculator.quotaHint")}</small>
         </div>
         <div className="form-group">
-          <label>Existing Sales Position ($)</label>
+          <label>{t("adminCommissionTools.calculator.existingSalesPosition")}</label>
           <input
             type="number"
             value={repActualSalesBefore}
             onChange={e => setRepActualSalesBefore(e.target.value)}
-            placeholder="Rep's QuotaPeriod.actualSales before this deal"
+            placeholder={t("adminCommissionTools.calculator.existingSalesPlaceholder")}
             min="0"
             step="0.01"
           />
           <small>
-            Drives 3% / 6% / 9% piecewise split. Cutoffs: ${activeRules.quotaTierCutoffs.aboveQuota.toLocaleString()} /
-            ${activeRules.quotaTierCutoffs.doubleQuota.toLocaleString()}.
+            {t("adminCommissionTools.calculator.existingSalesHint", { above: activeRules.quotaTierCutoffs.aboveQuota.toLocaleString(), double: activeRules.quotaTierCutoffs.doubleQuota.toLocaleString() })}
           </small>
         </div>
 
         <div className="form-group">
-          <label>Business Type</label>
+          <label>{t("adminCommissionTools.calculator.businessType")}</label>
           <select value={businessType} onChange={e => setBusinessType(e.target.value as BusinessType)}>
             {BUSINESS_TYPES.map(b => (
               <option key={b.value} value={b.value}>
-                {b.label}
+                {t(`adminCommissionTools.calculator.businessTypes.${b.labelKey}`)}
               </option>
             ))}
           </select>
@@ -428,7 +428,7 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
         {businessType === "renewal" && (
           <>
             <div className="form-group">
-              <label>Years as Customer</label>
+              <label>{t("adminCommissionTools.calculator.yearsAsCustomer")}</label>
               <input
                 type="number"
                 value={yearsAsCustomer}
@@ -436,10 +436,10 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
                 min="0"
                 step="1"
               />
-              <small>{activeRules.renewalBonusRate}% bonus at {activeRules.renewalMinYears}+ years.</small>
+              <small>{t("adminCommissionTools.calculator.yearsAsCustomerHint", { rate: activeRules.renewalBonusRate, years: activeRules.renewalMinYears })}</small>
             </div>
             <div className="form-group">
-              <label>Total Renewal Value ($)</label>
+              <label>{t("adminCommissionTools.calculator.totalRenewalValue")}</label>
               <input
                 type="number"
                 value={totalRenewalValue}
@@ -459,7 +459,7 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
             checked={isInsideSales}
             onChange={e => setIsInsideSales(e.target.checked)}
           />
-          Inside Sales Involvement ({activeRules.insideSalesDeduction}% deduction)
+          {t("adminCommissionTools.calculator.insideSalesInvolvement", { deduction: activeRules.insideSalesDeduction })}
         </label>
       </div>
 
@@ -471,11 +471,11 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
             disabled={saving}
             style={{ backgroundColor: "#16a34a" }}
           >
-            {saving ? "Saving..." : "Save to History"}
+            {saving ? t("adminCommissionTools.calculator.saving") : t("adminCommissionTools.calculator.saveToHistory")}
           </button>
         )}
         <button className="calculate-btn" onClick={handleClear} style={{ backgroundColor: "#6b7280" }}>
-          Clear
+          {t("adminCommissionTools.calculator.clear")}
         </button>
       </div>
 
@@ -534,9 +534,10 @@ const sectionTitleStyle: React.CSSProperties = {
 };
 
 function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculatorMemo>> }) {
+  const { t } = useTranslation();
   return (
     <div style={{ marginTop: 24 }}>
-      <h3 style={{ fontSize: "1.1em", fontWeight: 700, marginBottom: 4 }}>Commission Breakdown</h3>
+      <h3 style={{ fontSize: "1.1em", fontWeight: 700, marginBottom: 4 }}>{t("adminCommissionTools.result.commissionBreakdown")}</h3>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
         <div
           style={{
@@ -548,7 +549,7 @@ function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculato
           }}
         >
           <div style={{ fontSize: "0.8em", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Annual Commission
+            {t("adminCommissionTools.result.annualCommission")}
           </div>
           <div style={{ fontSize: "1.6em", fontWeight: 800 }}>{formatCurrency(r.annualCommission)}</div>
         </div>
@@ -562,98 +563,98 @@ function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculato
           }}
         >
           <div style={{ fontSize: "0.8em", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Weekly Commission
+            {t("adminCommissionTools.result.weeklyCommission")}
           </div>
           <div style={{ fontSize: "1.6em", fontWeight: 800 }}>{formatCurrency(r.weeklyCommission)}</div>
         </div>
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Step 0–1: Pricing Tier (Agreement-Level)</div>
+        <div style={sectionTitleStyle}>{t("adminCommissionTools.result.step01")}</div>
         <div style={rowStyle}>
-          <span>Current 12-month Contract:</span>
+          <span>{t("adminCommissionTools.result.current12Month")}</span>
           <span>{formatCurrency(r.currentContract12Months)}</span>
         </div>
         <div style={rowStyle}>
-          <span>Original (Redline) 12-month Contract:</span>
+          <span>{t("adminCommissionTools.result.original12Month")}</span>
           <span>{formatCurrency(r.originalContract12Months)}</span>
         </div>
         <div style={rowStyle}>
-          <span>Price Ratio (Current ÷ Redline):</span>
+          <span>{t("adminCommissionTools.result.priceRatio")}</span>
           <span>{formatPercent(r.priceRatio * 100, 1)}</span>
         </div>
         <div style={rowStyle}>
-          <span>Pricing Tier:</span>
+          <span>{t("adminCommissionTools.result.pricingTier")}</span>
           <span style={{ fontWeight: 600 }}>{r.pricingTier}</span>
         </div>
         <div style={rowStyle}>
-          <span>Pricing Multiplier:</span>
+          <span>{t("adminCommissionTools.result.pricingMultiplier")}</span>
           <span style={{ color: r.pricingMultiplier > 1 ? "#16a34a" : r.pricingMultiplier < 1 ? "#dc2626" : "#6b7280", fontWeight: 600 }}>
             {r.pricingMultiplier.toFixed(2)}×
           </span>
         </div>
         {r.requiresApproval && (
           <div style={{ ...rowStyle, color: "#dc2626" }}>
-            <span><FaExclamationTriangle /> Requires Approval</span>
+            <span><FaExclamationTriangle /> {t("adminCommissionTools.result.requiresApproval")}</span>
             <span></span>
           </div>
         )}
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Step 2–3: Adjusted Annual Revenue</div>
+        <div style={sectionTitleStyle}>{t("adminCommissionTools.result.step23")}</div>
         <div style={rowStyle}>
-          <span>Adjusted Annual ({formatCurrency(r.currentContract12Months)} × {r.pricingMultiplier.toFixed(2)}×):</span>
+          <span>{t("adminCommissionTools.result.adjustedAnnual", { base: formatCurrency(r.currentContract12Months), multiplier: r.pricingMultiplier.toFixed(2) })}</span>
           <span>{formatCurrency(r.adjustedAnnual)}</span>
         </div>
         <div style={rowStyle}>
-          <span>Frequency:</span>
-          <span>{r.input.frequency} ({r.visitsPerYear} visits/yr)</span>
+          <span>{t("adminCommissionTools.result.frequency")}</span>
+          <span>{t("adminCommissionTools.result.frequencyValue", { frequency: r.input.frequency, visits: r.visitsPerYear })}</span>
         </div>
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Step 4: Account-Type Adjustment ({r.input.accountType})</div>
+        <div style={sectionTitleStyle}>{t("adminCommissionTools.result.step4", { accountType: r.input.accountType })}</div>
         {r.revenueDeduction > 0 && (
           <div style={rowStyle}>
-            <span>Revenue Deduction ({r.input.isNewLocation ? "new" : "existing"}):</span>
+            <span>{t("adminCommissionTools.result.revenueDeduction", { location: r.input.isNewLocation ? t("adminCommissionTools.result.locationNew") : t("adminCommissionTools.result.locationExisting") })}</span>
             <span style={{ color: "#dc2626" }}>−{formatCurrency(r.revenueDeduction)}</span>
           </div>
         )}
         {r.anchorBonus > 0 && (
           <div style={rowStyle}>
-            <span>Anchor Bonus ({r.pricingMultiplier > 1 ? "Greenline-relaxed " : ""}150% above threshold):</span>
+            <span>{t("adminCommissionTools.result.anchorBonus", { prefix: r.pricingMultiplier > 1 ? t("adminCommissionTools.result.greenlineRelaxed") : "" })}</span>
             <span style={{ color: "#16a34a" }}>+{formatCurrency(r.anchorBonus)}</span>
           </div>
         )}
         <div style={totalRowStyle}>
-          <span>Commissionable Annual:</span>
+          <span>{t("adminCommissionTools.result.commissionableAnnual")}</span>
           <span>{formatCurrency(r.commissionableAnnual)}</span>
         </div>
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Step 5: Quota Credit</div>
+        <div style={sectionTitleStyle}>{t("adminCommissionTools.result.step5")}</div>
         <div style={rowStyle}>
-          <span>Annual Contract Total (12-month slice):</span>
+          <span>{t("adminCommissionTools.result.annualContractTotal")}</span>
           <span>{formatCurrency(r.annualContractTotal)}</span>
         </div>
         <div style={totalRowStyle}>
-          <span>Annual Quota Credit (× {r.pricingMultiplier.toFixed(2)}×):</span>
+          <span>{t("adminCommissionTools.result.annualQuotaCredit", { multiplier: r.pricingMultiplier.toFixed(2) })}</span>
           <span>{formatCurrency(r.annualQuotaCredit)}</span>
         </div>
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Step 6: Tiered Commission Rate</div>
+        <div style={sectionTitleStyle}>{t("adminCommissionTools.result.step6")}</div>
         <div style={rowStyle}>
-          <span>Existing Sales Position:</span>
+          <span>{t("adminCommissionTools.result.existingSalesPosition")}</span>
           <span>{formatCurrency(r.input.repActualSalesBefore)}</span>
         </div>
         {r.belowQuotaPortion > 0 && (
           <div style={rowStyle}>
             <span>
-              Below tier portion ({formatCurrency(r.belowQuotaPortion)} × {r.input.isInsideSales ? `(${r.baseRate} − 3)` : r.baseRate}% × {r.agreementMultiplier}%):
+              {t("adminCommissionTools.result.belowTierPortion", { base: formatCurrency(r.belowQuotaPortion), rate: r.input.isInsideSales ? `(${r.baseRate} − 3)` : r.baseRate, multiplier: r.agreementMultiplier })}
             </span>
             <span>{formatCurrency(r.belowQuotaCommission)}</span>
           </div>
@@ -661,7 +662,7 @@ function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculato
         {r.aboveQuotaPortion > 0 && (
           <div style={rowStyle}>
             <span>
-              Above tier portion ({formatCurrency(r.aboveQuotaPortion)} × {r.input.isInsideSales ? "3" : "6"}% × {r.agreementMultiplier}%):
+              {t("adminCommissionTools.result.aboveTierPortion", { base: formatCurrency(r.aboveQuotaPortion), rate: r.input.isInsideSales ? "3" : "6", multiplier: r.agreementMultiplier })}
             </span>
             <span>{formatCurrency(r.aboveQuotaCommission)}</span>
           </div>
@@ -669,26 +670,26 @@ function CalculatorResult({ r }: { r: NonNullable<ReturnType<CommissionCalculato
         {r.doubleQuotaPortion > 0 && (
           <div style={rowStyle}>
             <span>
-              Double tier portion ({formatCurrency(r.doubleQuotaPortion)} × {r.input.isInsideSales ? "6" : "9"}% × {r.agreementMultiplier}%):
+              {t("adminCommissionTools.result.doubleTierPortion", { base: formatCurrency(r.doubleQuotaPortion), rate: r.input.isInsideSales ? "6" : "9", multiplier: r.agreementMultiplier })}
             </span>
             <span>{formatCurrency(r.doubleQuotaCommission)}</span>
           </div>
         )}
         <div style={totalRowStyle}>
-          <span>Annual Commission:</span>
+          <span>{t("adminCommissionTools.result.annualCommission")}</span>
           <span style={{ color: "#16a34a" }}>{formatCurrency(r.annualCommission)}</span>
         </div>
       </div>
 
       {r.renewalBonusAmount > 0 && (
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Renewal Bonus</div>
+          <div style={sectionTitleStyle}>{t("adminCommissionTools.result.renewalBonus")}</div>
           <div style={rowStyle}>
-            <span>Total Renewed Value × {r.renewalBonusRate}%:</span>
+            <span>{t("adminCommissionTools.result.totalRenewedValue", { rate: r.renewalBonusRate })}</span>
             <span style={{ color: "#16a34a" }}>+{formatCurrency(r.renewalBonusAmount)}</span>
           </div>
           <div style={totalRowStyle}>
-            <span>Total Commission:</span>
+            <span>{t("adminCommissionTools.result.totalCommission")}</span>
             <span style={{ color: "#16a34a" }}>{formatCurrency(r.totalCommission)}</span>
           </div>
         </div>

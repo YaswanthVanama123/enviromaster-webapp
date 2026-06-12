@@ -1,0 +1,29 @@
+{
+  "searchPlaceholder": "Rechercher",
+  "agreementsCount": "{{count}} contrats",
+  "filesPendingApproval": "{{count}} fichiers en attente d'approbation",
+  "approveSelected": "Approuver la sélection ({{count}})",
+  "loading": "Chargement des documents à approuver…",
+  "loadError": "Impossible de charger les documents à approuver. Veuillez réessayer.",
+  "noneFound": "Aucun document en attente d'approbation trouvé.",
+  "pageInfo": "Affichage de {{from}} à {{to}} sur {{agreements}} contrats ({{files}} fichiers)",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "statusUpdated": "Statut mis à jour avec succès !",
+  "statusUpdateError": "Impossible de mettre à jour le statut. Veuillez réessayer.",
+  "downloadError": "Impossible de télécharger ce PDF. Veuillez réessayer.",
+  "emailSent": "E-mail de demande d'approbation envoyé avec succès avec le PDF en pièce jointe !",
+  "stats": {
+    "pendingApproval": "En attente d'approbation",
+    "approvedSalesman": "Approuvé par le commercial",
+    "approvedAdmin": "Approuvé par l'administrateur"
+  },
+  "email": {
+    "subject": "{{name}} - Demande d'approbation",
+    "body": "Bonjour,\n\nVeuillez examiner le document suivant pour approbation.\n\nDocument : {{name}}\nType : {{type}}\nStatut : {{status}}\nMis à jour : {{updated}}\n\nCordialement",
+    "typeMainPdf": "PDF du contrat principal",
+    "typeVersionPdf": "PDF de la version {{version}}",
+    "typeAttachedPdf": "PDF joint",
+    "typeDocument": "Document"
+  }
+}

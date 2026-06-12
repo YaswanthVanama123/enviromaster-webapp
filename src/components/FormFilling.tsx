@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -270,6 +271,26 @@ function ContractSummary({
   accountTypeDetection = null,
   repActualSalesBefore = 0
 }: ContractSummaryProps) {
+  const { t } = useTranslation();
+  const getFreqLabel = (freq: number) =>
+    freq === 0 ? t("formFilling.contractSummary.freqOneTime") :
+    freq === 4 ? t("formFilling.contractSummary.freqWeekly") :
+    freq === 2 ? t("formFilling.contractSummary.freqBiWeekly") :
+    freq === 1 ? t("formFilling.contractSummary.freqMonthly") :
+    freq === 0.5 ? t("formFilling.contractSummary.freqEvery2MoShort") :
+    freq === 0.33 ? t("formFilling.contractSummary.freqQuarterly") :
+    freq === 0.17 ? t("formFilling.contractSummary.freqBiAnnually") :
+    freq === 0.08 ? t("formFilling.contractSummary.freqAnnually") : `${freq}×`;
+  const freqOptions = [
+    { value: 0, label: t("formFilling.contractSummary.freqOneTime"), description: t("formFilling.contractSummary.freqDescSingleCharge") },
+    { value: 4, label: t("formFilling.contractSummary.freqWeekly"), description: t("formFilling.contractSummary.freqDesc4PerMonth") },
+    { value: 2, label: t("formFilling.contractSummary.freqBiWeekly"), description: t("formFilling.contractSummary.freqDesc2PerMonth") },
+    { value: 1, label: t("formFilling.contractSummary.freqMonthly"), description: t("formFilling.contractSummary.freqDesc1PerMonth") },
+    { value: 0.5, label: t("formFilling.contractSummary.freqEvery2Months"), description: t("formFilling.contractSummary.freqDesc6PerYear") },
+    { value: 0.33, label: t("formFilling.contractSummary.freqQuarterly"), description: t("formFilling.contractSummary.freqDesc4PerYear") },
+    { value: 0.17, label: t("formFilling.contractSummary.freqBiAnnually"), description: t("formFilling.contractSummary.freqDesc2PerYear") },
+    { value: 0.08, label: t("formFilling.contractSummary.freqAnnually"), description: t("formFilling.contractSummary.freqDesc1PerYear") },
+  ];
   const {
     servicesState,
     globalContractMonths,
@@ -668,7 +689,7 @@ function ContractSummary({
   return (
     <div className="contract-summary-section">
       <div className="contract-summary-header">
-        <h2>Contract Summary</h2>
+        <h2>{t("formFilling.contractSummary.title")}</h2>
       </div>
 
       {}
@@ -680,17 +701,17 @@ function ContractSummary({
                 <FontAwesomeIcon icon={faExclamationTriangle} />
               </span>
               <div className="status-info">
-                <div className="status-title">Red Line Pricing</div>
-                <div className="status-subtitle">Below 30% above original — requires approval</div>
+                <div className="status-title">{t("formFilling.contractSummary.redLineTitle")}</div>
+                <div className="status-subtitle">{t("formFilling.contractSummary.redLineSubtitle")}</div>
               </div>
               <div className="status-values">
                 <div className="status-value-item">
-                  <span className="value-label">Current Contract</span>
+                  <span className="value-label">{t("formFilling.contractSummary.currentContract")}</span>
                   <span className="value-amount">${totalCurrentContract.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div className="status-divider">≤</div>
                 <div className="status-value-item">
-                  <span className="value-label">Greenline Price</span>
+                  <span className="value-label">{t("formFilling.contractSummary.greenlinePrice")}</span>
                   <span className="value-amount">${greenLineThreshold.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
               </div>
@@ -701,17 +722,17 @@ function ContractSummary({
                 <FontAwesomeIcon icon={faCheckCircle} />
               </span>
               <div className="status-info">
-                <div className="status-title">Green Line Pricing</div>
-                <div className="status-subtitle">30%+ above original — auto approved</div>
+                <div className="status-title">{t("formFilling.contractSummary.greenLineTitle")}</div>
+                <div className="status-subtitle">{t("formFilling.contractSummary.greenLineSubtitle")}</div>
               </div>
               <div className="status-values">
                 <div className="status-value-item">
-                  <span className="value-label">Current Contract</span>
+                  <span className="value-label">{t("formFilling.contractSummary.currentContract")}</span>
                   <span className="value-amount">${totalCurrentContract.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div className="status-divider">≥</div>
                 <div className="status-value-item">
-                  <span className="value-label">Greenline Price</span>
+                  <span className="value-label">{t("formFilling.contractSummary.greenlinePrice")}</span>
                   <span className="value-amount">${greenLineThreshold.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
               </div>
@@ -723,7 +744,7 @@ function ContractSummary({
       <div className="contract-summary-grid">
         {}
         <div className="contract-card">
-          <h3 className="card-title">Contract Details</h3>
+          <h3 className="card-title">{t("formFilling.contractSummary.contractDetails")}</h3>
 
           {}
           {!allServicesOneTime && (
@@ -732,7 +753,7 @@ function ContractSummary({
               <span className="label-icon">
                 <FontAwesomeIcon icon={faCalendarDays} />
               </span>
-              Contract Duration
+              {t("formFilling.contractSummary.contractDuration")}
             </label>
             <div className="custom-dropdown">
               <button
@@ -741,7 +762,7 @@ function ContractSummary({
                 onClick={() => setIsMonthsDropdownOpen(!isMonthsDropdownOpen)}
                 aria-expanded={isMonthsDropdownOpen}
               >
-                <span className="dropdown-value">{globalContractMonths} Months</span>
+                <span className="dropdown-value">{t("formFilling.contractSummary.months", { count: globalContractMonths })}</span>
                 <svg
                   className={`dropdown-arrow ${isMonthsDropdownOpen ? 'open' : ''}`}
                   width="12"
@@ -768,11 +789,11 @@ function ContractSummary({
                         className={`dropdown-option ${globalContractMonths === months ? 'selected' : ''}`}
                         onClick={() => handleContractMonthsChange(months)}
                       >
-                        {months} {months === 1 ? 'Month' : 'Months'}
+                        {months} {months === 1 ? t("formFilling.contractSummary.monthSingular") : t("formFilling.contractSummary.monthPlural")}
                         {months === 36 && (
                           <span className="recommended-badge">
                             <FontAwesomeIcon icon={faStar} style={{ marginRight: '4px' }} />
-                            Recommended
+                            {t("formFilling.contractSummary.recommended")}
                           </span>
                         )}
                       </button>
@@ -790,7 +811,7 @@ function ContractSummary({
               <span className="label-icon">
                 <FontAwesomeIcon icon={faCalendarDays} />
               </span>
-              Agreement Start Date
+              {t("formFilling.contractSummary.agreementStartDate")}
             </label>
             <input
               id="agreement-start-date"
@@ -817,7 +838,7 @@ function ContractSummary({
                     <span className="label-icon">
                       <FontAwesomeIcon icon={faCalendarDays} />
                     </span>
-                    Agreement Timeline
+                    {t("formFilling.contractSummary.agreementTimeline")}
                   </label>
                 </div>
 
@@ -833,18 +854,18 @@ function ContractSummary({
                     </div>
                     <div className="badge-info">
                       <div className="badge-title">
-                        {expiryStatus === 'yet-to-start' && 'Yet to Start'}
-                        {expiryStatus === 'expired' && 'Inactive'}
-                        {expiryStatus === 'critical' && 'Expiring Soon'}
-                        {expiryStatus === 'warning' && 'Renewal Approaching'}
-                        {expiryStatus === 'safe' && 'Active Agreement'}
+                        {expiryStatus === 'yet-to-start' && t("formFilling.contractSummary.statusYetToStart")}
+                        {expiryStatus === 'expired' && t("formFilling.contractSummary.statusInactive")}
+                        {expiryStatus === 'critical' && t("formFilling.contractSummary.statusExpiringSoon")}
+                        {expiryStatus === 'warning' && t("formFilling.contractSummary.statusRenewalApproaching")}
+                        {expiryStatus === 'safe' && t("formFilling.contractSummary.statusActive")}
                       </div>
                       <div className="badge-subtitle">
                         {expiryStatus === 'yet-to-start'
-                          ? `Starts in ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'}`
+                          ? t("formFilling.contractSummary.startsInDays", { count: daysRemaining, unit: daysRemaining === 1 ? t("formFilling.contractSummary.day") : t("formFilling.contractSummary.days") })
                           : expiryStatus === 'expired'
-                          ? `Inactive from ${Math.abs(daysRemaining)} ${Math.abs(daysRemaining) === 1 ? 'day' : 'days'}`
-                          : `${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining`
+                          ? t("formFilling.contractSummary.inactiveFromDays", { count: Math.abs(daysRemaining), unit: Math.abs(daysRemaining) === 1 ? t("formFilling.contractSummary.day") : t("formFilling.contractSummary.days") })
+                          : t("formFilling.contractSummary.daysRemainingText", { count: daysRemaining, unit: daysRemaining === 1 ? t("formFilling.contractSummary.day") : t("formFilling.contractSummary.days") })
                         }
                       </div>
                     </div>
@@ -866,27 +887,27 @@ function ContractSummary({
                     />
                   </div>
                   <div className="timeline-labels">
-                    <span className="timeline-start">Start: {new Date(agreementStartDate).toLocaleDateString()}</span>
-                    <span className="timeline-end">Expires: {expiryDate.toLocaleDateString()}</span>
+                    <span className="timeline-start">{t("formFilling.contractSummary.timelineStart", { date: new Date(agreementStartDate).toLocaleDateString() })}</span>
+                    <span className="timeline-end">{t("formFilling.contractSummary.timelineExpires", { date: expiryDate.toLocaleDateString() })}</span>
                   </div>
                 </div>
 
                 {}
                 <div className="timeline-stats">
                   <div className="timeline-stat">
-                    <span className="stat-labels">Total Duration</span>
-                    <span className="stat-values">{globalContractMonths} months</span>
+                    <span className="stat-labels">{t("formFilling.contractSummary.totalDuration")}</span>
+                    <span className="stat-values">{t("formFilling.contractSummary.totalDurationMonths", { count: globalContractMonths })}</span>
                   </div>
                   <div className="timeline-stat">
-                    <span className="stat-labels">Days Passed</span>
+                    <span className="stat-labels">{t("formFilling.contractSummary.daysPassed")}</span>
                     <span className="stat-values">
-                      {Math.max(0, (globalContractMonths * 30) - (daysRemaining >= 0 ? daysRemaining : 0))} days
+                      {t("formFilling.contractSummary.daysCount", { count: Math.max(0, (globalContractMonths * 30) - (daysRemaining >= 0 ? daysRemaining : 0)) })}
                     </span>
                   </div>
                   <div className="timeline-stat">
-                    <span className="stat-labels">Days Remaining</span>
+                    <span className="stat-labels">{t("formFilling.contractSummary.daysRemaining")}</span>
                     <span className={`stat-values stat-${expiryStatus}`}>
-                      {daysRemaining >= 0 ? `${daysRemaining} days` : `Expired`}
+                      {daysRemaining >= 0 ? t("formFilling.contractSummary.daysCount", { count: daysRemaining }) : t("formFilling.contractSummary.expired")}
                     </span>
                   </div>
                 </div>
@@ -900,7 +921,7 @@ function ContractSummary({
               <span className="label-icon">
                 <FontAwesomeIcon icon={faCar} />
               </span>
-              Trip Charge <span className="label-hint">(per visit)</span>
+              {t("formFilling.contractSummary.tripCharge")} <span className="label-hint">{t("formFilling.contractSummary.perVisitHint")}</span>
             </label>
             <div className="charge-input-row">
               <div className="contract-input-with-prefix">
@@ -924,14 +945,7 @@ function ContractSummary({
                   aria-expanded={isTripFreqDropdownOpen}
                 >
                   <span className="frequency-value">
-                    {globalTripChargeFrequency === 0 ? 'One-time' :
-                     globalTripChargeFrequency === 4 ? 'Weekly' :
-                     globalTripChargeFrequency === 2 ? 'Bi-weekly' :
-                     globalTripChargeFrequency === 1 ? 'Monthly' :
-                     globalTripChargeFrequency === 0.5 ? 'Every 2 Mo' :
-                     globalTripChargeFrequency === 0.33 ? 'Quarterly' :
-                     globalTripChargeFrequency === 0.17 ? 'Bi-annually' :
-                     globalTripChargeFrequency === 0.08 ? 'Annually' : `${globalTripChargeFrequency}×`}
+                    {getFreqLabel(globalTripChargeFrequency)}
                   </span>
                   <svg
                     className={`dropdown-arrow ${isTripFreqDropdownOpen ? 'open' : ''}`}
@@ -952,16 +966,7 @@ function ContractSummary({
                 {isTripFreqDropdownOpen && (
                   <div className="frequency-dropdown-menu">
                     <div className="frequency-options">
-                      {[
-                        { value: 0, label: 'One-time', description: 'Single charge' },
-                        { value: 4, label: 'Weekly', description: '4× per month' },
-                        { value: 2, label: 'Bi-weekly', description: '2× per month' },
-                        { value: 1, label: 'Monthly', description: '1× per month' },
-                        { value: 0.5, label: 'Every 2 Months', description: '6× per year' },
-                        { value: 0.33, label: 'Quarterly', description: '4× per year' },
-                        { value: 0.17, label: 'Bi-annually', description: '2× per year' },
-                        { value: 0.08, label: 'Annually', description: '1× per year' },
-                      ].map((freq) => (
+                      {freqOptions.map((freq) => (
                         <button
                           key={freq.value}
                           type="button"
@@ -988,7 +993,7 @@ function ContractSummary({
               <span className="label-icon">
                 <FontAwesomeIcon icon={faSquareParking} />
               </span>
-              Parking Charge <span className="label-hint">(per visit)</span>
+              {t("formFilling.contractSummary.parkingCharge")} <span className="label-hint">{t("formFilling.contractSummary.perVisitHint")}</span>
             </label>
             <div className="charge-input-row">
               <div className="contract-input-with-prefix">
@@ -1012,14 +1017,7 @@ function ContractSummary({
                   aria-expanded={isParkingFreqDropdownOpen}
                 >
                   <span className="frequency-value">
-                    {globalParkingChargeFrequency === 0 ? 'One-time' :
-                     globalParkingChargeFrequency === 4 ? 'Weekly' :
-                     globalParkingChargeFrequency === 2 ? 'Bi-weekly' :
-                     globalParkingChargeFrequency === 1 ? 'Monthly' :
-                     globalParkingChargeFrequency === 0.5 ? 'Every 2 Mo' :
-                     globalParkingChargeFrequency === 0.33 ? 'Quarterly' :
-                     globalParkingChargeFrequency === 0.17 ? 'Bi-annually' :
-                     globalParkingChargeFrequency === 0.08 ? 'Annually' : `${globalParkingChargeFrequency}×`}
+                    {getFreqLabel(globalParkingChargeFrequency)}
                   </span>
                   <svg
                     className={`dropdown-arrow ${isParkingFreqDropdownOpen ? 'open' : ''}`}
@@ -1040,16 +1038,7 @@ function ContractSummary({
                 {isParkingFreqDropdownOpen && (
                   <div className="frequency-dropdown-menu">
                     <div className="frequency-options">
-                      {[
-                        { value: 0, label: 'One-time', description: 'Single charge' },
-                        { value: 4, label: 'Weekly', description: '4× per month' },
-                        { value: 2, label: 'Bi-weekly', description: '2× per month' },
-                        { value: 1, label: 'Monthly', description: '1× per month' },
-                        { value: 0.5, label: 'Every 2 Months', description: '6× per year' },
-                        { value: 0.33, label: 'Quarterly', description: '4× per year' },
-                        { value: 0.17, label: 'Bi-annually', description: '2× per year' },
-                        { value: 0.08, label: 'Annually', description: '1× per year' },
-                      ].map((freq) => (
+                      {freqOptions.map((freq) => (
                         <button
                           key={freq.value}
                           type="button"
@@ -1073,26 +1062,26 @@ function ContractSummary({
 
         {}
         <div className="contract-card">
-          <h3 className="card-title">Pricing Breakdown</h3>
+          <h3 className="card-title">{t("formFilling.contractSummary.pricingBreakdown")}</h3>
 
           <div className="pricing-breakdown">
             <div className="breakdown-row">
-              <span className="breakdown-label">Redline Price Charge</span>
+              <span className="breakdown-label">{t("formFilling.contractSummary.redlinePriceCharge")}</span>
               <span className="breakdown-value original">${totalOriginalContract.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             </div>
             <div className="breakdown-row">
-              <span className="breakdown-label">Current Contract Total</span>
+              <span className="breakdown-label">{t("formFilling.contractSummary.currentContractTotal")}</span>
               <span className="breakdown-value minimum">${totalCurrentContract.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             </div>
             <div className="breakdown-row">
-              <span className="breakdown-label">Green Line Target (+30%)</span>
+              <span className="breakdown-label">{t("formFilling.contractSummary.greenLineTarget")}</span>
               <span className="breakdown-value target">${greenLineThreshold.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
             </div>
 
             {}
             <div className="breakdown-divider"></div>
             <div className="breakdown-row highlight">
-              <span className="breakdown-label">Price Change</span>
+              <span className="breakdown-label">{t("formFilling.contractSummary.priceChange")}</span>
               <span className={`breakdown-value profit ${pricingIndicator}`}>
                 {totalOriginalContract > 0
                   ? `${(((totalCurrentContract - totalOriginalContract) / totalOriginalContract) * 100).toFixed(1)}%`
@@ -1111,24 +1100,24 @@ function ContractSummary({
                       icon={perVisitMeetsMinimum ? faCheckCircle : faExclamationTriangle}
                       className="cross-min-icon"
                     />
-                    <span className="cross-min-title">Cross-Service Per Visit Minimum</span>
+                    <span className="cross-min-title">{t("formFilling.contractSummary.crossServiceMinimum")}</span>
                   </div>
                   <div className="cross-min-rows">
                     <div className="cross-min-row">
-                      <span className="cross-min-label">Total Per Visit (all services)</span>
+                      <span className="cross-min-label">{t("formFilling.contractSummary.totalPerVisitAll")}</span>
                       <span className={`cross-min-value ${perVisitMeetsMinimum ? 'value-ok' : 'value-warn'}`}>
                         ${totalPerVisit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                       </span>
                     </div>
                     <div className="cross-min-row">
-                      <span className="cross-min-label">Required Minimum Per Visit</span>
+                      <span className="cross-min-label">{t("formFilling.contractSummary.requiredMinimumPerVisit")}</span>
                       <span className="cross-min-value value-target">$50.00</span>
                     </div>
                   </div>
                   <div className={`cross-min-status ${perVisitMeetsMinimum ? 'status-ok' : 'status-warn'}`}>
                     {perVisitMeetsMinimum
-                      ? `Meets minimum — $${(totalPerVisit - CROSS_SERVICE_MIN_PER_VISIT).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} above $50.00`
-                      : `Below minimum — $${(CROSS_SERVICE_MIN_PER_VISIT - totalPerVisit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} short of $50.00`
+                      ? t("formFilling.contractSummary.meetsMinimum", { amount: (totalPerVisit - CROSS_SERVICE_MIN_PER_VISIT).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) })
+                      : t("formFilling.contractSummary.belowMinimum", { amount: (CROSS_SERVICE_MIN_PER_VISIT - totalPerVisit).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) })
                     }
                   </div>
                 </div>
@@ -1140,36 +1129,20 @@ function ContractSummary({
 
       {}
       <div className="contract-total-section">
-        <div className="total-label">Total Service Agreement Total</div>
+        <div className="total-label">{t("formFilling.contractSummary.totalServiceAgreementTotal")}</div>
         <div className="total-amount">${effectiveTotalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
         <div className="total-breakdown">
-          Sum of all active service contract totals (includes Refresh Power Scrub cost){!allServicesOneTime && <> across {globalContractMonths} month agreement</>}
+          {t("formFilling.contractSummary.totalBreakdown")}{!allServicesOneTime && <>{t("formFilling.contractSummary.totalBreakdownAcross", { count: globalContractMonths })}</>}
           {(globalTripCharge > 0 || globalParkingCharge > 0) && (
             <span className="charges-included">
               {globalTripCharge > 0 && (() => {
-                const freqLabel = globalTripChargeFrequency === 0 ? 'One-time' :
-                                 globalTripChargeFrequency === 4 ? 'Weekly' :
-                                 globalTripChargeFrequency === 2 ? 'Bi-weekly' :
-                                 globalTripChargeFrequency === 1 ? 'Monthly' :
-                                 globalTripChargeFrequency === 0.5 ? 'Every 2 Mo' :
-                                 globalTripChargeFrequency === 0.33 ? 'Quarterly' :
-                                 globalTripChargeFrequency === 0.17 ? 'Bi-annually' :
-                                 globalTripChargeFrequency === 0.08 ? 'Annually' :
-                                 `${globalTripChargeFrequency}×/mo`;
+                const freqLabel = getFreqLabel(globalTripChargeFrequency);
                 return globalTripChargeFrequency === 0
                   ? ` + Trip ($${globalTripCharge.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} - ${freqLabel})`
                   : ` + Trip ($${globalTripCharge.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} × ${freqLabel})`;
               })()}
               {globalParkingCharge > 0 && (() => {
-                const freqLabel = globalParkingChargeFrequency === 0 ? 'One-time' :
-                                 globalParkingChargeFrequency === 4 ? 'Weekly' :
-                                 globalParkingChargeFrequency === 2 ? 'Bi-weekly' :
-                                 globalParkingChargeFrequency === 1 ? 'Monthly' :
-                                 globalParkingChargeFrequency === 0.5 ? 'Every 2 Mo' :
-                                 globalParkingChargeFrequency === 0.33 ? 'Quarterly' :
-                                 globalParkingChargeFrequency === 0.17 ? 'Bi-annually' :
-                                 globalParkingChargeFrequency === 0.08 ? 'Annually' :
-                                 `${globalParkingChargeFrequency}×/mo`;
+                const freqLabel = getFreqLabel(globalParkingChargeFrequency);
                 return globalParkingChargeFrequency === 0
                   ? ` + Parking ($${globalParkingCharge.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} - ${freqLabel})`
                   : ` + Parking ($${globalParkingCharge.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} × ${freqLabel})`;
@@ -1179,16 +1152,16 @@ function ContractSummary({
         </div>
       </div>
       <div className="contract-card">
-        <h3 className="card-title">Product Totals</h3>
+        <h3 className="card-title">{t("formFilling.contractSummary.productTotals")}</h3>
 
         <div className="pricing-breakdown">
           <div className="breakdown-row">
-            <span className="breakdown-label">Monthly Product Total</span>
+            <span className="breakdown-label">{t("formFilling.contractSummary.monthlyProductTotal")}</span>
             <span className="breakdown-value product-monthly">${productMonthlyTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
           {!allServicesOneTime && (
           <div className="breakdown-row">
-            <span className="breakdown-label">Products × {globalContractMonths} Months</span>
+            <span className="breakdown-label">{t("formFilling.contractSummary.productsTimesMonths", { count: globalContractMonths })}</span>
             <span className="breakdown-value product-contract">${productContractTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
           )}
@@ -1207,6 +1180,7 @@ function FormFillingContent({
   serviceAgreementTemplate: ServiceAgreementTemplate | null;
   templateLoading: boolean;
 }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { id: urlId } = useParams<{ id: string }>();
@@ -1440,7 +1414,17 @@ function FormFillingContent({
     setContextAgreementId(documentId);
   }, [documentId, setContextAgreementId]);
 
-  const currentPaymentLabel = PAYMENT_OPTION_DETAILS.find((entry) => entry.value === paymentOption)?.label ?? "Payment Option";
+  const paymentOptionLabelKey: Record<PaymentOption, string> = {
+    online: "formFilling.payment.onlineLabel",
+    cash: "formFilling.payment.cashLabel",
+    others: "formFilling.payment.othersLabel",
+  };
+  const paymentOptionDescriptionKey: Record<PaymentOption, string> = {
+    online: "formFilling.payment.onlineDescription",
+    cash: "formFilling.payment.cashDescription",
+    others: "formFilling.payment.othersDescription",
+  };
+  const currentPaymentLabel = paymentOption ? t(paymentOptionLabelKey[paymentOption]) : t("formFilling.payment.defaultLabel");
 
   const calculatePricingStatus = useCallback((): 'red' | 'green' | 'neutral' => {
     const threshold = totalOriginalContract * 1.30;
@@ -2085,7 +2069,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
           }
         }
 
-        setToastMessage({ message: "Draft saved successfully!", type: "success" });
+        setToastMessage({ message: t("formFilling.toast.draftSaved"), type: "success" });
 
         console.log(`📝 [DEBUG] Checking changes before draft save:`, {
           hasChanges,
@@ -2124,7 +2108,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
         const newId = result.data?._id || result.data?.id || result.headers["x-customerheaderdoc-id"];
         setDocumentId(newId);
         console.log("Draft created successfully with ID:", newId);
-        setToastMessage({ message: "Draft saved successfully!", type: "success" });
+        setToastMessage({ message: t("formFilling.toast.draftSaved"), type: "success" });
 
         const currentHasChanges = hasPriceChanges();
         const currentChangesCount = getPriceChangeCount();
@@ -2157,7 +2141,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
       }
     } catch (err) {
       console.error("Error saving draft:", err);
-      setToastMessage({ message: "Failed to save draft. Please try again.", type: "error" });
+      setToastMessage({ message: t("formFilling.toast.draftSaveFailed"), type: "error" });
     } finally {
       setIsSaving(false);
     }
@@ -2235,7 +2219,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
     } catch (err: any) {
       console.error("❌ [SAVE ERROR] Failed to save agreement:", err);
       setToastMessage({
-        message: err.response?.data?.message || "Failed to save agreement. Please try again.",
+        message: err.response?.data?.message || t("formFilling.toast.agreementSaveFailed"),
         type: "error"
       });
       setIsSaving(false);
@@ -2293,7 +2277,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
         zohoApi.createAutoApprovalTask(documentId, payload?.headerTitle || 'Agreement').catch(() => {});
       } else {
         setToastMessage({
-          message: "First version (v1) created and approved successfully! Green Line pricing.",
+          message: t("formFilling.toast.firstVersionCreated"),
           type: "success"
         });
       }
@@ -2305,7 +2289,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
     } catch (err: any) {
       console.error("❌ [FIRST VERSION ERROR] Failed to create v1:", err);
       setToastMessage({
-        message: err.response?.data?.message || "Failed to create first version. Please try again.",
+        message: err.response?.data?.message || t("formFilling.toast.firstVersionFailed"),
         type: "error"
       });
     } finally {
@@ -2405,7 +2389,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
           zohoApi.createAutoApprovalTask(newId, payloadToSend.headerTitle || 'Agreement').catch(() => {});
         } else {
           setToastMessage({
-            message: "Agreement created and approved successfully! Green Line pricing.",
+            message: t("formFilling.toast.agreementCreated"),
             type: "success"
           });
         }
@@ -2418,7 +2402,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
       console.error("❌ [SAVE ERROR] Error saving document:", err);
 
       setToastMessage({
-        message: err.response?.data?.message || "Failed to save document. Please try again.",
+        message: err.response?.data?.message || t("formFilling.toast.documentSaveFailed"),
         type: "error"
       });
     }
@@ -2493,7 +2477,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
     } catch (err: any) {
       console.error("❌ [VERSION ERROR] Failed to create version:", err);
       setToastMessage({
-        message: err.response?.data?.message || "Failed to create version. Please try again.",
+        message: err.response?.data?.message || t("formFilling.toast.versionCreateFailed"),
         type: "error"
       });
     } finally {
@@ -2718,10 +2702,10 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
             type="button"
             className="edit-back-button"
             onClick={handleBack}
-            title="Go back"
+            title={t("formFilling.goBackTitle")}
           >
             <FontAwesomeIcon icon={faArrowLeft} />
-            <span>Back</span>
+            <span>{t("formFilling.back")}</span>
           </button>
         </div>
       )}
@@ -2732,7 +2716,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
             {console.log("🎨 [RENDERING] Loading overlay is being rendered - loading state is TRUE")}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
               <div className="formfilling__spinner">
-                <span className="formfilling__sr-only">Loading form data…</span>
+                <span className="formfilling__sr-only">{t("formFilling.loadingFormData")}</span>
               </div>
               <div style={{
                 color: 'white',
@@ -2741,7 +2725,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
                 textAlign: 'center',
                 textShadow: '0 2px 4px rgba(0,0,0,0.5)'
               }}>
-                Loading Agreement Data...
+                {t("formFilling.loadingAgreementData")}
               </div>
             </div>
           </div>
@@ -2887,7 +2871,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
         {isSaving && (
           <div className="formfilling__saving-overlay" role="status" aria-live="polite">
             <div className="formfilling__spinner">
-              <span className="formfilling__sr-only">Saving agreement data…</span>
+              <span className="formfilling__sr-only">{t("formFilling.savingAgreementData")}</span>
             </div>
           </div>
         )}
@@ -2930,7 +2914,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
                 checked={includeProductsTable}
                 onChange={(e) => setIncludeProductsTable(e.target.checked)}
               />
-              <span>Include Products Table in PDF</span>
+              <span>{t("formFilling.includeProductsTable")}</span>
             </label>
 
             <ServicesSection
@@ -2969,10 +2953,10 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
             <div className="formfilling__payment-options">
               <div className="formfilling__payment-options-header">
                 <div>
-                  <h3>Payment Options</h3>
-                  <p>Select how the customer will pay. Choosing “Other Payment” moves the document to Pending Approval even if Green Line pricing applies.</p>
+                  <h3>{t("formFilling.payment.title")}</h3>
+                  <p>{t("formFilling.payment.description")}</p>
                 </div>
-                <span className="formfilling__payment-option-current">Current: {currentPaymentLabel}</span>
+                <span className="formfilling__payment-option-current">{t("formFilling.payment.current", { label: currentPaymentLabel })}</span>
               </div>
 
               <div className="formfilling__payment-options-grid">
@@ -2988,20 +2972,20 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
                       checked={paymentOption === option.value}
                       onChange={() => setPaymentOption(option.value)}
                     />
-                    <span className="payment-option-title">{option.label}</span>
-                    <span className="payment-option-description">{option.description}</span>
+                    <span className="payment-option-title">{t(paymentOptionLabelKey[option.value])}</span>
+                    <span className="payment-option-description">{t(paymentOptionDescriptionKey[option.value])}</span>
                   </label>
                 ))}
               </div>
 
               <div className="formfilling__payment-note">
-                <label className="formfilling__payment-note-label" htmlFor="paymentNote">Note</label>
+                <label className="formfilling__payment-note-label" htmlFor="paymentNote">{t("formFilling.payment.noteLabel")}</label>
                 <textarea
                   id="paymentNote"
                   className="formfilling__payment-note-input"
                   value={paymentNote}
                   onChange={(e) => setPaymentNote(e.target.value)}
-                  placeholder="Write anything..."
+                  placeholder={t("formFilling.payment.notePlaceholder")}
                   rows={3}
                 />
               </div>
@@ -3040,7 +3024,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
                     animation: 'spin 0.6s linear infinite'
                   }} />
                 )}
-                {isSaving ? "Saving..." : "Save as Draft"}
+                {isSaving ? t("formFilling.saving") : t("formFilling.saveAsDraft")}
               </button>
               <button
                 type="button"
@@ -3066,7 +3050,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
                     animation: 'spin 0.6s linear infinite'
                   }} />
                 )}
-                {isSaving ? "Saving..." : "Save & Generate PDF"}
+                {isSaving ? t("formFilling.saving") : t("formFilling.saveAndGeneratePdf")}
               </button>
             </div>
           </div>
@@ -3074,10 +3058,10 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
 
         <ConfirmationModal
           isOpen={showSaveModal}
-          title="Confirm Save"
-          message="Are you sure you want to save this form and convert it to PDF? This will compile the document and store it in Bigin."
-          confirmText="Yes, Save & Generate"
-          cancelText="Cancel"
+          title={t("formFilling.saveModal.title")}
+          message={t("formFilling.saveModal.message")}
+          confirmText={t("formFilling.saveModal.confirmText")}
+          cancelText={t("common.cancel")}
           onConfirm={handleSave}
           onCancel={() => setShowSaveModal(false)}
         />

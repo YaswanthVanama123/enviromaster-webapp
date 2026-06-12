@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { emailTemplateApi, type EmailTemplate } from '../../backendservice/api/emailTemplateApi';
 import { Toast } from './Toast';
 import type { ToastType } from './Toast';
@@ -7,6 +8,7 @@ import { faSave, faUndo, faEnvelope, faFileAlt } from '@fortawesome/free-solid-s
 import './EmailTemplateManager.css';
 
 export const EmailTemplateManager: React.FC = () => {
+  const { t } = useTranslation();
   const [template, setTemplate] = useState<EmailTemplate | null>(null);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -36,7 +38,7 @@ export const EmailTemplateManager: React.FC = () => {
     } catch (error) {
       console.error('Error loading template:', error);
       setToastMessage({
-        message: 'Failed to load email template',
+        message: t('emailTemplate.failedToLoad'),
         type: 'error'
       });
     } finally {
@@ -47,7 +49,7 @@ export const EmailTemplateManager: React.FC = () => {
   const handleSave = async () => {
     if (!subject.trim()) {
       setToastMessage({
-        message: 'Subject cannot be empty',
+        message: t('emailTemplate.subjectEmpty'),
         type: 'error'
       });
       return;
@@ -55,7 +57,7 @@ export const EmailTemplateManager: React.FC = () => {
 
     if (!body.trim()) {
       setToastMessage({
-        message: 'Body cannot be empty',
+        message: t('emailTemplate.bodyEmpty'),
         type: 'error'
       });
       return;
@@ -69,14 +71,14 @@ export const EmailTemplateManager: React.FC = () => {
         setTemplate(result.template);
         setHasChanges(false);
         setToastMessage({
-          message: 'Email template saved successfully!',
+          message: t('emailTemplate.savedSuccess'),
           type: 'success'
         });
       }
     } catch (error) {
       console.error('Error saving template:', error);
       setToastMessage({
-        message: 'Failed to save email template',
+        message: t('emailTemplate.failedToSave'),
         type: 'error'
       });
     } finally {
@@ -90,7 +92,7 @@ export const EmailTemplateManager: React.FC = () => {
       setBody(template.body);
       setHasChanges(false);
       setToastMessage({
-        message: 'Changes discarded',
+        message: t('emailTemplate.changesDiscarded'),
         type: 'success'
       });
     }
@@ -101,11 +103,11 @@ export const EmailTemplateManager: React.FC = () => {
       <div className="email-template-header">
         <div className="email-template-title">
           <FontAwesomeIcon icon={faEnvelope} />
-          <h2>Email Template Manager</h2>
+          <h2>{t('emailTemplate.title')}</h2>
         </div>
         <div className="email-template-info">
           <FontAwesomeIcon icon={faFileAlt} />
-          <span>This template will be used as default for all email communications</span>
+          <span>{t('emailTemplate.infoBanner')}</span>
         </div>
       </div>
 
@@ -113,15 +115,15 @@ export const EmailTemplateManager: React.FC = () => {
         {loading ? (
           <div className="email-template-loading-state">
             <div className="email-template-spinner-inline">
-              <span className="email-template-sr-only">Loading email template…</span>
+              <span className="email-template-sr-only">{t('emailTemplate.loadingTemplate')}</span>
             </div>
-            <p className="email-template-loading-text">Loading template data...</p>
+            <p className="email-template-loading-text">{t('emailTemplate.loadingTemplateData')}</p>
           </div>
         ) : (
           <>
             <div className="email-template-field">
               <label htmlFor="subject">
-                Email Subject
+                {t('emailTemplate.emailSubject')}
                 <span className="required">*</span>
               </label>
               <input
@@ -129,39 +131,39 @@ export const EmailTemplateManager: React.FC = () => {
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject..."
+                placeholder={t('emailTemplate.subjectPlaceholder')}
                 disabled={saving}
                 className="email-template-input"
               />
-              <small className="field-hint">This subject will be pre-filled when sending emails</small>
+              <small className="field-hint">{t('emailTemplate.subjectHint')}</small>
             </div>
 
             <div className="email-template-field">
               <label htmlFor="body">
-                Email Body
+                {t('emailTemplate.emailBody')}
                 <span className="required">*</span>
               </label>
               <textarea
                 id="body"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Enter email body..."
+                placeholder={t('emailTemplate.bodyPlaceholder')}
                 rows={15}
                 disabled={saving}
                 className="email-template-textarea"
               />
               <small className="field-hint">
-                This message will be pre-filled when sending emails. Salesmen can edit it before sending.
+                {t('emailTemplate.bodyHint')}
               </small>
             </div>
 
             <div className="email-template-variables">
-              <h3>Template Tips</h3>
+              <h3>{t('emailTemplate.templateTips')}</h3>
               <ul>
-                <li>Keep the message professional and concise</li>
-                <li>Salesmen can customize this template before sending</li>
-                <li>The PDF attachment will be added automatically</li>
-                <li>Changes take effect immediately for all users</li>
+                <li>{t('emailTemplate.tip1')}</li>
+                <li>{t('emailTemplate.tip2')}</li>
+                <li>{t('emailTemplate.tip3')}</li>
+                <li>{t('emailTemplate.tip4')}</li>
               </ul>
             </div>
 
@@ -173,7 +175,7 @@ export const EmailTemplateManager: React.FC = () => {
                 disabled={!hasChanges || saving}
               >
                 <FontAwesomeIcon icon={faUndo} />
-                Discard Changes
+                {t('emailTemplate.discardChanges')}
               </button>
               <button
                 type="button"
@@ -182,13 +184,13 @@ export const EmailTemplateManager: React.FC = () => {
                 disabled={!hasChanges || saving}
               >
                 <FontAwesomeIcon icon={faSave} />
-                {saving ? 'Saving...' : 'Save Template'}
+                {saving ? t('emailTemplate.saving') : t('emailTemplate.saveTemplate')}
               </button>
             </div>
 
             {template && (
               <div className="email-template-meta">
-                Last updated: {new Date(template.updatedAt).toLocaleString()}
+                {t('emailTemplate.lastUpdated', { date: new Date(template.updatedAt).toLocaleString() })}
               </div>
             )}
           </>

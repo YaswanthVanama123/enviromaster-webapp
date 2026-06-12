@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -39,6 +40,7 @@ type ChartDataPoint = {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [timeFilter, setTimeFilter] = useState("This Week");
   const [selectedDateFrom, setSelectedDateFrom] = useState<Date | null>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Date | null>(null);
@@ -339,31 +341,31 @@ export default function Home() {
   const agreementOptions = [
     {
       id: "create",
-      title: "Create Agreement",
-      description: "Create a new customer agreement with comprehensive service details and product selections",
+      title: t("home.cards.create.title"),
+      description: t("home.cards.create.description"),
       icon: faClipboardList,
       action: () => navigate("/form-filling"),
-      buttonText: "Get Started →",
+      buttonText: t("home.cards.create.button"),
       buttonClass: "home__button-green",
       available: true,
     },
     {
       id: "extend",
-      title: "Extend Agreement",
-      description: "Extend an existing customer agreement with new terms and updated service packages",
+      title: t("home.cards.extend.title"),
+      description: t("home.cards.extend.description"),
       icon: faCalendarPlus,
       action: () => navigate("/form-filling"),
-      buttonText: "Click to extend",
+      buttonText: t("home.cards.extend.button"),
       buttonClass: "home__button-green",
       available: true,
     },
     {
       id: "edit",
-      title: "Edit Agreement",
-      description: "Modify existing agreement details, update services, or adjust product configurations",
+      title: t("home.cards.edit.title"),
+      description: t("home.cards.edit.description"),
       icon: faPencilAlt,
       action: () => navigate("/saved-pdfs"),
-      buttonText: "Get Started →",
+      buttonText: t("home.cards.edit.button"),
       buttonClass: "home__button-blue",
       available: true,
     },
@@ -440,19 +442,19 @@ export default function Home() {
     <section className="home">
       <div className="home__hero">
         <div className="home__hero-content">
-          <h1 className="home__title">Welcome to Enviro-Master</h1>
+          <h1 className="home__title">{t("home.title")}</h1>
           <p className="home__subtitle">
-            Professional Agreement Management System
+            {t("home.subtitle")}
           </p>
           <p className="home__description">
-            Create, manage, and maintain customer service agreements with ease. | Our comprehensive platform streamlines your workflow and ensures accuracy.
+            {t("home.description")}
           </p>
         </div>
       </div>
 
       <div className="home__container">
         <div className="home__section-header">
-          <h2 className="home__section-title">Agreement Management</h2>
+          <h2 className="home__section-title">{t("home.sectionTitle")}</h2>
         </div>
 
         <div className="home__cards">
@@ -487,10 +489,10 @@ export default function Home() {
                 value={timeFilter}
                 onChange={(e) => handleTimeFilterChange(e.target.value)}
               >
-                <option>This Week</option>
-                <option>This Month</option>
-                <option>This Year</option>
-                <option>Date Range</option>
+                <option value="This Week">{t("home.filter.thisWeek")}</option>
+                <option value="This Month">{t("home.filter.thisMonth")}</option>
+                <option value="This Year">{t("home.filter.thisYear")}</option>
+                <option value="Date Range">{t("home.filter.dateRange")}</option>
               </select>
             </div>
 
@@ -576,7 +578,7 @@ export default function Home() {
                             >
                               {hoveredBar?.index === index && hoveredBar?.type === 'done' && (
                                 <div className="home__chart-tooltip">
-                                  <span className="home__chart-tooltip-label">Done: </span>
+                                  <span className="home__chart-tooltip-label">{t("home.legend.done")}: </span>
                                   <span className="home__chart-tooltip-value">{data.done}</span>
                                 </div>
                               )}
@@ -592,7 +594,7 @@ export default function Home() {
                             >
                               {hoveredBar?.index === index && hoveredBar?.type === 'pending' && (
                                 <div className="home__chart-tooltip">
-                                  <span className="home__chart-tooltip-label">Pending: </span>
+                                  <span className="home__chart-tooltip-label">{t("home.legend.pending")}: </span>
                                   <span className="home__chart-tooltip-value">{data.pending}</span>
                                 </div>
                               )}
@@ -608,7 +610,7 @@ export default function Home() {
                             >
                               {hoveredBar?.index === index && hoveredBar?.type === 'saved' && (
                                 <div className="home__chart-tooltip">
-                                  <span className="home__chart-tooltip-label">Saved: </span>
+                                  <span className="home__chart-tooltip-label">{t("home.legend.saved")}: </span>
                                   <span className="home__chart-tooltip-value">{data.saved}</span>
                                 </div>
                               )}
@@ -624,7 +626,7 @@ export default function Home() {
                             >
                               {hoveredBar?.index === index && hoveredBar?.type === 'drafts' && (
                                 <div className="home__chart-tooltip">
-                                  <span className="home__chart-tooltip-label">Drafts: </span>
+                                  <span className="home__chart-tooltip-label">{t("home.legend.drafts")}: </span>
                                   <span className="home__chart-tooltip-value">{data.drafts}</span>
                                 </div>
                               )}
@@ -639,15 +641,15 @@ export default function Home() {
                 <div className="home__chart-legend">
                   <div className="home__legend-item">
                     <span className="home__legend-dot home__legend-dot--pending"></span>
-                    Pending
+                    {t("home.legend.pending")}
                   </div>
                   <div className="home__legend-item">
                     <span className="home__legend-dot home__legend-dot--saved"></span>
-                    Saved
+                    {t("home.legend.saved")}
                   </div>
                   <div className="home__legend-item">
                     <span className="home__legend-dot home__legend-dot--drafts"></span>
-                    Drafts
+                    {t("home.legend.drafts")}
                   </div>
                 </div>
               </>

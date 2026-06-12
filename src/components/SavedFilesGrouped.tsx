@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
 import type { SavedFileListItem, SavedFileGroup } from "../backendservice/api/pdfApi";
 import { Toast } from "./admin/Toast";
@@ -63,6 +64,7 @@ interface SavedFilesGroupedProps {
 let hasInitiallyLoaded = false;
 
 export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedProps) {
+  const { t } = useTranslation();
   const [groups, setGroups] = useState<SavedFileGroup[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -199,7 +201,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       console.log(`✅ [SAVED-FILES-GROUPED] Loaded ${allGroups.length} groups, ${groupedResponse.totalGroups} total`);
     } catch (err) {
       console.error("❌ Error fetching grouped saved files:", err);
-      setError("Unable to load files. Please try again.");
+      setError(t("savedFiles.toast.loadError"));
       setGroups([]);
       setTotalGroups(0);
       setTotalFiles(0);
@@ -304,7 +306,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
     const filesWithPdf = selectedFileObjects.filter(file => file.hasPdf);
     if (filesWithPdf.length === 0) {
       setToastMessage({
-        message: "Please select files with PDFs to upload to bigin.",
+        message: t("savedFiles.toast.selectFilesWithPdf"),
         type: "error"
       });
       return;
@@ -382,7 +384,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       });
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this document. Please try again.",
+        message: t("savedFiles.toast.viewError"),
         type: "error"
       });
     }
@@ -417,7 +419,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setToastMessage({ message: "Unable to download this file. Please try again.", type: "error" });
+      setToastMessage({ message: t("savedFiles.toast.downloadFileError"), type: "error" });
     }
   };
 
@@ -429,7 +431,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
   const handleZohoUpload = (file: SavedFileListItem) => {
     if (!file.hasPdf) {
       setToastMessage({
-        message: "This document doesn't have a PDF to upload. Please generate the PDF first.",
+        message: t("savedFiles.toast.noPdfToUpload"),
         type: "error"
       });
       return;
@@ -441,7 +443,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
   const handleViewLogs = async (file: SavedFileListItem) => {
     if (file.fileType !== 'version_pdf') {
       setToastMessage({
-        message: "Logs are only available for version PDFs.",
+        message: t("savedFiles.toast.logsOnlyVersionPdfs"),
         type: "error"
       });
       return;
@@ -473,7 +475,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
     } catch (err) {
       console.error('❌ [VIEW LOGS] Failed to fetch version logs:', err);
       setToastMessage({
-        message: "Failed to load version change logs. Please try again.",
+        message: t("savedFiles.toast.loadLogsError"),
         type: "error"
       });
     } finally {
@@ -507,7 +509,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       }
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this document for editing. Please try again.",
+        message: t("savedFiles.toast.editError"),
         type: "error"
       });
     }
@@ -528,7 +530,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       });
     } catch (err) {
       setToastMessage({
-        message: "Unable to load this agreement for editing. Please try again.",
+        message: t("savedFiles.toast.editAgreementError"),
         type: "error"
       });
     }
@@ -564,13 +566,13 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
       );
 
       setToastMessage({
-        message: "Status updated successfully!",
+        message: t("savedFiles.toast.statusUpdated"),
         type: "success"
       });
     } catch (error) {
       console.error("Failed to update status:", error);
       setToastMessage({
-        message: "Failed to update status. Please try again.",
+        message: t("savedFiles.toast.statusUpdateFailed"),
         type: "error"
       });
     } finally {
@@ -587,7 +589,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
   const confirmDelete = async () => {
     if (!itemToDelete || !isDeleteConfirmed) {
       setToastMessage({
-        message: "Please type 'DELETE' to confirm",
+        message: t("savedFiles.toast.typeDeleteToConfirm"),
         type: "error"
       });
       return;
@@ -610,21 +612,21 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
         setDeleteConfirmText('');
 
         setToastMessage({
-          message: `${itemToDelete.type === 'folder' ? 'Agreement' : 'File'} moved to trash successfully!`,
+          message: itemToDelete.type === 'folder' ? t("savedFiles.toast.movedToTrashAgreement") : t("savedFiles.toast.movedToTrashFile"),
           type: "success"
         });
 
         await fetchGroups(currentPage, query);
       } else {
         setToastMessage({
-          message: result.message || "Failed to delete. Please try again.",
+          message: result.message || t("savedFiles.toast.deleteFailed"),
           type: "error"
         });
       }
     } catch (error) {
       console.error("Failed to delete:", error);
       setToastMessage({
-        message: "Failed to delete. Please try again.",
+        message: t("savedFiles.toast.deleteFailed"),
         type: "error"
       });
     }
@@ -636,7 +638,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
         <div className="sf__search">
           <input
             type="text"
-            placeholder="Search agreements..."
+            placeholder={t("savedFiles.searchAgreements")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -651,7 +653,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 fontWeight: '500',
                 padding: '0 8px'
               }}>
-                {selectedFileIds.length} file{selectedFileIds.length !== 1 ? 's' : ''} selected
+                {t("savedFiles.filesSelected", { count: selectedFileIds.length })}
               </div>
 
               <button
@@ -659,7 +661,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 className="sf__btn sf__btn--light"
                 onClick={clearAllSelections}
               >
-                Clear Selection
+                {t("savedFiles.clearSelection")}
               </button>
 
               <button
@@ -669,7 +671,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 disabled={selectedFileObjects.filter(f => f.hasPdf).length === 0}
               >
                 <FontAwesomeIcon icon={faUpload} style={{ marginRight: '6px' }} />
-                Upload to Bigin ({selectedFileObjects.filter(f => f.hasPdf).length})
+                {t("savedFiles.uploadToBigin", { count: selectedFileObjects.filter(f => f.hasPdf).length })}
               </button>
             </>
           )}
@@ -682,13 +684,13 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               disabled={totalFiles === 0}
             >
               <FontAwesomeIcon icon={faCheckSquare} style={{ marginRight: '6px' }} />
-              Select All
+              {t("savedFiles.selectAll")}
             </button>
           )}
         </div>
 
         <div className="sf__stats">
-          {totalGroups} agreements • {totalFiles} files
+          {t("savedFiles.agreementsAndFiles", { agreements: totalGroups, files: totalFiles })}
         </div>
       </div>
 
@@ -768,7 +770,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
 
         {!loading && !error && groups.length === 0 && (
           <div className="sf__empty">
-            {query ? `No agreements found matching "${query}"` : "No agreements found."}
+            {query ? t("savedFiles.empty.noAgreementsMatching", { query }) : t("savedFiles.empty.noAgreements")}
           </div>
         )}
 
@@ -813,7 +815,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
 
       <div className="sf__pager">
         <div className="sf__page-info">
-          Showing {Math.min((currentPage - 1) * groupsPerPage + 1, totalGroups)}-{Math.min(currentPage * groupsPerPage, totalGroups)} of {totalGroups} agreements
+          {t("savedFiles.pageInfoAgreements", { from: Math.min((currentPage - 1) * groupsPerPage + 1, totalGroups), to: Math.min(currentPage * groupsPerPage, totalGroups), total: totalGroups })}
         </div>
       </div>
 
@@ -841,7 +843,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               documentType,
             });
           setToastMessage({
-            message: "Email sent successfully with PDF attachment!",
+            message: t("savedFiles.toast.emailSent"),
             type: "success"
           });
           setEmailComposerOpen(false);
@@ -853,8 +855,8 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
           downloadUrl: pdfApi.getPdfDownloadUrl(currentEmailFile.id),
           documentType: getDocumentTypeForSavedFile(currentEmailFile)
         } : undefined}
-        defaultSubject={currentEmailFile ? `${currentEmailFile.title} - ${STATUS_LABEL[currentEmailFile.status as FileStatus]}` : ''}
-        defaultBody={currentEmailFile ? `Hello,\n\nPlease find the customer header document attached.\n\nDocument: ${currentEmailFile.title}\nStatus: ${STATUS_LABEL[currentEmailFile.status as FileStatus]}\n\nBest regards` : ''}
+        defaultSubject={currentEmailFile ? t("savedFiles.email.subject", { name: currentEmailFile.title, status: STATUS_LABEL[currentEmailFile.status as FileStatus] }) : ''}
+        defaultBody={currentEmailFile ? t("savedFiles.email.bodyCustomerHeader", { name: currentEmailFile.title, status: STATUS_LABEL[currentEmailFile.status as FileStatus] }) : ''}
         userEmail=""
       />
 
@@ -877,7 +879,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
             setCurrentZohoFile(null);
             fetchGroups(currentPage, query);
             setToastMessage({
-              message: "Successfully uploaded to Zoho Bigin!",
+              message: t("savedFiles.toast.uploadedToZohoBigin"),
               type: "success"
             });
           }}
@@ -890,7 +892,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
           agreementTitle={currentTaskAgreement.title}
           onClose={() => { setTaskModalOpen(false); setCurrentTaskAgreement(null); }}
           onSuccess={() => {
-            setToastMessage({ message: "Task created in Bigin!", type: "success" });
+            setToastMessage({ message: t("savedFiles.toast.taskCreated"), type: "success" });
           }}
         />
       )}
@@ -931,7 +933,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 fontWeight: '600',
                 color: '#374151'
               }}>
-                Version Change Logs - {currentLogsFile.title}
+                {t("savedFiles.logs.title", { title: currentLogsFile.title })}
               </h3>
               <button
                 onClick={() => {
@@ -947,7 +949,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                   color: '#6b7280',
                   padding: '4px'
                 }}
-                title="Close"
+                title={t("common.close")}
               >
                 ×
               </button>
@@ -961,7 +963,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 padding: '40px',
                 color: '#6b7280'
               }}>
-                <div>Loading version change logs...</div>
+                <div>{t("savedFiles.logs.loading")}</div>
               </div>
             )}
 
@@ -980,10 +982,10 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                   style={{ fontSize: '48px', marginBottom: '16px', color: '#d1d5db' }}
                 />
                 <div style={{ fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>
-                  No Change Logs Found
+                  {t("savedFiles.logs.noLogsTitle")}
                 </div>
                 <div style={{ fontSize: '14px' }}>
-                  No price override changes have been logged for this version yet.
+                  {t("savedFiles.logs.noLogsBody")}
                 </div>
               </div>
             )}
@@ -1014,13 +1016,13 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                         color: '#374151',
                         marginBottom: '4px'
                       }}>
-                        Version {log.versionNumber} Changes
+                        {t("savedFiles.logs.versionChanges", { version: log.versionNumber })}
                       </div>
                       <div style={{
                         fontSize: '14px',
                         color: '#6b7280'
                       }}>
-                        {log.totalChanges} change{log.totalChanges !== 1 ? 's' : ''} logged
+                        {t("savedFiles.logs.changesLogged", { count: log.totalChanges })}
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
@@ -1036,7 +1038,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                         fontSize: '12px',
                         color: '#6b7280'
                       }}>
-                        Total Impact
+                        {t("savedFiles.logs.totalImpact")}
                       </div>
                     </div>
                   </div>
@@ -1052,25 +1054,25 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                     fontSize: '13px'
                   }}>
                     <div>
-                      <span style={{ fontWeight: '500', color: '#374151' }}>Salesperson:</span>
+                      <span style={{ fontWeight: '500', color: '#374151' }}>{t("savedFiles.logs.salesperson")}</span>
                       <span style={{ marginLeft: '8px', color: '#6b7280' }}>
-                        {log.salespersonName || 'Unknown'}
+                        {log.salespersonName || t("savedFiles.logs.unknown")}
                       </span>
                     </div>
                     <div>
-                      <span style={{ fontWeight: '500', color: '#374151' }}>Action:</span>
+                      <span style={{ fontWeight: '500', color: '#374151' }}>{t("savedFiles.logs.action")}</span>
                       <span style={{
                         marginLeft: '8px',
                         color: '#6b7280',
                         textTransform: 'capitalize'
                       }}>
-                        {log.saveAction?.replace('_', ' ') || 'Unknown'}
+                        {log.saveAction?.replace('_', ' ') || t("savedFiles.logs.unknown")}
                       </span>
                     </div>
                     <div>
-                      <span style={{ fontWeight: '500', color: '#374151' }}>Date:</span>
+                      <span style={{ fontWeight: '500', color: '#374151' }}>{t("savedFiles.logs.date")}</span>
                       <span style={{ marginLeft: '8px', color: '#6b7280' }}>
-                        {log.createdAt ? new Date(log.createdAt).toLocaleDateString() : 'Unknown'}
+                        {log.createdAt ? new Date(log.createdAt).toLocaleDateString() : t("savedFiles.logs.unknown")}
                       </span>
                     </div>
                     {log.hasSignificantChanges && (
@@ -1083,7 +1085,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                           fontSize: '11px',
                           fontWeight: '600'
                         }}>
-                          <FontAwesomeIcon icon={faExclamationTriangle} /> Significant Changes
+                          <FontAwesomeIcon icon={faExclamationTriangle} /> {t("savedFiles.logs.significantChanges")}
                         </span>
                       </div>
                     )}
@@ -1098,7 +1100,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                       color: '#374151',
                       marginBottom: '12px'
                     }}>
-                      Price Override Changes:
+                      {t("savedFiles.logs.priceOverrideChanges")}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {log.changes.map((change, changeIndex) => (
@@ -1161,7 +1163,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                     color: '#6b7280',
                     fontSize: '14px'
                   }}>
-                    No individual changes recorded for this version.
+                    {t("savedFiles.logs.noIndividualChanges")}
                   </div>
                 )}
               </div>
@@ -1198,7 +1200,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               fontWeight: '600',
               color: '#374151'
             }}>
-              Upload {selectedFilesForBulkUpload.length} Files to Bigin
+              {t("savedFiles.bulkModal.title", { count: selectedFilesForBulkUpload.length })}
             </h3>
 
             <div style={{
@@ -1209,7 +1211,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               marginBottom: '20px'
             }}>
               <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-                Selected files:
+                {t("savedFiles.bulkModal.selectedFiles")}
               </div>
               {selectedFilesForBulkUpload.map((file, index) => (
                 <div key={file.id} style={{
@@ -1231,7 +1233,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               color: '#6b7280',
               marginBottom: '20px'
             }}>
-              This will upload all selected files to Bigin. Each file will be processed individually.
+              {t("savedFiles.bulkModal.description")}
             </p>
 
             <div style={{
@@ -1255,7 +1257,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                   setSelectedFilesForBulkUpload([]);
                 }}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
@@ -1276,21 +1278,21 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                     clearAllSelections();
 
                     setToastMessage({
-                      message: `Successfully uploaded ${selectedFilesForBulkUpload.length} files to Bigin!`,
+                      message: t("savedFiles.toast.bulkUploaded", { count: selectedFilesForBulkUpload.length }),
                       type: "success"
                     });
 
                     await fetchGroups(currentPage, query);
                   } catch (error) {
                     setToastMessage({
-                      message: "Failed to upload files to Zoho. Please try again.",
+                      message: t("savedFiles.toast.bulkUploadFailed"),
                       type: "error"
                     });
                   }
                 }}
               >
                 <FontAwesomeIcon icon={faUpload} style={{ marginRight: '6px' }} />
-                Upload All
+                {t("savedFiles.uploadAll")}
               </button>
             </div>
           </div>
@@ -1348,14 +1350,14 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                   fontWeight: '600',
                   color: '#374151'
                 }}>
-                  Delete {itemToDelete.type === 'folder' ? 'Agreement' : 'File'}
+                  {itemToDelete.type === 'folder' ? t("savedFiles.deleteModal.titleAgreement") : t("savedFiles.deleteModal.titleFile")}
                 </h3>
                 <p style={{
                   margin: 0,
                   fontSize: '14px',
                   color: '#6b7280'
                 }}>
-                  This action will move the item to trash
+                  {t("savedFiles.deleteModal.subtitle")}
                 </p>
               </div>
             </div>
@@ -1373,7 +1375,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 fontWeight: '500',
                 color: '#374151'
               }}>
-                {itemToDelete.type === 'folder' ? 'Agreement' : 'File'}: {itemToDelete.title}
+                {itemToDelete.type === 'folder' ? t("savedFiles.deleteModal.agreementLabel", { title: itemToDelete.title }) : t("savedFiles.deleteModal.fileLabel", { title: itemToDelete.title })}
               </p>
               <p style={{
                 margin: 0,
@@ -1381,8 +1383,8 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 color: '#6b7280'
               }}>
                 {itemToDelete.type === 'folder'
-                  ? 'This will move the entire agreement and all its files to trash.'
-                  : 'This will move only this file to trash.'
+                  ? t("savedFiles.deleteModal.noteAgreement")
+                  : t("savedFiles.deleteModal.noteFile")
                 }
               </p>
             </div>
@@ -1395,7 +1397,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Type "DELETE" to confirm:
+                {t("savedFiles.deleteModal.typeToConfirm")}
               </label>
               <input
                 type="text"
@@ -1438,7 +1440,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                   setDeleteConfirmText('');
                 }}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
@@ -1457,7 +1459,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
                 disabled={!isDeleteConfirmed}
               >
                 <FontAwesomeIcon icon={faTrash} style={{ marginRight: '6px' }} />
-                Move to Trash
+                {t("savedFiles.deleteModal.moveToTrash")}
               </button>
             </div>
           </div>

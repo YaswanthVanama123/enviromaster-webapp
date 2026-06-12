@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { FaInfoCircle, FaUsers } from "react-icons/fa";
 import { salesPersonApi } from "../../../backendservice/api/quotaApi";
 import type {
@@ -15,6 +16,7 @@ interface SalesPersonManagerProps {
 }
 
 export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefresh }) => {
+  const { t } = useTranslation();
   const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPerson, setEditingPerson] = useState<SalesPerson | null>(null);
@@ -84,7 +86,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
       });
 
       if (!updateResult) {
-        setFormError("Failed to update sales person");
+        setFormError(t("adminQuota.salesPersonManager.updateFailed"));
         setSaving(false);
         return;
       }
@@ -99,7 +101,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
         });
 
         if (!quotaResult) {
-          setFormError("Failed to update quota");
+          setFormError(t("adminQuota.salesPersonManager.quotaUpdateFailed"));
           setSaving(false);
           return;
         }
@@ -109,7 +111,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
       loadSalesPersons();
       onRefresh();
     } catch (error) {
-      setFormError("An error occurred while saving");
+      setFormError(t("adminQuota.salesPersonManager.saveError"));
     }
 
     setSaving(false);
@@ -126,7 +128,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
         <div className="search-filters">
           <input
             type="text"
-            placeholder="Search by name, email, or username..."
+            placeholder={t("adminQuota.salesPersonManager.searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -139,14 +141,14 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
             }}
             className="filter-select"
           >
-            <option value="all">All Status</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
+            <option value="all">{t("adminQuota.salesPersonManager.allStatus")}</option>
+            <option value="active">{t("adminQuota.salesPersonManager.activeOnly")}</option>
+            <option value="inactive">{t("adminQuota.salesPersonManager.inactiveOnly")}</option>
           </select>
         </div>
         <div className="info-banner">
           <span className="info-icon"><FaInfoCircle /></span>
-          <span>Employees are managed in <strong>User Management</strong>. Edit quota targets here.</span>
+          <span>{t("adminQuota.salesPersonManager.infoBannerBefore")}<strong>{t("adminQuota.salesPersonManager.userManagement")}</strong>{t("adminQuota.salesPersonManager.infoBannerAfter")}</span>
         </div>
       </div>
 
@@ -154,45 +156,45 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
       {editingPerson && (
         <div className="edit-modal-overlay">
           <div className="edit-modal">
-            <h3>Edit Quota Settings - {editingPerson.name}</h3>
-            <p className="edit-subtitle">Employee: {editingPerson.employeeId}</p>
+            <h3>{t("adminQuota.salesPersonManager.editTitle", { name: editingPerson.name })}</h3>
+            <p className="edit-subtitle">{t("adminQuota.salesPersonManager.employeeLabel", { id: editingPerson.employeeId })}</p>
 
             <div className="form-grid">
               <div className="form-group">
-                <label>Sales Role</label>
+                <label>{t("adminQuota.salesPersonManager.salesRole")}</label>
                 <select
                   name="salesRole"
                   value={editFormData.salesRole}
                   onChange={handleEditInputChange}
                 >
-                  <option value="field_sales">Field Sales</option>
-                  <option value="inside_sales">Inside Sales</option>
-                  <option value="account_manager">Account Manager</option>
-                  <option value="sales_manager">Sales Manager</option>
+                  <option value="field_sales">{t("adminQuota.salesPersonManager.fieldSales")}</option>
+                  <option value="inside_sales">{t("adminQuota.salesPersonManager.insideSales")}</option>
+                  <option value="account_manager">{t("adminQuota.salesPersonManager.accountManager")}</option>
+                  <option value="sales_manager">{t("adminQuota.salesPersonManager.salesManager")}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Territory</label>
+                <label>{t("adminQuota.salesPersonManager.territory")}</label>
                 <input
                   type="text"
                   name="territory"
                   value={editFormData.territory}
                   onChange={handleEditInputChange}
-                  placeholder="e.g., Houston Metro"
+                  placeholder={t("adminQuota.salesPersonManager.territoryPlaceholder")}
                 />
               </div>
               <div className="form-group">
-                <label>Phone</label>
+                <label>{t("adminQuota.salesPersonManager.phone")}</label>
                 <input
                   type="tel"
                   name="phone"
                   value={editFormData.phone}
                   onChange={handleEditInputChange}
-                  placeholder="(555) 123-4567"
+                  placeholder={t("adminQuota.salesPersonManager.phonePlaceholder")}
                 />
               </div>
               <div className="form-group">
-                <label>Monthly Quota Target ($)</label>
+                <label>{t("adminQuota.salesPersonManager.monthlyQuotaTarget")}</label>
                 <input
                   type="number"
                   name="monthlyTarget"
@@ -203,15 +205,15 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
                 />
               </div>
               <div className="form-group">
-                <label>Quota Period</label>
+                <label>{t("adminQuota.salesPersonManager.quotaPeriod")}</label>
                 <select
                   name="periodType"
                   value={editFormData.periodType}
                   onChange={handleEditInputChange}
                 >
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="annual">Annual</option>
+                  <option value="monthly">{t("adminQuota.salesPersonManager.monthly")}</option>
+                  <option value="quarterly">{t("adminQuota.salesPersonManager.quarterly")}</option>
+                  <option value="annual">{t("adminQuota.salesPersonManager.annual")}</option>
                 </select>
               </div>
             </div>
@@ -220,10 +222,10 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
 
             <div className="modal-actions">
               <button className="cancel-btn" onClick={handleCancelEdit}>
-                Cancel
+                {t("adminQuota.salesPersonManager.cancel")}
               </button>
               <button className="submit-btn" onClick={handleSaveEdit} disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t("adminQuota.salesPersonManager.saving") : t("adminQuota.salesPersonManager.saveChanges")}
               </button>
             </div>
           </div>
@@ -231,14 +233,14 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
       )}
 
       {loading ? (
-        <div className="loading-state">Loading employees...</div>
+        <div className="loading-state">{t("adminQuota.salesPersonManager.loading")}</div>
       ) : salesPersons.length === 0 ? (
         <div className="empty-state-container">
           <div className="empty-state-icon"><FaUsers /></div>
-          <h3>No Employees Found</h3>
+          <h3>{t("adminQuota.salesPersonManager.noEmployeesTitle")}</h3>
           <p>
-            Employees are managed in <strong>User Management</strong>.<br />
-            Go to User Management → Add Employee to create sales team members.
+            {t("adminQuota.salesPersonManager.noEmployeesTextBefore")}<strong>{t("adminQuota.salesPersonManager.userManagement")}</strong>{t("adminQuota.salesPersonManager.noEmployeesTextAfter")}<br />
+            {t("adminQuota.salesPersonManager.noEmployeesTextLine2")}
           </p>
         </div>
       ) : (
@@ -246,14 +248,14 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
           <table className="sales-persons-table">
             <thead>
               <tr>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Sales Role</th>
-                <th>Territory</th>
-                <th>Quota Target</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t("adminQuota.salesPersonManager.colUsername")}</th>
+                <th>{t("adminQuota.salesPersonManager.colName")}</th>
+                <th>{t("adminQuota.salesPersonManager.colEmail")}</th>
+                <th>{t("adminQuota.salesPersonManager.colSalesRole")}</th>
+                <th>{t("adminQuota.salesPersonManager.colTerritory")}</th>
+                <th>{t("adminQuota.salesPersonManager.colQuotaTarget")}</th>
+                <th>{t("adminQuota.salesPersonManager.colStatus")}</th>
+                <th>{t("adminQuota.salesPersonManager.colActions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -264,15 +266,15 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
                   <td>{person.email || "-"}</td>
                   <td>{getSalesRoleLabel(person.role)}</td>
                   <td>{person.territory || "-"}</td>
-                  <td>{formatCurrency(person.quota?.monthlyTarget || 50000)}/mo</td>
+                  <td>{t("adminQuota.salesPersonManager.perMonth", { value: formatCurrency(person.quota?.monthlyTarget || 50000) })}</td>
                   <td>
                     <span className={`status-badge ${person.isActive ? "active" : "inactive"}`}>
-                      {person.isActive ? "Active" : "Inactive"}
+                      {person.isActive ? t("adminQuota.salesPersonManager.active") : t("adminQuota.salesPersonManager.inactive")}
                     </span>
                   </td>
                   <td className="actions-cell">
                     <button className="action-btn edit-btn" onClick={() => handleEdit(person)}>
-                      Edit Quota
+                      {t("adminQuota.salesPersonManager.editQuota")}
                     </button>
                   </td>
                 </tr>

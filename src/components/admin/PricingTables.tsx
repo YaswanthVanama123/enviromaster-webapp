@@ -1,8 +1,10 @@
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
 
 export const PricingTables: React.FC = () => {
+  const { t } = useTranslation();
   const { configs, loading: configsLoading, error: configsError } = useServiceConfigs();
   const { catalog, loading: catalogLoading, error: catalogError } = useActiveProductCatalog();
   const [activeTab, setActiveTab] = useState<"services" | "products">("services");
@@ -10,7 +12,7 @@ export const PricingTables: React.FC = () => {
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
 
   if (configsLoading || catalogLoading) {
-    return <div style={styles.loading}>Loading pricing data...</div>;
+    return <div style={styles.loading}>{t("adminPricing.tables.loading")}</div>;
   }
 
   const selectedServiceConfig = configs.find((c) => c.serviceId === selectedService);
@@ -19,7 +21,7 @@ export const PricingTables: React.FC = () => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>Pricing Tables</h1>
+        <h1 style={styles.title}>{t("adminPricing.tables.title")}</h1>
         <div style={styles.tabs}>
           <button
             style={{
@@ -28,7 +30,7 @@ export const PricingTables: React.FC = () => {
             }}
             onClick={() => setActiveTab("services")}
           >
-            Service Configs ({configs.length})
+            {t("adminPricing.tables.serviceConfigs", { count: configs.length })}
           </button>
           <button
             style={{
@@ -37,7 +39,7 @@ export const PricingTables: React.FC = () => {
             }}
             onClick={() => setActiveTab("products")}
           >
-            Product Catalog
+            {t("adminPricing.tables.productCatalog")}
           </button>
         </div>
       </div>
@@ -58,7 +60,7 @@ export const PricingTables: React.FC = () => {
               >
                 <div style={styles.cardHeader}>
                   <h3 style={styles.cardTitle}>{config.label}</h3>
-                  {config.isActive && <span style={styles.badge}>Active</span>}
+                  {config.isActive && <span style={styles.badge}>{t("adminPricing.tables.active")}</span>}
                 </div>
                 <p style={styles.cardDescription}>{config.description}</p>
                 <div style={styles.cardMeta}>
@@ -82,14 +84,14 @@ export const PricingTables: React.FC = () => {
               </div>
               <div style={styles.detailContent}>
                 <div style={styles.detailSection}>
-                  <h4 style={styles.sectionTitle}>Configuration</h4>
+                  <h4 style={styles.sectionTitle}>{t("adminPricing.tables.configuration")}</h4>
                   <pre style={styles.codeBlock}>
                     {JSON.stringify(selectedServiceConfig.config, null, 2)}
                   </pre>
                 </div>
                 {selectedServiceConfig.defaultFormState && (
                   <div style={styles.detailSection}>
-                    <h4 style={styles.sectionTitle}>Default Form State</h4>
+                    <h4 style={styles.sectionTitle}>{t("adminPricing.tables.defaultFormState")}</h4>
                     <pre style={styles.codeBlock}>
                       {JSON.stringify(selectedServiceConfig.defaultFormState, null, 2)}
                     </pre>
@@ -97,7 +99,7 @@ export const PricingTables: React.FC = () => {
                 )}
                 {selectedServiceConfig.tags && selectedServiceConfig.tags.length > 0 && (
                   <div style={styles.detailSection}>
-                    <h4 style={styles.sectionTitle}>Tags</h4>
+                    <h4 style={styles.sectionTitle}>{t("adminPricing.tables.tags")}</h4>
                     <div style={styles.tagList}>
                       {selectedServiceConfig.tags.map((tag) => (
                         <span key={tag} style={styles.tag}>
@@ -121,12 +123,12 @@ export const PricingTables: React.FC = () => {
             <>
               <div style={styles.catalogInfo}>
                 <div>
-                  <h3>Version: {catalog.version}</h3>
+                  <h3>{t("adminPricing.tables.versionInfo", { version: catalog.version })}</h3>
                   <p style={styles.catalogMeta}>
-                    Last Updated: {catalog.lastUpdated} | Currency: {catalog.currency}
+                    {t("adminPricing.tables.lastUpdated", { date: catalog.lastUpdated, currency: catalog.currency })}
                   </p>
                 </div>
-                {catalog.isActive && <span style={styles.badge}>Active</span>}
+                {catalog.isActive && <span style={styles.badge}>{t("adminPricing.tables.active")}</span>}
               </div>
 
               <div style={styles.grid}>
@@ -141,11 +143,11 @@ export const PricingTables: React.FC = () => {
                   >
                     <div style={styles.cardHeader}>
                       <h3 style={styles.cardTitle}>{family.label}</h3>
-                      <span style={styles.badge}>{family.products.length} items</span>
+                      <span style={styles.badge}>{t("adminPricing.tables.itemsCount", { count: family.products.length })}</span>
                     </div>
-                    <p style={styles.cardDescription}>Product family: {family.key}</p>
+                    <p style={styles.cardDescription}>{t("adminPricing.tables.productFamily", { key: family.key })}</p>
                     <div style={styles.cardMeta}>
-                      <span style={styles.metaItem}>Sort order: {family.sortOrder}</span>
+                      <span style={styles.metaItem}>{t("adminPricing.tables.sortOrder", { order: family.sortOrder })}</span>
                     </div>
                   </div>
                 ))}
@@ -167,12 +169,12 @@ export const PricingTables: React.FC = () => {
                       <table style={styles.table}>
                         <thead>
                           <tr style={styles.tableHeaderRow}>
-                            <th style={styles.tableHeader}>Product Name</th>
-                            <th style={styles.tableHeader}>Key</th>
-                            <th style={styles.tableHeader}>Kind</th>
-                            <th style={styles.tableHeader}>Price</th>
-                            <th style={styles.tableHeader}>UOM</th>
-                            <th style={styles.tableHeader}>Warranty</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thProductName")}</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thKey")}</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thKind")}</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thPrice")}</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thUom")}</th>
+                            <th style={styles.tableHeader}>{t("adminPricing.tables.thWarranty")}</th>
                           </tr>
                         </thead>
                         <tbody>

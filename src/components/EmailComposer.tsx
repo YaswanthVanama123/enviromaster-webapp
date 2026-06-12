@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPaperPlane, faFileAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { Toast } from './admin/Toast';
@@ -36,6 +37,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
   defaultSubject = '',
   defaultBody = ''
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<EmailData>({
     to: '',
     subject: '',
@@ -66,7 +68,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
   const handleSend = async () => {
     if (!formData.to.trim()) {
       setToastMessage({
-        message: 'Please enter a recipient email address',
+        message: t('misc.ecEnterRecipient'),
         type: 'error'
       });
       return;
@@ -74,7 +76,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
 
     if (!formData.subject.trim()) {
       setToastMessage({
-        message: 'Please enter an email subject',
+        message: t('misc.ecEnterSubject'),
         type: 'error'
       });
       return;
@@ -86,7 +88,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
       await onSend(formData);
 
       setToastMessage({
-        message: 'Email sent successfully!',
+        message: t('misc.ecSentSuccess'),
         type: 'success'
       });
 
@@ -97,7 +99,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
     } catch (error) {
       console.error('Error sending email:', error);
       setToastMessage({
-        message: 'Failed to send email. Please try again.',
+        message: t('misc.ecSendFailed'),
         type: 'error'
       });
     } finally {
@@ -123,7 +125,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
         <div className="email-composer-header">
           <h2>
             <FontAwesomeIcon icon={faEnvelope} />
-            Send Email
+            {t('misc.ecSendEmail')}
           </h2>
           <button
             className="email-composer-close"
@@ -138,24 +140,24 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
           <div className="email-composer-field">
             <label>
               <FontAwesomeIcon icon={faEnvelope} />
-              To:
+              {t('misc.ecTo')}
             </label>
             <input
               type="email"
               value={formData.to}
               onChange={(e) => handleInputChange('to', e.target.value)}
-              placeholder="recipient@example.com"
+              placeholder={t('misc.ecToPlaceholder')}
               disabled={sending}
             />
           </div>
 
           <div className="email-composer-field">
-            <label>Subject:</label>
+            <label>{t('misc.ecSubject')}</label>
             <input
               type="text"
               value={formData.subject}
               onChange={(e) => handleInputChange('subject', e.target.value)}
-              placeholder="Enter email subject"
+              placeholder={t('misc.ecSubjectPlaceholder')}
               disabled={sending}
             />
           </div>
@@ -163,19 +165,19 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
           {attachment && (
             <div className="email-composer-attachment">
               <FontAwesomeIcon icon={faFileAlt} />
-              <span>Attachment: {attachment.fileName}</span>
+              <span>{t('misc.ecAttachment', { fileName: attachment.fileName })}</span>
               <span className="attachment-ready">
-                (Ready to send)
+                {t('misc.ecReadyToSend')}
               </span>
             </div>
           )}
 
           <div className="email-composer-field">
-            <label>Message:</label>
+            <label>{t('misc.ecMessage')}</label>
             <textarea
               value={formData.body}
               onChange={(e) => handleInputChange('body', e.target.value)}
-              placeholder="Enter your message here..."
+              placeholder={t('misc.ecMessagePlaceholder')}
               rows={10}
               disabled={sending}
             />
@@ -188,7 +190,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             onClick={handleClose}
             disabled={sending}
           >
-            Cancel
+            {t('misc.ecCancel')}
           </button>
           <button
             className="email-composer-btn email-composer-btn--send"
@@ -196,11 +198,11 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             disabled={sending}
           >
             {sending ? (
-              <>Sending...</>
+              <>{t('misc.ecSending')}</>
             ) : (
               <>
                 <FontAwesomeIcon icon={faPaperPlane} />
-                {attachment ? 'Send Email with PDF' : 'Send Email'}
+                {attachment ? t('misc.ecSendWithPdf') : t('misc.ecSend')}
               </>
             )}
           </button>

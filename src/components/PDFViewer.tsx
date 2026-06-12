@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faLightbulb, faFileAlt, faPencilAlt, faDownload, faSpinner, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { FaTint, FaMagic } from "react-icons/fa";
@@ -36,6 +37,7 @@ const isMobileOrMediumDevice = () => {
 export default function PDFViewer() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     documentId,
     fileName,
@@ -59,7 +61,7 @@ export default function PDFViewer() {
 
   useEffect(() => {
     if (!documentId) {
-      setError("No document ID provided");
+      setError(t("pdfViewer.noDocumentId"));
       setLoading(false);
       return;
     }
@@ -134,12 +136,12 @@ export default function PDFViewer() {
           setErrorDetails(errorData);
 
           if (errorData.error === "no_pdf") {
-            setError(`PDF Not Available: ${errorData.detail}`);
+            setError(t("pdfViewer.pdfNotAvailable", { detail: errorData.detail }));
           } else {
-            setError(errorData.detail || "Unable to load PDF. Please try again.");
+            setError(errorData.detail || t("pdfViewer.unableToLoadPdfRetry"));
           }
         } else {
-          setError("Unable to load PDF. Please check your connection and try again.");
+          setError(t("pdfViewer.unableToLoadPdfConnection"));
         }
       } finally {
         setLoading(false);
@@ -198,7 +200,7 @@ export default function PDFViewer() {
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
-        setToastMessage({ message: "Log file downloaded successfully!", type: "success" });
+        setToastMessage({ message: t("pdfViewer.logFileDownloaded"), type: "success" });
         return;
       }
 
@@ -226,10 +228,10 @@ export default function PDFViewer() {
       a.remove();
 
       window.URL.revokeObjectURL(url);
-      setToastMessage({ message: "PDF downloaded successfully!", type: "success" });
+      setToastMessage({ message: t("pdfViewer.pdfDownloaded"), type: "success" });
     } catch (err) {
       console.error("Error downloading file:", err);
-      setToastMessage({ message: "Failed to download file. Please try again.", type: "error" });
+      setToastMessage({ message: t("pdfViewer.downloadFailed"), type: "error" });
     } finally {
       setDownloading(false);
     }
@@ -291,7 +293,7 @@ export default function PDFViewer() {
       <div className="pdf-viewer">
         <div className="pdf-viewer__loading">
           <div className="spinner"></div>
-          <p>Loading {isLogFile ? 'log file' : 'PDF'}...</p>
+          <p>{isLogFile ? t("pdfViewer.loadingLog") : t("pdfViewer.loadingPdf")}</p>
         </div>
       </div>
     );
@@ -303,15 +305,15 @@ export default function PDFViewer() {
         <div className="pdf-viewer__error">
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
             <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#f59e0b' }} />
-            {isLogFile ? 'Log File' : 'PDF'} Viewing Error
+            {t("pdfViewer.viewingErrorTitle", { type: isLogFile ? t("pdfViewer.logFile") : t("pdfViewer.pdf") })}
           </h2>
-          <p className="error-message">{error || `Unable to load ${isLogFile ? 'log file' : 'PDF'}`}</p>
+          <p className="error-message">{error || t("pdfViewer.unableToLoad", { type: isLogFile ? t("pdfViewer.logFile") : t("pdfViewer.pdf") })}</p>
 
           {errorDetails?.suggestions && (
             <div className="error-suggestions">
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FontAwesomeIcon icon={faLightbulb} style={{ color: '#f59e0b' }} />
-                Suggested Solutions:
+                {t("pdfViewer.suggestedSolutions")}
               </h3>
               <ul>
                 {errorDetails.suggestions.map((suggestion: string, index: number) => (
@@ -325,29 +327,29 @@ export default function PDFViewer() {
             <div className="document-info">
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FontAwesomeIcon icon={faFileAlt} style={{ color: '#3b82f6' }} />
-                Document Information:
+                {t("pdfViewer.documentInformation")}
               </h3>
               <ul>
-                <li><strong>Title:</strong> {errorDetails.documentInfo.title}</li>
-                <li><strong>Status:</strong> {errorDetails.documentInfo.status}</li>
-                <li><strong>Created:</strong> {new Date(errorDetails.documentInfo.createdAt).toLocaleString()}</li>
+                <li><strong>{t("pdfViewer.title")}</strong> {errorDetails.documentInfo.title}</li>
+                <li><strong>{t("pdfViewer.status")}</strong> {errorDetails.documentInfo.status}</li>
+                <li><strong>{t("pdfViewer.created")}</strong> {new Date(errorDetails.documentInfo.createdAt).toLocaleString()}</li>
               </ul>
             </div>
           )}
 
           <div className="error-actions">
             <button onClick={handleBack} className="pdf-viewer__btn pdf-viewer__btn--secondary">
-              ← Back to Files
+              ← {t("pdfViewer.backToFiles")}
             </button>
             {errorDetails?.error === "no_pdf" && documentId && (
               <button
                 onClick={handleEdit}
                 className="pdf-viewer__btn pdf-viewer__btn--primary"
-                title="Try regenerating the PDF by editing and saving again"
+                title={t("pdfViewer.editRegenerateTooltip")}
                 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <FontAwesomeIcon icon={faPencilAlt} />
-                Edit & Regenerate PDF
+                {t("pdfViewer.editRegenerate")}
               </button>
             )}
           </div>
@@ -361,9 +363,9 @@ export default function PDFViewer() {
       <div className="pdf-viewer__toolbar">
         <div className="pdf-viewer__toolbar-left">
           <button onClick={handleBack} className="pdf-viewer__btn pdf-viewer__btn--secondary">
-            ← Back
+            ← {t("common.back")}
           </button>
-          <h2 className="pdf-viewer__title">{fileName || "Document"}</h2>
+          <h2 className="pdf-viewer__title">{fileName || t("pdfViewer.document")}</h2>
         </div>
         <div className="pdf-viewer__toolbar-right">
           {documentType === 'version' && (
@@ -377,7 +379,7 @@ export default function PDFViewer() {
                   className="watermark-checkbox"
                 />
                 <span className="watermark-label-text">
-                  {showWatermark ? <><FaTint /> Draft Watermark</> : <><FaMagic /> Normal View</>}
+                  {showWatermark ? <><FaTint /> {t("pdfViewer.draftWatermark")}</> : <><FaMagic /> {t("pdfViewer.normalView")}</>}
                 </span>
               </label>
             </div>
@@ -386,18 +388,18 @@ export default function PDFViewer() {
             onClick={handleDownload}
             className="pdf-viewer__btn pdf-viewer__btn--download"
             disabled={downloading}
-            title={isLogFile ? "Download Log File" : "Download PDF"}
+            title={isLogFile ? t("pdfViewer.downloadLogFile") : t("pdfViewer.downloadPdf")}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
             {downloading ? (
               <>
                 <FontAwesomeIcon icon={faSpinner} spin />
-                Downloading...
+                {t("pdfViewer.downloading")}
               </>
             ) : (
               <>
                 <FontAwesomeIcon icon={faDownload} />
-                Download
+                {t("common.download")}
               </>
             )}
           </button>
@@ -411,10 +413,9 @@ export default function PDFViewer() {
               <div className="mobile-pdf-icon">
                 <FontAwesomeIcon icon={faFileAlt} size="3x" style={{ color: '#10b981' }} />
               </div>
-              <h3>Log File Ready to View</h3>
+              <h3>{t("pdfViewer.logFileReady")}</h3>
               <p>
-                For the best viewing experience on mobile and tablet devices,
-                open the log file in your browser's native text viewer.
+                {t("pdfViewer.mobileLogHint")}
               </p>
               <button
                 onClick={handleOpenLogFileInNewTab}
@@ -429,10 +430,10 @@ export default function PDFViewer() {
                 }}
               >
                 <FontAwesomeIcon icon={faExternalLinkAlt} />
-                Open Log File in Browser
+                {t("pdfViewer.openLogInBrowser")}
               </button>
               <p className="mobile-pdf-note">
-                This will open the log file as text in a new tab.
+                {t("pdfViewer.mobileLogNote")}
               </p>
             </div>
           ) : pdfUrl ? (
@@ -450,12 +451,13 @@ export default function PDFViewer() {
               </div>
               <h3>
                 {documentType === 'manual-upload' || documentType === 'attached-file'
-                  ? 'Uploaded File Ready to View'
-                  : 'PDF Ready to View'}
+                  ? t("pdfViewer.uploadedFileReady")
+                  : t("pdfViewer.pdfReady")}
               </h3>
               <p>
-                For the best viewing experience on mobile and tablet devices,
-                open the {documentType === 'manual-upload' || documentType === 'attached-file' ? 'file' : 'PDF'} in your browser's native viewer.
+                {documentType === 'manual-upload' || documentType === 'attached-file'
+                  ? t("pdfViewer.mobileFileHint")
+                  : t("pdfViewer.mobilePdfHint")}
               </p>
               <button
                 onClick={handleOpenPdfInNewTab}
@@ -471,11 +473,13 @@ export default function PDFViewer() {
               >
                 <FontAwesomeIcon icon={faExternalLinkAlt} />
                 {documentType === 'manual-upload' || documentType === 'attached-file'
-                  ? 'Open File in Browser'
-                  : 'Open PDF in Browser'}
+                  ? t("pdfViewer.openFileInBrowser")
+                  : t("pdfViewer.openPdfInBrowser")}
               </button>
               <p className="mobile-pdf-note">
-                This will open the full {documentType === 'manual-upload' || documentType === 'attached-file' ? 'file' : 'PDF'} with all pages in a new tab.
+                {documentType === 'manual-upload' || documentType === 'attached-file'
+                  ? t("pdfViewer.mobileFileNote")
+                  : t("pdfViewer.mobilePdfNote")}
               </p>
             </div>
           ) : null
@@ -500,7 +504,7 @@ export default function PDFViewer() {
             <iframe
               src={`${pdfUrl}#toolbar=1&navpanes=0`}
               className="pdf-viewer__iframe"
-              title="PDF Viewer"
+              title={t("pdfViewer.pdfViewerTitle")}
               style={{
                 width: '100%',
                 height: '100%',

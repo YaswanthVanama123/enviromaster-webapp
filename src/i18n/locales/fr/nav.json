@@ -1,0 +1,19 @@
+{
+  "home": "Accueil",
+  "formFilling": "Remplir le formulaire",
+  "savedPdfs": "PDF enregistrés",
+  "myCommissions": "Mes commissions",
+  "myQuota": "Mon quota",
+  "insideSales": "Ventes internes",
+  "trash": "Corbeille",
+  "employeeCommissions": "Commissions des employés",
+  "adminPanel": "Panneau d'administration",
+  "profile": "Profil",
+  "logout": "Déconnexion",
+  "language": "Langue",
+  "admin": "Administrateur",
+  "employee": "Employé",
+  "userMenu": "Menu utilisateur",
+  "menu": "Menu",
+  "closeMenu": "Fermer le menu"
+}

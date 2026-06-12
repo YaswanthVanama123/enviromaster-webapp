@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faMoneyBill,
   faBox,
@@ -38,6 +39,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
   backup,
   onClose
 }) => {
+  const { t } = useTranslation();
   const { backup: detailedBackup, snapshot, loading: snapshotLoading, error: snapshotError } = usePricingBackupDetails(backup.changeDayId);
   const [activeTab, setActiveTab] = useState<'overview' | 'content' | 'metadata'>('overview');
 
@@ -448,80 +450,80 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
     <div>
       <div style={styles.infoGrid}>
         <div style={styles.infoCard}>
-          <div style={styles.infoLabel}>Change Day</div>
+          <div style={styles.infoLabel}>{t("adminTools.backup.details.changeDay")}</div>
           <div style={styles.infoValue}>{backupUtils.formatChangeDay(displayBackup.changeDay)}</div>
-          <div style={styles.infoSubvalue}>{backupUtils.getDaysAgo(displayBackup.changeDay)} days ago</div>
+          <div style={styles.infoSubvalue}>{t("adminTools.backup.details.daysAgo", { count: backupUtils.getDaysAgo(displayBackup.changeDay) })}</div>
         </div>
         <div style={styles.infoCard}>
-          <div style={styles.infoLabel}>Backup Size</div>
+          <div style={styles.infoLabel}>{t("adminTools.backup.details.backupSize")}</div>
           <div style={styles.infoValue}>{backupUtils.formatFileSize(sizeInfo.compressedSize)}</div>
           <div style={styles.infoSubvalue}>
-            {sizeInfo.compressionRatio > 0 ? backupUtils.formatCompressionRatio(sizeInfo.compressionRatio) : 'No compression data'}
+            {sizeInfo.compressionRatio > 0 ? backupUtils.formatCompressionRatio(sizeInfo.compressionRatio) : t("adminTools.backup.details.noCompressionData")}
           </div>
         </div>
         <div style={styles.infoCard}>
-          <div style={styles.infoLabel}>Trigger</div>
+          <div style={styles.infoLabel}>{t("adminTools.backup.details.trigger")}</div>
           <div style={styles.infoValue}>{backupUtils.formatBackupTrigger(displayBackup.backupTrigger)}</div>
           <div style={styles.infoSubvalue}>
-            Created: {displayBackup.createdAt ? backupUtils.formatDate(displayBackup.createdAt) : 'Unknown'}
+            {t("adminTools.backup.details.createdLabel", { date: displayBackup.createdAt ? backupUtils.formatDate(displayBackup.createdAt) : t("adminTools.backup.details.unknown") })}
           </div>
         </div>
         <div style={styles.infoCard}>
-          <div style={styles.infoLabel}>Status</div>
+          <div style={styles.infoLabel}>{t("adminTools.backup.details.status")}</div>
           <div style={styles.infoValue}>
-            {displayBackup.restorationInfo?.hasBeenRestored ? <><FontAwesomeIcon icon={faSync} /> Restored</> : <><FontAwesomeIcon icon={faCheckCircle} /> Available</>}
+            {displayBackup.restorationInfo?.hasBeenRestored ? <><FontAwesomeIcon icon={faSync} /> {t("adminTools.backup.details.restored")}</> : <><FontAwesomeIcon icon={faCheckCircle} /> {t("adminTools.backup.details.available")}</>}
           </div>
           <div style={styles.infoSubvalue}>
             {displayBackup.restorationInfo?.hasBeenRestored && displayBackup.restorationInfo?.lastRestoredAt ?
-              `Last restored: ${backupUtils.formatDate(displayBackup.restorationInfo.lastRestoredAt)}` :
-              'Ready for restoration'
+              t("adminTools.backup.details.lastRestored", { date: backupUtils.formatDate(displayBackup.restorationInfo.lastRestoredAt) }) :
+              t("adminTools.backup.details.readyForRestoration")
             }
           </div>
         </div>
       </div>
 
       <div style={styles.section}>
-        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faChartBar} /> Document Summary</h3>
+        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faChartBar} /> {t("adminTools.backup.details.documentSummary")}</h3>
         <div style={styles.infoGrid}>
           <div style={styles.infoCard}>
-            <div style={styles.infoLabel}>PriceFix Records</div>
+            <div style={styles.infoLabel}>{t("adminTools.backup.details.priceFixRecords")}</div>
             <div style={styles.infoValue}>{documentCounts.priceFixCount}</div>
-            <div style={styles.infoSubvalue}>Service pricing configurations</div>
+            <div style={styles.infoSubvalue}>{t("adminTools.backup.details.servicePricingConfigs")}</div>
           </div>
           <div style={styles.infoCard}>
-            <div style={styles.infoLabel}>Product Catalog</div>
+            <div style={styles.infoLabel}>{t("adminTools.backup.details.productCatalog")}</div>
             <div style={styles.infoValue}>{documentCounts.productCatalogCount}</div>
-            <div style={styles.infoSubvalue}>Product families and items</div>
+            <div style={styles.infoSubvalue}>{t("adminTools.backup.details.productFamiliesItems")}</div>
           </div>
           <div style={styles.infoCard}>
-            <div style={styles.infoLabel}>Service Configs</div>
+            <div style={styles.infoLabel}>{t("adminTools.backup.details.serviceConfigs")}</div>
             <div style={styles.infoValue}>{documentCounts.serviceConfigCount}</div>
-            <div style={styles.infoSubvalue}>Service configuration templates</div>
+            <div style={styles.infoSubvalue}>{t("adminTools.backup.details.serviceConfigTemplates")}</div>
           </div>
         </div>
       </div>
 
       {displayBackup.changeContext && (
         <div style={styles.section}>
-          <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faEdit} /> Change Information</h3>
+          <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faEdit} /> {t("adminTools.backup.details.changeInformation")}</h3>
           <div style={styles.dataTypeCard}>
             <table style={styles.metadataTable}>
               <tbody>
                 <tr style={styles.metadataRow}>
-                  <td style={styles.metadataLabel}>Description</td>
+                  <td style={styles.metadataLabel}>{t("adminTools.backup.details.description")}</td>
                   <td style={styles.metadataValue}>
-                    {displayBackup.changeContext?.changeDescription || 'No description provided'}
+                    {displayBackup.changeContext?.changeDescription || t("adminTools.backup.details.noDescriptionProvided")}
                   </td>
                 </tr>
                 <tr style={styles.metadataRow}>
-                  <td style={styles.metadataLabel}>Areas Changed</td>
+                  <td style={styles.metadataLabel}>{t("adminTools.backup.details.areasChanged")}</td>
                   <td style={styles.metadataValue}>
-                    {displayBackup.changeContext?.changedAreas?.join(', ') || 'Not specified'}
+                    {displayBackup.changeContext?.changedAreas?.join(', ') || t("adminTools.backup.details.notSpecified")}
                   </td>
                 </tr>
                 <tr style={styles.metadataRow}>
-                  <td style={styles.metadataLabel}>Change Count</td>
-                  <td style={styles.metadataValue}>{displayBackup.changeContext?.changeCount || 1} changes</td>
+                  <td style={styles.metadataLabel}>{t("adminTools.backup.details.changeCount")}</td>
+                  <td style={styles.metadataValue}>{displayBackup.changeContext?.changeCount || 1} {t("adminTools.backup.details.changesSuffix")}</td>
                 </tr>
               </tbody>
             </table>
@@ -530,18 +532,18 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
       )}
 
       <div style={styles.section}>
-        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faHdd} /> Storage Efficiency</h3>
+        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faHdd} /> {t("adminTools.backup.details.storageEfficiency")}</h3>
         <div style={styles.dataTypeCard}>
           <table style={styles.metadataTable}>
             <tbody>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Original Size</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.originalSize")}</td>
                 <td style={styles.metadataValue}>
                   {backupUtils.formatFileSize(sizeInfo.originalSize)}
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Compressed Size</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.compressedSize")}</td>
                 <td style={styles.metadataValue}>
                   {backupUtils.formatFileSize(sizeInfo.compressedSize)}
                   {sizeInfo.originalSize > 0 && (
@@ -557,13 +559,13 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Space Saved</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.spaceSaved")}</td>
                 <td style={styles.metadataValue}>
                   {sizeInfo.originalSize > 0 ? (
                     <>
                       {backupUtils.formatFileSize(sizeInfo.originalSize - sizeInfo.compressedSize)} ({Math.round((1 - sizeInfo.compressionRatio) * 100)}%)
                     </>
-                  ) : 'No size data available'}
+                  ) : t("adminTools.backup.details.noSizeData")}
                 </td>
               </tr>
             </tbody>
@@ -577,7 +579,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
     if (snapshotLoading) {
       return (
         <div style={styles.loadingState}>
-          <div>Loading backup content preview...</div>
+          <div>{t("adminTools.backup.details.loadingContent")}</div>
         </div>
       );
     }
@@ -585,7 +587,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
     if (snapshotError) {
       return (
         <div style={styles.errorState}>
-          <strong>Error loading content:</strong> {snapshotError}
+          <strong>{t("adminTools.backup.details.errorLoadingContent")}</strong> {snapshotError}
         </div>
       );
     }
@@ -593,7 +595,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
     if (!snapshot) {
       return (
         <div style={styles.loadingState}>
-          <div>No content preview available</div>
+          <div>{t("adminTools.backup.details.noContentPreview")}</div>
         </div>
       );
     }
@@ -603,7 +605,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
         <div style={styles.warningBox}>
           <FontAwesomeIcon icon={faExclamationTriangle} />
           <span style={styles.warningText}>
-            Click on items below to expand and view detailed business data. This shows the complete backup contents.
+            {t("adminTools.backup.details.expandHint")}
           </span>
         </div>
 
@@ -611,7 +613,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
           <div style={styles.dataTypeCard}>
             <div style={styles.dataTypeHeader}>
               <h4 style={styles.dataTypeTitle}>
-                <FontAwesomeIcon icon={faMoneyBill} /> Pricing Overview Summary
+                <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.pricingOverviewSummary")}
               </h4>
             </div>
 
@@ -631,18 +633,18 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                         padding: '16px'
                       }}>
                         <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px', color: '#374151' }}>
-                          <FontAwesomeIcon icon={faBox} /> Product Catalog Pricing:
+                          <FontAwesomeIcon icon={faBox} /> {t("adminTools.backup.details.productCatalogPricing")}
                         </div>
                         <div style={{ fontSize: '18px', fontWeight: 'bold', color: pricedProducts.length > 0 ? '#166534' : '#92400e' }}>
                           {pricedProducts.length > 0 ? (
-                            <><FontAwesomeIcon icon={faCheckCircle} /> {pricedProducts.length} of {totalProducts} products have prices set</>
+                            <><FontAwesomeIcon icon={faCheckCircle} /> {t("adminTools.backup.details.productsPriced", { priced: pricedProducts.length, total: totalProducts })}</>
                           ) : (
-                            <><FontAwesomeIcon icon={faExclamationTriangle} /> No product prices configured ({totalProducts} products without pricing)</>
+                            <><FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noProductPrices", { total: totalProducts })}</>
                           )}
                         </div>
                         {pricedProducts.length > 0 && (
                           <div style={{ marginTop: '8px', fontSize: '14px', color: '#6b7280' }}>
-                            Products are ready for customer pricing
+                            {t("adminTools.backup.details.productsReady")}
                           </div>
                         )}
                       </div>
@@ -684,7 +686,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                 padding: '16px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px', color: '#374151' }}>
-                  <FontAwesomeIcon icon={faWrench} /> Service Pricing Configuration:
+                  <FontAwesomeIcon icon={faWrench} /> {t("adminTools.backup.details.servicePricingConfiguration")}
                 </div>
                 <div style={{
                   fontSize: '18px',
@@ -729,17 +731,17 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                       return (
                         <div>
                           <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#166534', marginBottom: '8px' }}>
-                            <FontAwesomeIcon icon={faCheckCircle} /> {servicesWithAnyPricing.length} services have pricing configured{pricingFixCount > 0 ? ` + ${pricingFixCount} PriceFix services` : ''}
+                            <FontAwesomeIcon icon={faCheckCircle} /> {t("adminTools.backup.details.servicesHavePricing", { count: servicesWithAnyPricing.length, extra: pricingFixCount > 0 ? t("adminTools.backup.details.priceFixServicesExtra", { count: pricingFixCount }) : '' })}
                           </div>
                           <div style={{ fontSize: '14px', color: '#374151' }}>
-                            <strong>Service Pricing Details:</strong>
+                            <strong>{t("adminTools.backup.details.servicePricingDetails")}</strong>
                             <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
                               {servicesWithAnyPricing.map(service => (
                                 <li key={service.serviceId} style={{ marginBottom: '4px' }}>
                                   <strong>{service.serviceId}</strong>:
-                                  {service.hasServicePricing && ` ${service.serviceRateCount} rate${service.serviceRateCount !== 1 ? 's' : ''}`}
+                                  {service.hasServicePricing && ` ${service.serviceRateCount !== 1 ? t("adminTools.backup.details.rateOther", { count: service.serviceRateCount }) : t("adminTools.backup.details.rateOne", { count: service.serviceRateCount })}`}
                                   {service.hasServicePricing && service.hasStandardPricing && ' + '}
-                                  {service.hasStandardPricing && ` ${service.standardTierCount} tier${service.standardTierCount !== 1 ? 's' : ''}`}
+                                  {service.hasStandardPricing && ` ${service.standardTierCount !== 1 ? t("adminTools.backup.details.tierOther", { count: service.standardTierCount }) : t("adminTools.backup.details.tierOne", { count: service.standardTierCount })}`}
                                 </li>
                               ))}
                             </ul>
@@ -749,7 +751,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                     } else {
                       return (
                         <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#92400e' }}>
-                          <FontAwesomeIcon icon={faExclamationTriangle} /> No service pricing configured - {totalServices} services may not be billable
+                          <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noServicePricing", { count: totalServices })}
                         </div>
                       );
                     }
@@ -765,10 +767,10 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             <div style={styles.dataTypeCard}>
               <div style={styles.dataTypeHeader}>
                 <h4 style={styles.dataTypeTitle}>
-                  <FontAwesomeIcon icon={faBox} /> Product Catalog Hierarchy
+                  <FontAwesomeIcon icon={faBox} /> {t("adminTools.backup.details.productCatalogHierarchy")}
                 </h4>
                 <span style={styles.dataTypeCount}>
-                  {snapshot.dataTypes.productCatalog.totalCount} catalogs
+                  {snapshot.dataTypes.productCatalog.totalCount} {t("adminTools.backup.details.catalogs")}
                 </span>
               </div>
 
@@ -791,7 +793,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                       <strong><FontAwesomeIcon icon={faClipboard} /> {snapshot.dataTypes.productCatalog.active.version}</strong>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
                         <span style={{...styles.badge, backgroundColor: '#dbeafe', color: '#1e40af'}}>
-                          {snapshot.dataTypes.productCatalog.active.families?.length || 0} Families
+                          {snapshot.dataTypes.productCatalog.active.families?.length || 0} {t("adminTools.backup.details.families")}
                         </span>
                         {(() => {
                           const allProducts = snapshot.dataTypes.productCatalog.active.families?.flatMap(f => f.products || []) || [];
@@ -807,7 +809,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                               fontSize: '12px',
                               fontWeight: '500'
                             }}>
-                              <FontAwesomeIcon icon={faMoneyBill} /> {pricedProducts.length}/{totalProducts} Products Priced
+                              <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.productsPricedBadge", { priced: pricedProducts.length, total: totalProducts })}
                             </span>
                           ) : (
                             <span style={{
@@ -818,7 +820,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                               fontSize: '12px',
                               fontWeight: '500'
                             }}>
-                              <FontAwesomeIcon icon={faExclamationTriangle} /> No Prices Set
+                              <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noPricesSet")}
                             </span>
                           );
                         })()}
@@ -829,9 +831,9 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                       <div style={styles.treeItemContent}>
                         <div style={styles.hierarchyLevel2}>
                           <div style={{ marginBottom: '16px', fontSize: '14px', color: '#374151' }}>
-                            <div><strong>Catalog ID:</strong> {snapshot.dataTypes.productCatalog.active._id}</div>
-                            <div><strong>Version:</strong> {snapshot.dataTypes.productCatalog.active.version}</div>
-                            <div><strong>Last Updated:</strong> {new Date(snapshot.dataTypes.productCatalog.active.lastUpdated).toLocaleDateString()}</div>
+                            <div><strong>{t("adminTools.backup.details.catalogId")}</strong> {snapshot.dataTypes.productCatalog.active._id}</div>
+                            <div><strong>{t("adminTools.backup.details.version")}</strong> {snapshot.dataTypes.productCatalog.active.version}</div>
+                            <div><strong>{t("adminTools.backup.details.lastUpdated")}</strong> {new Date(snapshot.dataTypes.productCatalog.active.lastUpdated).toLocaleDateString()}</div>
                           </div>
 
                           {snapshot.dataTypes.productCatalog.active.families?.map((family, familyIndex) => (
@@ -849,10 +851,10 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                 }}>
                                   <FontAwesomeIcon icon={faCaretRight} />
                                 </span>
-                                <strong><FontAwesomeIcon icon={faFolder} /> {family.familyName || family.name || `Family ${familyIndex + 1}`}</strong>
+                                <strong><FontAwesomeIcon icon={faFolder} /> {family.familyName || family.name || t("adminTools.backup.details.familyFallback", { num: familyIndex + 1 })}</strong>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
                                   <span style={{...styles.badge, backgroundColor: '#fef3c7', color: '#92400e'}}>
-                                    {family.products?.length || 0} Products
+                                    {t("adminTools.backup.details.productsBadge", { count: family.products?.length || 0 })}
                                   </span>
                                   {family.products && family.products.some(p => p.basePrice?.amount) && (
                                     <span style={{
@@ -863,7 +865,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                       fontSize: '12px',
                                       fontWeight: '500'
                                     }}>
-                                      <FontAwesomeIcon icon={faMoneyBill} /> Priced Items: {family.products.filter(p => p.basePrice?.amount).length}
+                                      <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.pricedItems", { count: family.products.filter(p => p.basePrice?.amount).length })}
                                     </span>
                                   )}
                                 </div>
@@ -874,7 +876,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                   <div style={styles.hierarchyLevel3}>
                                     {family.description && (
                                       <div style={{ marginBottom: '12px', fontSize: '14px', color: '#6b7280' }}>
-                                        <strong>Description:</strong> {family.description}
+                                        <strong>{t("adminTools.backup.details.description")}:</strong> {family.description}
                                       </div>
                                     )}
 
@@ -894,7 +896,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                             <FontAwesomeIcon icon={faCaretRight} />
                                           </span>
                                           <div style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'space-between' }}>
-                                            <strong><FontAwesomeIcon icon={faBox} /> {product.name || product.productName || `Product ${productIndex + 1}`}</strong>
+                                            <strong><FontAwesomeIcon icon={faBox} /> {product.name || product.productName || t("adminTools.backup.details.productFallback", { num: productIndex + 1 })}</strong>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                               {product.basePrice?.amount ? (
                                                 <span style={{
@@ -904,7 +906,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                                   backgroundColor: '#166534',
                                                   color: 'white'
                                                 }}>
-                                                  <FontAwesomeIcon icon={faMoneyBill} /> ${product.basePrice.amount}/{product.basePrice.uom || 'unit'}
+                                                  <FontAwesomeIcon icon={faMoneyBill} /> ${product.basePrice.amount}/{product.basePrice.uom || t("adminTools.backup.details.perUnit")}
                                                 </span>
                                               ) : (
                                                 <span style={{
@@ -915,9 +917,8 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                                   fontSize: '12px',
                                                   fontWeight: '500'
                                                 }}>
-                                                  No Price Set
-                                                </span>
-                                              )}
+                                                  {t("adminTools.backup.details.noPriceSet")}
+                                                </span>                                              )}
                                             </div>
                                           </div>
                                         </div>
@@ -935,9 +936,9 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                                 fontSize: '20px',
                                                 fontWeight: 'bold'
                                               }}>
-                                                <FontAwesomeIcon icon={faMoneyBill} /> PRICE: ${product.basePrice.amount} {product.basePrice.currency || 'USD'}
+                                                <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.priceLabel", { amount: product.basePrice.amount, currency: product.basePrice.currency || 'USD' })}
                                                 <div style={{ fontSize: '14px', opacity: 0.9, marginTop: '4px' }}>
-                                                  Per {product.basePrice.uom || 'unit'}
+                                                  {t("adminTools.backup.details.perUnitLabel", { uom: product.basePrice.uom || t("adminTools.backup.details.perUnit") })}
                                                 </div>
                                               </div>
                                             ) : (
@@ -952,48 +953,48 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                                 fontWeight: 'bold',
                                                 border: '2px dashed #f59e0b'
                                               }}>
-                                                <FontAwesomeIcon icon={faExclamationTriangle} /> NO PRICE CONFIGURED FOR THIS PRODUCT
+                                                <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noPriceConfigured")}
                                               </div>
                                             )}
 
                                             <div style={{ fontSize: '14px', color: '#374151' }}>
                                               {product.description && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Description:</strong> {product.description}
+                                                  <strong>{t("adminTools.backup.details.description")}:</strong> {product.description}
                                                 </div>
                                               )}
                                               {product.key && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Product Key:</strong> {product.key}
+                                                  <strong>{t("adminTools.backup.details.productKey")}</strong> {product.key}
                                                 </div>
                                               )}
                                               {product.kind && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Product Kind:</strong> {product.kind}
+                                                  <strong>{t("adminTools.backup.details.productKind")}</strong> {product.kind}
                                                 </div>
                                               )}
                                               {product.familyKey && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Family:</strong> {product.familyKey}
+                                                  <strong>{t("adminTools.backup.details.family")}</strong> {product.familyKey}
                                                 </div>
                                               )}
                                               {product.frequency && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Frequency:</strong> {product.frequency}
+                                                  <strong>{t("adminTools.backup.details.frequency")}</strong> {product.frequency}
                                                 </div>
                                               )}
                                               {product.basePrice && (
                                                 <div style={{ marginBottom: '8px' }}>
-                                                  <strong>Pricing Details:</strong>
+                                                  <strong>{t("adminTools.backup.details.pricingDetails")}</strong>
                                                   <div style={{ marginTop: '4px', fontSize: '13px', color: '#6b7280' }}>
-                                                    • Currency: {product.basePrice.currency || 'USD'}
-                                                    • Unit of Measure: {product.basePrice.uom || 'unit'}
-                                                    {product.basePrice.amount && `• Base Amount: $${product.basePrice.amount}`}
+                                                    • {t("adminTools.backup.details.currency")} {product.basePrice.currency || 'USD'}
+                                                    • {t("adminTools.backup.details.unitOfMeasure")} {product.basePrice.uom || t("adminTools.backup.details.perUnit")}
+                                                    {product.basePrice.amount && `• ${t("adminTools.backup.details.baseAmount", { amount: product.basePrice.amount })}`}
                                                   </div>
                                                 </div>
                                               )}
                                               <div style={{ marginBottom: '8px' }}>
-                                                <strong>Admin Display:</strong> {product.displayByAdmin ? 'Yes' : 'No'}
+                                                <strong>{t("adminTools.backup.details.adminDisplay")}</strong> {product.displayByAdmin ? t("adminTools.backup.details.yes") : t("adminTools.backup.details.no")}
                                               </div>
                                             </div>
                                           </div>
@@ -1012,7 +1013,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                 </div>
               ) : (
                 <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
-                  No active product catalog found in this backup.
+                  {t("adminTools.backup.details.noActiveCatalog")}
                 </div>
               )}
             </div>
@@ -1024,15 +1025,15 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             <div style={styles.dataTypeCard}>
               <div style={styles.dataTypeHeader}>
                 <h4 style={styles.dataTypeTitle}>
-                  <FontAwesomeIcon icon={faCog} /> Service Configuration Hierarchy
+                  <FontAwesomeIcon icon={faCog} /> {t("adminTools.backup.details.serviceConfigHierarchy")}
                 </h4>
                 <span style={styles.dataTypeCount}>
-                  {snapshot.dataTypes.serviceConfigs.count} services
+                  {snapshot.dataTypes.serviceConfigs.count} {t("adminTools.backup.details.servicesCount")}
                 </span>
               </div>
 
               <div style={{ marginBottom: '16px', fontSize: '14px', color: '#374151' }}>
-                <strong>Active Services:</strong> {snapshot.dataTypes.serviceConfigs.activeCount} of {snapshot.dataTypes.serviceConfigs.count} total
+                <strong>{t("adminTools.backup.details.activeServices")}</strong> {t("adminTools.backup.details.activeServicesValue", { active: snapshot.dataTypes.serviceConfigs.activeCount, total: snapshot.dataTypes.serviceConfigs.count })}
               </div>
 
               {snapshot.dataTypes.serviceConfigs.documents && snapshot.dataTypes.serviceConfigs.documents.length > 0 ? (
@@ -1066,7 +1067,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                               backgroundColor: config.isActive ? '#dcfce7' : '#f3f4f6',
                               color: config.isActive ? '#166534' : '#6b7280'
                             }}>
-                              {config.isActive ? 'ACTIVE' : 'INACTIVE'}
+                              {config.isActive ? t("adminTools.backup.details.active") : t("adminTools.backup.details.inactive")}
                             </span>
                             {(() => {
                               const servicePricing = extractServicePricing(config, config.serviceId);
@@ -1083,7 +1084,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                     fontSize: '12px',
                                     fontWeight: '500'
                                   }}>
-                                    <FontAwesomeIcon icon={faMoneyBill} /> {hasServicePricing ? `${servicePricing.length} Rate${servicePricing.length !== 1 ? 's' : ''}` : ''}{hasServicePricing && hasStandardPricing ? ' + ' : ''}{hasStandardPricing ? `${Object.keys(config.pricing).length} Tier${Object.keys(config.pricing).length !== 1 ? 's' : ''}` : ''}
+                                    <FontAwesomeIcon icon={faMoneyBill} /> {hasServicePricing ? (servicePricing.length !== 1 ? t("adminTools.backup.details.rateOther", { count: servicePricing.length }) : t("adminTools.backup.details.rateOne", { count: servicePricing.length })) : ''}{hasServicePricing && hasStandardPricing ? ' + ' : ''}{hasStandardPricing ? (Object.keys(config.pricing).length !== 1 ? t("adminTools.backup.details.tierOther", { count: Object.keys(config.pricing).length }) : t("adminTools.backup.details.tierOne", { count: Object.keys(config.pricing).length })) : ''}
                                   </span>
                                 );
                               }
@@ -1091,7 +1092,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                             })()}
                           </div>
                           <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#6b7280' }}>
-                            {config.version || 'No version'}
+                            {config.version || t("adminTools.backup.details.noVersion")}
                           </span>
                         </div>
                       </div>
@@ -1102,17 +1103,17 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                             <div style={{ marginBottom: '16px', fontSize: '14px', color: '#374151' }}>
                               {config.description && (
                                 <div style={{ marginBottom: '8px' }}>
-                                  <strong>Description:</strong> {config.description}
+                                  <strong>{t("adminTools.backup.details.description")}:</strong> {config.description}
                                 </div>
                               )}
                               {config.category && (
                                 <div style={{ marginBottom: '8px' }}>
-                                  <strong>Category:</strong> {config.category}
+                                  <strong>{t("adminTools.backup.details.category")}</strong> {config.category}
                                 </div>
                               )}
                               {config.lastUpdated && (
                                 <div style={{ marginBottom: '8px' }}>
-                                  <strong>Last Updated:</strong> {new Date(config.lastUpdated).toLocaleDateString()}
+                                  <strong>{t("adminTools.backup.details.lastUpdated")}</strong> {new Date(config.lastUpdated).toLocaleDateString()}
                                 </div>
                               )}
                             </div>
@@ -1132,9 +1133,9 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                   }}>
                                     <FontAwesomeIcon icon={faCaretRight} />
                                   </span>
-                                  <strong><FontAwesomeIcon icon={faCog} /> Configuration Settings</strong>
+                                  <strong><FontAwesomeIcon icon={faCog} /> {t("adminTools.backup.details.configurationSettings")}</strong>
                                   <span style={{...styles.badge, backgroundColor: '#e0e7ff', color: '#3730a3', marginLeft: '12px'}}>
-                                    {Object.keys(config.settings).length} Settings
+                                    {t("adminTools.backup.details.settingsBadge", { count: Object.keys(config.settings).length })}
                                   </span>
                                 </div>
 
@@ -1179,16 +1180,16 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                     }}>
                                       <FontAwesomeIcon icon={faCaretRight} />
                                     </span>
-                                    <strong><FontAwesomeIcon icon={faMoneyBill} /> Service Pricing Details</strong>
+                                    <strong><FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.servicePricingDetailsTitle")}</strong>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
                                       {hasServicePricing && (
                                         <span style={{...styles.badge, backgroundColor: '#dcfce7', color: '#166534'}}>
-                                          {servicePricing.length} Rate{servicePricing.length !== 1 ? 's' : ''}
+                                          {servicePricing.length !== 1 ? t("adminTools.backup.details.rateOther", { count: servicePricing.length }) : t("adminTools.backup.details.rateOne", { count: servicePricing.length })}
                                         </span>
                                       )}
                                       {hasStandardPricing && (
                                         <span style={{...styles.badge, backgroundColor: '#e0e7ff', color: '#3730a3'}}>
-                                          {Object.keys(config.pricing).length} Tier{Object.keys(config.pricing).length !== 1 ? 's' : ''}
+                                          {Object.keys(config.pricing).length !== 1 ? t("adminTools.backup.details.tierOther", { count: Object.keys(config.pricing).length }) : t("adminTools.backup.details.tierOne", { count: Object.keys(config.pricing).length })}
                                         </span>
                                       )}
                                     </div>
@@ -1208,7 +1209,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                               alignItems: 'center',
                                               gap: '8px'
                                             }}>
-                                              <FontAwesomeIcon icon={faTags} /> Current Service Rates
+                                              <FontAwesomeIcon icon={faTags} /> {t("adminTools.backup.details.currentServiceRates")}
                                             </h4>
                                             {(() => {
                                               const groupedPricing = servicePricing.reduce((groups, item) => {
@@ -1284,7 +1285,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                               alignItems: 'center',
                                               gap: '8px'
                                             }}>
-                                              <FontAwesomeIcon icon={faClipboard} /> Pricing Tiers
+                                              <FontAwesomeIcon icon={faClipboard} /> {t("adminTools.backup.details.pricingTiers")}
                                             </h4>
                                             {Object.entries(config.pricing).map(([tierKey, tierData]) => (
                                               <div key={tierKey} style={{
@@ -1300,10 +1301,10 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                               }}>
                                                 <div>
                                                   <div style={{ fontSize: '15px', fontWeight: 'bold' }}>
-                                                    {tierData?.name || tierKey} Tier
+                                                    {t("adminTools.backup.details.tierName", { name: tierData?.name || tierKey })}
                                                   </div>
                                                   <div style={{ fontSize: '12px', opacity: 0.9 }}>
-                                                    {tierData?.basePrice?.uom ? `Per ${tierData.basePrice.uom}` : 'Per service call'}
+                                                    {tierData?.basePrice?.uom ? t("adminTools.backup.details.perUnitLabel", { uom: tierData.basePrice.uom }) : t("adminTools.backup.details.perServiceCall")}
                                                   </div>
                                                   {tierData?.description && (
                                                     <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>
@@ -1337,7 +1338,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                             color: '#92400e',
                                             fontWeight: 'bold'
                                           }}>
-                                            <FontAwesomeIcon icon={faExclamationTriangle} /> No pricing information configured for this service
+                                            <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noPricingForService")}
                                           </div>
                                         )}
                                       </div>
@@ -1354,7 +1355,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                 </div>
               ) : (
                 <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
-                  No service configuration details available.
+                  {t("adminTools.backup.details.noServiceConfigDetails")}
                 </div>
               )}
             </div>
@@ -1366,10 +1367,10 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             <div style={styles.dataTypeCard}>
               <div style={styles.dataTypeHeader}>
                 <h4 style={styles.dataTypeTitle}>
-                  <FontAwesomeIcon icon={faMoneyBill} /> Service Pricing Information
+                  <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.servicePricingInformation")}
                 </h4>
                 <span style={styles.dataTypeCount}>
-                  {snapshot.dataTypes.priceFix.count} pricing records
+                  {snapshot.dataTypes.priceFix.count} {t("adminTools.backup.details.pricingRecords")}
                 </span>
               </div>
 
@@ -1389,11 +1390,11 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                       }}>
                         <FontAwesomeIcon icon={faCaretRight} />
                       </span>
-                      <strong><FontAwesomeIcon icon={faMoneyBill} /> {pricing.serviceId || 'Unknown Service'}</strong>
+                      <strong><FontAwesomeIcon icon={faMoneyBill} /> {pricing.serviceId || t("adminTools.backup.details.unknownService")}</strong>
                       {pricing.pricing && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
                           <span style={{...styles.badge, backgroundColor: '#dcfce7', color: '#166534'}}>
-                            {Object.keys(pricing.pricing).length} Pricing Tiers
+                            {t("adminTools.backup.details.pricingTiersBadge", { count: Object.keys(pricing.pricing).length })}
                           </span>
                           {(() => {
                             const hasValidPricing = Object.values(pricing.pricing).some(tier =>
@@ -1408,7 +1409,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                 fontSize: '12px',
                                 fontWeight: '500'
                               }}>
-                                <FontAwesomeIcon icon={faMoneyBill} /> Prices Configured
+                                <FontAwesomeIcon icon={faMoneyBill} /> {t("adminTools.backup.details.pricesConfigured")}
                               </span>
                             ) : (
                               <span style={{
@@ -1419,7 +1420,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                 fontSize: '12px',
                                 fontWeight: '500'
                               }}>
-                                <FontAwesomeIcon icon={faExclamationTriangle} /> No Prices Set
+                                <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminTools.backup.details.noPricesSet")}
                               </span>
                             );
                           })()}
@@ -1445,14 +1446,14 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                               }}>
                                 <div>
                                   <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                                    {tierData?.name || tierKey} Pricing Tier
+                                    {t("adminTools.backup.details.pricingTierName", { name: tierData?.name || tierKey })}
                                   </div>
                                   <div style={{ fontSize: '14px', opacity: 0.9 }}>
-                                    Service: {pricing.serviceId}
+                                    {t("adminTools.backup.details.serviceLabel", { serviceId: pricing.serviceId })}
                                   </div>
                                   {tierData?.basePrice?.uom && (
                                     <div style={{ fontSize: '12px', opacity: 0.8 }}>
-                                      Per {tierData.basePrice.uom}
+                                      {t("adminTools.backup.details.perUnitLabel", { uom: tierData.basePrice.uom })}
                                     </div>
                                   )}
                                   {tierData?.description && (
@@ -1491,51 +1492,51 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
   const renderMetadata = () => (
     <div>
       <div style={styles.section}>
-        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faWrench} /> Technical Metadata</h3>
+        <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faWrench} /> {t("adminTools.backup.details.technicalMetadata")}</h3>
         <div style={styles.dataTypeCard}>
           <table style={styles.metadataTable}>
             <tbody>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Backup ID</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.backupId")}</td>
                 <td style={styles.metadataValue}>{displayBackup.changeDayId}</td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Change Day</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.changeDay")}</td>
                 <td style={styles.metadataValue}>{displayBackup.changeDay}</td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>First Change Timestamp</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.firstChangeTimestamp")}</td>
                 <td style={styles.metadataValue}>
-                  {displayBackup.firstChangeTimestamp ? backupUtils.formatDate(displayBackup.firstChangeTimestamp) : 'Unknown'}
+                  {displayBackup.firstChangeTimestamp ? backupUtils.formatDate(displayBackup.firstChangeTimestamp) : t("adminTools.backup.details.unknown")}
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Backup Created</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.backupCreated")}</td>
                 <td style={styles.metadataValue}>
-                  {displayBackup.createdAt ? backupUtils.formatDate(displayBackup.createdAt) : 'Unknown'}
+                  {displayBackup.createdAt ? backupUtils.formatDate(displayBackup.createdAt) : t("adminTools.backup.details.unknown")}
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Last Modified</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.lastModified")}</td>
                 <td style={styles.metadataValue}>
-                  {displayBackup.updatedAt ? backupUtils.formatDate(displayBackup.updatedAt) : 'Unknown'}
+                  {displayBackup.updatedAt ? backupUtils.formatDate(displayBackup.updatedAt) : t("adminTools.backup.details.unknown")}
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Compression Ratio</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.compressionRatio")}</td>
                 <td style={styles.metadataValue}>
                   {sizeInfo.compressionRatio > 0 ? sizeInfo.compressionRatio.toFixed(3) : 'N/A'}
                 </td>
               </tr>
               <tr style={styles.metadataRow}>
-                <td style={styles.metadataLabel}>Data Types Included</td>
+                <td style={styles.metadataLabel}>{t("adminTools.backup.details.dataTypesIncluded")}</td>
                 <td style={styles.metadataValue}>
                   {displayBackup.snapshotMetadata?.includedDataTypes ?
                     Object.entries(displayBackup.snapshotMetadata.includedDataTypes)
                       .filter(([, included]) => included)
                       .map(([type]) => type)
-                      .join(', ') || 'None specified'
-                    : 'PriceFix, Product Catalog, Service Configs' 
+                      .join(', ') || t("adminTools.backup.details.noneSpecified")
+                    : t("adminTools.backup.details.defaultDataTypes")
                   }
                 </td>
               </tr>
@@ -1546,26 +1547,26 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
 
       {displayBackup.restorationInfo?.hasBeenRestored && (
         <div style={styles.section}>
-          <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faSync} /> Restoration History</h3>
+          <h3 style={styles.sectionTitle}><FontAwesomeIcon icon={faSync} /> {t("adminTools.backup.details.restorationHistory")}</h3>
           <div style={styles.dataTypeCard}>
             <table style={styles.metadataTable}>
               <tbody>
                 <tr style={styles.metadataRow}>
-                  <td style={styles.metadataLabel}>Restoration Status</td>
-                  <td style={styles.metadataValue}><FontAwesomeIcon icon={faCheckCircle} /> Previously Restored</td>
+                  <td style={styles.metadataLabel}>{t("adminTools.backup.details.restorationStatus")}</td>
+                  <td style={styles.metadataValue}><FontAwesomeIcon icon={faCheckCircle} /> {t("adminTools.backup.details.previouslyRestored")}</td>
                 </tr>
                 <tr style={styles.metadataRow}>
-                  <td style={styles.metadataLabel}>Last Restored Date</td>
+                  <td style={styles.metadataLabel}>{t("adminTools.backup.details.lastRestoredDate")}</td>
                   <td style={styles.metadataValue}>
                     {displayBackup.restorationInfo?.lastRestoredAt ?
                       backupUtils.formatDate(displayBackup.restorationInfo.lastRestoredAt) :
-                      'Not available'
+                      t("adminTools.backup.details.notAvailable")
                     }
                   </td>
                 </tr>
                 {displayBackup.restorationInfo?.restorationNotes && (
                   <tr style={styles.metadataRow}>
-                    <td style={styles.metadataLabel}>Restoration Notes</td>
+                    <td style={styles.metadataLabel}>{t("adminTools.backup.details.restorationNotes")}</td>
                     <td style={styles.metadataValue}>{displayBackup.restorationInfo.restorationNotes}</td>
                   </tr>
                 )}
@@ -1582,7 +1583,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>Backup Details</h2>
+            <h2 style={styles.title}>{t("adminTools.backup.details.title")}</h2>
             <div style={styles.subtitle}>
               {backupUtils.formatChangeDay(displayBackup.changeDay)} - {backupUtils.formatFileSize(sizeInfo.compressedSize)}
             </div>
@@ -1600,7 +1601,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             }}
             onClick={() => setActiveTab('overview')}
           >
-            <FontAwesomeIcon icon={faClipboard} /> Overview
+            <FontAwesomeIcon icon={faClipboard} /> {t("adminTools.backup.details.tabOverview")}
           </button>
           <button
             style={{
@@ -1609,7 +1610,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             }}
             onClick={() => setActiveTab('content')}
           >
-            <FontAwesomeIcon icon={faFile} /> Content Preview
+            <FontAwesomeIcon icon={faFile} /> {t("adminTools.backup.details.tabContent")}
           </button>
           <button
             style={{
@@ -1618,7 +1619,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
             }}
             onClick={() => setActiveTab('metadata')}
           >
-            <FontAwesomeIcon icon={faWrench} /> Technical Info
+            <FontAwesomeIcon icon={faWrench} /> {t("adminTools.backup.details.tabMetadata")}
           </button>
         </div>
 

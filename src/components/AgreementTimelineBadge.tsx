@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendarDays,
@@ -29,6 +30,7 @@ export function AgreementTimelineBadge({
   onDateChange,
   agreementId,
 }: AgreementTimelineBadgeProps) {
+  const { t } = useTranslation();
   const [expiryStatus, setExpiryStatus] = useState<ExpiryStatus>('safe');
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
   const [expiryDate, setExpiryDate] = useState<Date | null>(null);
@@ -98,17 +100,17 @@ export function AgreementTimelineBadge({
   const getStatusText = (): string => {
     switch (expiryStatus) {
       case 'yet-to-start':
-        return 'Yet to Start';
+        return t('timeline.status.yetToStart');
       case 'expired':
-        return 'Inactive';
+        return t('timeline.status.inactive');
       case 'critical':
-        return 'Expiring Soon';
+        return t('timeline.status.expiringSoon');
       case 'warning':
-        return 'Renewal Due';
+        return t('timeline.status.renewalDue');
       case 'safe':
-        return 'Active';
+        return t('timeline.status.active');
       default:
-        return 'Active';
+        return t('timeline.status.active');
     }
   };
 
@@ -116,15 +118,14 @@ export function AgreementTimelineBadge({
     if (daysRemaining === null) return '';
 
     const days = Math.abs(daysRemaining);
-    const dayWord = days === 1 ? 'day' : 'days';
 
     switch (expiryStatus) {
       case 'yet-to-start':
-        return `Starts in ${days} ${dayWord}`;
+        return t('timeline.days.startsIn', { count: days });
       case 'expired':
-        return `Inactive ${days} ${dayWord}`;
+        return t('timeline.days.inactiveFor', { count: days });
       default:
-        return `${days} ${dayWord} left`;
+        return t('timeline.days.left', { count: days });
     }
   };
 
@@ -162,13 +163,13 @@ export function AgreementTimelineBadge({
               type="button"
               className="timeline-calendar-btn"
               onClick={handleCalendarClick}
-              title="Change start date"
+              title={t('timeline.changeStartDate')}
             >
               <FontAwesomeIcon icon={faCalendarDays} />
             </button>
             {showDatePicker && (
               <div className="timeline-date-picker-popup">
-                <label htmlFor={`date-${agreementId}`}>Start Date:</label>
+                <label htmlFor={`date-${agreementId}`}>{t('timeline.startDateLabel')}</label>
                 <input
                   id={`date-${agreementId}`}
                   type="date"
@@ -182,7 +183,7 @@ export function AgreementTimelineBadge({
                     className="timeline-date-save"
                     onClick={handleDateChange}
                   >
-                    Save
+                    {t('common.save')}
                   </button>
                   <button
                     type="button"
@@ -193,7 +194,7 @@ export function AgreementTimelineBadge({
                       setShowDatePicker(false);
                     }}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
@@ -215,8 +216,8 @@ export function AgreementTimelineBadge({
       </div>
       {expiryDate && (
         <div className="timeline-badge-dates">
-          <span>Start: {new Date(startDate).toLocaleDateString()}</span>
-          <span>Expires: {expiryDate.toLocaleDateString()}</span>
+          <span>{t('timeline.start', { date: new Date(startDate).toLocaleDateString() })}</span>
+          <span>{t('timeline.expires', { date: expiryDate.toLocaleDateString() })}</span>
         </div>
       )}
     </div>

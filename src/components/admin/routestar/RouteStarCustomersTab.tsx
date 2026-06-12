@@ -1,11 +1,13 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import { routestarCustomersApi, type RouteStarCustomer, type CustomerSyncStatus, type CustomerStats } from '../../../backendservice/api/routestarCustomersApi';
 import './RouteStarCustomersTab.css';
 
 export const RouteStarCustomersTab: React.FC = () => {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState<RouteStarCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState<CustomerSyncStatus | null>(null);
@@ -90,8 +92,8 @@ export const RouteStarCustomersTab: React.FC = () => {
       {}
       <div className="rs-header">
         <div className="rs-header-content">
-          <h2>RouteStar Customers</h2>
-          <p className="rs-subtitle">Sync and manage customers from RouteStar</p>
+          <h2>{t('adminTools.routestar.title')}</h2>
+          <p className="rs-subtitle">{t('adminTools.routestar.subtitle')}</p>
         </div>
         <button
           className={`rs-sync-btn ${syncStatus?.isRunning ? 'syncing' : ''}`}
@@ -101,14 +103,14 @@ export const RouteStarCustomersTab: React.FC = () => {
           {syncStatus?.isRunning ? (
             <>
               <span className="sync-spinner"></span>
-              Syncing... {syncStatus.progress}%
+              {t('adminTools.routestar.syncing', { progress: syncStatus.progress })}
             </>
           ) : (
             <>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
               </svg>
-              Sync from RouteStar
+              {t('adminTools.routestar.syncFromRouteStar')}
             </>
           )}
         </button>
@@ -118,19 +120,19 @@ export const RouteStarCustomersTab: React.FC = () => {
       <div className="rs-stats-grid">
         <div className="rs-stat-card">
           <div className="rs-stat-value">{stats?.total || 0}</div>
-          <div className="rs-stat-label">Total Customers</div>
+          <div className="rs-stat-label">{t('adminTools.routestar.totalCustomers')}</div>
         </div>
         <div className="rs-stat-card">
           <div className="rs-stat-value rs-stat-active">{stats?.active || 0}</div>
-          <div className="rs-stat-label">Active</div>
+          <div className="rs-stat-label">{t('adminTools.routestar.active')}</div>
         </div>
         <div className="rs-stat-card">
           <div className="rs-stat-value rs-stat-inactive">{stats?.inactive || 0}</div>
-          <div className="rs-stat-label">Inactive</div>
+          <div className="rs-stat-label">{t('adminTools.routestar.inactive')}</div>
         </div>
         <div className="rs-stat-card">
           <div className="rs-stat-value">{stats?.uniqueStates || 0}</div>
-          <div className="rs-stat-label">States</div>
+          <div className="rs-stat-label">{t('adminTools.routestar.states')}</div>
         </div>
       </div>
 
@@ -138,12 +140,12 @@ export const RouteStarCustomersTab: React.FC = () => {
       {syncStatus && (
         <div className={`rs-sync-status ${syncStatus.lastSyncResult || ''}`}>
           <div className="rs-sync-info">
-            <span className="rs-sync-label">Last Sync:</span>
+            <span className="rs-sync-label">{t('adminTools.routestar.lastSync')}</span>
             <span className="rs-sync-time">{formatDate(syncStatus.lastSyncAt)}</span>
             {syncStatus.lastSyncResult && (
               <span className={`rs-sync-result ${syncStatus.lastSyncResult}`}>
-                {syncStatus.lastSyncResult === 'success' ? '✓ Success' :
-                 syncStatus.lastSyncResult === 'partial' ? 'Partial' : '✗ Failed'}
+                {syncStatus.lastSyncResult === 'success' ? `✓ ${t('adminTools.routestar.success')}` :
+                 syncStatus.lastSyncResult === 'partial' ? t('adminTools.routestar.partial') : `✗ ${t('adminTools.routestar.failed')}`}
               </span>
             )}
           </div>
@@ -163,12 +165,12 @@ export const RouteStarCustomersTab: React.FC = () => {
         <form onSubmit={handleSearch} className="rs-search-form">
           <input
             type="text"
-            placeholder="Search customers..."
+            placeholder={t('adminTools.routestar.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="rs-search-input"
           />
-          <button type="submit" className="rs-search-btn">Search</button>
+          <button type="submit" className="rs-search-btn">{t('adminTools.routestar.search')}</button>
         </form>
 
         <select
@@ -179,7 +181,7 @@ export const RouteStarCustomersTab: React.FC = () => {
           }}
           className="rs-filter-select"
         >
-          <option value="">All States</option>
+          <option value="">{t('adminTools.routestar.allStates')}</option>
           {stats?.states.map(state => (
             <option key={state} value={state}>{state}</option>
           ))}
@@ -193,13 +195,13 @@ export const RouteStarCustomersTab: React.FC = () => {
           }}
           className="rs-filter-select"
         >
-          <option value="all">All Status</option>
-          <option value="active">Active Only</option>
-          <option value="inactive">Inactive Only</option>
+          <option value="all">{t('adminTools.routestar.allStatus')}</option>
+          <option value="active">{t('adminTools.routestar.activeOnly')}</option>
+          <option value="inactive">{t('adminTools.routestar.inactiveOnly')}</option>
         </select>
 
         <span className="rs-results-count">
-          {pagination.total} customers found
+          {t('adminTools.routestar.customersFound', { count: pagination.total })}
         </span>
       </div>
 
@@ -207,7 +209,7 @@ export const RouteStarCustomersTab: React.FC = () => {
       {loading ? (
         <div className="rs-loading">
           <div className="rs-loading-spinner"></div>
-          <p>Loading customers...</p>
+          <p>{t('adminTools.routestar.loadingCustomers')}</p>
         </div>
       ) : customers.length === 0 ? (
         <div className="rs-empty">
@@ -219,23 +221,23 @@ export const RouteStarCustomersTab: React.FC = () => {
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <h3>No Customers Found</h3>
-          <p>Click "Sync from RouteStar" to fetch customers from your RouteStar account.</p>
+          <h3>{t('adminTools.routestar.noCustomersTitle')}</h3>
+          <p>{t('adminTools.routestar.noCustomersText')}</p>
         </div>
       ) : (
         <div className="rs-table-container">
           <table className="rs-table">
             <thead>
               <tr>
-                <th>Customer</th>
-                <th>Company</th>
-                <th>Address</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Phone</th>
-                <th>Route</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t('adminTools.routestar.colCustomer')}</th>
+                <th>{t('adminTools.routestar.colCompany')}</th>
+                <th>{t('adminTools.routestar.colAddress')}</th>
+                <th>{t('adminTools.routestar.colCity')}</th>
+                <th>{t('adminTools.routestar.colState')}</th>
+                <th>{t('adminTools.routestar.colPhone')}</th>
+                <th>{t('adminTools.routestar.colRoute')}</th>
+                <th>{t('adminTools.routestar.colStatus')}</th>
+                <th>{t('adminTools.routestar.colActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -256,7 +258,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                   <td>{customer.onRoute || '-'}</td>
                   <td>
                     <span className={`rs-status-badge ${customer.isActive ? 'active' : 'inactive'}`}>
-                      {customer.isActive ? 'Active' : 'Inactive'}
+                      {customer.isActive ? t('adminTools.routestar.active') : t('adminTools.routestar.inactive')}
                     </span>
                   </td>
                   <td className="rs-actions">
@@ -264,7 +266,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                       className="rs-view-btn"
                       onClick={() => setSelectedCustomer(customer)}
                     >
-                      View
+                      {t('adminTools.routestar.view')}
                     </button>
                     {customer.detailUrl && (
                       <a
@@ -272,7 +274,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rs-external-link"
-                        title="Open in RouteStar"
+                        title={t('adminTools.routestar.openInRouteStar')}
                       >
                         <FaExternalLinkAlt />
                       </a>
@@ -293,17 +295,17 @@ export const RouteStarCustomersTab: React.FC = () => {
             disabled={pagination.skip === 0}
             className="rs-page-btn"
           >
-            Previous
+            {t('adminTools.routestar.previous')}
           </button>
           <span className="rs-page-info">
-            {pagination.skip + 1} - {Math.min(pagination.skip + pagination.limit, pagination.total)} of {pagination.total}
+            {t('adminTools.routestar.pageInfo', { from: pagination.skip + 1, to: Math.min(pagination.skip + pagination.limit, pagination.total), total: pagination.total })}
           </span>
           <button
             onClick={() => setPagination(prev => ({ ...prev, skip: prev.skip + prev.limit }))}
             disabled={pagination.skip + pagination.limit >= pagination.total}
             className="rs-page-btn"
           >
-            Next
+            {t('adminTools.routestar.next')}
           </button>
         </div>
       )}
@@ -319,61 +321,61 @@ export const RouteStarCustomersTab: React.FC = () => {
             <div className="rs-modal-body">
               <div className="rs-detail-grid">
                 <div className="rs-detail-item">
-                  <label>Company</label>
+                  <label>{t('adminTools.routestar.company')}</label>
                   <span>{selectedCustomer.company || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>RouteStar ID</label>
+                  <label>{t('adminTools.routestar.routeStarId')}</label>
                   <span className="rs-mono">{selectedCustomer.routeStarId}</span>
                 </div>
                 <div className="rs-detail-item full-width">
-                  <label>Address</label>
+                  <label>{t('adminTools.routestar.address')}</label>
                   <span>{selectedCustomer.address || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>City</label>
+                  <label>{t('adminTools.routestar.city')}</label>
                   <span>{selectedCustomer.city || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>State</label>
+                  <label>{t('adminTools.routestar.state')}</label>
                   <span>{selectedCustomer.state || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Zip Code</label>
+                  <label>{t('adminTools.routestar.zipCode')}</label>
                   <span>{selectedCustomer.zipCode || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Phone</label>
+                  <label>{t('adminTools.routestar.phone')}</label>
                   <span>{selectedCustomer.phone || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Email</label>
+                  <label>{t('adminTools.routestar.email')}</label>
                   <span>{selectedCustomer.email || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>On Route</label>
+                  <label>{t('adminTools.routestar.onRoute')}</label>
                   <span>{selectedCustomer.onRoute || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Grouping</label>
+                  <label>{t('adminTools.routestar.grouping')}</label>
                   <span>{selectedCustomer.grouping || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Sales Rep</label>
+                  <label>{t('adminTools.routestar.salesRep')}</label>
                   <span>{selectedCustomer.salesRep || '-'}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Status</label>
+                  <label>{t('adminTools.routestar.status')}</label>
                   <span className={`rs-status-badge ${selectedCustomer.isActive ? 'active' : 'inactive'}`}>
-                    {selectedCustomer.isActive ? 'Active' : 'Inactive'}
+                    {selectedCustomer.isActive ? t('adminTools.routestar.active') : t('adminTools.routestar.inactive')}
                   </span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Created in RouteStar</label>
+                  <label>{t('adminTools.routestar.createdInRouteStar')}</label>
                   <span>{formatDate(selectedCustomer.createdInRouteStar)}</span>
                 </div>
                 <div className="rs-detail-item">
-                  <label>Last Synced</label>
+                  <label>{t('adminTools.routestar.lastSynced')}</label>
                   <span>{formatDate(selectedCustomer.lastSyncedAt)}</span>
                 </div>
               </div>
@@ -385,7 +387,7 @@ export const RouteStarCustomersTab: React.FC = () => {
                     rel="noopener noreferrer"
                     className="rs-external-btn"
                   >
-                    Open in RouteStar <FaExternalLinkAlt />
+                    {t('adminTools.routestar.openInRouteStar')} <FaExternalLinkAlt />
                   </a>
                 </div>
               )}

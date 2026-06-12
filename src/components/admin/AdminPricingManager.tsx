@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaBox, FaHourglassHalf, FaDownload } from "react-icons/fa";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
@@ -22,6 +23,7 @@ import { ElectrostaticSprayForm } from "../services/electrostaticSpray/Electrost
 type ViewMode = "list" | "service" | "products" | "editConfig";
 
 export const AdminPricingManager: React.FC = () => {
+  const { t } = useTranslation();
   const { configs, loading, error, updateConfig } = useServiceConfigs();
   const { catalog, loading: catalogLoading } = useActiveProductCatalog();
 
@@ -45,9 +47,9 @@ export const AdminPricingManager: React.FC = () => {
     } catch (err: any) {
       console.error("Export PDF failed:", err);
       if (err?.code === 'PUPPETEER_BUSY') {
-        setExportError('Export in progress — a PDF is already being generated. Please wait a moment and try again.');
+        setExportError(t('adminPricing.manager.exportBusy'));
       } else {
-        setExportError('Failed to generate the pricing catalog PDF. Please try again.');
+        setExportError(t('adminPricing.manager.exportFailed'));
       }
       setTimeout(() => setExportError(null), 6000);
     } finally {
@@ -73,7 +75,7 @@ export const AdminPricingManager: React.FC = () => {
     });
 
     if (result.success) {
-      setSuccessMessage("Configuration saved successfully!");
+      setSuccessMessage(t('adminPricing.manager.configSaved'));
       setTimeout(() => {
         setSuccessMessage(null);
         setViewMode("list");
@@ -106,20 +108,20 @@ export const AdminPricingManager: React.FC = () => {
     };
 
     return serviceComponents[serviceId] || (
-      <div className="apm-no-form" style={styles.noForm}>No form available for this service</div>
+      <div className="apm-no-form" style={styles.noForm}>{t('adminPricing.manager.noForm')}</div>
     );
   };
 
   if (loading || catalogLoading) {
-    return <div className="apm-loading" style={styles.loading}>Loading pricing data...</div>;
+    return <div className="apm-loading" style={styles.loading}>{t('adminPricing.manager.loading')}</div>;
   }
 
   if (viewMode === "list") {
     return (
       <div className="apm-container" style={styles.container}>
         <div className="apm-header" style={styles.header}>
-          <h2 className="apm-title" style={styles.title}>Pricing Management</h2>
-          <p className="apm-subtitle" style={styles.subtitle}>View and edit service pricing configurations</p>
+          <h2 className="apm-title" style={styles.title}>{t('adminPricing.manager.title')}</h2>
+          <p className="apm-subtitle" style={styles.subtitle}>{t('adminPricing.manager.subtitle')}</p>
         </div>
 
         {error && <div className="apm-error" style={styles.error}>{error}</div>}
@@ -132,7 +134,7 @@ export const AdminPricingManager: React.FC = () => {
             style={styles.viewButton}
             onClick={() => setViewMode("products")}
           >
-            <FaBox /> View Product Catalog
+            <FaBox /> {t('adminPricing.manager.viewProductCatalog')}
           </button>
           <button
             className="apm-export-pdf-button"
@@ -140,7 +142,7 @@ export const AdminPricingManager: React.FC = () => {
             onClick={handleExportPdf}
             disabled={exportingPdf}
           >
-            {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
+            {exportingPdf ? <><FaHourglassHalf /> {t('adminPricing.manager.generating')}</> : <><FaDownload /> {t('adminPricing.manager.exportPricingPdf')}</>}
           </button>
         </div>
 
@@ -149,14 +151,14 @@ export const AdminPricingManager: React.FC = () => {
             <div key={config._id} className="apm-service-card" style={styles.serviceCard}>
               <div className="apm-card-header" style={styles.cardHeader}>
                 <h3 className="apm-card-title" style={styles.cardTitle}>{config.label}</h3>
-                {config.isActive && <span className="apm-active-badge" style={styles.activeBadge}>Active</span>}
+                {config.isActive && <span className="apm-active-badge" style={styles.activeBadge}>{t('adminPricing.manager.active')}</span>}
               </div>
 
               <p className="apm-card-description" style={styles.cardDescription}>{config.description}</p>
 
               <div className="apm-card-meta" style={styles.cardMeta}>
-                <span className="apm-meta-item" style={styles.metaItem}>Version: {config.version}</span>
-                <span className="apm-meta-item" style={styles.metaItem}>ID: {config.serviceId}</span>
+                <span className="apm-meta-item" style={styles.metaItem}>{t('adminPricing.manager.version', { version: config.version })}</span>
+                <span className="apm-meta-item" style={styles.metaItem}>{t('adminPricing.manager.id', { id: config.serviceId })}</span>
               </div>
 
               <div className="apm-card-actions" style={styles.cardActions}>
@@ -165,14 +167,14 @@ export const AdminPricingManager: React.FC = () => {
                   style={styles.viewFormButton}
                   onClick={() => handleViewService(config)}
                 >
-                  View Pricing Form
+                  {t('adminPricing.manager.viewPricingForm')}
                 </button>
                 <button
                   className="apm-edit-config-button"
                   style={styles.editConfigButton}
                   onClick={() => handleEditConfig(config)}
                 >
-                  Edit Config
+                  {t('adminPricing.manager.editConfig')}
                 </button>
               </div>
             </div>
@@ -188,7 +190,7 @@ export const AdminPricingManager: React.FC = () => {
         <div className="apm-header" style={styles.header}>
           <div>
             <button className="apm-back-button" style={styles.backButton} onClick={() => setViewMode("list")}>
-              ← Back to Services
+              ← {t('adminPricing.manager.backToServices')}
             </button>
             <h2 className="apm-title" style={styles.title}>{selectedService.label}</h2>
             <p className="apm-subtitle" style={styles.subtitle}>{selectedService.description}</p>
@@ -198,7 +200,7 @@ export const AdminPricingManager: React.FC = () => {
             style={styles.editConfigButton}
             onClick={() => handleEditConfig(selectedService)}
           >
-            Edit Configuration
+            {t('adminPricing.manager.editConfiguration')}
           </button>
         </div>
 
@@ -208,25 +210,25 @@ export const AdminPricingManager: React.FC = () => {
           </div>
 
           <div className="apm-config-panel" style={styles.configPanel}>
-            <h3 className="apm-panel-title" style={styles.panelTitle}>Current Configuration</h3>
+            <h3 className="apm-panel-title" style={styles.panelTitle}>{t('adminPricing.manager.currentConfiguration')}</h3>
             <div className="apm-config-info" style={styles.configInfo}>
               <div className="apm-info-row" style={styles.infoRow}>
-                <span className="apm-info-label" style={styles.infoLabel}>Version:</span>
+                <span className="apm-info-label" style={styles.infoLabel}>{t('adminPricing.manager.versionLabel')}</span>
                 <span className="apm-info-value" style={styles.infoValue}>{selectedService.version}</span>
               </div>
               <div className="apm-info-row" style={styles.infoRow}>
-                <span className="apm-info-label" style={styles.infoLabel}>Service ID:</span>
+                <span className="apm-info-label" style={styles.infoLabel}>{t('adminPricing.manager.serviceIdLabel')}</span>
                 <code className="apm-code" style={styles.code}>{selectedService.serviceId}</code>
               </div>
               <div className="apm-info-row" style={styles.infoRow}>
-                <span className="apm-info-label" style={styles.infoLabel}>Status:</span>
+                <span className="apm-info-label" style={styles.infoLabel}>{t('adminPricing.manager.statusLabel')}</span>
                 <span className={selectedService.isActive ? "apm-status-active" : "apm-status-inactive"} style={selectedService.isActive ? styles.statusActive : styles.statusInactive}>
-                  {selectedService.isActive ? "Active" : "Inactive"}
+                  {selectedService.isActive ? t('adminPricing.manager.active') : t('adminPricing.manager.inactive')}
                 </span>
               </div>
             </div>
 
-            <h4 className="apm-section-title" style={styles.sectionTitle}>Configuration JSON</h4>
+            <h4 className="apm-section-title" style={styles.sectionTitle}>{t('adminPricing.manager.configurationJson')}</h4>
             <pre className="apm-code-block" style={styles.codeBlock}>
               {JSON.stringify(selectedService.config, null, 2)}
             </pre>
@@ -252,11 +254,11 @@ export const AdminPricingManager: React.FC = () => {
         <div className="apm-header" style={styles.header}>
           <div>
             <button className="apm-back-button" style={styles.backButton} onClick={() => setViewMode("list")}>
-              ← Back to Services
+              ← {t('adminPricing.manager.backToServices')}
             </button>
-            <h2 className="apm-title" style={styles.title}>Product Catalog</h2>
+            <h2 className="apm-title" style={styles.title}>{t('adminPricing.manager.productCatalog')}</h2>
             <p className="apm-subtitle" style={styles.subtitle}>
-              Version: {catalog.version} | Currency: {catalog.currency}
+              {t('adminPricing.manager.catalogMeta', { version: catalog.version, currency: catalog.currency })}
             </p>
           </div>
           <button
@@ -265,7 +267,7 @@ export const AdminPricingManager: React.FC = () => {
             onClick={handleExportPdf}
             disabled={exportingPdf}
           >
-            {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
+            {exportingPdf ? <><FaHourglassHalf /> {t('adminPricing.manager.generating')}</> : <><FaDownload /> {t('adminPricing.manager.exportPricingPdf')}</>}
           </button>
         </div>
 
@@ -273,17 +275,17 @@ export const AdminPricingManager: React.FC = () => {
           {catalog.families.map((family) => (
             <div key={family.key} className="apm-family-section" style={styles.familySection}>
               <h3 className="apm-family-title" style={styles.familyTitle}>
-                {family.label} ({family.products.length} products)
+                {t('adminPricing.manager.familyTitle', { label: family.label, count: family.products.length })}
               </h3>
 
               <div className="apm-table-wrapper" style={styles.tableWrapper}>
                 <table className="apm-table" style={styles.table}>
                   <thead>
                     <tr className="apm-table-header-row" style={styles.tableHeaderRow}>
-                      <th className="apm-th" style={styles.th}>Product</th>
-                      <th className="apm-th" style={styles.th}>Price</th>
-                      <th className="apm-th" style={styles.th}>UOM</th>
-                      <th className="apm-th" style={styles.th}>Warranty</th>
+                      <th className="apm-th" style={styles.th}>{t('adminPricing.manager.thProduct')}</th>
+                      <th className="apm-th" style={styles.th}>{t('adminPricing.manager.thPrice')}</th>
+                      <th className="apm-th" style={styles.th}>{t('adminPricing.manager.thUom')}</th>
+                      <th className="apm-th" style={styles.th}>{t('adminPricing.manager.thWarranty')}</th>
                     </tr>
                   </thead>
                   <tbody>

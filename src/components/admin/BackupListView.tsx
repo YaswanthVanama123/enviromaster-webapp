@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faSortUp,
   faSortDown,
@@ -34,6 +35,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
   onRestoreClick,
   onRefresh
 }) => {
+  const { t } = useTranslation();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'changeDay', direction: 'desc' });
   const [filterTrigger, setFilterTrigger] = useState<string>('all');
   const [filterRestored, setFilterRestored] = useState<string>('all');
@@ -282,9 +284,9 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
     return (
       <div className="blv-loading-state" style={styles.loadingState}>
         <div className="blv-spinner-inline">
-          <span className="blv-sr-only">Loading backups…</span>
+          <span className="blv-sr-only">{t("adminTools.backup.list.loadingBackups")}</span>
         </div>
-        <p className="blv-loading-text">Loading backups...</p>
+        <p className="blv-loading-text">{t("adminTools.backup.list.loadingBackups")}</p>
       </div>
     );
   }
@@ -292,7 +294,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
   if (error) {
     return (
       <div className="blv-error-state" style={styles.errorState}>
-        <strong>Error loading backups:</strong> {error}
+        <strong>{t("adminTools.backup.list.errorLoading")}</strong> {error}
         <button
           onClick={onRefresh}
           style={{
@@ -306,7 +308,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
             cursor: 'pointer'
           }}
         >
-          Retry
+          {t("adminTools.backup.list.retry")}
         </button>
       </div>
     );
@@ -316,14 +318,14 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
     <div className="blv-container" style={styles.container}>
       <div className="blv-filters-container" style={styles.filtersContainer}>
         <div className="blv-filter-group" style={styles.filterGroup}>
-          <label className="blv-filter-label" style={styles.filterLabel}>Trigger Type</label>
+          <label className="blv-filter-label" style={styles.filterLabel}>{t("adminTools.backup.list.triggerType")}</label>
           <select
             className="blv-filter-select"
             style={styles.filterSelect}
             value={filterTrigger}
             onChange={(e) => setFilterTrigger(e.target.value)}
           >
-            <option value="all">All Triggers</option>
+            <option value="all">{t("adminTools.backup.list.allTriggers")}</option>
             {uniqueTriggers.map(trigger => (
               <option key={trigger} value={trigger}>
                 {backupUtils.formatBackupTrigger(trigger)}
@@ -333,23 +335,23 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
         </div>
 
         <div className="blv-filter-group" style={styles.filterGroup}>
-          <label className="blv-filter-label" style={styles.filterLabel}>Restoration Status</label>
+          <label className="blv-filter-label" style={styles.filterLabel}>{t("adminTools.backup.list.restorationStatus")}</label>
           <select
             className="blv-filter-select"
             style={styles.filterSelect}
             value={filterRestored}
             onChange={(e) => setFilterRestored(e.target.value)}
           >
-            <option value="all">All Backups</option>
-            <option value="false">Not Restored</option>
-            <option value="true">Restored</option>
+            <option value="all">{t("adminTools.backup.list.allBackups")}</option>
+            <option value="false">{t("adminTools.backup.list.notRestored")}</option>
+            <option value="true">{t("adminTools.backup.list.restored")}</option>
           </select>
         </div>
 
         <div className="blv-filter-group" style={styles.filterGroup}>
-          <label className="blv-filter-label" style={styles.filterLabel}>Results</label>
+          <label className="blv-filter-label" style={styles.filterLabel}>{t("adminTools.backup.list.results")}</label>
           <div style={{ fontSize: '14px', color: '#374151', padding: '8px 0' }}>
-            {processedBackups.length} of {(backups || []).length} backups
+            {t("adminTools.backup.list.resultsCount", { shown: processedBackups.length, total: (backups || []).length })}
           </div>
         </div>
       </div>
@@ -357,8 +359,8 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
       {processedBackups.length === 0 ? (
         <div className="blv-empty-state" style={styles.emptyState}>
           {(backups || []).length === 0
-            ? "No backups available. Create your first backup to get started."
-            : "No backups match the current filters."
+            ? t("adminTools.backup.list.emptyNoBackups")
+            : t("adminTools.backup.list.emptyNoMatch")
           }
         </div>
       ) : (
@@ -378,7 +380,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
 
                 <th className="blv-header-cell" style={styles.headerCell} onClick={() => handleSort('changeDay')}>
                   <div className="blv-sortable-header" style={styles.sortableHeader}>
-                    Change Day
+                    {t("adminTools.backup.list.colChangeDay")}
                     <span className="blv-sort-icon" style={styles.sortIcon}>
                       {sortConfig.key === 'changeDay' ? (
                         sortConfig.direction === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />
@@ -391,7 +393,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
 
                 <th className="blv-header-cell" style={styles.headerCell} onClick={() => handleSort('daysAgo')}>
                   <div className="blv-sortable-header" style={styles.sortableHeader}>
-                    Days Ago
+                    {t("adminTools.backup.list.colDaysAgo")}
                     <span className="blv-sort-icon" style={styles.sortIcon}>
                       {sortConfig.key === 'daysAgo' ? (
                         sortConfig.direction === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />
@@ -404,7 +406,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
 
                 <th className="blv-header-cell" style={styles.headerCell} onClick={() => handleSort('backupTrigger')}>
                   <div className="blv-sortable-header" style={styles.sortableHeader}>
-                    Trigger
+                    {t("adminTools.backup.list.colTrigger")}
                     <span className="blv-sort-icon" style={styles.sortIcon}>
                       {sortConfig.key === 'backupTrigger' ? (
                         sortConfig.direction === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />
@@ -415,11 +417,11 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                   </div>
                 </th>
 
-                <th className="blv-header-cell" style={styles.headerCell}>Data Summary</th>
+                <th className="blv-header-cell" style={styles.headerCell}>{t("adminTools.backup.list.colDataSummary")}</th>
 
                 <th className="blv-header-cell" style={styles.headerCell} onClick={() => handleSort('size')}>
                   <div className="blv-sortable-header" style={styles.sortableHeader}>
-                    Size
+                    {t("adminTools.backup.list.colSize")}
                     <span className="blv-sort-icon" style={styles.sortIcon}>
                       {sortConfig.key === 'size' ? (
                         sortConfig.direction === 'asc' ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />
@@ -430,8 +432,8 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                   </div>
                 </th>
 
-                <th className="blv-header-cell" style={styles.headerCell}>Status</th>
-                <th className="blv-header-cell" style={styles.headerCell}>Actions</th>
+                <th className="blv-header-cell" style={styles.headerCell}>{t("adminTools.backup.list.colStatus")}</th>
+                <th className="blv-header-cell" style={styles.headerCell}>{t("adminTools.backup.list.colActions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -462,7 +464,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                   </td>
 
                   <td className="blv-cell" style={styles.cell}>
-                    {backupUtils.getDaysAgo(backup.changeDay)} days ago
+                    {t("adminTools.backup.list.daysAgo", { count: backupUtils.getDaysAgo(backup.changeDay) })}
                   </td>
 
                   <td className="blv-cell" style={styles.cell}>
@@ -470,7 +472,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                       {backupUtils.formatBackupTrigger(backup.backupTrigger)}
                     </span>
                     <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                      {backup.changeContext?.changeDescription || 'No description available'}
+                      {backup.changeContext?.changeDescription || t("adminTools.backup.list.noDescription")}
                     </div>
                   </td>
 
@@ -478,17 +480,17 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                     <div className="blv-metadata-container" style={styles.metadataContainer}>
                       {(backup.snapshotMetadata?.documentCounts?.priceFixCount || 0) > 0 && (
                         <div className="blv-metadata-row" style={styles.metadataRow}>
-                          PriceFix: {backup.snapshotMetadata.documentCounts.priceFixCount}
+                          {t("adminTools.backup.list.priceFix", { count: backup.snapshotMetadata.documentCounts.priceFixCount })}
                         </div>
                       )}
                       {(backup.snapshotMetadata?.documentCounts?.productCatalogCount || 0) > 0 && (
                         <div className="blv-metadata-row" style={styles.metadataRow}>
-                          Products: {backup.snapshotMetadata.documentCounts.productCatalogCount}
+                          {t("adminTools.backup.list.products", { count: backup.snapshotMetadata.documentCounts.productCatalogCount })}
                         </div>
                       )}
                       {(backup.snapshotMetadata?.documentCounts?.serviceConfigCount || 0) > 0 && (
                         <div className="blv-metadata-row" style={styles.metadataRow}>
-                          Services: {backup.snapshotMetadata.documentCounts.serviceConfigCount}
+                          {t("adminTools.backup.list.services", { count: backup.snapshotMetadata.documentCounts.serviceConfigCount })}
                         </div>
                       )}
                     </div>
@@ -512,7 +514,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                         )
                       }}
                     >
-                      {backup.restorationInfo?.hasBeenRestored ? 'Restored' : 'Available'}
+                      {backup.restorationInfo?.hasBeenRestored ? t("adminTools.backup.list.restored") : t("adminTools.backup.list.available")}
                     </span>
                     {backup.restorationInfo?.hasBeenRestored && backup.restorationInfo?.lastRestoredAt && (
                       <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
@@ -527,9 +529,9 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                         className="blv-action-button blv-details-button"
                         style={{ ...styles.actionButton, ...styles.detailsButton }}
                         onClick={() => setDetailsBackup(backup)}
-                        title="View backup details"
+                        title={t("adminTools.backup.list.viewDetailsTitle")}
                       >
-                        View Details
+                        {t("adminTools.backup.list.viewDetails")}
                       </button>
                       <button
                         className="blv-action-button blv-restore-button"
@@ -544,11 +546,11 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                         onClick={() => onRestoreClick(backup)}
                         title={
                           backup.restorationInfo?.hasBeenRestored
-                            ? `Previously restored on ${new Date(backup.restorationInfo.lastRestoredAt).toLocaleDateString()}. Click to restore again.`
-                            : 'Restore this backup'
+                            ? t("adminTools.backup.list.restoreAgainTitle", { date: new Date(backup.restorationInfo.lastRestoredAt).toLocaleDateString() })
+                            : t("adminTools.backup.list.restoreTitle")
                         }
                       >
-                        {backup.restorationInfo?.hasBeenRestored ? 'Restore Again' : 'Restore'}
+                        {backup.restorationInfo?.hasBeenRestored ? t("adminTools.backup.list.restoreAgain") : t("adminTools.backup.list.restore")}
                       </button>
                     </div>
                   </td>

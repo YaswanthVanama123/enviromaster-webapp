@@ -9,6 +9,7 @@ import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 import { useEditableCurrency } from "../../../features/services/engine";
 import { FaCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const FIELD_ORDER = {
   frequency: 1,
@@ -35,6 +36,8 @@ const FIELD_ORDER = {
 export const MicrofiberMoppingForm: React.FC<
   ServiceInitialData<MicrofiberMoppingFormState>
 > = ({ initialData, onRemove }) => {
+
+  const { t } = useTranslation();
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -374,7 +377,7 @@ export const MicrofiberMoppingForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="MICROFIBER MOPPING"
+      title={t("serviceForms.microfiberMopping.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -403,17 +406,17 @@ export const MicrofiberMoppingForm: React.FC<
           }}
         >
           <div style={{ fontWeight: "bold", color: "#2e7d32", fontSize: "14px" }}>
-            ✓ INCLUDED in SaniClean All-Inclusive Package
+            {t("serviceForms.microfiberMopping.includedTitle")}
           </div>
           <div style={{ fontSize: "13px", color: "#555", marginTop: "4px" }}>
-            Microfiber Mopping is already included at no additional charge (${(form.customIncludedBathroomRate ?? form.includedBathroomRate).toFixed(2)}/bathroom waived).
+            {t("serviceForms.microfiberMopping.includedBody", { rate: (form.customIncludedBathroomRate ?? form.includedBathroomRate).toFixed(2) })}
           </div>
         </div>
       )}
 
       {}
       <div className="svc-row">
-        <label>Combined with Sani program?</label>
+        <label>{t("serviceForms.microfiberMopping.combinedWithSani")}</label>
         <div className="svc-row-right">
           <label className="svc-check">
             <input
@@ -422,14 +425,14 @@ export const MicrofiberMoppingForm: React.FC<
               checked={form.hasExistingSaniService}
               onChange={onChange}
             />
-            <span>Yes, bathrooms already on Sani</span>
+            <span>{t("serviceForms.microfiberMopping.yesOnSani")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>All-inclusive package?</label>
+        <label>{t("serviceForms.microfiberMopping.allInclusivePackage")}</label>
         <div className="svc-row-right">
           <label className="svc-check">
             <input
@@ -438,14 +441,14 @@ export const MicrofiberMoppingForm: React.FC<
               checked={form.isAllInclusive}
               onChange={onChange}
             />
-            <span>Microfiber included (no separate pricing)</span>
+            <span>{t("serviceForms.microfiberMopping.includedNoSeparate")}</span>
           </label>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -453,23 +456,23 @@ export const MicrofiberMoppingForm: React.FC<
             value={form.frequency}
             onChange={onChange}
           >
-            <option value="oneTime">One Time</option>
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Bi-weekly</option>
-            <option value="twicePerMonth">2× / Month</option>
-            <option value="monthly">Monthly</option>
-            <option value="everyFourWeeks">Every 4 Weeks</option>
-            <option value="bimonthly">Every 2 Months</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="biannual">Bi-Annual</option>
-            <option value="annual">Annual</option>
+            <option value="oneTime">{t("serviceForms.microfiberMopping.freq.oneTime")}</option>
+            <option value="weekly">{t("serviceForms.microfiberMopping.freq.weekly")}</option>
+            <option value="biweekly">{t("serviceForms.microfiberMopping.freq.biweekly")}</option>
+            <option value="twicePerMonth">{t("serviceForms.microfiberMopping.freq.twicePerMonth")}</option>
+            <option value="monthly">{t("serviceForms.microfiberMopping.freq.monthly")}</option>
+            <option value="everyFourWeeks">{t("serviceForms.microfiberMopping.freq.everyFourWeeks")}</option>
+            <option value="bimonthly">{t("serviceForms.microfiberMopping.freq.bimonthly")}</option>
+            <option value="quarterly">{t("serviceForms.microfiberMopping.freq.quarterly")}</option>
+            <option value="biannual">{t("serviceForms.microfiberMopping.freq.biannual")}</option>
+            <option value="annual">{t("serviceForms.microfiberMopping.freq.annual")}</option>
           </select>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Standard Bathrooms</label>
+        <label>{t("serviceForms.microfiberMopping.standardBathrooms")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -503,7 +506,7 @@ export const MicrofiberMoppingForm: React.FC<
               style={{
                 backgroundColor: form.customIncludedBathroomRate !== undefined ? '#fffacd' : 'white'
               }}
-              title="Bathroom rate (editable with yellow highlight if overridden)"
+              title={t("serviceForms.microfiberMopping.bathroomRateTitle")}
             />
           </div>
           <span>=</span>
@@ -532,7 +535,7 @@ export const MicrofiberMoppingForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Huge Bathroom (sq ft)</label>
+        <label>{t("serviceForms.microfiberMopping.hugeBathroom")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -564,7 +567,7 @@ export const MicrofiberMoppingForm: React.FC<
               style={{
                 backgroundColor: form.customHugeBathroomRatePerSqFt !== undefined ? '#fffacd' : 'white'
               }}
-              title="Huge bathroom rate per sq ft (editable with yellow highlight if overridden)"
+              title={t("serviceForms.microfiberMopping.hugeBathroomRateTitle")}
             />
           </div>
           {}
@@ -594,7 +597,7 @@ export const MicrofiberMoppingForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Extra non-bathroom(sq ft)</label>
+        <label>{t("serviceForms.microfiberMopping.extraNonBathroom")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -626,7 +629,7 @@ export const MicrofiberMoppingForm: React.FC<
               style={{
                 backgroundColor: form.customExtraAreaRatePerUnit !== undefined ? '#fffacd' : 'white'
               }}
-              title="Rate per 400 sq ft unit (editable with yellow highlight if overridden)"
+              title={t("serviceForms.microfiberMopping.extraAreaRateTitle")}
             />
           </div>
           {}
@@ -666,19 +669,19 @@ export const MicrofiberMoppingForm: React.FC<
               checked={form.useExactExtraAreaSqft}
               onChange={onChange}
             />
-            <span>Exact SqFt Calculation</span>
+            <span>{t("serviceForms.common.exactSqftCalculation")}</span>
           </label>
           <span className="svc-small">
             {form.useExactExtraAreaSqft
-              ? `(${activeConfig.extraAreaPricing.extraAreaSqFtUnit} sq ft units: $${activeConfig.extraAreaPricing.singleLargeAreaRate} first + $${(form.customExtraAreaRatePerUnit ?? form.extraAreaRatePerUnit).toFixed(2)} per extra)`
-              : `(Direct: $${activeConfig.extraAreaPricing.singleLargeAreaRate} for first ${activeConfig.extraAreaPricing.extraAreaSqFtUnit} sq ft + area × $${((form.customExtraAreaRatePerUnit ?? form.extraAreaRatePerUnit) / activeConfig.extraAreaPricing.extraAreaSqFtUnit).toFixed(4)}/sq ft)`}
+              ? t("serviceForms.microfiberMopping.exactExtraInfo", { unit: activeConfig.extraAreaPricing.extraAreaSqFtUnit, first: activeConfig.extraAreaPricing.singleLargeAreaRate, per: (form.customExtraAreaRatePerUnit ?? form.extraAreaRatePerUnit).toFixed(2) })
+              : t("serviceForms.microfiberMopping.directExtraInfo", { first: activeConfig.extraAreaPricing.singleLargeAreaRate, unit: activeConfig.extraAreaPricing.extraAreaSqFtUnit, perSqFt: ((form.customExtraAreaRatePerUnit ?? form.extraAreaRatePerUnit) / activeConfig.extraAreaPricing.extraAreaSqFtUnit).toFixed(4) })}
           </span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Standalone microfiber mopping (sq ft)</label>
+        <label>{t("serviceForms.microfiberMopping.standalone")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -710,7 +713,7 @@ export const MicrofiberMoppingForm: React.FC<
               style={{
                 backgroundColor: form.customStandaloneRatePerUnit !== undefined ? '#fffacd' : 'white'
               }}
-              title="Standalone rate per 200 sq ft (editable with yellow highlight if overridden)"
+              title={t("serviceForms.microfiberMopping.standaloneRateTitle")}
             />
           </div>
           {}
@@ -749,12 +752,12 @@ export const MicrofiberMoppingForm: React.FC<
               checked={form.useExactStandaloneSqft}
               onChange={onChange}
             />
-            <span>Exact SqFt Calculation</span>
+            <span>{t("serviceForms.common.exactSqftCalculation")}</span>
           </label>
           <span className="svc-small">
             {form.useExactStandaloneSqft
-              ? `(${activeConfig.standalonePricing.standaloneSqFtUnit} sq ft units: $${activeConfig.standalonePricing.standaloneMinimum} first + $${(form.customStandaloneRatePerUnit ?? form.standaloneRatePerUnit).toFixed(2)} per extra)`
-              : `(Direct: $${activeConfig.standalonePricing.standaloneMinimum} for first ${activeConfig.standalonePricing.standaloneSqFtUnit} sq ft + area × $${((form.customStandaloneRatePerUnit ?? form.standaloneRatePerUnit) / activeConfig.standalonePricing.standaloneSqFtUnit).toFixed(4)}/sq ft)`}
+              ? t("serviceForms.microfiberMopping.exactStandaloneInfo", { unit: activeConfig.standalonePricing.standaloneSqFtUnit, first: activeConfig.standalonePricing.standaloneMinimum, per: (form.customStandaloneRatePerUnit ?? form.standaloneRatePerUnit).toFixed(2) })
+              : t("serviceForms.microfiberMopping.directStandaloneInfo", { first: activeConfig.standalonePricing.standaloneMinimum, unit: activeConfig.standalonePricing.standaloneSqFtUnit, perSqFt: ((form.customStandaloneRatePerUnit ?? form.standaloneRatePerUnit) / activeConfig.standalonePricing.standaloneSqFtUnit).toFixed(4) })}
           </span>
         </div>
       </div>
@@ -769,7 +772,7 @@ export const MicrofiberMoppingForm: React.FC<
       <div className="svc-summary">
         {}
         <div className="svc-row">
-          <label>Minimum Per Visit</label>
+          <label>{t("serviceForms.common.minimumPerVisit")}</label>
           <div className="svc-row-right">
             <span className="svc-small">${calc.minimumChargePerVisit?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? "0.00"}</span>
             <label className="svc-inline" style={{ marginLeft: '10px' }}>
@@ -779,14 +782,14 @@ export const MicrofiberMoppingForm: React.FC<
                 checked={form.applyMinimum !== false}
                 onChange={onChange}
               />
-              <span>Apply Minimum</span>
+              <span>{t("serviceForms.common.applyMinimum")}</span>
             </label>
           </div>
         </div>
 
         {}
         <div className="svc-row">
-          <label>Per-visit service total</label>
+          <label>{t("serviceForms.microfiberMopping.perVisitServiceTotal")}</label>
           <div className="svc-dollar">
             <span>$</span>
             <input
@@ -829,7 +832,7 @@ export const MicrofiberMoppingForm: React.FC<
                   borderRadius: '4px',
                   display: 'inline-block'
                 }}>
-                  <FaCircle color="#16a34a" /> Greenline Pricing
+                  <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
                 </span>
               ) : (
                 <span style={{
@@ -841,7 +844,7 @@ export const MicrofiberMoppingForm: React.FC<
                   borderRadius: '4px',
                   display: 'inline-block'
                 }}>
-                  <FaCircle color="#dc2626" /> Redline Pricing
+                  <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
                 </span>
               )}
             </div>
@@ -864,7 +867,7 @@ export const MicrofiberMoppingForm: React.FC<
          form.frequency !== "biannual" && form.frequency !== "annual" &&
          form.frequency !== "bimonthly" && form.frequency !== "everyFourWeeks" && (
           <div className="svc-row">
-            <label>Monthly recurring</label>
+            <label>{t("serviceForms.microfiberMopping.monthlyRecurring")}</label>
             <div className="svc-dollar">
               <span>$</span>
               <input
@@ -897,7 +900,7 @@ export const MicrofiberMoppingForm: React.FC<
          form.frequency !== "biannual" && form.frequency !== "annual" &&
          form.frequency !== "bimonthly" && form.frequency !== "everyFourWeeks" && (
           <div className="svc-row">
-            <label>First month total</label>
+            <label>{t("serviceForms.microfiberMopping.firstMonthTotal")}</label>
             <div className="svc-dollar">
               <span>$</span>
               <input
@@ -931,7 +934,7 @@ export const MicrofiberMoppingForm: React.FC<
           form.frequency === "biannual" || form.frequency === "annual" ||
           form.frequency === "bimonthly" || form.frequency === "everyFourWeeks") && (
           <div className="svc-row">
-            <label>{form.frequency === "oneTime" ? "Total Price" : "First Visit Total"}</label>
+            <label>{form.frequency === "oneTime" ? t("serviceForms.common.totalPrice") : t("serviceForms.common.firstVisitTotal")}</label>
             <div className="svc-dollar">
               <span>$</span>
               <input
@@ -965,7 +968,7 @@ export const MicrofiberMoppingForm: React.FC<
           form.frequency === "biannual" || form.frequency === "annual" ||
           form.frequency === "everyFourWeeks") && (
           <div className="svc-row">
-            <label>Recurring Visit Total</label>
+            <label>{t("serviceForms.common.recurringVisitTotal")}</label>
             <div className="svc-dollar">
               <span>$</span>
               <input
@@ -984,7 +987,7 @@ export const MicrofiberMoppingForm: React.FC<
         {}
         {form.frequency !== "oneTime" && (
           <div className="svc-row">
-            <label>Contract Total</label>
+            <label>{t("serviceForms.common.contractTotal")}</label>
             <div className="svc-row-right">
               <select
                 className="svc-in"
@@ -994,22 +997,22 @@ export const MicrofiberMoppingForm: React.FC<
               >
                 {form.frequency === "quarterly"
                   ? Array.from({ length: 12 }, (_, i) => (i + 1) * 3).map((m) => (
-                      <option key={m} value={m}>{m} months</option>
+                      <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                     ))
                   : form.frequency === "bimonthly"
                   ? [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36].map((m) => (
-                      <option key={m} value={m}>{m} months</option>
+                      <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                     ))
                   : form.frequency === "biannual"
                   ? [6, 12, 18, 24, 30, 36].map((m) => (
-                      <option key={m} value={m}>{m} months</option>
+                      <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                     ))
                   : form.frequency === "annual"
                   ? [12, 24, 36].map((m) => (
-                      <option key={m} value={m}>{m} months</option>
+                      <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                     ))
                   : Array.from({ length: 35 }, (_, i) => i + 2).map((m) => (
-                      <option key={m} value={m}>{m} months</option>
+                      <option key={m} value={m}>{t("serviceForms.common.months", { count: m })}</option>
                     ))
                 }
               </select>

@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -25,7 +27,7 @@ interface EditHistoryItem {
   fileType?: string;
 }
 
-function formatTimestamp(iso: string): string {
+function formatTimestamp(iso: string, t: TFunction): string {
   if (!iso) return "—";
   const date = new Date(iso);
   const now = new Date();
@@ -37,20 +39,21 @@ function formatTimestamp(iso: string): string {
     hour12: true,
   });
 
-  if (diffDays === 0) return `Today at ${timeStr}`;
-  if (diffDays === 1) return `Yesterday at ${timeStr}`;
-  if (diffDays < 7) return `${diffDays} days ago at ${timeStr}`;
+  if (diffDays === 0) return t("editHistory.today", { time: timeStr });
+  if (diffDays === 1) return t("editHistory.yesterday", { time: timeStr });
+  if (diffDays < 7) return t("editHistory.daysAgo", { count: diffDays, time: timeStr });
 
-  return (
-    date.toLocaleDateString("en-US", {
+  return t("editHistory.dateAt", {
+    date: date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
-    }) + ` at ${timeStr}`
-  );
+    }),
+    time: timeStr,
+  });
 }
 
-function getActionConfig(action: EditHistoryItem["action"]): {
+function getActionConfig(action: EditHistoryItem["action"], t: TFunction): {
   icon: typeof faUserPlus;
   color: string;
   bg: string;
@@ -58,19 +61,19 @@ function getActionConfig(action: EditHistoryItem["action"]): {
 } {
   switch (action) {
     case "created":
-      return { icon: faUserPlus, color: "#16a34a", bg: "#dcfce7", label: "Created agreement" };
+      return { icon: faUserPlus, color: "#16a34a", bg: "#dcfce7", label: t("editHistory.actionCreated") };
     case "edited":
-      return { icon: faEdit, color: "#2563eb", bg: "#dbeafe", label: "Edited agreement" };
+      return { icon: faEdit, color: "#2563eb", bg: "#dbeafe", label: t("editHistory.actionEdited") };
     case "version_added":
-      return { icon: faCodeBranch, color: "#7c3aed", bg: "#f3e8ff", label: "Added new version" };
+      return { icon: faCodeBranch, color: "#7c3aed", bg: "#f3e8ff", label: t("editHistory.actionVersionAdded") };
     case "attachment_added":
-      return { icon: faPaperclip, color: "#ea580c", bg: "#fff7ed", label: "Added attachment" };
+      return { icon: faPaperclip, color: "#ea580c", bg: "#fff7ed", label: t("editHistory.actionAttachmentAdded") };
     default:
-      return { icon: faClock, color: "#6b7280", bg: "#f3f4f6", label: "Modified" };
+      return { icon: faClock, color: "#6b7280", bg: "#f3f4f6", label: t("editHistory.actionModified") };
   }
 }
 
-function buildEditHistory(agreement: SavedFileGroup): EditHistoryItem[] {
+function buildEditHistory(agreement: SavedFileGroup, t: TFunction): EditHistoryItem[] {
   const history: EditHistoryItem[] = [];
 
   const sortedByCreation = [...agreement.files].sort(
@@ -82,14 +85,14 @@ function buildEditHistory(agreement: SavedFileGroup): EditHistoryItem[] {
     history.push({
       id: `${firstFile.id}-created`,
       timestamp: firstFile.createdAt,
-      changedBy: firstFile.createdBy || "Unknown",
+      changedBy: firstFile.createdBy || t("editHistory.unknown"),
       action: "created",
       fileName: firstFile.title || firstFile.fileName,
     });
   }
 
   agreement.files.forEach((file) => {
-    
+
     if (file.updatedAt && file.updatedAt !== file.createdAt && file.updatedBy) {
       history.push({
         id: `${file.id}-edited-${file.updatedAt}`,
@@ -109,7 +112,7 @@ function buildEditHistory(agreement: SavedFileGroup): EditHistoryItem[] {
           timestamp: file.createdAt,
           changedBy: file.createdBy,
           action: "version_added",
-          fileName: `Version ${file.versionNumber || ""}`,
+          fileName: t("editHistory.versionLabel", { number: file.versionNumber || "" }),
         });
       }
     }
@@ -137,11 +140,12 @@ interface AgreementHistoryCardProps {
 }
 
 function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const history = useMemo(() => buildEditHistory(agreement), [agreement]);
+  const history = useMemo(() => buildEditHistory(agreement, t), [agreement, t]);
 
   const creationEntry = history.find((h) => h.action === "created");
-  const createdBy = creationEntry?.changedBy || "Unknown";
+  const createdBy = creationEntry?.changedBy || t("editHistory.unknown");
   const editCount = history.filter((h) => h.action !== "created").length;
 
   return (
@@ -215,7 +219,7 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
               }}
             >
               <FontAwesomeIcon icon={faUserPlus} style={{ fontSize: "9px" }} />
-              Created by {createdBy}
+              {t("editHistory.createdBy", { name: createdBy })}
             </span>
             {editCount > 0 && (
               <span
@@ -232,7 +236,7 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
                 }}
               >
                 <FontAwesomeIcon icon={faEdit} style={{ fontSize: "9px" }} />
-                {editCount} edit{editCount !== 1 ? "s" : ""}
+                {t("editHistory.editCount", { count: editCount })}
               </span>
             )}
           </div>
@@ -277,7 +281,7 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
                 letterSpacing: "0.5px",
               }}
             >
-              Edit History
+              {t("editHistory.editHistory")}
             </span>
           </div>
 
@@ -291,12 +295,12 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
                 fontSize: "13px",
               }}
             >
-              No edit history available
+              {t("editHistory.noEditHistory")}
             </div>
           ) : (
             <div style={{ padding: "12px 16px" }}>
               {history.map((item, idx) => {
-                const config = getActionConfig(item.action);
+                const config = getActionConfig(item.action, t);
                 const isLast = idx === history.length - 1;
 
                 return (
@@ -383,7 +387,7 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
                           {item.changedBy}
                         </span>
                         <span style={{ fontSize: "11px", color: "#9ca3af" }}>
-                          {formatTimestamp(item.timestamp)}
+                          {formatTimestamp(item.timestamp, t)}
                         </span>
                       </div>
                     </div>
@@ -399,6 +403,7 @@ function AgreementHistoryCard({ agreement }: AgreementHistoryCardProps) {
 }
 
 export function EditHistory() {
+  const { t } = useTranslation();
   const [agreements, setAgreements] = useState<SavedFileGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -452,10 +457,10 @@ export function EditHistory() {
               margin: "0 0 4px 0",
             }}
           >
-            Edit History
+            {t("editHistory.title")}
           </h2>
           <p style={{ fontSize: "14px", color: "#6b7280", margin: 0 }}>
-            Track all agreement changes and modifications
+            {t("editHistory.subtitle")}
           </p>
         </div>
         <button
@@ -477,7 +482,7 @@ export function EditHistory() {
           }}
         >
           <FontAwesomeIcon icon={faSync} spin={loading} style={{ fontSize: "12px" }} />
-          Refresh
+          {t("editHistory.refresh")}
         </button>
       </div>
 
@@ -497,7 +502,7 @@ export function EditHistory() {
         <FontAwesomeIcon icon={faSearch} style={{ color: "#9ca3af", fontSize: "14px" }} />
         <input
           type="text"
-          placeholder="Search agreements..."
+          placeholder={t("editHistory.searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -534,7 +539,7 @@ export function EditHistory() {
           fontWeight: "500",
         }}
       >
-        {filteredAgreements.length} agreement{filteredAgreements.length !== 1 ? "s" : ""}
+        {t("editHistory.agreementCount", { count: filteredAgreements.length })}
       </div>
 
       {}
@@ -554,7 +559,7 @@ export function EditHistory() {
             spin
             style={{ fontSize: "24px", color: "#c00000", marginBottom: "12px" }}
           />
-          <span style={{ fontSize: "14px" }}>Loading history...</span>
+          <span style={{ fontSize: "14px" }}>{t("editHistory.loadingHistory")}</span>
         </div>
       ) : filteredAgreements.length === 0 ? (
         <div
@@ -572,10 +577,10 @@ export function EditHistory() {
             style={{ fontSize: "40px", color: "#d1d5db", marginBottom: "12px" }}
           />
           <span style={{ fontSize: "16px", fontWeight: "600", color: "#374151" }}>
-            {searchQuery ? "No Results" : "No Agreements"}
+            {searchQuery ? t("editHistory.noResults") : t("editHistory.noAgreements")}
           </span>
           <span style={{ fontSize: "13px", marginTop: "4px" }}>
-            {searchQuery ? "Try a different search term" : "Agreement history will appear here"}
+            {searchQuery ? t("editHistory.tryDifferentSearch") : t("editHistory.historyWillAppear")}
           </span>
         </div>
       ) : (

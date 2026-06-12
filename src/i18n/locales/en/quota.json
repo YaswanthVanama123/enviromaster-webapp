@@ -1,0 +1,48 @@
+{
+  "title": "My Quota",
+  "subtitle": "Track your sales quota progress",
+  "loading": "Loading your quota...",
+  "error": "Error",
+  "noData": "No Quota Data",
+  "noDataMessage": "No quota data available for your account.",
+  "fetchError": "Failed to fetch quota data",
+  "period": {
+    "weekly": "Weekly"
+  },
+  "level": {
+    "below": "Below Quota",
+    "above": "Above Quota",
+    "double": "Double Quota"
+  },
+  "levelBadge": "{{label}} ({{rate}})",
+  "progressLabel": "{{percent}}% of quota",
+  "marker100": "100%",
+  "marker200": "200%",
+  "stats": {
+    "target": "Target",
+    "actualSales": "Actual Sales",
+    "commissionRate": "Commission Rate",
+    "earned": "Earned"
+  },
+  "nextTier": {
+    "title": "Progress to Next Tier",
+    "toReachQuota": "To reach quota (6% rate):",
+    "toReachDouble": "To reach double (9% rate):",
+    "achieved": "You've reached the highest tier!",
+    "achievedValue": "9% Commission"
+  },
+  "agreementStats": {
+    "title": "Agreement Stats",
+    "totalAgreements": "Total Agreements",
+    "newBusiness": "New Business",
+    "renewals": "Renewals"
+  },
+  "recent": {
+    "title": "Recent Agreements",
+    "perMonth": "{{amount}}/mo"
+  },
+  "history": {
+    "title": "Quota History",
+    "agreements": "{{count}} agreements"
+  }
+}

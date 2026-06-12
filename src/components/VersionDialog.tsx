@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTimes,
@@ -29,6 +30,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
   onReplaceMain,
   loading = false
 }) => {
+  const { t } = useTranslation();
   const [selectedAction, setSelectedAction] = useState<'create_version' | 'replace_recent'>('create_version');
   const [changeNotes, setChangeNotes] = useState("");
 
@@ -75,7 +77,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
       <div className="version-dialog__action-header">
         <FontAwesomeIcon icon={icon} />
         <span className="version-dialog__action-title">{title}</span>
-        {recommended && <span className="version-dialog__recommended-badge">Recommended</span>}
+        {recommended && <span className="version-dialog__recommended-badge">{t("versionDialog.recommended")}</span>}
       </div>
       <p className="version-dialog__action-description">{description}</p>
     </div>
@@ -86,7 +88,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
       <div className="version-dialog__overlay" onClick={onClose} />
       <div className="version-dialog__modal">
         <div className="version-dialog__header">
-          <h2>Save PDF Options</h2>
+          <h2>{t("versionDialog.title")}</h2>
           <button className="version-dialog__close" onClick={onClose} disabled={loading}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -97,30 +99,30 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
             <FontAwesomeIcon icon={faInfo} />
             <div className="version-dialog__status-content">
               <p>
-                <strong>Agreement:</strong> {versionStatus.agreement.headerTitle}
+                <strong>{t("versionDialog.agreementLabel")}</strong> {versionStatus.agreement.headerTitle}
               </p>
               <p>
-                Current versions: {versionStatus.totalVersions}
-                {versionStatus.totalVersions > 0 && ` (latest: v${versionStatus.latestVersionNumber})`}
+                {t("versionDialog.currentVersions", { count: versionStatus.totalVersions })}
+                {versionStatus.totalVersions > 0 && t("versionDialog.latestVersion", { number: versionStatus.latestVersionNumber })}
               </p>
             </div>
           </div>
 
           <div className="version-dialog__actions">
-            <h3>How would you like to save this PDF?</h3>
+            <h3>{t("versionDialog.howToSave")}</h3>
 
             {renderActionOption(
               'create_version',
-              'Create New Version',
-              `Create version ${versionStatus.latestVersionNumber + 1}. Recommended for tracking changes.`,
+              t("versionDialog.createVersionTitle"),
+              t("versionDialog.createVersionDescription", { number: versionStatus.latestVersionNumber + 1 }),
               faPlus,
               true
             )}
 
             {versionStatus.totalVersions > 0 && renderActionOption(
               'replace_recent',
-              'Replace Recent Version',
-              `Replace version ${versionStatus.latestVersionNumber} with this updated content. Saves storage space.`,
+              t("versionDialog.replaceRecentTitle"),
+              t("versionDialog.replaceRecentDescription", { number: versionStatus.latestVersionNumber }),
               faSync,
               false
             )}
@@ -128,12 +130,12 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
 
           <div className="version-dialog__notes">
             <label htmlFor="changeNotes" className="version-dialog__notes-label">
-              What changed? *
+              {t("versionDialog.notesLabel")}
             </label>
             <textarea
               id="changeNotes"
               className="version-dialog__notes-textarea"
-              placeholder="Describe what changed in this version (e.g., updated pricing, added services, client feedback changes)"
+              placeholder={t("versionDialog.notesPlaceholder")}
               value={changeNotes}
               onChange={(e) => setChangeNotes(e.target.value)}
               rows={3}
@@ -145,7 +147,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
             <div className="version-dialog__history">
               <h4>
                 <FontAwesomeIcon icon={faHistory} />
-                Existing Versions ({versionStatus.versions.length})
+                {t("versionDialog.existingVersions", { count: versionStatus.versions.length })}
               </h4>
               <div className="version-dialog__version-list">
                 {versionStatus.versions.slice(0, 3).map((version) => (
@@ -162,7 +164,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
                 {versionStatus.versions.length > 3 && (
                   <div className="version-dialog__version-item">
                     <span className="version-more">
-                      +{versionStatus.versions.length - 3} more versions
+                      {t("versionDialog.moreVersions", { count: versionStatus.versions.length - 3 })}
                     </span>
                   </div>
                 )}
@@ -177,9 +179,8 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
             onClick={onClose}
             disabled={loading}
           >
-            Cancel
+            {t("common.cancel")}
           </button>
-
           <button
             className="version-dialog__btn version-dialog__btn--primary"
             onClick={handleConfirm}
@@ -191,12 +192,12 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
             {loading ? (
               <>
                 <FontAwesomeIcon icon={faSpinner} spin />
-                Saving...
+                {t("versionDialog.saving")}
               </>
             ) : (
               <>
-                {selectedAction === 'create_version' && `Create Version ${versionStatus.latestVersionNumber + 1}`}
-                {selectedAction === 'replace_recent' && `Replace Version ${versionStatus.latestVersionNumber}`}
+                {selectedAction === 'create_version' && t("versionDialog.createVersionButton", { number: versionStatus.latestVersionNumber + 1 })}
+                {selectedAction === 'replace_recent' && t("versionDialog.replaceVersionButton", { number: versionStatus.latestVersionNumber })}
               </>
             )}
           </button>

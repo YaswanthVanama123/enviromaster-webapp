@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { companyMappingApi, CompanyMapping } from '../../../backendservice/api/companyMappingApi';
 import { accountTypeApi, MapboxDetectionResult, DestinationResult } from '../../../backendservice/api/accountTypeApi';
 import { getAccountTypeColor, getAccountTypeBgColor } from '../../../backendservice/types/accountType.types';
@@ -8,15 +9,15 @@ import { MdSearch, MdDirectionsCar, MdLocationOn, MdBusiness, MdSchedule } from 
 import './AccountTypeDetectorTab.css';
 
 const FREQUENCY_OPTIONS = [
-  { value: '', label: 'All Frequencies' },
-  { value: '1', label: 'Weekly' },
-  { value: '2', label: 'Bi-Weekly' },
-  { value: '3', label: 'Monthly' },
-  { value: '14', label: 'Bi-Monthly' },
-  { value: '4', label: 'Quarterly' },
-  { value: '5', label: 'Bi-Annual' },
-  { value: '6', label: 'Annual' },
-  { value: '7', label: 'One Time' },
+  { value: '', labelKey: 'adminTools.accountType.frequency.all' },
+  { value: '1', labelKey: 'adminTools.accountType.frequency.weekly' },
+  { value: '2', labelKey: 'adminTools.accountType.frequency.biWeekly' },
+  { value: '3', labelKey: 'adminTools.accountType.frequency.monthly' },
+  { value: '14', labelKey: 'adminTools.accountType.frequency.biMonthly' },
+  { value: '4', labelKey: 'adminTools.accountType.frequency.quarterly' },
+  { value: '5', labelKey: 'adminTools.accountType.frequency.biAnnual' },
+  { value: '6', labelKey: 'adminTools.accountType.frequency.annual' },
+  { value: '7', labelKey: 'adminTools.accountType.frequency.oneTime' },
 ];
 
 interface CompanyOption {
@@ -26,6 +27,7 @@ interface CompanyOption {
 }
 
 export const AccountTypeDetectorTab: React.FC = () => {
+  const { t } = useTranslation();
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
@@ -50,7 +52,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
         }
       } catch (err) {
         console.error('Error fetching companies:', err);
-        setError('Failed to load companies');
+        setError(t('adminTools.accountType.failedToLoadCompanies'));
       } finally {
         setLoadingCompanies(false);
       }
@@ -70,7 +72,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
 
   const handleDetect = async () => {
     if (!selectedCompanyId) {
-      setError('Please select a company');
+      setError(t('adminTools.accountType.pleaseSelectCompany'));
       return;
     }
 
@@ -86,7 +88,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
         setError(detectionResult.error);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Detection failed');
+      setError(err instanceof Error ? err.message : t('adminTools.accountType.detectionFailed'));
     } finally {
       setDetecting(false);
     }
@@ -97,21 +99,21 @@ export const AccountTypeDetectorTab: React.FC = () => {
   return (
     <div className="account-type-detector-tab">
       <div className="detector-header">
-        <h2>Account Type Detector</h2>
+        <h2>{t('adminTools.accountType.title')}</h2>
         <p className="detector-description">
-          Select a Bigin company to detect its account type based on actual driving time to nearby customers using Mapbox.
+          {t('adminTools.accountType.description')}
         </p>
       </div>
 
       <div className="detector-controls">
         <div className="company-selector">
-          <label htmlFor="company-search">Select Bigin Company:</label>
+          <label htmlFor="company-search">{t('adminTools.accountType.selectBiginCompany')}</label>
           <div className="search-input-wrapper">
             <MdSearch className="search-icon" />
             <input
               type="text"
               id="company-search"
-              placeholder="Search companies..."
+              placeholder={t('adminTools.accountType.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loadingCompanies}
@@ -127,7 +129,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
             disabled={loadingCompanies}
             size={Math.min(10, filteredCompanies.length + 1)}
           >
-            <option value="">-- Select a company --</option>
+            <option value="">{t('adminTools.accountType.selectACompany')}</option>
             {filteredCompanies.map(company => (
               <option key={company.biginId} value={company.biginId}>
                 {company.biginCompanyName}
@@ -135,13 +137,13 @@ export const AccountTypeDetectorTab: React.FC = () => {
               </option>
             ))}
           </select>
-          {loadingCompanies && <span className="loading-text">Loading companies...</span>}
+          {loadingCompanies && <span className="loading-text">{t('adminTools.accountType.loadingCompanies')}</span>}
         </div>
 
         <div className="frequency-selector">
           <label htmlFor="frequency-select">
             <MdSchedule className="label-icon" />
-            Filter by Frequency:
+            {t('adminTools.accountType.filterByFrequency')}
           </label>
           <select
             id="frequency-select"
@@ -155,7 +157,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
           >
             {FREQUENCY_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>
-                {opt.label}
+                {t(opt.labelKey)}
               </option>
             ))}
           </select>
@@ -169,12 +171,12 @@ export const AccountTypeDetectorTab: React.FC = () => {
           {detecting ? (
             <>
               <span className="spinner"></span>
-              Detecting...
+              {t('adminTools.accountType.detecting')}
             </>
           ) : (
             <>
               <MdDirectionsCar size={20} />
-              Detect Account Type
+              {t('adminTools.accountType.detectAccountType')}
             </>
           )}
         </button>
@@ -182,7 +184,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
 
       {error && (
         <div className="error-message">
-          <strong>Error:</strong> {error}
+          <strong>{t('adminTools.accountType.error')}</strong> {error}
         </div>
       )}
 
@@ -193,19 +195,19 @@ export const AccountTypeDetectorTab: React.FC = () => {
               <div className="info-row">
                 <MdBusiness className="info-icon" />
                 <div>
-                  <span className="label">Bigin Company:</span>
+                  <span className="label">{t('adminTools.accountType.biginCompany')}</span>
                   <span className="value">{result.biginCompany}</span>
                 </div>
               </div>
               <div className="info-row">
                 <MdLocationOn className="info-icon" />
                 <div>
-                  <span className="label">Mapped to:</span>
+                  <span className="label">{t('adminTools.accountType.mappedTo')}</span>
                   <span className="value">{result.routeStarCustomer}</span>
                 </div>
               </div>
               <div className="info-row address-row">
-                <span className="label">Address:</span>
+                <span className="label">{t('adminTools.accountType.address')}</span>
                 <span className="value">{result.fromAddress || 'N/A'}</span>
               </div>
             </div>
@@ -213,26 +215,26 @@ export const AccountTypeDetectorTab: React.FC = () => {
 
           {result.destinations && result.destinations.length > 0 && (
             <div className="destinations-section">
-              <h4>Nearest Destinations</h4>
+              <h4>{t('adminTools.accountType.nearestDestinations')}</h4>
               <div className="destinations-table">
                 <div className="table-header">
                   <span>#</span>
-                  <span>Customer</span>
-                  <span>Stored Distance</span>
-                  <span>Mapbox Distance</span>
-                  <span>Driving Time</span>
+                  <span>{t('adminTools.accountType.colCustomer')}</span>
+                  <span>{t('adminTools.accountType.colStoredDistance')}</span>
+                  <span>{t('adminTools.accountType.colMapboxDistance')}</span>
+                  <span>{t('adminTools.accountType.colDrivingTime')}</span>
                 </div>
                 {result.destinations.map((dest: DestinationResult, idx: number) => (
                   <div key={idx} className={`table-row ${idx === 0 ? 'nearest' : ''}`}>
                     <span className="row-num">{idx + 1}</span>
                     <span className="dest-name">{dest.destination}</span>
-                    <span>{dest.storedDistanceMiles?.toFixed(1) || '-'} mi</span>
-                    <span>{dest.mapboxDistanceMiles?.toFixed(1) || '-'} mi</span>
+                    <span>{dest.storedDistanceMiles?.toFixed(1) || '-'} {t('adminTools.accountType.miles')}</span>
+                    <span>{dest.mapboxDistanceMiles?.toFixed(1) || '-'} {t('adminTools.accountType.miles')}</span>
                     <span className="driving-time">
                       {dest.drivingTimeMinutes ? (
                         <>
                           <MdDirectionsCar className="time-icon" />
-                          {dest.drivingTimeMinutes.toFixed(1)} min
+                          {dest.drivingTimeMinutes.toFixed(1)} {t('adminTools.accountType.minutes')}
                         </>
                       ) : dest.error || '-'}
                     </span>
@@ -243,7 +245,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
           )}
 
           <div className="account-type-result">
-            <div className="result-label">Account Type:</div>
+            <div className="result-label">{t('adminTools.accountType.accountTypeLabel')}</div>
             <div
               className="account-type-badge"
               style={{
@@ -260,7 +262,7 @@ export const AccountTypeDetectorTab: React.FC = () => {
 
           {result.thresholds && (
             <div className="thresholds-info">
-              <span>Thresholds: Bread5 &le; {result.thresholds.bread5MaxMinutes} min | Bread15 &le; {result.thresholds.bread15MaxMinutes} min | Pit &gt; {result.thresholds.bread15MaxMinutes} min</span>
+              <span>{t('adminTools.accountType.thresholds', { bread5: result.thresholds.bread5MaxMinutes, bread15: result.thresholds.bread15MaxMinutes })}</span>
             </div>
           )}
         </div>
@@ -268,9 +270,9 @@ export const AccountTypeDetectorTab: React.FC = () => {
 
       {result && !result.success && !error && (
         <div className="no-result">
-          <p>{result.error || 'Could not detect account type'}</p>
-          {result.biginCompany && <p>Company: {result.biginCompany}</p>}
-          {result.routeStarCustomer && <p>Mapped to: {result.routeStarCustomer}</p>}
+          <p>{result.error || t('adminTools.accountType.couldNotDetect')}</p>
+          {result.biginCompany && <p>{t('adminTools.accountType.company', { name: result.biginCompany })}</p>}
+          {result.routeStarCustomer && <p>{t('adminTools.accountType.mappedTo')} {result.routeStarCustomer}</p>}
         </div>
       )}
     </div>

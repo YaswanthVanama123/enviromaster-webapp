@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { FaClipboardList } from "react-icons/fa";
 
 interface CreateBackupModalProps {
@@ -12,6 +13,7 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
   onCreate,
   loading
 }) => {
+  const { t } = useTranslation();
   const [description, setDescription] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -151,7 +153,7 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
-          <h2 style={styles.title}>Create Manual Backup</h2>
+          <h2 style={styles.title}>{t("adminTools.backup.create.title")}</h2>
           <button
             style={styles.closeButton}
             onClick={onClose}
@@ -164,26 +166,25 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
         <div style={styles.content}>
           <div style={styles.infoBox}>
             <p style={styles.infoText}>
-              <FaClipboardList /> This will create a backup of all current pricing data (PriceFixes, Product Catalog, and Service Configs).
-              Only one backup per day is allowed - if a backup already exists for today, this action will be skipped.
+              <FaClipboardList /> {t("adminTools.backup.create.infoText")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit}>
             <div style={styles.formGroup}>
               <label style={styles.label} htmlFor="description">
-                Change Description
+                {t("adminTools.backup.create.descriptionLabel")}
               </label>
               <textarea
                 id="description"
                 style={styles.textarea}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe what changes prompted this manual backup..."
+                placeholder={t("adminTools.backup.create.descriptionPlaceholder")}
                 disabled={loading}
               />
               <div style={styles.helpText}>
-                Optional: Describe the reason for creating this manual backup
+                {t("adminTools.backup.create.descriptionHelp")}
               </div>
             </div>
 
@@ -198,7 +199,7 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
                 onClick={onClose}
                 disabled={loading}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
@@ -209,7 +210,7 @@ export const CreateBackupModal: React.FC<CreateBackupModalProps> = ({
                 }}
                 disabled={loading}
               >
-                {loading ? 'Creating...' : 'Create Backup'}
+                {loading ? t("adminTools.backup.create.creating") : t("adminTools.backup.create.createButton")}
               </button>
             </div>
           </form>

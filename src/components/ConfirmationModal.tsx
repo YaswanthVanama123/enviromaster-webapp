@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./ConfirmationModal.css";
 
 type ConfirmationModalProps = {
@@ -13,13 +14,17 @@ type ConfirmationModalProps = {
 
 export default function ConfirmationModal({
   isOpen,
-  title = "Confirm",
+  title,
   message,
-  confirmText = "Yes",
-  cancelText = "Cancel",
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
 }: ConfirmationModalProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("confirm.defaultTitle");
+  const resolvedConfirm = confirmText ?? t("confirm.defaultConfirm");
+  const resolvedCancel = cancelText ?? t("confirm.defaultCancel");
   useEffect(() => {
     if (isOpen) {
       const handleEsc = (e: KeyboardEvent) => {
@@ -35,7 +40,7 @@ export default function ConfirmationModal({
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">{title}</h2>
+        <h2 className="modal-title">{resolvedTitle}</h2>
         <p className="modal-message">{message}</p>
         <div className="modal-actions">
           <button
@@ -43,14 +48,14 @@ export default function ConfirmationModal({
             className="modal-btn modal-btn--cancel"
             onClick={onCancel}
           >
-            {cancelText}
+            {resolvedCancel}
           </button>
           <button
             type="button"
             className="modal-btn modal-btn--confirm"
             onClick={onConfirm}
           >
-            {confirmText}
+            {resolvedConfirm}
           </button>
         </div>
       </div>

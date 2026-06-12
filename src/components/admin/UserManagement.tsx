@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userManagementApi } from '../../backendservice/api/userManagementApi';
 import { Spinner } from '../atoms/Spinner';
 import type { UserListItem, UserRole, CreateAdminPayload, CreateEmployeePayload } from '../../backendservice/types/api.types';
@@ -6,6 +7,7 @@ import type { UserListItem, UserRole, CreateAdminPayload, CreateEmployeePayload 
 interface UserManagementProps {}
 
 export function UserManagement({}: UserManagementProps) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function UserManagement({}: UserManagementProps) {
       });
       setUsers(response.users);
     } catch (err: any) {
-      setError(err?.detail || err?.message || 'Failed to fetch users');
+      setError(err?.detail || err?.message || t('userManagement.failedToFetchUsers'));
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export function UserManagement({}: UserManagementProps) {
     setFormError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError('Passwords do not match');
+      setFormError(t('userManagement.passwordsDoNotMatch'));
       return;
     }
 
@@ -89,7 +91,7 @@ export function UserManagement({}: UserManagementProps) {
       resetForm();
       fetchUsers();
     } catch (err: any) {
-      setFormError(err?.detail || err?.message || 'Failed to create user');
+      setFormError(err?.detail || err?.message || t('userManagement.failedToCreateUser'));
     } finally {
       setSubmitting(false);
     }
@@ -115,7 +117,7 @@ export function UserManagement({}: UserManagementProps) {
       resetForm();
       fetchUsers();
     } catch (err: any) {
-      setFormError(err?.detail || err?.message || 'Failed to update user');
+      setFormError(err?.detail || err?.message || t('userManagement.failedToUpdateUser'));
     } finally {
       setSubmitting(false);
     }
@@ -126,7 +128,7 @@ export function UserManagement({}: UserManagementProps) {
       await userManagementApi.toggleUserStatus(user.role, user.id, !user.isActive);
       fetchUsers();
     } catch (err: any) {
-      setError(err?.detail || err?.message || 'Failed to toggle user status');
+      setError(err?.detail || err?.message || t('userManagement.failedToToggleStatus'));
     }
   };
 
@@ -137,7 +139,7 @@ export function UserManagement({}: UserManagementProps) {
     setFormError(null);
 
     if (newPassword !== confirmNewPassword) {
-      setFormError('Passwords do not match');
+      setFormError(t('userManagement.passwordsDoNotMatch'));
       return;
     }
 
@@ -153,7 +155,7 @@ export function UserManagement({}: UserManagementProps) {
       setNewPassword('');
       setConfirmNewPassword('');
     } catch (err: any) {
-      setFormError(err?.detail || err?.message || 'Failed to reset password');
+      setFormError(err?.detail || err?.message || t('userManagement.failedToResetPassword'));
     } finally {
       setSubmitting(false);
     }
@@ -200,7 +202,7 @@ export function UserManagement({}: UserManagementProps) {
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Never';
+    if (!dateString) return t('userManagement.never');
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -215,8 +217,8 @@ export function UserManagement({}: UserManagementProps) {
       {}
       <div style={styles.header}>
         <div>
-          <h2 style={styles.title}>User Management</h2>
-          <p style={styles.subtitle}>Manage admin and employee accounts</p>
+          <h2 style={styles.title}>{t('userManagement.title')}</h2>
+          <p style={styles.subtitle}>{t('userManagement.subtitle')}</p>
         </div>
         <button
           style={styles.primaryButton}
@@ -225,30 +227,30 @@ export function UserManagement({}: UserManagementProps) {
             setShowCreateModal(true);
           }}
         >
-          + Add User
+          {t('userManagement.addUser')}
         </button>
       </div>
 
       {}
       <div style={styles.filters}>
         <div style={styles.filterGroup}>
-          <label style={styles.filterLabel}>Role</label>
+          <label style={styles.filterLabel}>{t('userManagement.roleLabel')}</label>
           <select
             style={styles.select}
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value as UserRole | 'all')}
           >
-            <option value="all">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="employee">Employee</option>
+            <option value="all">{t('userManagement.allRoles')}</option>
+            <option value="admin">{t('userManagement.admin')}</option>
+            <option value="employee">{t('userManagement.employee')}</option>
           </select>
         </div>
         <div style={styles.filterGroup}>
-          <label style={styles.filterLabel}>Search</label>
+          <label style={styles.filterLabel}>{t('userManagement.searchLabel')}</label>
           <input
             type="text"
             style={styles.searchInput}
-            placeholder="Search by username or name..."
+            placeholder={t('userManagement.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -270,22 +272,22 @@ export function UserManagement({}: UserManagementProps) {
         {loading ? (
           <div style={styles.loadingContainer}>
             <Spinner size="md" />
-            <p>Loading users...</p>
+            <p>{t('userManagement.loadingUsers')}</p>
           </div>
         ) : users.length === 0 ? (
           <div style={styles.emptyState}>
-            <p>No users found</p>
+            <p>{t('userManagement.noUsersFound')}</p>
           </div>
         ) : (
           <table style={styles.table}>
             <thead>
               <tr>
-                <th style={styles.th}>Username</th>
-                <th style={styles.th}>Full Name</th>
-                <th style={styles.th}>Role</th>
-                <th style={styles.th}>Status</th>
-                <th style={styles.th}>Last Login</th>
-                <th style={styles.th}>Actions</th>
+                <th style={styles.th}>{t('userManagement.thUsername')}</th>
+                <th style={styles.th}>{t('userManagement.thFullName')}</th>
+                <th style={styles.th}>{t('userManagement.thRole')}</th>
+                <th style={styles.th}>{t('userManagement.thStatus')}</th>
+                <th style={styles.th}>{t('userManagement.thLastLogin')}</th>
+                <th style={styles.th}>{t('userManagement.thActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -310,7 +312,7 @@ export function UserManagement({}: UserManagementProps) {
                         ...(user.isActive ? styles.activeBadge : styles.inactiveBadge),
                       }}
                     >
-                      {user.isActive ? 'Active' : 'Inactive'}
+                      {user.isActive ? t('userManagement.active') : t('userManagement.inactive')}
                     </span>
                   </td>
                   <td style={styles.td}>{formatDate(user.lastLoginAt)}</td>
@@ -319,16 +321,16 @@ export function UserManagement({}: UserManagementProps) {
                       <button
                         style={styles.actionButton}
                         onClick={() => openEditModal(user)}
-                        title="Edit"
+                        title={t('userManagement.edit')}
                       >
-                        Edit
+                        {t('userManagement.edit')}
                       </button>
                       <button
                         style={styles.actionButton}
                         onClick={() => openResetPasswordModal(user)}
-                        title="Reset Password"
+                        title={t('userManagement.resetPassword')}
                       >
-                        Reset Password
+                        {t('userManagement.resetPassword')}
                       </button>
                       <button
                         style={{
@@ -337,7 +339,7 @@ export function UserManagement({}: UserManagementProps) {
                         }}
                         onClick={() => handleToggleStatus(user)}
                       >
-                        {user.isActive ? 'Deactivate' : 'Activate'}
+                        {user.isActive ? t('userManagement.deactivate') : t('userManagement.activate')}
                       </button>
                     </div>
                   </td>
@@ -352,10 +354,10 @@ export function UserManagement({}: UserManagementProps) {
       {showCreateModal && (
         <div style={styles.modalOverlay} onClick={() => setShowCreateModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.modalTitle}>Create New User</h3>
+            <h3 style={styles.modalTitle}>{t('userManagement.createNewUser')}</h3>
             <form onSubmit={handleCreateUser}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Role</label>
+                <label style={styles.label}>{t('userManagement.roleLabel')}</label>
                 <select
                   style={styles.input}
                   value={formData.role}
@@ -363,12 +365,12 @@ export function UserManagement({}: UserManagementProps) {
                     setFormData({ ...formData, role: e.target.value as UserRole })
                   }
                 >
-                  <option value="employee">Employee</option>
-                  <option value="admin">Admin</option>
+                  <option value="employee">{t('userManagement.employee')}</option>
+                  <option value="admin">{t('userManagement.admin')}</option>
                 </select>
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Username *</label>
+                <label style={styles.label}>{t('userManagement.usernameRequired')}</label>
                 <input
                   type="text"
                   style={styles.input}
@@ -378,7 +380,7 @@ export function UserManagement({}: UserManagementProps) {
                 />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Password *</label>
+                <label style={styles.label}>{t('userManagement.passwordRequired')}</label>
                 <div style={styles.passwordContainer}>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -387,7 +389,7 @@ export function UserManagement({}: UserManagementProps) {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     minLength={6}
-                    placeholder="Minimum 6 characters"
+                    placeholder={t('userManagement.minLengthPlaceholder')}
                   />
                   <button
                     type="button"
@@ -410,7 +412,7 @@ export function UserManagement({}: UserManagementProps) {
                 </div>
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Confirm Password *</label>
+                <label style={styles.label}>{t('userManagement.confirmPasswordRequired')}</label>
                 <div style={styles.passwordContainer}>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -419,7 +421,7 @@ export function UserManagement({}: UserManagementProps) {
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
                     minLength={6}
-                    placeholder="Confirm your password"
+                    placeholder={t('userManagement.confirmPasswordPlaceholder')}
                   />
                   <button
                     type="button"
@@ -444,7 +446,7 @@ export function UserManagement({}: UserManagementProps) {
               {formData.role === 'employee' && (
                 <>
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Full Name *</label>
+                    <label style={styles.label}>{t('userManagement.fullNameRequired')}</label>
                     <input
                       type="text"
                       style={styles.input}
@@ -454,7 +456,7 @@ export function UserManagement({}: UserManagementProps) {
                     />
                   </div>
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Email</label>
+                    <label style={styles.label}>{t('userManagement.email')}</label>
                     <input
                       type="email"
                       style={styles.input}
@@ -471,10 +473,10 @@ export function UserManagement({}: UserManagementProps) {
                   style={styles.cancelButton}
                   onClick={() => setShowCreateModal(false)}
                 >
-                  Cancel
+                  {t('userManagement.cancel')}
                 </button>
                 <button type="submit" style={styles.submitButton} disabled={submitting}>
-                  {submitting ? 'Creating...' : 'Create User'}
+                  {submitting ? t('userManagement.creating') : t('userManagement.createUser')}
                 </button>
               </div>
             </form>
@@ -486,10 +488,10 @@ export function UserManagement({}: UserManagementProps) {
       {showEditModal && selectedUser && (
         <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.modalTitle}>Edit User</h3>
+            <h3 style={styles.modalTitle}>{t('userManagement.editUser')}</h3>
             <form onSubmit={handleUpdateUser}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Username</label>
+                <label style={styles.label}>{t('userManagement.username')}</label>
                 <input
                   type="text"
                   style={styles.input}
@@ -501,7 +503,7 @@ export function UserManagement({}: UserManagementProps) {
               {selectedUser.role === 'employee' && (
                 <>
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Full Name</label>
+                    <label style={styles.label}>{t('userManagement.fullName')}</label>
                     <input
                       type="text"
                       style={styles.input}
@@ -511,7 +513,7 @@ export function UserManagement({}: UserManagementProps) {
                     />
                   </div>
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Email</label>
+                    <label style={styles.label}>{t('userManagement.email')}</label>
                     <input
                       type="email"
                       style={styles.input}
@@ -528,7 +530,7 @@ export function UserManagement({}: UserManagementProps) {
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   />
-                  <span style={{ marginLeft: '8px' }}>Active</span>
+                  <span style={{ marginLeft: '8px' }}>{t('userManagement.active')}</span>
                 </label>
               </div>
               {formError && <div style={styles.formError}>{formError}</div>}
@@ -538,10 +540,10 @@ export function UserManagement({}: UserManagementProps) {
                   style={styles.cancelButton}
                   onClick={() => setShowEditModal(false)}
                 >
-                  Cancel
+                  {t('userManagement.cancel')}
                 </button>
                 <button type="submit" style={styles.submitButton} disabled={submitting}>
-                  {submitting ? 'Saving...' : 'Save Changes'}
+                  {submitting ? t('userManagement.saving') : t('userManagement.saveChanges')}
                 </button>
               </div>
             </form>
@@ -553,13 +555,13 @@ export function UserManagement({}: UserManagementProps) {
       {showResetPasswordModal && selectedUser && (
         <div style={styles.modalOverlay} onClick={() => setShowResetPasswordModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.modalTitle}>Reset Password</h3>
+            <h3 style={styles.modalTitle}>{t('userManagement.resetPassword')}</h3>
             <p style={styles.modalSubtitle}>
-              Reset password for <strong>{selectedUser.username}</strong>
+              {t('userManagement.resetPasswordFor')} <strong>{selectedUser.username}</strong>
             </p>
             <form onSubmit={handleResetPassword}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>New Password *</label>
+                <label style={styles.label}>{t('userManagement.newPasswordRequired')}</label>
                 <div style={styles.passwordContainer}>
                   <input
                     type={showNewPassword ? 'text' : 'password'}
@@ -568,7 +570,7 @@ export function UserManagement({}: UserManagementProps) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
                     minLength={6}
-                    placeholder="Minimum 6 characters"
+                    placeholder={t('userManagement.minLengthPlaceholder')}
                   />
                   <button
                     type="button"
@@ -591,7 +593,7 @@ export function UserManagement({}: UserManagementProps) {
                 </div>
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Confirm New Password *</label>
+                <label style={styles.label}>{t('userManagement.confirmNewPasswordRequired')}</label>
                 <div style={styles.passwordContainer}>
                   <input
                     type={showConfirmNewPassword ? 'text' : 'password'}
@@ -600,7 +602,7 @@ export function UserManagement({}: UserManagementProps) {
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     required
                     minLength={6}
-                    placeholder="Confirm new password"
+                    placeholder={t('userManagement.confirmNewPasswordPlaceholder')}
                   />
                   <button
                     type="button"
@@ -629,10 +631,10 @@ export function UserManagement({}: UserManagementProps) {
                   style={styles.cancelButton}
                   onClick={() => setShowResetPasswordModal(false)}
                 >
-                  Cancel
+                  {t('userManagement.cancel')}
                 </button>
                 <button type="submit" style={styles.submitButton} disabled={submitting}>
-                  {submitting ? 'Resetting...' : 'Reset Password'}
+                  {submitting ? t('userManagement.resetting') : t('userManagement.resetPassword')}
                 </button>
               </div>
             </form>

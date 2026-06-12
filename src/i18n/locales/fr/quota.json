@@ -1,0 +1,48 @@
+{
+  "title": "Mon Quota",
+  "subtitle": "Suivez la progression de votre quota de ventes",
+  "loading": "Chargement de votre quota...",
+  "error": "Erreur",
+  "noData": "Aucune donnée de quota",
+  "noDataMessage": "Aucune donnée de quota disponible pour votre compte.",
+  "fetchError": "Échec de la récupération des données de quota",
+  "period": {
+    "weekly": "Hebdomadaire"
+  },
+  "level": {
+    "below": "Sous le quota",
+    "above": "Au-dessus du quota",
+    "double": "Double quota"
+  },
+  "levelBadge": "{{label}} ({{rate}})",
+  "progressLabel": "{{percent}} % du quota",
+  "marker100": "100%",
+  "marker200": "200%",
+  "stats": {
+    "target": "Objectif",
+    "actualSales": "Ventes réelles",
+    "commissionRate": "Taux de commission",
+    "earned": "Gagné"
+  },
+  "nextTier": {
+    "title": "Progression vers le niveau suivant",
+    "toReachQuota": "Pour atteindre le quota (taux de 6 %) :",
+    "toReachDouble": "Pour atteindre le double (taux de 9 %) :",
+    "achieved": "Vous avez atteint le niveau le plus élevé !",
+    "achievedValue": "9 % de commission"
+  },
+  "agreementStats": {
+    "title": "Statistiques des contrats",
+    "totalAgreements": "Total des contrats",
+    "newBusiness": "Nouvelles affaires",
+    "renewals": "Renouvellements"
+  },
+  "recent": {
+    "title": "Contrats récents",
+    "perMonth": "{{amount}}/mois"
+  },
+  "history": {
+    "title": "Historique des quotas",
+    "agreements": "{{count}} contrats"
+  }
+}

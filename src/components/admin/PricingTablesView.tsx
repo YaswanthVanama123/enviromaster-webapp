@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
 import type { Product } from "../../backendservice/types/productCatalog.types";
@@ -19,6 +20,7 @@ const truncateText = (text: string | undefined, maxLength: number): string => {
 };
 
 export const PricingTablesView: React.FC = () => {
+  const { t } = useTranslation();
   const { configs, loading: servicesLoading, error: servicesError, updateConfig } = useServiceConfigs();
   const { catalog, loading: catalogLoading, error: catalogError, updateCatalog } = useActiveProductCatalog();
 
@@ -530,7 +532,7 @@ export const PricingTablesView: React.FC = () => {
     });
 
     if (result.success) {
-      setSuccessMessage("✓ Product price updated successfully!");
+      setSuccessMessage(t("adminPricing.view.productPriceUpdated"));
       setEditingProduct(null);
 
     }
@@ -560,7 +562,7 @@ export const PricingTablesView: React.FC = () => {
     const result = await updateConfig(service._id, { config: newConfig });
 
     if (result.success) {
-      setSuccessMessage("✓ Service price updated successfully!");
+      setSuccessMessage(t("adminPricing.view.servicePriceUpdated"));
       setEditingServiceField(null);
     }
     setSaving(false);
@@ -611,7 +613,7 @@ export const PricingTablesView: React.FC = () => {
     return (
       <div style={styles.loadingContainer} className="pricing-loading-container">
         <Spinner size="md" />
-        <p style={styles.loadingText} className="pricing-loading-text">Loading pricing data...</p>
+        <p style={styles.loadingText} className="pricing-loading-text">{t("adminPricing.view.loading")}</p>
       </div>
     );
   }
@@ -620,9 +622,9 @@ export const PricingTablesView: React.FC = () => {
     return (
       <div style={styles.container} className="pricing-container">
         <div style={styles.errorBox} className="pricing-error-box">
-          <h3><FaExclamationTriangle /> Error Loading Data</h3>
-          {servicesError && <p>Services Error: {servicesError}</p>}
-          {catalogError && <p>Catalog Error: {catalogError}</p>}
+          <h3><FaExclamationTriangle /> {t("adminPricing.view.errorLoadingData")}</h3>
+          {servicesError && <p>{t("adminPricing.view.servicesError", { error: servicesError })}</p>}
+          {catalogError && <p>{t("adminPricing.view.catalogError", { error: catalogError })}</p>}
         </div>
       </div>
     );
@@ -632,10 +634,10 @@ export const PricingTablesView: React.FC = () => {
     return (
       <div style={styles.container} className="pricing-container">
         <div style={styles.errorBox} className="pricing-error-box">
-          <h3><FaExclamationTriangle /> No Data Available</h3>
-          <p>No services or products found. Please check backend connection.</p>
-          <p>Configs length: {configs?.length || 0}</p>
-          <p>Catalog families: {catalog?.families?.length || 0}</p>
+          <h3><FaExclamationTriangle /> {t("adminPricing.view.noDataAvailable")}</h3>
+          <p>{t("adminPricing.view.noDataMessage")}</p>
+          <p>{t("adminPricing.view.configsLength", { count: configs?.length || 0 })}</p>
+          <p>{t("adminPricing.view.catalogFamilies", { count: catalog?.families?.length || 0 })}</p>
         </div>
       </div>
     );
@@ -650,7 +652,7 @@ export const PricingTablesView: React.FC = () => {
 
       {}
       <div style={styles.section} className="pricing-section">
-        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaBox /> PRODUCT CATALOG</h2>
+        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaBox /> {t("adminPricing.view.productCatalogHeading")}</h2>
 
         <div style={styles.tabBar} className="pricing-tab-bar">
           {catalog?.families.map((family) => (
@@ -670,20 +672,20 @@ export const PricingTablesView: React.FC = () => {
 
         {selectedFamily && (
           <div style={styles.tableContainer} className="pricing-table-container">
-            <h3 style={styles.tableTitle} className="pricing-table-title">{selectedFamily.label} ({selectedFamily.products.length} products)</h3>
+            <h3 style={styles.tableTitle} className="pricing-table-title">{t("adminPricing.view.tableTitle", { label: selectedFamily.label, count: selectedFamily.products.length })}</h3>
 
             <div style={styles.tableWrapper} className="pricing-table-wrapper">
               <table style={styles.table} className="pricing-table">
                 <thead>
                   <tr>
-                    <th style={styles.th} className="pricing-th">Product Name</th>
-                    <th style={styles.th} className="pricing-th">Product Key</th>
-                    <th style={styles.th} className="pricing-th">Base Price</th>
-                    <th style={styles.th} className="pricing-th">UOM</th>
-                    <th style={styles.th} className="pricing-th">Warranty Price</th>
-                    <th style={styles.th} className="pricing-th">Billing Period</th>
-                    <th style={styles.th} className="pricing-th">Description</th>
-                    <th style={styles.th} className="pricing-th">Actions</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thProductName")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thProductKey")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thBasePrice")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thUom")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thWarrantyPrice")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thBillingPeriod")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thDescription")}</th>
+                    <th style={styles.th} className="pricing-th">{t("adminPricing.view.thActions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -730,7 +732,7 @@ export const PricingTablesView: React.FC = () => {
                         </td>
                         <td style={styles.td} className="pricing-td">{product.warrantyPricePerUnit?.billingPeriod || "—"}</td>
                         <td style={styles.td} className="pricing-td">
-                          <span title={product.description || "No description"}>
+                          <span title={product.description || t("adminPricing.view.noDescription")}>
                             {truncateText(product.description, 50)}
                           </span>
                         </td>
@@ -738,9 +740,9 @@ export const PricingTablesView: React.FC = () => {
                           {isEditingBase || isEditingWarranty ? (
                             <div style={styles.actionButtons} className="pricing-action-buttons">
                               <button style={styles.saveBtn} className="pricing-save-btn" onClick={handleSaveProduct} disabled={saving}>
-                                {saving ? "..." : "Save"}
+                                {saving ? "..." : t("adminPricing.view.save")}
                               </button>
-                              <button style={styles.cancelBtn} className="pricing-cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                              <button style={styles.cancelBtn} className="pricing-cancel-btn" onClick={handleCancelEdit}>{t("adminPricing.view.cancel")}</button>
                             </div>
                           ) : (
                             <div style={styles.actionButtons} className="pricing-action-buttons">
@@ -750,16 +752,15 @@ export const PricingTablesView: React.FC = () => {
                                   className="pricing-edit-btn"
                                   onClick={() => handleEditProduct(selectedFamily.key, product.key, "basePrice", product.basePrice!.amount)}
                                 >
-                                  Edit Base
-                                </button>
-                              )}
+                                  {t("adminPricing.view.editBase")}
+                                </button>                              )}
                               {product.warrantyPricePerUnit && (
                                 <button
                                   style={styles.editBtn}
                                   className="pricing-edit-btn"
                                   onClick={() => handleEditProduct(selectedFamily.key, product.key, "warrantyPrice", product.warrantyPricePerUnit!.amount)}
                                 >
-                                  Edit Warranty
+                                  {t("adminPricing.view.editWarranty")}
                                 </button>
                               )}
                             </div>
@@ -777,7 +778,7 @@ export const PricingTablesView: React.FC = () => {
 
       {}
       <div style={styles.section} className="pricing-section">
-        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaTools /> SERVICES PRICING</h2>
+        <h2 style={styles.sectionTitle} className="pricing-section-title"><FaTools /> {t("adminPricing.view.servicesPricingHeading")}</h2>
 
         <div style={styles.tabBar} className="pricing-tab-bar">
           {configs.map((service) => (
@@ -802,7 +803,7 @@ export const PricingTablesView: React.FC = () => {
                 <h3 style={styles.tableTitle} className="pricing-table-title">
                   {selectedServiceData.label}
                   <span style={selectedServiceData.isActive ? styles.badgeActive : styles.badgeInactive} className={selectedServiceData.isActive ? "pricing-badge-active" : "pricing-badge-inactive"}>
-                    {selectedServiceData.isActive ? "● Active" : "● Inactive"}
+                    {selectedServiceData.isActive ? t("adminPricing.view.active") : t("adminPricing.view.inactive")}
                   </span>
                 </h3>
                 <div
@@ -816,7 +817,7 @@ export const PricingTablesView: React.FC = () => {
                 className="pricing-view-all-fields-btn"
                 onClick={() => setDetailedViewService(selectedServiceData)}
               >
-                <FontAwesomeIcon icon={faWindowMaximize} /> View All Fields (Organized)
+                <FontAwesomeIcon icon={faWindowMaximize} /> {t("adminPricing.view.viewAllFields")}
               </button>
             </div>
 
@@ -826,10 +827,10 @@ export const PricingTablesView: React.FC = () => {
               if (pricingFields.length === 0) {
                 return (
                   <div style={styles.errorBox} className="pricing-error-box">
-                    <p>No pricing fields found for this service.</p>
-                    <p>Service ID: {selectedServiceData.serviceId}</p>
+                    <p>{t("adminPricing.view.noPricingFields")}</p>
+                    <p>{t("adminPricing.view.serviceId", { id: selectedServiceData.serviceId })}</p>
                     <details>
-                      <summary>View Config</summary>
+                      <summary>{t("adminPricing.view.viewConfig")}</summary>
                       <pre style={{ fontSize: "11px", overflow: "auto" }}>
                         {JSON.stringify(selectedServiceData.config, null, 2)}
                       </pre>
@@ -843,9 +844,9 @@ export const PricingTablesView: React.FC = () => {
                   <table style={styles.table} className="pricing-table">
                     <thead>
                       <tr>
-                        <th style={styles.th} className="pricing-th">Pricing Field</th>
-                        <th style={styles.th} className="pricing-th">Current Value</th>
-                        <th style={styles.th} className="pricing-th">Actions</th>
+                        <th style={styles.th} className="pricing-th">{t("adminPricing.view.thPricingField")}</th>
+                        <th style={styles.th} className="pricing-th">{t("adminPricing.view.thCurrentValue")}</th>
+                        <th style={styles.th} className="pricing-th">{t("adminPricing.view.thActions")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -875,9 +876,9 @@ export const PricingTablesView: React.FC = () => {
                               {isEditing ? (
                                 <div style={styles.actionButtons} className="pricing-action-buttons">
                                   <button style={styles.saveBtn} className="pricing-save-btn" onClick={handleSaveServiceField} disabled={saving}>
-                                    {saving ? "..." : "Save"}
+                                    {saving ? "..." : t("adminPricing.view.save")}
                                   </button>
-                                  <button style={styles.cancelBtn} className="pricing-cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                                  <button style={styles.cancelBtn} className="pricing-cancel-btn" onClick={handleCancelEdit}>{t("adminPricing.view.cancel")}</button>
                                 </div>
                               ) : (
                                 <button
@@ -885,7 +886,7 @@ export const PricingTablesView: React.FC = () => {
                                   className="pricing-edit-btn"
                                   onClick={() => handleEditServiceField(selectedServiceData.serviceId, field.path, field.value)}
                                 >
-                                  Edit Price
+                                  {t("adminPricing.view.editPrice")}
                                 </button>
                               )}
                             </td>
@@ -902,9 +903,9 @@ export const PricingTablesView: React.FC = () => {
 
         {!selectedServiceData && (
           <div style={styles.errorBox} className="pricing-error-box">
-            <p><FaExclamationTriangle /> Service not found</p>
-            <p>Selected: {selectedService}</p>
-            <p>Available services: {configs.map(c => c.serviceId).join(", ")}</p>
+            <p><FaExclamationTriangle /> {t("adminPricing.view.serviceNotFound")}</p>
+            <p>{t("adminPricing.view.selected", { id: selectedService })}</p>
+            <p>{t("adminPricing.view.availableServices", { services: configs.map(c => c.serviceId).join(", ") })}</p>
           </div>
         )}
       </div>

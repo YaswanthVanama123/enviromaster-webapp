@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { agreementApi, salesPersonApi, quotaApi } from "../../../backendservice/api/quotaApi";
 import type {
   SalesPerson,
@@ -29,6 +30,7 @@ const TERM_MONTHS: Record<string, number> = {
 };
 
 export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated }) => {
+  const { t } = useTranslation();
   const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
   const [quotaLevel, setQuotaLevel] = useState<QuotaLevelResponse | null>(null);
   const [saving, setSaving] = useState(false);
@@ -97,7 +99,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
     setSuccess(null);
 
     if (!selectedSalesPersonId || !customerName || !monthlyValue || !startDate) {
-      setError("Please fill in all required fields");
+      setError(t("adminQuota.agreementForm.fillRequired"));
       return;
     }
 
@@ -141,7 +143,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
 
     if (result) {
       setSuccess(
-        `Agreement created! Quota: ${result.quotaPeriod.quotaPercentage.toFixed(1)}% (${result.quotaPeriod.quotaLevel})`
+        t("adminQuota.agreementForm.createSuccess", { percentage: result.quotaPeriod.quotaPercentage.toFixed(1), level: result.quotaPeriod.quotaLevel })
       );
       
       setCustomerName("");
@@ -162,7 +164,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
         onAgreementCreated();
       }, 1500);
     } else {
-      setError("Failed to create agreement");
+      setError(t("adminQuota.agreementForm.createFailed"));
     }
 
     setSaving(false);
@@ -179,7 +181,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
   return (
     <div className="agreement-form-container">
       <div className="form-card">
-        <h3>Create New Agreement</h3>
+        <h3>{t("adminQuota.agreementForm.createTitle")}</h3>
 
         {}
         {quotaLevel && (
@@ -195,7 +197,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
               className="quota-level"
               style={{ color: getQuotaLevelColor(quotaLevel.quotaLevel) }}
             >
-              {quotaLevel.quotaLevel.toUpperCase()} QUOTA ({getQuotaCommissionRate(quotaLevel.quotaLevel)}%)
+              {t("adminQuota.agreementForm.quotaLevelBadge", { level: quotaLevel.quotaLevel.toUpperCase(), rate: getQuotaCommissionRate(quotaLevel.quotaLevel) })}
             </span>
             <span className="quota-progress">
               {formatCurrency(quotaLevel.actualSales)} / {formatCurrency(quotaLevel.quotaTarget)}
@@ -206,10 +208,10 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
         <form onSubmit={handleSubmit}>
           {}
           <div className="form-section">
-            <h4>Sales Information</h4>
+            <h4>{t("adminQuota.agreementForm.salesInformation")}</h4>
             <div className="form-grid">
               <div className="form-group">
-                <label>Sales Person *</label>
+                <label>{t("adminQuota.agreementForm.salesPersonRequired")}</label>
                 <select
                   value={selectedSalesPersonId}
                   onChange={(e) => setSelectedSalesPersonId(e.target.value)}
@@ -228,17 +230,17 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
                     checked={insideSalesInvolved}
                     onChange={(e) => setInsideSalesInvolved(e.target.checked)}
                   />
-                  Inside Sales Involved (-3% deduction)
+                  {t("adminQuota.agreementForm.insideSalesInvolved")}
                 </label>
               </div>
               {insideSalesInvolved && (
                 <div className="form-group">
-                  <label>Inside Sales Person</label>
+                  <label>{t("adminQuota.agreementForm.insideSalesPerson")}</label>
                   <select
                     value={insideSalesPersonId}
                     onChange={(e) => setInsideSalesPersonId(e.target.value)}
                   >
-                    <option value="">Select...</option>
+                    <option value="">{t("adminQuota.agreementForm.selectPlaceholder")}</option>
                     {salesPersons
                       .filter((sp) => sp.role === "inside_sales")
                       .map((sp) => (
@@ -254,52 +256,52 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
 
           {}
           <div className="form-section">
-            <h4>Customer Information</h4>
+            <h4>{t("adminQuota.agreementForm.customerInformation")}</h4>
             <div className="form-grid">
               <div className="form-group full-width">
-                <label>Customer Name *</label>
+                <label>{t("adminQuota.agreementForm.customerNameRequired")}</label>
                 <input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="ABC Restaurant"
+                  placeholder={t("adminQuota.agreementForm.customerNamePlaceholder")}
                 />
               </div>
               <div className="form-group full-width">
-                <label>Address</label>
+                <label>{t("adminQuota.agreementForm.address")}</label>
                 <input
                   type="text"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  placeholder="123 Main Street"
+                  placeholder={t("adminQuota.agreementForm.addressPlaceholder")}
                 />
               </div>
               <div className="form-group">
-                <label>City</label>
+                <label>{t("adminQuota.agreementForm.city")}</label>
                 <input
                   type="text"
                   value={customerCity}
                   onChange={(e) => setCustomerCity(e.target.value)}
-                  placeholder="Houston"
+                  placeholder={t("adminQuota.agreementForm.cityPlaceholder")}
                 />
               </div>
               <div className="form-group">
-                <label>State</label>
+                <label>{t("adminQuota.agreementForm.state")}</label>
                 <input
                   type="text"
                   value={customerState}
                   onChange={(e) => setCustomerState(e.target.value)}
-                  placeholder="TX"
+                  placeholder={t("adminQuota.agreementForm.statePlaceholder")}
                   maxLength={2}
                 />
               </div>
               <div className="form-group">
-                <label>ZIP Code</label>
+                <label>{t("adminQuota.agreementForm.zipCode")}</label>
                 <input
                   type="text"
                   value={customerZip}
                   onChange={(e) => setCustomerZip(e.target.value)}
-                  placeholder="77001"
+                  placeholder={t("adminQuota.agreementForm.zipPlaceholder")}
                 />
               </div>
             </div>
@@ -307,33 +309,33 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
 
           {}
           <div className="form-section">
-            <h4>Agreement Details</h4>
+            <h4>{t("adminQuota.agreementForm.agreementDetails")}</h4>
             <div className="form-grid">
               <div className="form-group">
-                <label>Monthly Value ($) *</label>
+                <label>{t("adminQuota.agreementForm.monthlyValueRequired")}</label>
                 <input
                   type="number"
                   value={monthlyValue}
                   onChange={(e) => setMonthlyValue(e.target.value)}
-                  placeholder="500"
+                  placeholder={t("adminQuota.agreementForm.monthlyValuePlaceholder")}
                   min="0"
                   step="0.01"
                 />
               </div>
               <div className="form-group">
-                <label>Agreement Term</label>
+                <label>{t("adminQuota.agreementForm.agreementTerm")}</label>
                 <select
                   value={agreementTerm}
                   onChange={(e) => setAgreementTerm(e.target.value as any)}
                 >
-                  <option value="3-year">3-Year (135% multiplier)</option>
-                  <option value="1-year">1-Year (100% multiplier)</option>
-                  <option value="MTM-with-install">MTM with Install (100%)</option>
-                  <option value="MTM-no-install">MTM No Install (50%)</option>
+                  <option value="3-year">{t("adminQuota.agreementForm.term3Year")}</option>
+                  <option value="1-year">{t("adminQuota.agreementForm.term1Year")}</option>
+                  <option value="MTM-with-install">{t("adminQuota.agreementForm.termMtmInstall")}</option>
+                  <option value="MTM-no-install">{t("adminQuota.agreementForm.termMtmNoInstall")}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Start Date *</label>
+                <label>{t("adminQuota.agreementForm.startDateRequired")}</label>
                 <input
                   type="date"
                   value={startDate}
@@ -341,35 +343,35 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
                 />
               </div>
               <div className="form-group">
-                <label>Pricing Line</label>
+                <label>{t("adminQuota.agreementForm.pricingLine")}</label>
                 <select
                   value={pricingLine}
                   onChange={(e) => setPricingLine(e.target.value as any)}
                 >
-                  <option value="Redline">Redline (Standard)</option>
-                  <option value="Greenline">Greenline (+1% bonus)</option>
+                  <option value="Redline">{t("adminQuota.agreementForm.redline")}</option>
+                  <option value="Greenline">{t("adminQuota.agreementForm.greenline")}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Business Type</label>
+                <label>{t("adminQuota.agreementForm.businessType")}</label>
                 <select
                   value={businessType}
                   onChange={(e) => setBusinessType(e.target.value as any)}
                 >
-                  <option value="new">New Business</option>
-                  <option value="renewal">Renewal</option>
+                  <option value="new">{t("adminQuota.agreementForm.newBusiness")}</option>
+                  <option value="renewal">{t("adminQuota.agreementForm.renewal")}</option>
                 </select>
               </div>
               {businessType === "renewal" && (
                 <div className="form-group">
-                  <label>Years as Customer</label>
+                  <label>{t("adminQuota.agreementForm.yearsAsCustomer")}</label>
                   <input
                     type="number"
                     value={yearsAsCustomer}
                     onChange={(e) => setYearsAsCustomer(e.target.value)}
                     min="0"
                   />
-                  <small>4% bonus applies at 2+ years</small>
+                  <small>{t("adminQuota.agreementForm.renewalBonusHint")}</small>
                 </div>
               )}
             </div>
@@ -378,14 +380,14 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
           {}
           <div className="form-section">
             <h4>
-              Account Type
+              {t("adminQuota.agreementForm.accountType")}
               <label className="auto-detect-toggle">
                 <input
                   type="checkbox"
                   checked={autoDetectEnabled}
                   onChange={(e) => setAutoDetectEnabled(e.target.checked)}
                 />
-                Auto-detect
+                {t("adminQuota.agreementForm.autoDetect")}
               </label>
             </h4>
 
@@ -393,23 +395,23 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
               <div className="auto-detect-section">
                 <div className="form-grid">
                   <div className="form-group">
-                    <label>Per-Visit Revenue ($)</label>
+                    <label>{t("adminQuota.agreementForm.perVisitRevenue")}</label>
                     <input
                       type="number"
                       value={perVisitRevenue}
                       onChange={(e) => setPerVisitRevenue(e.target.value)}
-                      placeholder="75"
+                      placeholder={t("adminQuota.agreementForm.perVisitPlaceholder")}
                       min="0"
                       step="0.01"
                     />
                   </div>
                   <div className="form-group">
-                    <label>Distance to Anchor (miles)</label>
+                    <label>{t("adminQuota.agreementForm.distanceToAnchor")}</label>
                     <input
                       type="number"
                       value={distanceToAnchor}
                       onChange={(e) => setDistanceToAnchor(e.target.value)}
-                      placeholder="2.5"
+                      placeholder={t("adminQuota.agreementForm.distancePlaceholder")}
                       min="0"
                       step="0.1"
                     />
@@ -423,8 +425,8 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
                       color: getAccountTypeColor(detectionResult.accountType),
                     }}
                   >
-                    <strong>Detected: {detectionResult.accountType}</strong>
-                    <span className="confidence">({detectionResult.confidence} confidence)</span>
+                    <strong>{t("adminQuota.agreementForm.detected", { type: detectionResult.accountType })}</strong>
+                    <span className="confidence">{t("adminQuota.agreementForm.confidence", { confidence: detectionResult.confidence })}</span>
                     <div className="reason">{detectionResult.reason}</div>
                   </div>
                 )}
@@ -432,15 +434,15 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
             ) : (
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Account Type</label>
+                  <label>{t("adminQuota.agreementForm.accountTypeLabel")}</label>
                   <select
                     value={accountType}
                     onChange={(e) => setAccountType(e.target.value as any)}
                   >
-                    <option value="Anchor">Anchor ($200+/visit)</option>
-                    <option value="Bread5">Bread5 (within 5 min)</option>
-                    <option value="Bread15">Bread15 (within 15 min)</option>
-                    <option value="Pit">Pit (far from anchor)</option>
+                    <option value="Anchor">{t("adminQuota.agreementForm.anchorOption")}</option>
+                    <option value="Bread5">{t("adminQuota.agreementForm.bread5Option")}</option>
+                    <option value="Bread15">{t("adminQuota.agreementForm.bread15Option")}</option>
+                    <option value="Pit">{t("adminQuota.agreementForm.pitOption")}</option>
                   </select>
                 </div>
               </div>
@@ -450,11 +452,11 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
           {}
           <div className="form-section">
             <div className="form-group full-width">
-              <label>Notes</label>
+              <label>{t("adminQuota.agreementForm.notes")}</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any additional notes..."
+                placeholder={t("adminQuota.agreementForm.notesPlaceholder")}
                 rows={3}
               />
             </div>
@@ -465,7 +467,7 @@ export const AgreementForm: React.FC<AgreementFormProps> = ({ onAgreementCreated
 
           <div className="form-actions">
             <button type="submit" className="submit-btn" disabled={saving}>
-              {saving ? "Creating Agreement..." : "Create Agreement"}
+              {saving ? t("adminQuota.agreementForm.creating") : t("adminQuota.agreementForm.createButton")}
             </button>
           </div>
         </form>

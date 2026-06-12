@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { FaCalendarAlt, FaCog, FaUsers, FaHistory, FaDollarSign, FaChevronDown, FaChevronUp, FaSave, FaSync, FaDownload, FaFileInvoiceDollar, FaFilePdf, FaLock } from "react-icons/fa";
 import { apiClient } from "../../../backendservice/utils/apiClient";
 import { PayrollSlipModal } from "./PayrollSlipModal";
@@ -53,22 +54,23 @@ interface PayrollTotals {
 type SubTab = "overview" | "settings" | "history";
 
 const CYCLE_TYPES = [
-  { key: "weekly", label: "Weekly" },
-  { key: "biweekly", label: "Bi-Weekly" },
-  { key: "monthly", label: "Monthly" },
+  { key: "weekly", labelKey: "weekly" },
+  { key: "biweekly", labelKey: "biweekly" },
+  { key: "monthly", labelKey: "monthly" },
 ] as const;
 
 const DAYS_OF_WEEK = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
+  { value: 0, labelKey: "sunday" },
+  { value: 1, labelKey: "monday" },
+  { value: 2, labelKey: "tuesday" },
+  { value: 3, labelKey: "wednesday" },
+  { value: 4, labelKey: "thursday" },
+  { value: 5, labelKey: "friday" },
+  { value: 6, labelKey: "saturday" },
 ];
 
 export const PayrollTab: React.FC = () => {
+  const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -122,11 +124,11 @@ export const PayrollTab: React.FC = () => {
         setTotals(employeesRes.data.totals);
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load payroll data");
+      setError(err.message || t("payroll.loadFailed"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -205,14 +207,14 @@ export const PayrollTab: React.FC = () => {
 
       if (res.data?.success) {
         setOriginalSettings(settings);
-        setSuccessMessage("Payroll settings saved successfully!");
+        setSuccessMessage(t("payroll.saveSuccess"));
         setTimeout(() => setSuccessMessage(null), 3000);
         loadPayrollData();
       } else {
-        setError("Failed to save settings");
+        setError(t("payroll.saveFailed"));
       }
     } catch (err: any) {
-      setError(err.message || "Failed to save settings");
+      setError(err.message || t("payroll.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -236,15 +238,15 @@ export const PayrollTab: React.FC = () => {
     if (!employees.length || !currentPeriod) return;
 
     const headers = [
-      "Salesperson",
-      "Agreements",
-      "Monthly Revenue",
-      "Total Commission",
-      "Draft",
-      "Saved",
-      "Pending",
-      "Approved",
-      "Active"
+      t("payroll.csv.salesperson"),
+      t("payroll.csv.agreements"),
+      t("payroll.csv.monthlyRevenue"),
+      t("payroll.csv.totalCommission"),
+      t("payroll.csv.draft"),
+      t("payroll.csv.saved"),
+      t("payroll.csv.pending"),
+      t("payroll.csv.approved"),
+      t("payroll.csv.active")
     ];
 
     const rows = employees.map(emp => [
@@ -261,7 +263,7 @@ export const PayrollTab: React.FC = () => {
 
     if (totals) {
       rows.push([
-        "TOTAL",
+        t("payroll.csv.total"),
         totals.totalAgreements,
         totals.totalMonthlyRevenue.toFixed(2),
         totals.totalAnnualCommission.toFixed(2),
@@ -276,19 +278,19 @@ export const PayrollTab: React.FC = () => {
     const agreementHeaders = [
       "",
       "",
-      "Agreement Title",
-      "Created Date",
-      "Status",
-      "Monthly Value",
-      "Commission"
+      t("payroll.csv.agreementTitle"),
+      t("payroll.csv.createdDate"),
+      t("payroll.csv.status"),
+      t("payroll.csv.monthlyValue"),
+      t("payroll.csv.commission")
     ];
 
-    let csvContent = `Payroll Report: ${currentPeriod.label}\n`;
-    csvContent += `Period: ${formatDate(currentPeriod.start)} - ${formatDate(currentPeriod.end)}\n\n`;
+    let csvContent = `${t("payroll.csv.reportTitle", { label: currentPeriod.label })}\n`;
+    csvContent += `${t("payroll.csv.period", { start: formatDate(currentPeriod.start), end: formatDate(currentPeriod.end) })}\n\n`;
     csvContent += headers.join(",") + "\n";
     csvContent += rows.map(row => row.join(",")).join("\n");
 
-    csvContent += "\n\n--- Agreement Details ---\n";
+    csvContent += `\n\n${t("payroll.csv.agreementDetails")}\n`;
     csvContent += agreementHeaders.join(",") + "\n";
 
     employees.forEach(emp => {
@@ -342,7 +344,7 @@ export const PayrollTab: React.FC = () => {
         loadHistory();
       }
     } catch (err: any) {
-      setError(err?.message || "Failed to download payroll PDF");
+      setError(err?.message || t("payroll.downloadPdfFailed"));
     } finally {
       setDownloadingPdf(false);
       setDownloadingEmployee(null);
@@ -362,21 +364,21 @@ export const PayrollTab: React.FC = () => {
               <FaDollarSign />
             </div>
             <div className="summary-content">
-              <span className="summary-label">Total Commission Payout</span>
+              <span className="summary-label">{t("payroll.summary.totalCommissionPayout")}</span>
               <span className="summary-value">{formatMoney(tot.totalAnnualCommission)}</span>
-              <span className="summary-note">Full commission for this period</span>
+              <span className="summary-note">{t("payroll.summary.fullCommissionNote")}</span>
             </div>
           </div>
           <div className="payroll-summary-card">
-            <span className="summary-label">Salespeople</span>
+            <span className="summary-label">{t("payroll.summary.salespeople")}</span>
             <span className="summary-value">{tot.totalEmployees}</span>
           </div>
           <div className="payroll-summary-card">
-            <span className="summary-label">Agreements</span>
+            <span className="summary-label">{t("payroll.summary.agreements")}</span>
             <span className="summary-value">{tot.totalAgreements}</span>
           </div>
           <div className="payroll-summary-card">
-            <span className="summary-label">Total Revenue</span>
+            <span className="summary-label">{t("payroll.summary.totalRevenue")}</span>
             <span className="summary-value">{formatMoney(tot.totalMonthlyRevenue)}</span>
           </div>
         </div>
@@ -384,23 +386,23 @@ export const PayrollTab: React.FC = () => {
 
       <div className="payroll-employees-section">
         <div className="employees-section-header">
-          <h3>Salesperson Commissions</h3>
+          <h3>{t("payroll.employees.sectionTitle")}</h3>
           {emps.length > 0 && (
             <div className="employees-section-actions">
               <button
                 className="download-payroll-pdf-btn"
                 onClick={() => downloadPayrollPdf(period)}
                 disabled={downloadingPdf}
-                title="Download one combined PDF with every employee's payroll and record it in history"
+                title={t("payroll.employees.downloadPdfTitle")}
               >
-                <FaFilePdf /> {downloadingPdf ? "Generating…" : "Download Payroll PDF"}
+                <FaFilePdf /> {downloadingPdf ? t("payroll.employees.generating") : t("payroll.employees.downloadPayrollPdf")}
               </button>
             </div>
           )}
         </div>
         {emps.length === 0 ? (
           <div className="payroll-empty">
-            <p>No agreements found for this period.</p>
+            <p>{t("payroll.employees.noAgreements")}</p>
           </div>
         ) : (
           <div className="payroll-employees-list">
@@ -423,14 +425,14 @@ export const PayrollTab: React.FC = () => {
                   <div className="employee-info">
                     <span className="employee-name">{emp.username}</span>
                     <span className="employee-meta">
-                      {emp.totalAgreements} agreements · {formatMoney(emp.totalMonthlyRevenue)}/mo
+                      {t("payroll.employees.agreementsMeta", { count: emp.totalAgreements, revenue: formatMoney(emp.totalMonthlyRevenue) })}
                     </span>
                   </div>
                   <div className="employee-commission">
                     <span className="commission-amount">
                       {formatMoney(emp.totalAnnualCommission)}
                     </span>
-                    <span className="commission-label">Period Commission</span>
+                    <span className="commission-label">{t("payroll.employees.periodCommission")}</span>
                   </div>
                   <button
                     className="view-payroll-btn"
@@ -439,7 +441,7 @@ export const PayrollTab: React.FC = () => {
                       openSlip(emp, period);
                     }}
                   >
-                    <FaFileInvoiceDollar /> View Payroll
+                    <FaFileInvoiceDollar /> {t("payroll.employees.viewPayroll")}
                   </button>
                   <button
                     className="export-pdf-btn"
@@ -448,9 +450,9 @@ export const PayrollTab: React.FC = () => {
                       downloadPayrollPdf(period, emp);
                     }}
                     disabled={downloadingEmployee === emp.username}
-                    title="Download this salesperson's payroll PDF"
+                    title={t("payroll.employees.exportPdfTitle")}
                   >
-                    <FaDownload /> {downloadingEmployee === emp.username ? "…" : "PDF"}
+                    <FaDownload /> {downloadingEmployee === emp.username ? "…" : t("payroll.history.pdf")}
                   </button>
                   <div className="expand-icon">
                     {expandedEmployee === emp.username ? <FaChevronUp /> : <FaChevronDown />}
@@ -460,14 +462,14 @@ export const PayrollTab: React.FC = () => {
                 {expandedEmployee === emp.username && (
                   <div className="employee-details">
                     <div className="status-breakdown">
-                      <span className="status-chip draft">Draft: {emp.statusCounts.draft}</span>
-                      <span className="status-chip saved">Saved: {emp.statusCounts.saved}</span>
-                      <span className="status-chip pending">Pending: {emp.statusCounts.pending_approval}</span>
-                      <span className="status-chip approved">Approved: {emp.statusCounts.approved}</span>
-                      <span className="status-chip active">Active: {emp.statusCounts.active}</span>
+                      <span className="status-chip draft">{t("payroll.employees.draftCount", { count: emp.statusCounts.draft })}</span>
+                      <span className="status-chip saved">{t("payroll.employees.savedCount", { count: emp.statusCounts.saved })}</span>
+                      <span className="status-chip pending">{t("payroll.employees.pendingCount", { count: emp.statusCounts.pending_approval })}</span>
+                      <span className="status-chip approved">{t("payroll.employees.approvedCount", { count: emp.statusCounts.approved })}</span>
+                      <span className="status-chip active">{t("payroll.employees.activeCount", { count: emp.statusCounts.active })}</span>
                     </div>
                     <div className="agreements-list">
-                      <h4>Agreements</h4>
+                      <h4>{t("payroll.employees.agreementsHeading")}</h4>
                       {emp.agreements.map((agreement) => (
                         <div key={agreement.id} className="agreement-item">
                           <div className="agreement-info">
@@ -475,7 +477,7 @@ export const PayrollTab: React.FC = () => {
                             <span className="agreement-date">{formatDate(agreement.createdAt)}</span>
                           </div>
                           <div className="agreement-values">
-                            <span className="agreement-revenue">{formatMoney(agreement.monthlyValue)}/mo</span>
+                            <span className="agreement-revenue">{t("payroll.employees.perMonth", { value: formatMoney(agreement.monthlyValue) })}</span>
                             <span className="agreement-commission">{formatMoney(agreement.annualCommission)}</span>
                           </div>
                         </div>
@@ -496,7 +498,7 @@ export const PayrollTab: React.FC = () => {
       <div className="payroll-tab-container">
         <div className="payroll-loading">
           <div className="payroll-spinner" />
-          <p>Loading payroll data...</p>
+          <p>{t("payroll.loading")}</p>
         </div>
       </div>
     );
@@ -509,9 +511,9 @@ export const PayrollTab: React.FC = () => {
           <FaCalendarAlt />
         </div>
         <div>
-          <h2>Payroll Management</h2>
+          <h2>{t("payroll.header.title")}</h2>
           <p className="payroll-subtitle">
-            Manage payroll periods, settings, and view employee commission data
+            {t("payroll.header.subtitle")}
           </p>
         </div>
       </div>
@@ -535,21 +537,21 @@ export const PayrollTab: React.FC = () => {
           onClick={() => setActiveSubTab("overview")}
         >
           <FaUsers />
-          Current Period
+          {t("payroll.subtabs.currentPeriod")}
         </button>
         <button
           className={`payroll-subtab-btn ${activeSubTab === "settings" ? "active" : ""}`}
           onClick={() => setActiveSubTab("settings")}
         >
           <FaCog />
-          Settings
+          {t("payroll.subtabs.settings")}
         </button>
         <button
           className={`payroll-subtab-btn ${activeSubTab === "history" ? "active" : ""}`}
           onClick={() => setActiveSubTab("history")}
         >
           <FaHistory />
-          History
+          {t("payroll.subtabs.history")}
         </button>
       </div>
 
@@ -559,13 +561,13 @@ export const PayrollTab: React.FC = () => {
             {/* Period Info */}
             <div className="payroll-period-card">
               <div className="period-header">
-                <h3>Current Payroll Period</h3>
+                <h3>{t("payroll.overview.currentPayrollPeriod")}</h3>
                 <div className="period-actions">
                   <button className="refresh-btn" onClick={loadPayrollData}>
-                    <FaSync /> Refresh
+                    <FaSync /> {t("payroll.overview.refresh")}
                   </button>
                   <button className="export-btn" onClick={exportToCSV} disabled={!employees.length}>
-                    <FaDownload /> Export CSV
+                    <FaDownload /> {t("payroll.overview.exportCsv")}
                   </button>
                 </div>
               </div>
@@ -587,10 +589,10 @@ export const PayrollTab: React.FC = () => {
           <div className="payroll-settings">
             <div className="settings-section">
               <h3>
-                <FaCalendarAlt /> Payroll Start Date
+                <FaCalendarAlt /> {t("payroll.settings.startDateTitle")}
               </h3>
               <p className="settings-hint">
-                The date from which payroll calculations begin. Commissions will be tracked from this date.
+                {t("payroll.settings.startDateHint")}
               </p>
               <input
                 type="date"
@@ -602,21 +604,21 @@ export const PayrollTab: React.FC = () => {
               />
               {settings.startDate && (
                 <div className="settings-preview">
-                  Selected: {new Date(settings.startDate).toLocaleDateString("en-US", {
+                  {t("payroll.settings.selected", { date: new Date(settings.startDate).toLocaleDateString("en-US", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
                     day: "numeric",
-                  })}
+                  }) })}
                 </div>
               )}
             </div>
 
             <div className="settings-section">
               <h3>
-                <FaCog /> Payroll Cycle Type
+                <FaCog /> {t("payroll.settings.cycleTypeTitle")}
               </h3>
-              <p className="settings-hint">How often payroll is calculated.</p>
+              <p className="settings-hint">{t("payroll.settings.cycleTypeHint")}</p>
               <div className="cycle-type-options">
                 {CYCLE_TYPES.map((type) => (
                   <button
@@ -624,7 +626,7 @@ export const PayrollTab: React.FC = () => {
                     className={`cycle-type-btn ${settings.cycleType === type.key ? "active" : ""}`}
                     onClick={() => setSettings({ ...settings, cycleType: type.key })}
                   >
-                    {type.label}
+                    {t(`payroll.cycleTypes.${type.labelKey}`)}
                   </button>
                 ))}
               </div>
@@ -633,9 +635,9 @@ export const PayrollTab: React.FC = () => {
             {(settings.cycleType === "weekly" || settings.cycleType === "biweekly") && (
               <div className="settings-section">
                 <h3>
-                  <FaCalendarAlt /> Cycle Day of Week
+                  <FaCalendarAlt /> {t("payroll.settings.cycleDayTitle")}
                 </h3>
-                <p className="settings-hint">The day when the payroll cycle starts/ends.</p>
+                <p className="settings-hint">{t("payroll.settings.cycleDayHint")}</p>
                 <select
                   className="settings-select"
                   value={settings.cycleDayOfWeek}
@@ -645,7 +647,7 @@ export const PayrollTab: React.FC = () => {
                 >
                   {DAYS_OF_WEEK.map((day) => (
                     <option key={day.value} value={day.value}>
-                      {day.label}
+                      {t(`payroll.daysOfWeek.${day.labelKey}`)}
                     </option>
                   ))}
                 </select>
@@ -659,10 +661,10 @@ export const PayrollTab: React.FC = () => {
                 disabled={!hasChanges || saving}
               >
                 <FaSave />
-                {saving ? "Saving..." : "Save Settings"}
+                {saving ? t("payroll.settings.saving") : t("payroll.settings.saveSettings")}
               </button>
               {!hasChanges && !saving && (
-                <span className="no-changes-text">No unsaved changes</span>
+                <span className="no-changes-text">{t("payroll.settings.noChanges")}</span>
               )}
             </div>
           </div>
@@ -670,14 +672,14 @@ export const PayrollTab: React.FC = () => {
 
         {activeSubTab === "history" && !selectedHistoryPeriod && (
           <div className="payroll-history">
-            <h3>Payroll History</h3>
+            <h3>{t("payroll.history.title")}</h3>
             <p className="history-subtitle">
-              Click a period to view each salesperson's payroll
+              {t("payroll.history.subtitle")}
             </p>
 
             {history.length === 0 ? (
               <div className="payroll-empty">
-                <p>No payroll history available.</p>
+                <p>{t("payroll.history.noHistory")}</p>
               </div>
             ) : (
               <div className="history-list">
@@ -691,31 +693,31 @@ export const PayrollTab: React.FC = () => {
                   >
                     <div className="history-period">
                       <span className="history-label">{period.period.label}</span>
-                      {idx === 0 && <span className="current-badge">Current</span>}
-                      {period.finalized && <span className="finalized-badge"><FaLock /> Finalized</span>}
+                      {idx === 0 && <span className="current-badge">{t("payroll.history.current")}</span>}
+                      {period.finalized && <span className="finalized-badge"><FaLock /> {t("payroll.history.finalized")}</span>}
                       {period.pdfGeneratedAt && (
-                        <span className="pdf-badge" title={`Payroll PDF generated ${formatDate(period.pdfGeneratedAt)}${period.pdfCount > 1 ? ` · ${period.pdfCount}×` : ""}`}>
-                          <FaFilePdf /> PDF
+                        <span className="pdf-badge" title={t("payroll.history.pdfTitle", { date: formatDate(period.pdfGeneratedAt), count: period.pdfCount > 1 ? t("payroll.history.pdfCount", { count: period.pdfCount }) : "" })}>
+                          <FaFilePdf /> {t("payroll.history.pdf")}
                         </span>
                       )}
-                      <span className="history-view-link">View payroll →</span>
+                      <span className="history-view-link">{t("payroll.history.viewPayroll")}</span>
                     </div>
                     <div className="history-stats">
                       <div className="history-stat">
                         <span className="stat-value">{period.employeeCount}</span>
-                        <span className="stat-label">Salespeople</span>
+                        <span className="stat-label">{t("payroll.history.salespeople")}</span>
                       </div>
                       <div className="history-stat">
                         <span className="stat-value">{period.totalAgreements}</span>
-                        <span className="stat-label">Agreements</span>
+                        <span className="stat-label">{t("payroll.history.agreements")}</span>
                       </div>
                       <div className="history-stat">
                         <span className="stat-value">{formatMoney(period.totalRevenue)}</span>
-                        <span className="stat-label">Revenue</span>
+                        <span className="stat-label">{t("payroll.history.revenue")}</span>
                       </div>
                       <div className="history-stat highlight">
                         <span className="stat-value">{formatMoney(period.totalCommission)}</span>
-                        <span className="stat-label">Commission</span>
+                        <span className="stat-label">{t("payroll.history.commission")}</span>
                       </div>
                     </div>
                   </div>
@@ -728,13 +730,13 @@ export const PayrollTab: React.FC = () => {
         {activeSubTab === "history" && selectedHistoryPeriod && (
           <div className="payroll-history-detail">
             <button className="back-to-history-btn" onClick={closePeriodDetail}>
-              ← Back to History
+              {t("payroll.history.backToHistory")}
             </button>
 
             <div className="payroll-period-card">
               <div className="period-header">
-                <h3>Payroll Period</h3>
-                {historyFinalized && <span className="finalized-badge"><FaLock /> Finalized</span>}
+                <h3>{t("payroll.history.payrollPeriod")}</h3>
+                {historyFinalized && <span className="finalized-badge"><FaLock /> {t("payroll.history.finalized")}</span>}
               </div>
               <div className="period-info">
                 <span className="period-label">{selectedHistoryPeriod.label}</span>
@@ -747,7 +749,7 @@ export const PayrollTab: React.FC = () => {
             {historyDetailLoading ? (
               <div className="payroll-loading">
                 <div className="payroll-spinner" />
-                <p>Loading payroll...</p>
+                <p>{t("payroll.history.loading")}</p>
               </div>
             ) : (
               renderPayrollBody(historyEmployees, historyTotals, selectedHistoryPeriod)

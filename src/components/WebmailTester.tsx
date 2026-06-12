@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaEnvelope, FaClipboardList, FaWrench } from "react-icons/fa";
 import {
   shareViaPdf,
@@ -6,6 +7,7 @@ import {
 } from '../utils/webmailService';
 
 const EmailTester: React.FC = () => {
+  const { t } = useTranslation();
   const [testResult, setTestResult] = useState<string>('');
 
   const handleTestEmail = () => {
@@ -18,9 +20,9 @@ const EmailTester: React.FC = () => {
       });
 
       shareViaPdf(emailData, attachment);
-      setTestResult('Email client opened and PDF download initiated successfully!');
+      setTestResult(t('misc.wtEmailSuccess'));
     } catch (error) {
-      setTestResult(`Email test failed: ${error}`);
+      setTestResult(t('misc.wtEmailFailed', { error }));
     }
   };
 
@@ -32,11 +34,11 @@ const EmailTester: React.FC = () => {
       margin: '20px',
       backgroundColor: '#f8f9fa'
     }}>
-      <h2><FaEnvelope /> Email Integration Tester</h2>
-      <p><strong>Note:</strong> This tests the new mailto-based email functionality.</p>
+      <h2><FaEnvelope /> {t('misc.wtTitle')}</h2>
+      <p><strong>{t('misc.wtNote')}</strong> {t('misc.wtNoteText')}</p>
 
       <div style={{ marginBottom: '20px' }}>
-        <h3>Testing</h3>
+        <h3>{t('misc.wtTesting')}</h3>
         <button
           onClick={handleTestEmail}
           style={{
@@ -48,13 +50,13 @@ const EmailTester: React.FC = () => {
             cursor: 'pointer'
           }}
         >
-          Test Email Compose
+          {t('misc.wtTestEmailCompose')}
         </button>
       </div>
 
       {testResult && (
         <div>
-          <h3>Results</h3>
+          <h3>{t('misc.wtResults')}</h3>
           <pre style={{
             backgroundColor: '#e9ecef',
             padding: '10px',
@@ -69,22 +71,22 @@ const EmailTester: React.FC = () => {
       )}
 
       <div style={{ marginTop: '20px', backgroundColor: '#fff3cd', padding: '10px', borderRadius: '4px' }}>
-        <h4><FaClipboardList /> Testing Instructions</h4>
+        <h4><FaClipboardList /> {t('misc.wtTestingInstructions')}</h4>
         <ol>
-          <li><strong>Test Email:</strong> Click "Test Email Compose" to open your default email client</li>
-          <li><strong>Check PDF Download:</strong> A PDF file should download automatically for attachment</li>
-          <li><strong>Verify Email Client:</strong> Your default email client should open with pre-filled subject and body</li>
-          <li><strong>Manual Attachment:</strong> Attach the downloaded PDF to the email manually</li>
+          <li><strong>{t('misc.wtInstr1Title')}</strong> {t('misc.wtInstr1')}</li>
+          <li><strong>{t('misc.wtInstr2Title')}</strong> {t('misc.wtInstr2')}</li>
+          <li><strong>{t('misc.wtInstr3Title')}</strong> {t('misc.wtInstr3')}</li>
+          <li><strong>{t('misc.wtInstr4Title')}</strong> {t('misc.wtInstr4')}</li>
         </ol>
       </div>
 
       <div style={{ marginTop: '20px', backgroundColor: '#d1ecf1', padding: '10px', borderRadius: '4px' }}>
-        <h4><FaWrench /> How it works</h4>
+        <h4><FaWrench /> {t('misc.wtHowItWorks')}</h4>
         <ul>
-          <li><strong>Opens default email client:</strong> Uses mailto: links to open your system email client</li>
-          <li><strong>Automatic PDF download:</strong> Downloads PDF file for manual attachment</li>
-          <li><strong>Pre-filled content:</strong> Subject and body are automatically filled</li>
-          <li><strong>No webmail dependency:</strong> Works with any email client (Outlook, Mail, etc.)</li>
+          <li><strong>{t('misc.wtWork1Title')}</strong> {t('misc.wtWork1')}</li>
+          <li><strong>{t('misc.wtWork2Title')}</strong> {t('misc.wtWork2')}</li>
+          <li><strong>{t('misc.wtWork3Title')}</strong> {t('misc.wtWork3')}</li>
+          <li><strong>{t('misc.wtWork4Title')}</strong> {t('misc.wtWork4')}</li>
         </ul>
       </div>
     </div>

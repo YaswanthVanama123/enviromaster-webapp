@@ -1,0 +1,28 @@
+{
+  "tabs": {
+    "pricing": "Grilles tarifaires",
+    "services": "Configurations de service",
+    "products": "Catalogue de produits",
+    "backup": "Gestion des sauvegardes",
+    "workflow": "Flux de travail",
+    "commissions": "Commissions",
+    "quota": "Suivi des quotas",
+    "customers": "Clients",
+    "audit": "Historique d'audit",
+    "biginCompanies": "Entreprises Bigin",
+    "companyMapping": "Correspondance des entreprises",
+    "mapDistance": "Distance sur carte",
+    "mapDistanceUpdate": "Mettre à jour la distance",
+    "insideSales": "Ventes internes",
+    "accountType": "Type de compte",
+    "payroll": "Paie"
+  },
+  "header": {
+    "logo": "Administration Enviro-Master",
+    "logout": "Déconnexion"
+  },
+  "actions": {
+    "exportPricingPdf": "Exporter le PDF des tarifs",
+    "generating": "Génération..."
+  }
+}

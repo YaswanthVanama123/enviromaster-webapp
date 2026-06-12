@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   faExclamationTriangle,
   faTrash,
@@ -33,8 +34,8 @@ export const TextConfirmationModal: React.FC<TextConfirmationModalProps> = ({
   isOpen,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   type = 'warning',
   onConfirm,
   onCancel,
@@ -42,6 +43,7 @@ export const TextConfirmationModal: React.FC<TextConfirmationModalProps> = ({
   details,
   textConfirmation
 }) => {
+  const { t } = useTranslation();
   const [inputText, setInputText] = useState('');
 
   if (!isOpen) return null;
@@ -300,7 +302,7 @@ export const TextConfirmationModal: React.FC<TextConfirmationModalProps> = ({
               />
               {textConfirmation.expectedText && inputText && !isConfirmationValid() && (
                 <div style={styles.validationMessage}>
-                  Please type "{textConfirmation.expectedText}" to confirm
+                  {t('adminModals.typeToConfirm', { text: textConfirmation.expectedText })}
                 </div>
               )}
             </div>
@@ -315,7 +317,7 @@ export const TextConfirmationModal: React.FC<TextConfirmationModalProps> = ({
             onMouseEnter={(e) => handleMouseEnter(e, '#e5e7eb')}
             onMouseLeave={(e) => handleMouseLeave(e, '#f3f4f6')}
           >
-            {cancelText}
+            {cancelText ?? t('adminModals.cancel')}
           </button>
           <button
             style={{ ...styles.button, ...styles.confirmButton }}
@@ -324,7 +326,7 @@ export const TextConfirmationModal: React.FC<TextConfirmationModalProps> = ({
             onMouseEnter={(e) => handleMouseEnter(e, buttonStyles.confirmHover)}
             onMouseLeave={(e) => handleMouseLeave(e, buttonStyles.confirm.backgroundColor as string)}
           >
-            {loading ? 'Processing...' : confirmText}
+            {loading ? t('adminModals.processing') : (confirmText ?? t('adminModals.confirm'))}
           </button>
         </div>
       </div>

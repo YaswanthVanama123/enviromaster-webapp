@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useActiveProductCatalog } from "../../backendservice/hooks";
 import type { Product, ProductFamily } from "../../backendservice/types/productCatalog.types";
@@ -43,6 +44,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
   isEmbedded = false,
   parentPath
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { catalog, loading, error, updateCatalog } = useActiveProductCatalog();
   const [selectedFamily, setSelectedFamily] = useState<ProductFamily | null>(null);
@@ -181,7 +183,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
     });
 
     if (result.success) {
-      setSuccessMessage("Product updated successfully!");
+      setSuccessMessage(t("adminPricing.catalogManager.productUpdated"));
       setIsEditMode(false);
       closeModal();
 
@@ -192,7 +194,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         }
       }
     } else {
-      setErrorMessage("Failed to update product: " + result.error);
+      setErrorMessage(t("adminPricing.catalogManager.productUpdateFailed", { error: result.error }));
     }
 
     setSaving(false);
@@ -215,7 +217,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
 
   const handleSaveNewProduct = async () => {
     if (!creatingProduct || !catalog || !newProduct.key || !newProduct.name) {
-      setWarningMessage("Please fill in required fields: Key and Name");
+      setWarningMessage(t("adminPricing.catalogManager.fillRequiredFields"));
       return;
     }
 
@@ -244,7 +246,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
     });
 
     if (result.success) {
-      setSuccessMessage("Product added successfully!");
+      setSuccessMessage(t("adminPricing.catalogManager.productAdded"));
       closeModal();
 
       if (selectedFamily && selectedFamily.key === creatingProduct.key) {
@@ -254,7 +256,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         }
       }
     } else {
-      setErrorMessage("Failed to add product: " + result.error);
+      setErrorMessage(t("adminPricing.catalogManager.productAddFailed", { error: result.error }));
     }
 
     setSaving(false);
@@ -277,7 +279,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
     });
 
     if (result.success) {
-      setSuccessMessage(`Product "${deletingProduct.name}" deleted successfully!`);
+      setSuccessMessage(t("adminPricing.catalogManager.productDeleted", { name: deletingProduct.name }));
       closeModal();
 
       if (selectedFamily && selectedFamily.key === deletingProduct.familyKey) {
@@ -287,7 +289,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         }
       }
     } else {
-      setErrorMessage("Failed to delete product: " + result.error);
+      setErrorMessage(t("adminPricing.catalogManager.productDeleteFailed", { error: result.error }));
     }
 
     setSaving(false);
@@ -370,32 +372,32 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
       <div className="pcm-container" style={styles.container}>
         <div className="pcm-header" style={styles.header}>
           <div>
-            <h2 className="pcm-title" style={styles.title}>Product Catalog Manager</h2>
-            <p className="pcm-subtitle" style={styles.subtitle}>Loading catalog information...</p>
+            <h2 className="pcm-title" style={styles.title}>{t("adminPricing.catalogManager.title")}</h2>
+            <p className="pcm-subtitle" style={styles.subtitle}>{t("adminPricing.catalogManager.loadingSubtitle")}</p>
           </div>
         </div>
 
         <div className="pcm-loading-state">
           <div className="pcm-spinner-inline">
-            <span className="pcm-sr-only">Loading product catalog…</span>
+            <span className="pcm-sr-only">{t("adminPricing.catalogManager.loadingScreenReader")}</span>
           </div>
-          <p className="pcm-loading-text">Loading product catalog...</p>
+          <p className="pcm-loading-text">{t("adminPricing.catalogManager.loadingText")}</p>
         </div>
       </div>
     );
   }
 
   if (!catalog) {
-    return <div className="pcm-error" style={styles.error}>No active product catalog found.</div>;
+    return <div className="pcm-error" style={styles.error}>{t("adminPricing.catalogManager.noActiveCatalog")}</div>;
   }
 
   return (
     <div className="pcm-container" style={styles.container}>
       <div className="pcm-header" style={styles.header}>
         <div>
-          <h2 className="pcm-title" style={styles.title}>Product Catalog Manager</h2>
+          <h2 className="pcm-title" style={styles.title}>{t("adminPricing.catalogManager.title")}</h2>
           <p className="pcm-subtitle" style={styles.subtitle}>
-            Version: {catalog.version} | Last Updated: {catalog.lastUpdated}
+            {t("adminPricing.catalogManager.subtitle", { version: catalog.version, date: catalog.lastUpdated })}
           </p>
         </div>
       </div>
@@ -406,7 +408,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
       <div className="pcm-search-container" style={styles.searchContainer}>
         <input
           type="text"
-          placeholder="Search products or families..."
+          placeholder={t("adminPricing.catalogManager.searchPlaceholder")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pcm-search-input"
@@ -426,7 +428,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
           >
             <div className="pcm-family-header" style={styles.familyHeader} onClick={() => setSelectedFamily(family)}>
               <h3 className="pcm-family-title" style={styles.familyTitle}>{family.label}</h3>
-              <span className="pcm-product-count" style={styles.productCount}>{family.products.length} products</span>
+              <span className="pcm-product-count" style={styles.productCount}>{t("adminPricing.catalogManager.productsCount", { count: family.products.length })}</span>
             </div>
             <p className="pcm-family-key" style={styles.familyKey}>{family.key}</p>
             <button
@@ -437,7 +439,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                 openCreateModal(family);
               }}
             >
-              + Add Product
+              {t("adminPricing.catalogManager.addProduct")}
             </button>
           </div>
         ))}
@@ -446,9 +448,9 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
       {selectedFamily && (
         <div className="pcm-product-section" style={styles.productSection}>
           <div className="pcm-product-header" style={styles.productHeader}>
-            <h3>{selectedFamily.label} - Products</h3>
+            <h3>{t("adminPricing.catalogManager.familyProducts", { label: selectedFamily.label })}</h3>
             <button className="pcm-close-button" style={styles.closeButton} onClick={() => setSelectedFamily(null)}>
-              Close
+              {t("adminPricing.catalogManager.close")}
             </button>
           </div>
 
@@ -456,15 +458,15 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
             <table className="pcm-table" style={styles.table}>
               <thead>
                 <tr style={styles.tableHeaderRow}>
-                  <th className="pcm-th" style={styles.th}>Product Name</th>
-                  <th className="pcm-th" style={styles.th}>Key</th>
-                  <th className="pcm-th" style={styles.th}>Kind</th>
-                  <th className="pcm-th" style={styles.th}>Base Price</th>
-                  <th className="pcm-th" style={styles.th}>UOM</th>
-                  <th className="pcm-th" style={styles.th}>Warranty</th>
-                  <th className="pcm-th" style={styles.th}>Display</th>
-                  <th className="pcm-th" style={styles.th}>Description</th>
-                  <th className="pcm-th" style={styles.th}>Actions</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thProductName")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thKey")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thKind")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thBasePrice")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thUom")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thWarranty")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thDisplay")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thDescription")}</th>
+                  <th className="pcm-th" style={styles.th}>{t("adminPricing.catalogManager.thActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -488,13 +490,13 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                     </td>
                     <td className="pcm-td" style={styles.td}>
                       {product.displayByAdmin !== false ? (
-                        <span className="pcm-active-tag" style={styles.activeTag}>Yes</span>
+                        <span className="pcm-active-tag" style={styles.activeTag}>{t("adminPricing.catalogManager.yes")}</span>
                       ) : (
-                        <span className="pcm-inactive-tag" style={styles.inactiveTag}>No</span>
+                        <span className="pcm-inactive-tag" style={styles.inactiveTag}>{t("adminPricing.catalogManager.no")}</span>
                       )}
                     </td>
                     <td className="pcm-td" style={styles.td}>
-                      <span title={product.description || "No description"}>
+                      <span title={product.description || t("adminPricing.catalogManager.noDescription")}>
                         {truncateText(product.description, 50)}
                       </span>
                     </td>
@@ -504,7 +506,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                         style={styles.viewButton}
                         onClick={() => openEditModal(product)}
                       >
-                        View Details
+                        {t("adminPricing.catalogManager.viewDetails")}
                       </button>
                     </td>
                   </tr>
@@ -519,7 +521,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-modal-content" style={styles.modalContent}>
             <div className="pcm-modal-header" style={styles.modalHeader}>
-              <h3>{isEditMode ? "Edit Product" : "Product Details"}</h3>
+              <h3>{isEditMode ? t("adminPricing.catalogManager.editProduct") : t("adminPricing.catalogManager.productDetails")}</h3>
               <button
                 className="pcm-modal-close-button"
                 style={styles.modalCloseButton}
@@ -536,37 +538,37 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               <>
                 <div className="pcm-detail-grid" style={styles.detailGrid}>
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Name:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.nameLabel")}</span>
                     <span className="pcm-detail-value" style={styles.detailValue}>{editingProduct.name}</span>
                   </div>
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Key:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.keyLabel")}</span>
                     <code className="pcm-code" style={styles.code}>{editingProduct.key}</code>
                   </div>
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Family:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.familyLabel")}</span>
                     <span className="pcm-detail-value" style={styles.detailValue}>{editingProduct.familyKey}</span>
                   </div>
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Kind:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.kindLabel")}</span>
                     <span className="pcm-detail-value" style={styles.detailValue}>{editingProduct.kind || "—"}</span>
                   </div>
 
                   {editingProduct.basePrice && (
                     <>
                       <div className="pcm-detail-item" style={styles.detailItem}>
-                        <span className="pcm-detail-label" style={styles.detailLabel}>Base Price:</span>
+                        <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.basePriceLabel")}</span>
                         <span className="pcm-detail-value" style={styles.detailValue}>
                           {editingProduct.basePrice.currency} ${editingProduct.basePrice.amount}
                         </span>
                       </div>
                       <div className="pcm-detail-item" style={styles.detailItem}>
-                        <span className="pcm-detail-label" style={styles.detailLabel}>UOM:</span>
+                        <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.uomLabel")}</span>
                         <span className="pcm-detail-value" style={styles.detailValue}>{editingProduct.basePrice.uom}</span>
                       </div>
                       {editingProduct.basePrice.unitSizeLabel && (
                         <div className="pcm-detail-item" style={styles.detailItem}>
-                          <span className="pcm-detail-label" style={styles.detailLabel}>Unit Size:</span>
+                          <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.unitSizeLabel")}</span>
                           <span className="pcm-detail-value" style={styles.detailValue}>
                             {editingProduct.basePrice.unitSizeLabel}
                           </span>
@@ -578,7 +580,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   {editingProduct.warrantyPricePerUnit && (
                     <>
                       <div className="pcm-detail-item" style={styles.detailItem}>
-                        <span className="pcm-detail-label" style={styles.detailLabel}>Warranty Price:</span>
+                        <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.warrantyPriceLabel")}</span>
                         <span className="pcm-detail-value" style={styles.detailValue}>
                           ${editingProduct.warrantyPricePerUnit.amount}/
                           {editingProduct.warrantyPricePerUnit.billingPeriod}
@@ -589,7 +591,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
 
                   {editingProduct.effectivePerRollPriceInternal && (
                     <div className="pcm-detail-item" style={styles.detailItem}>
-                      <span className="pcm-detail-label" style={styles.detailLabel}>Internal Roll Price:</span>
+                      <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.internalRollPriceLabel")}</span>
                       <span className="pcm-detail-value" style={styles.detailValue}>
                         ${editingProduct.effectivePerRollPriceInternal}
                       </span>
@@ -598,7 +600,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
 
                   {editingProduct.suggestedCustomerRollPrice && (
                     <div className="pcm-detail-item" style={styles.detailItem}>
-                      <span className="pcm-detail-label" style={styles.detailLabel}>Suggested Customer Price:</span>
+                      <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.suggestedCustomerPriceLabel")}</span>
                       <span className="pcm-detail-value" style={styles.detailValue}>
                         ${editingProduct.suggestedCustomerRollPrice}
                       </span>
@@ -607,7 +609,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
 
                   {editingProduct.quantityPerCase && (
                     <div className="pcm-detail-item" style={styles.detailItem}>
-                      <span className="pcm-detail-label" style={styles.detailLabel}>Quantity Per Case:</span>
+                      <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.quantityPerCaseLabel")}</span>
                       <span className="pcm-detail-value" style={styles.detailValue}>
                         {editingProduct.quantityPerCase} ({editingProduct.quantityPerCaseLabel})
                       </span>
@@ -615,20 +617,20 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   )}
 
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Display in Admin:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.displayInAdminLabel")}</span>
                     <span className="pcm-detail-value" style={styles.detailValue}>
                       {editingProduct.displayByAdmin !== false ? (
-                        <span className="pcm-yes-label" style={styles.yesLabel}>Yes</span>
+                        <span className="pcm-yes-label" style={styles.yesLabel}>{t("adminPricing.catalogManager.yes")}</span>
                       ) : (
-                        <span className="pcm-no-label" style={styles.noLabel}>No</span>
+                        <span className="pcm-no-label" style={styles.noLabel}>{t("adminPricing.catalogManager.no")}</span>
                       )}
                     </span>
                   </div>
 
                   <div className="pcm-detail-item" style={styles.detailItem}>
-                    <span className="pcm-detail-label" style={styles.detailLabel}>Description:</span>
+                    <span className="pcm-detail-label" style={styles.detailLabel}>{t("adminPricing.catalogManager.descriptionLabel")}</span>
                     <span className="pcm-detail-value" style={styles.detailValue}>
-                      {editingProduct.description || "No description available"}
+                      {editingProduct.description || t("adminPricing.catalogManager.noDescriptionAvailable")}
                     </span>
                   </div>
                 </div>
@@ -639,7 +641,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                     style={styles.deleteButton}
                     onClick={() => setDeletingProduct(editingProduct)}
                   >
-                    <FontAwesomeIcon icon={faTrash} /> Delete Product
+                    <FontAwesomeIcon icon={faTrash} /> {t("adminPricing.catalogManager.deleteProduct")}
                   </button>
                   <div style={{ flex: 1 }}></div>
                   <button
@@ -647,14 +649,14 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                     style={styles.editButton}
                     onClick={handleToggleEditMode}
                   >
-                    Edit Product
+                    {t("adminPricing.catalogManager.editProductButton")}
                   </button>
                   <button
                     className="pcm-modal-cancel-button"
                     style={styles.modalCancelButton}
                     onClick={() => closeModal()}
                   >
-                    Close
+                    {t("adminPricing.catalogManager.close")}
                   </button>
                 </div>
               </>
@@ -662,7 +664,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               <>
                 <div className="pcm-form-grid" style={styles.formGrid}>
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Product Name</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldProductName")}</label>
                     <input
                       type="text"
                       value={editingProduct.name}
@@ -673,7 +675,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Kind</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldKind")}</label>
                     <input
                       type="text"
                       value={editingProduct.kind || ""}
@@ -684,7 +686,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Base Price ($)</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldBasePrice")}</label>
                     <input
                       type="number"
                       value={editingProduct.basePrice?.amount || 0}
@@ -699,7 +701,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Unit of Measure</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldUom")}</label>
                     <input
                       type="text"
                       value={editingProduct.basePrice?.uom || ""}
@@ -713,7 +715,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Warranty Price ($)</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldWarrantyPrice")}</label>
                     <input
                       type="number"
                       value={editingProduct.warrantyPricePerUnit?.amount || 0}
@@ -728,7 +730,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Billing Period</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldBillingPeriod")}</label>
                     <select
                       value={editingProduct.warrantyPricePerUnit?.billingPeriod || "monthly"}
                       onChange={(e) => setEditingProduct({
@@ -738,9 +740,9 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                       className="pcm-form-input"
                       style={styles.formInput}
                     >
-                      <option value="monthly">Monthly</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="yearly">Yearly</option>
+                      <option value="monthly">{t("adminPricing.catalogManager.billingMonthly")}</option>
+                      <option value="weekly">{t("adminPricing.catalogManager.billingWeekly")}</option>
+                      <option value="yearly">{t("adminPricing.catalogManager.billingYearly")}</option>
                     </select>
                   </div>
 
@@ -753,18 +755,18 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                         className="pcm-checkbox"
                         style={styles.checkbox}
                       />
-                      <span>Display in Admin Panel</span>
+                      <span>{t("adminPricing.catalogManager.displayInAdminPanel")}</span>
                     </label>
                   </div>
 
                   <div className="pcm-form-group" style={styles.formGroup}>
-                    <label className="pcm-form-label" style={styles.formLabel}>Description</label>
+                    <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldDescription")}</label>
                     <textarea
                       value={editingProduct.description || ""}
                       onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
                       className="pcm-form-input"
                       style={{...styles.formInput, minHeight: "100px", resize: "vertical"}}
-                      placeholder="Enter product description..."
+                      placeholder={t("adminPricing.catalogManager.descriptionPlaceholder")}
                       rows={4}
                     />
                   </div>
@@ -776,7 +778,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                     style={styles.modalCancelButton}
                     onClick={() => setIsEditMode(false)}
                   >
-                    Cancel
+                    {t("adminPricing.catalogManager.cancel")}
                   </button>
                   <button
                     className="pcm-modal-save-button"
@@ -784,7 +786,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                     onClick={handleSaveExistingProduct}
                     disabled={saving}
                   >
-                    {saving ? "Saving..." : "Save Changes"}
+                    {saving ? t("adminPricing.catalogManager.saving") : t("adminPricing.catalogManager.saveChanges")}
                   </button>
                 </div>
               </>
@@ -797,7 +799,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-modal-content" style={styles.modalContent}>
             <div className="pcm-modal-header" style={styles.modalHeader}>
-              <h3>Add New Product to {creatingProduct.label}</h3>
+              <h3>{t("adminPricing.catalogManager.addNewProductTo", { label: creatingProduct.label })}</h3>
               <button
                 className="pcm-modal-close-button"
                 style={styles.modalCloseButton}
@@ -809,22 +811,22 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
 
             <div className="pcm-form-grid" style={styles.formGrid}>
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Product Key *</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldProductKey")}</label>
                 <input
                   type="text"
                   value={newProduct.key}
                   onChange={(e) => setNewProduct({ ...newProduct, key: validateProductKey(e.target.value) })}
                   className="pcm-form-input"
                   style={styles.formInput}
-                  placeholder="e.g., soap-standard-1000ml"
+                  placeholder={t("adminPricing.catalogManager.productKeyPlaceholder")}
                 />
                 <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                  Only letters, numbers, hyphens, and underscores allowed. Automatically converted to lowercase.
+                  {t("adminPricing.catalogManager.productKeyHelp")}
                 </small>
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Product Name *</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldProductNameRequired")}</label>
                 <input
                   type="text"
                   value={newProduct.name}
@@ -835,15 +837,15 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   }}
                   className="pcm-form-input"
                   style={styles.formInput}
-                  placeholder="e.g., Standard Hand Soap 1000ml"
+                  placeholder={t("adminPricing.catalogManager.productNamePlaceholder")}
                 />
                 <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                  <FontAwesomeIcon icon={faLightbulb} /> Product key will be automatically generated from the name
+                  <FontAwesomeIcon icon={faLightbulb} /> {t("adminPricing.catalogManager.productKeyAutoGenerated")}
                 </small>
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Kind</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldKind")}</label>
                 <select
                   value={customKindSelected ? 'CUSTOM' : (newProduct.kind || '')}
                   onChange={(e) => {
@@ -858,11 +860,11 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   className="pcm-form-input"
                   style={styles.formInput}
                 >
-                  <option value="">Select kind...</option>
+                  <option value="">{t("adminPricing.catalogManager.selectKind")}</option>
                   {allKinds.map(kind => (
                     <option key={kind} value={kind}>{kind}</option>
                   ))}
-                  <option value="CUSTOM">Custom (Enter manually)</option>
+                  <option value="CUSTOM">{t("adminPricing.catalogManager.customEnterManually")}</option>
                 </select>
                 {customKindSelected && (
                   <>
@@ -872,18 +874,18 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                       onChange={(e) => setNewProduct({ ...newProduct, kind: e.target.value })}
                       className="pcm-form-input"
                       style={{...styles.formInput, marginTop: '8px'}}
-                      placeholder="Enter custom kind (e.g., liquid, foam, gel)"
+                      placeholder={t("adminPricing.catalogManager.customKindPlaceholder")}
                       autoFocus
                     />
                     <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                      <FontAwesomeIcon icon={faLightbulb} /> Enter a custom kind for this product
+                      <FontAwesomeIcon icon={faLightbulb} /> {t("adminPricing.catalogManager.customKindHelp")}
                     </small>
                   </>
                 )}
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Base Price ($)</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldBasePrice")}</label>
                 <input
                   type="number"
                   value={newProduct.basePrice?.amount || 0}
@@ -898,7 +900,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Unit of Measure</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldUom")}</label>
                 <select
                   value={customUomSelected ? 'CUSTOM' : (newProduct.basePrice?.uom || '')}
                   onChange={(e) => {
@@ -919,11 +921,11 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   className="pcm-form-input"
                   style={styles.formInput}
                 >
-                  <option value="">Select UOM...</option>
+                  <option value="">{t("adminPricing.catalogManager.selectUom")}</option>
                   {allUoms.map(uom => (
                     <option key={uom} value={uom}>{uom}</option>
                   ))}
-                  <option value="CUSTOM">Custom (Enter manually)</option>
+                  <option value="CUSTOM">{t("adminPricing.catalogManager.customEnterManually")}</option>
                 </select>
                 {customUomSelected && (
                   <>
@@ -936,18 +938,18 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                       })}
                       className="pcm-form-input"
                       style={{...styles.formInput, marginTop: '8px'}}
-                      placeholder="e.g., per unit, per case, per gallon"
+                      placeholder={t("adminPricing.catalogManager.customUomPlaceholder")}
                       autoFocus
                     />
                     <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                      <FontAwesomeIcon icon={faLightbulb} /> Enter a custom unit of measure
+                      <FontAwesomeIcon icon={faLightbulb} /> {t("adminPricing.catalogManager.customUomHelp")}
                     </small>
                   </>
                 )}
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Warranty Price ($)</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldWarrantyPrice")}</label>
                 <input
                   type="number"
                   value={newProduct.warrantyPricePerUnit?.amount || 0}
@@ -962,7 +964,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               </div>
 
               <div className="pcm-form-group" style={styles.formGroup}>
-                <label className="pcm-form-label" style={styles.formLabel}>Billing Period</label>
+                <label className="pcm-form-label" style={styles.formLabel}>{t("adminPricing.catalogManager.fieldBillingPeriod")}</label>
                 <select
                   value={newProduct.warrantyPricePerUnit?.billingPeriod || "monthly"}
                   onChange={(e) => setNewProduct({
@@ -972,9 +974,9 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                   className="pcm-form-input"
                   style={styles.formInput}
                 >
-                  <option value="monthly">Monthly</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="yearly">Yearly</option>
+                  <option value="monthly">{t("adminPricing.catalogManager.billingMonthly")}</option>
+                  <option value="weekly">{t("adminPricing.catalogManager.billingWeekly")}</option>
+                  <option value="yearly">{t("adminPricing.catalogManager.billingYearly")}</option>
                 </select>
               </div>
 
@@ -1010,7 +1012,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                 style={styles.modalCancelButton}
                 onClick={() => closeModal()}
               >
-                Cancel
+                {t("adminPricing.catalogManager.cancel")}
               </button>
               <button
                 className="pcm-modal-save-button"
@@ -1018,7 +1020,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                 onClick={handleSaveNewProduct}
                 disabled={saving}
               >
-                {saving ? "Saving..." : "Add Product"}
+                {saving ? t("adminPricing.catalogManager.saving") : t("adminPricing.catalogManager.addProductButton")}
               </button>
             </div>
           </div>
@@ -1029,26 +1031,26 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-confirmation-modal" style={styles.confirmationModal}>
             <div className="pcm-confirmation-header" style={styles.confirmationHeader}>
-              <h3 className="pcm-confirmation-title" style={styles.confirmationTitle}><FontAwesomeIcon icon={faExclamationTriangle} /> Confirm Delete</h3>
+              <h3 className="pcm-confirmation-title" style={styles.confirmationTitle}><FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminPricing.catalogManager.confirmDelete")}</h3>
             </div>
 
             <div className="pcm-confirmation-body" style={styles.confirmationBody}>
               <p className="pcm-confirmation-text" style={styles.confirmationText}>
-                Are you sure you want to delete this product?
+                {t("adminPricing.catalogManager.confirmDeleteQuestion")}
               </p>
               <div className="pcm-product-info-box" style={styles.productInfoBox}>
                 <div className="pcm-product-info-row" style={styles.productInfoRow}>
-                  <strong>Product Name:</strong> {deletingProduct.name}
+                  <strong>{t("adminPricing.catalogManager.productNameRow")}</strong> {deletingProduct.name}
                 </div>
                 <div className="pcm-product-info-row" style={styles.productInfoRow}>
-                  <strong>Product Key:</strong> <code className="pcm-code" style={styles.code}>{deletingProduct.key}</code>
+                  <strong>{t("adminPricing.catalogManager.productKeyRow")}</strong> <code className="pcm-code" style={styles.code}>{deletingProduct.key}</code>
                 </div>
                 <div className="pcm-product-info-row" style={styles.productInfoRow}>
-                  <strong>Family:</strong> {deletingProduct.familyKey}
+                  <strong>{t("adminPricing.catalogManager.familyRow")}</strong> {deletingProduct.familyKey}
                 </div>
               </div>
               <p className="pcm-warning-text" style={styles.warningText}>
-                <FontAwesomeIcon icon={faExclamationTriangle} /> This action cannot be undone!
+                <FontAwesomeIcon icon={faExclamationTriangle} /> {t("adminPricing.catalogManager.actionCannotBeUndone")}
               </p>
             </div>
 
@@ -1059,7 +1061,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                 onClick={() => closeModal()}
                 disabled={saving}
               >
-                Cancel
+                {t("adminPricing.catalogManager.cancel")}
               </button>
               <button
                 className="pcm-confirm-delete-button"
@@ -1067,7 +1069,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
                 onClick={handleDeleteProduct}
                 disabled={saving}
               >
-                {saving ? "Deleting..." : "Yes, Delete Product"}
+                {saving ? t("adminPricing.catalogManager.deleting") : t("adminPricing.catalogManager.confirmDeleteProduct")}
               </button>
             </div>
           </div>

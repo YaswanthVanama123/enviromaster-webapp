@@ -1,0 +1,75 @@
+{
+  "loading": "Loading employee commissions...",
+  "error": "Error",
+  "retry": "Retry",
+  "backToEmployees": "← Back to Employees",
+  "fetchEmployeesError": "Failed to fetch employees commissions",
+  "fetchEmployeeError": "Failed to fetch employee commissions",
+  "loadingEmployee": "Loading commissions for {{employee}}...",
+  "noEmployeeData": "No commission data found for this employee.",
+  "employeeCommissionsTitle": "{{employee}}'s Commissions",
+  "title": "Employee Commissions",
+  "adminBadge": "Admin View",
+  "subtitle": "View commission earnings for all employees",
+  "timeFilter": {
+    "all": "All Time",
+    "thisWeek": "This Week",
+    "last14Days": "Last 14 Days",
+    "thisMonth": "This Month",
+    "thisQuarter": "This Quarter",
+    "thisYear": "This Year",
+    "dateRange": "Date Range"
+  },
+  "datePicker": {
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "rangeLabel": "Showing data from {{start}} to {{end}}"
+  },
+  "summary": {
+    "totalContractCommission": "Total Contract Commission",
+    "monthlyCommission": "Monthly Commission",
+    "totalAgreements": "Total Agreements",
+    "avgCommissionRate": "Avg Commission Rate",
+    "totalCommission": "Total Commission",
+    "totalEmployees": "Total Employees"
+  },
+  "status": {
+    "title": "Filter by Status",
+    "all": "All ({{count}})",
+    "draft": "Draft",
+    "saved": "Saved",
+    "pending": "Pending",
+    "approved": "Approved",
+    "adminApproved": "Admin Approved",
+    "active": "Active"
+  },
+  "agreements": "Agreements ({{count}})",
+  "noResults": "No agreements found for this filter.",
+  "months": "{{count}} months",
+  "contractValue": "Contract Value",
+  "commission": "Commission",
+  "breakdown": {
+    "title": "Commission Breakdown",
+    "monthlyValue": "Monthly Value",
+    "baseRate": "Base Rate ({{term}})",
+    "multiplier": "Agreement Multiplier",
+    "accountTypeAdjustment": "Account Type Adjustment",
+    "greenlineBonus": "Greenline Bonus",
+    "insideSalesDeduction": "Inside Sales Deduction",
+    "finalRate": "Final Rate",
+    "monthlyCommission": "Monthly Commission",
+    "totalContractCommission": "Total Contract Commission"
+  },
+  "searchPlaceholder": "Search employees...",
+  "employees": "Employees ({{count}})",
+  "noEmployees": "No employees found.",
+  "unknownEmployee": "Unknown",
+  "employeeAgreements": "{{count}} agreements",
+  "miniBadge": {
+    "draft": "{{count}} Draft",
+    "saved": "{{count}} Saved",
+    "pending": "{{count}} Pending",
+    "approved": "{{count}} Approved",
+    "active": "{{count}} Active"
+  }
+}

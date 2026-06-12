@@ -1,0 +1,75 @@
+{
+  "loading": "Cargando comisiones de empleados...",
+  "error": "Error",
+  "retry": "Reintentar",
+  "backToEmployees": "← Volver a empleados",
+  "fetchEmployeesError": "Error al obtener las comisiones de los empleados",
+  "fetchEmployeeError": "Error al obtener las comisiones del empleado",
+  "loadingEmployee": "Cargando comisiones de {{employee}}...",
+  "noEmployeeData": "No se encontraron datos de comisiones para este empleado.",
+  "employeeCommissionsTitle": "Comisiones de {{employee}}",
+  "title": "Comisiones de Empleados",
+  "adminBadge": "Vista de administrador",
+  "subtitle": "Vea las comisiones de todos los empleados",
+  "timeFilter": {
+    "all": "Todo el tiempo",
+    "thisWeek": "Esta semana",
+    "last14Days": "Últimos 14 días",
+    "thisMonth": "Este mes",
+    "thisQuarter": "Este trimestre",
+    "thisYear": "Este año",
+    "dateRange": "Rango de fechas"
+  },
+  "datePicker": {
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de fin",
+    "rangeLabel": "Mostrando datos desde {{start}} hasta {{end}}"
+  },
+  "summary": {
+    "totalContractCommission": "Comisión total del contrato",
+    "monthlyCommission": "Comisión mensual",
+    "totalAgreements": "Total de acuerdos",
+    "avgCommissionRate": "Tasa media de comisión",
+    "totalCommission": "Comisión total",
+    "totalEmployees": "Total de empleados"
+  },
+  "status": {
+    "title": "Filtrar por estado",
+    "all": "Todos ({{count}})",
+    "draft": "Borrador",
+    "saved": "Guardado",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "adminApproved": "Aprobado por administrador",
+    "active": "Activo"
+  },
+  "agreements": "Acuerdos ({{count}})",
+  "noResults": "No se encontraron acuerdos para este filtro.",
+  "months": "{{count}} meses",
+  "contractValue": "Valor del contrato",
+  "commission": "Comisión",
+  "breakdown": {
+    "title": "Desglose de la comisión",
+    "monthlyValue": "Valor mensual",
+    "baseRate": "Tasa base ({{term}})",
+    "multiplier": "Multiplicador del acuerdo",
+    "accountTypeAdjustment": "Ajuste por tipo de cuenta",
+    "greenlineBonus": "Bonificación Greenline",
+    "insideSalesDeduction": "Deducción de ventas internas",
+    "finalRate": "Tasa final",
+    "monthlyCommission": "Comisión mensual",
+    "totalContractCommission": "Comisión total del contrato"
+  },
+  "searchPlaceholder": "Buscar empleados...",
+  "employees": "Empleados ({{count}})",
+  "noEmployees": "No se encontraron empleados.",
+  "unknownEmployee": "Desconocido",
+  "employeeAgreements": "{{count}} acuerdos",
+  "miniBadge": {
+    "draft": "{{count}} Borrador",
+    "saved": "{{count}} Guardado",
+    "pending": "{{count}} Pendiente",
+    "approved": "{{count}} Aprobado",
+    "active": "{{count}} Activo"
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { usePricingBackups } from '../../backendservice/hooks/usePricingBackups';
 import { backupUtils } from '../../backendservice/api/pricingBackupApi';
@@ -31,6 +32,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
   const navigate = useNavigate();
   const { modalType, itemId } = useParams();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const {
     backups,
@@ -180,8 +182,8 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
       if (result.success) {
         setToastMessage({
           message: result.data?.created
-            ? (result.data?.replaced ? 'Manual backup replaced successfully!' : 'Manual backup created successfully!')
-            : 'Backup skipped (already exists for today)',
+            ? (result.data?.replaced ? t("adminTools.backup.manager.toastReplaced") : t("adminTools.backup.manager.toastCreated"))
+            : t("adminTools.backup.manager.toastSkipped"),
           type: result.data?.created ? 'success' : 'info'
         });
         setShowCreateModal(false);
@@ -192,30 +194,30 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
 
         setConfirmationModal({
           isOpen: true,
-          title: 'Replace Manual Backup',
-          message: 'A manual backup already exists for today. This action will permanently replace the existing backup.',
-          details: `Existing backup created: ${new Date(existingBackup?.createdAt || '').toLocaleString()}\nDescription: ${existingBackup?.changeDescription || 'No description'}`,
+          title: t("adminTools.backup.manager.replaceTitle"),
+          message: t("adminTools.backup.manager.replaceMessage"),
+          details: t("adminTools.backup.manager.replaceDetails", { date: new Date(existingBackup?.createdAt || '').toLocaleString(), description: existingBackup?.changeDescription || t("adminTools.backup.manager.noDescription") }),
           type: 'warning',
-          confirmText: 'Replace Backup',
-          cancelText: 'Keep Existing',
+          confirmText: t("adminTools.backup.manager.replaceConfirmText"),
+          cancelText: t("adminTools.backup.manager.keepExisting"),
           onConfirm: () => handleConfirmBackupReplace(),
           textConfirmation: {
             required: true,
-            placeholder: 'Type REPLACE to confirm',
+            placeholder: t("adminTools.backup.manager.replacePlaceholder"),
             expectedText: 'REPLACE',
-            label: 'Type REPLACE to confirm backup replacement',
-            description: 'This action cannot be undone. The previous manual backup will be permanently deleted.'
+            label: t("adminTools.backup.manager.replaceConfirmLabel"),
+            description: t("adminTools.backup.manager.replaceConfirmDescription")
           }
         });
       } else {
         setToastMessage({
-          message: result.error || 'Failed to create backup',
+          message: result.error || t("adminTools.backup.manager.toastCreateFailed"),
           type: 'error'
         });
       }
     } catch (err) {
       setToastMessage({
-        message: 'An unexpected error occurred',
+        message: t("adminTools.backup.manager.toastUnexpectedError"),
         type: 'error'
       });
     } finally {
@@ -245,20 +247,20 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
 
       if (result.success) {
         setToastMessage({
-          message: `Successfully restored ${result.data?.totalRestored} documents from ${restoreCandidate.changeDay}`,
+          message: t("adminTools.backup.manager.toastRestored", { count: result.data?.totalRestored, date: restoreCandidate.changeDay }),
           type: 'success'
         });
         setShowRestoreModal(false);
         setRestoreCandidate(null);
       } else {
         setToastMessage({
-          message: result.error || 'Failed to restore backup',
+          message: result.error || t("adminTools.backup.manager.toastRestoreFailed"),
           type: 'error'
         });
       }
     } catch (err) {
       setToastMessage({
-        message: 'An unexpected error occurred during restoration',
+        message: t("adminTools.backup.manager.toastRestoreError"),
         type: 'error'
       });
     } finally {
@@ -269,17 +271,19 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
   const handleDeleteBackups = async (changeDayIds: string[]) => {
     if (changeDayIds.length === 0) return;
 
-    const backupText = changeDayIds.length === 1 ? 'backup' : 'backups';
+    const isSingle = changeDayIds.length === 1;
+    const titleLabel = isSingle ? t("adminTools.backup.manager.backupSingular") : t("adminTools.backup.manager.backupPlural");
+    const messageLabel = isSingle ? t("adminTools.backup.manager.deleteMessageLabelSingular") : t("adminTools.backup.manager.deleteMessageLabelPlural");
     const backupList = changeDayIds.join(', ');
 
     setConfirmationModal({
       isOpen: true,
-      title: `Delete ${changeDayIds.length} ${backupText.charAt(0).toUpperCase() + backupText.slice(1)}`,
-      message: `Are you sure you want to delete ${changeDayIds.length} ${backupText}? This action cannot be undone.`,
-      details: `Selected ${backupText}:\n${backupList}`,
+      title: t("adminTools.backup.manager.deleteTitle", { count: changeDayIds.length, label: titleLabel }),
+      message: t("adminTools.backup.manager.deleteMessage", { count: changeDayIds.length, label: messageLabel }),
+      details: t("adminTools.backup.manager.deleteDetails", { label: messageLabel, list: backupList }),
       type: 'danger',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
+      confirmText: t("adminTools.backup.manager.delete"),
+      cancelText: t("adminTools.backup.manager.cancel"),
       onConfirm: () => handleConfirmDelete(changeDayIds),
       textConfirmation: {
         required: false,
@@ -299,19 +303,19 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
 
       if (result.success) {
         setToastMessage({
-          message: `Successfully deleted ${result.data?.deletedCount} backup(s)`,
+          message: t("adminTools.backup.manager.toastDeleted", { count: result.data?.deletedCount }),
           type: 'success'
         });
         setSelectedBackups([]);
       } else {
         setToastMessage({
-          message: result.error || 'Failed to delete backups',
+          message: result.error || t("adminTools.backup.manager.toastDeleteFailed"),
           type: 'error'
         });
       }
     } catch (err) {
       setToastMessage({
-        message: 'An unexpected error occurred during deletion',
+        message: t("adminTools.backup.manager.toastDeleteError"),
         type: 'error'
       });
     } finally {
@@ -328,18 +332,18 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
 
       if (result.success) {
         setToastMessage({
-          message: result.data?.message || 'Retention policy enforced',
+          message: result.data?.message || t("adminTools.backup.manager.toastRetentionEnforced"),
           type: 'success'
         });
       } else {
         setToastMessage({
-          message: result.error || 'Failed to enforce retention policy',
+          message: result.error || t("adminTools.backup.manager.toastRetentionFailed"),
           type: 'error'
         });
       }
     } catch (err) {
       setToastMessage({
-        message: 'An unexpected error occurred',
+        message: t("adminTools.backup.manager.toastUnexpectedError"),
         type: 'error'
       });
     } finally {
@@ -360,7 +364,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
 
     if (pendingBackupCreation) {
       setToastMessage({
-        message: 'Manual backup creation cancelled',
+        message: t("adminTools.backup.manager.toastCreationCancelled"),
         type: 'info'
       });
     }
@@ -499,16 +503,16 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>Pricing Backup Management</h1>
+        <h1 style={styles.title}>{t("adminTools.backup.manager.title")}</h1>
         <p style={styles.subtitle}>
-          Manage and restore pricing data backups. The system automatically maintains backups of the last 10 days with pricing changes.
+          {t("adminTools.backup.manager.subtitle")}
         </p>
 
         <div style={styles.tabContainer}>
           {[
-            { key: 'list', label: 'Backup List' },
-            { key: 'statistics', label: 'Statistics' },
-            { key: 'health', label: 'System Health' }
+            { key: 'list', label: t("adminTools.backup.manager.tabList") },
+            { key: 'statistics', label: t("adminTools.backup.manager.tabStatistics") },
+            { key: 'health', label: t("adminTools.backup.manager.tabHealth") }
           ].map(tab => (
             <button
               key={tab.key}
@@ -534,7 +538,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
               onClick={() => setShowCreateModal(true)}
               disabled={actionLoading}
             >
-              Create Manual Backup
+              {t("adminTools.backup.manager.createManualBackup")}
             </button>
 
             <button
@@ -543,7 +547,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
               onClick={refreshAll}
               disabled={loading || healthLoading || statisticsLoading}
             >
-              {loading || healthLoading || statisticsLoading ? 'Refreshing...' : 'Refresh All'}
+              {loading || healthLoading || statisticsLoading ? t("adminTools.backup.manager.refreshing") : t("adminTools.backup.manager.refreshAll")}
             </button>
 
             {selectedBackups.length > 0 && (
@@ -553,7 +557,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
                 onClick={() => handleDeleteBackups(selectedBackups)}
                 disabled={actionLoading}
               >
-                Delete Selected ({selectedBackups.length})
+                {t("adminTools.backup.manager.deleteSelected", { count: selectedBackups.length })}
               </button>
             )}
           </div>
@@ -565,7 +569,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
               onClick={handleEnforceRetention}
               disabled={actionLoading}
             >
-              Enforce Retention Policy
+              {t("adminTools.backup.manager.enforceRetentionPolicy")}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, lazy, Suspense } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "../backendservice/hooks";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
 import type {
@@ -112,6 +113,7 @@ const getAvailableStatusesForDropdown = (currentStatus: string, isInAdminContext
 };
 
 export default function ApprovalDocuments() {
+  const { t } = useTranslation();
   const [agreements, setAgreements] = useState<SavedFileGroup[]>([]);
   const [expandedAgreements, setExpandedAgreements] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
@@ -179,7 +181,7 @@ export default function ApprovalDocuments() {
           setTotalFiles(data.totalFiles || 0);
         } catch (err) {
           console.error("❌ [APPROVAL-DOCS] Error fetching approval documents:", err);
-          setError("Unable to load approval documents. Please try again.");
+          setError(t("approval.loadError"));
         } finally {
           setLoading(false);
         }
@@ -328,10 +330,10 @@ export default function ApprovalDocuments() {
         setTotalFiles(prev => prev - 1);
       }
 
-      setToastMessage({ message: "Status updated successfully!", type: "success" });
+      setToastMessage({ message: t("approval.statusUpdated"), type: "success" });
     } catch (err) {
       console.error("Error updating status:", err);
-      setToastMessage({ message: "Unable to update status. Please try again.", type: "error" });
+      setToastMessage({ message: t("approval.statusUpdateError"), type: "error" });
     } finally {
       setSavingStatusId(null);
     }
@@ -394,7 +396,7 @@ export default function ApprovalDocuments() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading file:", err);
-      setToastMessage({ message: "Unable to download this PDF. Please try again.", type: "error" });
+      setToastMessage({ message: t("approval.downloadError"), type: "error" });
     } finally {
       setDownloadingId(null);
     }
@@ -421,7 +423,7 @@ export default function ApprovalDocuments() {
         });
 
       setToastMessage({
-        message: "Approval request email sent successfully with PDF attachment!",
+        message: t("approval.emailSent"),
         type: "success"
       });
 
@@ -481,9 +483,9 @@ export default function ApprovalDocuments() {
     });
 
     return [
-      { label: 'Pending Approval', count: counts.pending_approval, color: '#f59e0b', icon: faClock },
-      { label: 'Approved by Salesman', count: counts.approved_salesman, color: '#3b82f6', icon: faCheckCircle },
-      { label: 'Approved by Admin', count: counts.approved_admin, color: '#10b981', icon: faCheckCircle }
+      { label: t('approval.stats.pendingApproval'), count: counts.pending_approval, color: '#f59e0b', icon: faClock },
+      { label: t('approval.stats.approvedSalesman'), count: counts.approved_salesman, color: '#3b82f6', icon: faCheckCircle },
+      { label: t('approval.stats.approvedAdmin'), count: counts.approved_admin, color: '#10b981', icon: faCheckCircle }
     ];
   }, [filteredAgreements]);
 
@@ -528,7 +530,7 @@ export default function ApprovalDocuments() {
         <div className="sf__search">
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("approval.searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -536,22 +538,22 @@ export default function ApprovalDocuments() {
 
         <div className="sf__actions">
           <div className="sf__stats">
-            <span>{totalAgreements} agreements</span>
-            <span>{totalFiles} files pending approval</span>
+            <span>{t("approval.agreementsCount", { count: totalAgreements })}</span>
+            <span>{t("approval.filesPendingApproval", { count: totalFiles })}</span>
           </div>
           <button
             className="sf__btn sf__btn--light"
             disabled={!anySelected}
             onClick={approveSelected}
           >
-            Approve Selected ({Object.values(selected).filter(Boolean).length})
+            {t("approval.approveSelected", { count: Object.values(selected).filter(Boolean).length })}
           </button>
         </div>
       </div>
 
       <div className="sf__groups">
         {loading && (
-          <div className="sf__empty">Loading approval documents…</div>
+          <div className="sf__empty">{t("approval.loading")}</div>
         )}
 
         {!loading && error && (
@@ -559,7 +561,7 @@ export default function ApprovalDocuments() {
         )}
 
         {!loading && !error && filteredAgreements.length === 0 && (
-          <div className="sf__empty">No documents pending approval found.</div>
+          <div className="sf__empty">{t("approval.noneFound")}</div>
         )}
 
         {!loading && !error && paginatedAgreements.map((agreement) => (
@@ -596,7 +598,7 @@ export default function ApprovalDocuments() {
 
       <div className="sf__pager">
         <div className="sf__page-info">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredAgreements.length)}-{Math.min(currentPage * itemsPerPage, filteredAgreements.length)} of {filteredAgreements.length} agreements ({totalFiles} files)
+          {t("approval.pageInfo", { from: Math.min((currentPage - 1) * itemsPerPage + 1, filteredAgreements.length), to: Math.min(currentPage * itemsPerPage, filteredAgreements.length), agreements: filteredAgreements.length, files: totalFiles })}
         </div>
 
         <div className="sf__page-controls">
@@ -606,7 +608,7 @@ export default function ApprovalDocuments() {
             disabled={!canGoPrev || loading}
             onClick={handlePrevPage}
           >
-            Previous
+            {t("approval.previous")}
           </button>
 
           <div className="sf__page-numbers">
@@ -641,7 +643,7 @@ export default function ApprovalDocuments() {
             disabled={!canGoNext || loading}
             onClick={handleNextPage}
           >
-            Next
+            {t("approval.next")}
           </button>
         </div>
       </div>
@@ -667,19 +669,15 @@ export default function ApprovalDocuments() {
               : pdfApi.getPdfDownloadUrl(currentEmailFile.id),
             documentType: getDocumentTypeForSavedFile(currentEmailFile)
           } : undefined}
-          defaultSubject={currentEmailFile ? `${currentEmailFile.fileName} - Approval Request` : ''}
-          defaultBody={currentEmailFile ? `Hello,
-
-Please review the following document for approval.
-
-Document: ${currentEmailFile.fileName}
-Type: ${currentEmailFile.fileType === 'main_pdf' ? 'Main Agreement PDF' :
-         currentEmailFile.fileType === 'version_pdf' ? `Version ${currentEmailFile.versionNumber || ''} PDF` :
-         currentEmailFile.fileType === 'attached_pdf' ? 'Attached PDF' : 'Document'}
-Status: ${STATUS_LABEL[currentEmailFile.status as FileStatus] || currentEmailFile.status}
-Updated: ${timeAgo(currentEmailFile.updatedAt)}
-
-Best regards` : ''}
+          defaultSubject={currentEmailFile ? t("approval.email.subject", { name: currentEmailFile.fileName }) : ''}
+          defaultBody={currentEmailFile ? t("approval.email.body", {
+            name: currentEmailFile.fileName,
+            type: currentEmailFile.fileType === 'main_pdf' ? t("approval.email.typeMainPdf") :
+                  currentEmailFile.fileType === 'version_pdf' ? t("approval.email.typeVersionPdf", { version: currentEmailFile.versionNumber || '' }) :
+                  currentEmailFile.fileType === 'attached_pdf' ? t("approval.email.typeAttachedPdf") : t("approval.email.typeDocument"),
+            status: STATUS_LABEL[currentEmailFile.status as FileStatus] || currentEmailFile.status,
+            updated: timeAgo(currentEmailFile.updatedAt)
+          }) : ''}
           userEmail=""
         />
       </Suspense>

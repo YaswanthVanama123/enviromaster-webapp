@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import {
@@ -51,6 +52,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
   isEmbedded = false,
   parentPath
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { configs, loading, error, updateConfig } = useServiceConfigs();
   const [editingConfig, setEditingConfig] = useState<ServiceConfig | null>(null);
@@ -112,10 +114,10 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
     const result = await updateConfig(editingConfig._id, formData);
 
     if (result.success) {
-      setToastMessage({ message: "Service config updated successfully!", type: "success" });
+      setToastMessage({ message: t("adminPricing.serviceConfig.configUpdated"), type: "success" });
       closeModal();
     } else {
-      setToastMessage({ message: "Failed to update service config. Please try again.", type: "error" });
+      setToastMessage({ message: t("adminPricing.serviceConfig.configUpdateFailed"), type: "error" });
     }
 
     setSaving(false);
@@ -136,7 +138,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
         images: [...(prev.images ?? []), { url, caption: "" }],
       }));
     } catch {
-      setToastMessage({ message: "Image upload failed.", type: "error" });
+      setToastMessage({ message: t("adminPricing.serviceConfig.imageUploadFailed"), type: "error" });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -187,9 +189,9 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
 
         <div className="scm-loading-state">
           <div className="scm-spinner-inline">
-            <span className="scm-sr-only">Loading service configs…</span>
+            <span className="scm-sr-only">{t("adminPricing.serviceConfig.loadingScreenReader")}</span>
           </div>
-          <p className="scm-loading-text">Loading service configurations...</p>
+          <p className="scm-loading-text">{t("adminPricing.serviceConfig.loadingText")}</p>
         </div>
       </div>
     );
@@ -198,8 +200,8 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
   return (
     <div className="scm-container" style={styles.container}>
       <div className="scm-header" style={styles.header}>
-        <h2 className="scm-title" style={styles.title}>Service Config Manager</h2>
-        <p className="scm-subtitle" style={styles.subtitle}>Manage pricing configurations for all services</p>
+        <h2 className="scm-title" style={styles.title}>{t("adminPricing.serviceConfig.title")}</h2>
+        <p className="scm-subtitle" style={styles.subtitle}>{t("adminPricing.serviceConfig.subtitle")}</p>
       </div>
 
       {error && <div className="scm-error" style={styles.error}>{error}</div>}
@@ -213,7 +215,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                 <p className="scm-card-service-id" style={styles.cardServiceId}>{config.serviceId}</p>
               </div>
               <div className="scm-card-badges" style={styles.cardBadges}>
-                {config.isActive && <span className="scm-active-badge" style={styles.activeBadge}>Active</span>}
+                {config.isActive && <span className="scm-active-badge" style={styles.activeBadge}>{t("adminPricing.serviceConfig.active")}</span>}
                 <span className="scm-version-badge" style={styles.versionBadge}>v{config.version}</span>
               </div>
             </div>
@@ -232,7 +234,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
               </div>
             )}
             <button className="scm-edit-button" style={styles.editButton} onClick={() => openEditModal(config)}>
-              Edit Configuration
+              {t("adminPricing.serviceConfig.editConfiguration")}
             </button>
           </div>
         ))}
@@ -242,14 +244,14 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
         <div className="scm-modal" style={styles.modal}>
           <div className="scm-modal-content" style={styles.modalContent}>
             <div className="scm-modal-header" style={styles.modalHeader}>
-              <h3>Edit Service Config</h3>
+              <h3>{t("adminPricing.serviceConfig.editServiceConfig")}</h3>
               <button className="scm-close-button" style={styles.closeButton} onClick={handleCancel}>
                 ✕
               </button>
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Label</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldLabel")}</label>
               <input
                 type="text"
                 value={formData.label || ""}
@@ -260,7 +262,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Description</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldDescription")}</label>
               <div style={styles.editorWrap}>
                 <CKEditor
                   editor={ClassicEditor}
@@ -325,7 +327,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Version</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldVersion")}</label>
               <input
                 type="text"
                 value={formData.version || ""}
@@ -344,12 +346,12 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                   className="scm-checkbox"
                   style={styles.checkbox}
                 />
-                <span>Active</span>
+                <span>{t("adminPricing.serviceConfig.active")}</span>
               </label>
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Tags (comma-separated)</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldTags")}</label>
               <input
                 type="text"
                 value={formData.tags?.join(", ") || ""}
@@ -361,12 +363,12 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                 }
                 className="scm-input"
                 style={styles.input}
-                placeholder="restroom, hygiene, core-service"
+                placeholder={t("adminPricing.serviceConfig.tagsPlaceholder")}
               />
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Images</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldImages")}</label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -380,7 +382,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
               >
-                {uploading ? "Uploading…" : "+ Upload Image"}
+                {uploading ? t("adminPricing.serviceConfig.uploading") : t("adminPricing.serviceConfig.uploadImage")}
               </button>
               {(formData.images ?? []).length > 0 && (
                 <div style={styles.imageGrid}>
@@ -391,10 +393,10 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                         type="text"
                         value={img.caption ?? ""}
                         onChange={(e) => handleImageCaption(idx, e.target.value)}
-                        placeholder="Caption (optional)"
+                        placeholder={t("adminPricing.serviceConfig.captionPlaceholder")}
                         style={styles.captionInput}
                       />
-                      <button type="button" style={styles.removeImageBtn} onClick={() => handleImageRemove(idx)} title="Remove">✕</button>
+                      <button type="button" style={styles.removeImageBtn} onClick={() => handleImageRemove(idx)} title={t("adminPricing.serviceConfig.remove")}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -402,24 +404,24 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
             </div>
 
             <div className="scm-form-group" style={styles.formGroup}>
-              <label className="scm-label" style={styles.label}>Links</label>
+              <label className="scm-label" style={styles.label}>{t("adminPricing.serviceConfig.fieldLinks")}</label>
               <div style={styles.addLinkRow}>
                 <input
                   type="text"
                   value={newLinkLabel}
                   onChange={e => setNewLinkLabel(e.target.value)}
-                  placeholder="Label (e.g. Product Sheet)"
+                  placeholder={t("adminPricing.serviceConfig.linkLabelPlaceholder")}
                   style={{ ...styles.input, flex: 1 }}
                 />
                 <input
                   type="url"
                   value={newLinkUrl}
                   onChange={e => setNewLinkUrl(e.target.value)}
-                  placeholder="https://…"
+                  placeholder={t("adminPricing.serviceConfig.linkUrlPlaceholder")}
                   style={{ ...styles.input, flex: 2 }}
                   onKeyDown={e => e.key === "Enter" && handleAddLink()}
                 />
-                <button type="button" style={styles.addLinkBtn} onClick={handleAddLink}>Add</button>
+                <button type="button" style={styles.addLinkBtn} onClick={handleAddLink}>{t("adminPricing.serviceConfig.add")}</button>
               </div>
               {(formData.links ?? []).length > 0 && (
                 <div style={styles.linkList}>
@@ -427,7 +429,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                     <div key={idx} style={styles.linkItem}>
                       <a href={link.url} target="_blank" rel="noopener noreferrer" style={styles.linkAnchor}>{link.label}</a>
                       <span style={styles.linkUrl}>{link.url}</span>
-                      <button type="button" style={styles.removeLinkBtn} onClick={() => handleLinkRemove(idx)} title="Remove">✕</button>
+                      <button type="button" style={styles.removeLinkBtn} onClick={() => handleLinkRemove(idx)} title={t("adminPricing.serviceConfig.remove")}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -436,10 +438,10 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
 
             <div className="scm-modal-actions" style={styles.modalActions}>
               <button className="scm-cancel-button" style={styles.cancelButton} onClick={handleCancel}>
-                Cancel
+                {t("adminPricing.serviceConfig.cancel")}
               </button>
               <button className="scm-save-button" style={styles.saveButton} onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t("adminPricing.serviceConfig.saving") : t("adminPricing.serviceConfig.saveChanges")}
               </button>
             </div>
           </div>

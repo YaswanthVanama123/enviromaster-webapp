@@ -11,19 +11,29 @@ import {
   DollarField,
   TextField,
 } from "../../molecules";
+import { useTranslation } from "react-i18next";
 
-const FREQUENCY_OPTIONS = [
-  { value: "one-time", label: "One-time" },
-  { value: "daily", label: "Daily" },
-  { value: "weekly", label: "Weekly" },
-  { value: "biweekly", label: "Bi-weekly" },
-  { value: "monthly", label: "Monthly" },
-];
+const FREQUENCY_KEYS = [
+  "one-time",
+  "daily",
+  "weekly",
+  "biweekly",
+  "monthly",
+] as const;
+
+const FREQUENCY_TKEY: Record<string, string> = {
+  "one-time": "oneTime",
+  daily: "daily",
+  weekly: "weekly",
+  biweekly: "biweekly",
+  monthly: "monthly",
+};
 
 export const GreaseTrapForm: React.FC<{
   initialData?: GreaseTrapFormState;
   onRemove?: () => void;
 }> = ({ initialData, onRemove }) => {
+  const { t } = useTranslation();
   const { form, handleChange, quote } = useGreaseTrapCalc(initialData!);
   const servicesContext = useServicesContextOptional();
 
@@ -123,7 +133,7 @@ export const GreaseTrapForm: React.FC<{
 
   return (
     <ServiceCardShell
-      title="GREASE TRAP"
+      title={t("serviceForms.greaseTrap.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
     >
@@ -137,46 +147,49 @@ export const GreaseTrapForm: React.FC<{
       <div className="svc-row">
         <div className="svc-col">
           <NumberField
-            label="Number of traps"
+            label={t("serviceForms.greaseTrap.numberOfTraps")}
             name="numberOfTraps"
             value={form.numberOfTraps || ""}
             onChange={handleChange as any}
           />
 
           <NumberField
-            label="Size of traps (gallons)"
+            label={t("serviceForms.greaseTrap.sizeOfTraps")}
             name="sizeOfTraps"
             value={form.sizeOfTraps || ""}
             onChange={handleChange as any}
           />
 
           <SelectField
-            label="Frequency"
+            label={t("serviceForms.common.frequency")}
             name="frequency"
             value={form.frequency}
-            options={FREQUENCY_OPTIONS}
+            options={FREQUENCY_KEYS.map((value) => ({
+              value,
+              label: t(`serviceForms.greaseTrap.freq.${FREQUENCY_TKEY[value]}`),
+            }))}
             onChange={handleChange as any}
           />
 
           <div className="svc-summary">
             <DollarField
-              label="Rate per trap"
+              label={t("serviceForms.greaseTrap.ratePerTrap")}
               name="perTrapRate"
               value={form.perTrapRate || ""}
               onChange={handleChange as any}
-              title="Rate charged per trap (editable)"
+              title={t("serviceForms.greaseTrap.ratePerTrapTitle")}
             />
             <DollarField
-              label="Rate per gallon"
+              label={t("serviceForms.greaseTrap.ratePerGallon")}
               name="perGallonRate"
               value={form.perGallonRate || ""}
               onChange={handleChange as any}
-              title="Rate charged per gallon (editable)"
+              title={t("serviceForms.greaseTrap.ratePerGallonTitle")}
             />
           </div>
 
           <TextField
-            label="Notes"
+            label={t("serviceForms.common.notes")}
             name="notes"
             value={form.notes ?? ""}
             onChange={handleChange as any}
@@ -186,8 +199,8 @@ export const GreaseTrapForm: React.FC<{
         <div className="svc-col">
           <ServiceTotals
             rows={[
-              { label: "Per Visit", amount: quote.perVisitPrice },
-              { label: "Annual Price", amount: quote.annualPrice },
+              { label: t("serviceForms.greaseTrap.perVisit"), amount: quote.perVisitPrice },
+              { label: t("serviceForms.greaseTrap.annualPrice"), amount: quote.annualPrice },
             ]}
             breakdown={quote.detailsBreakdown}
           />

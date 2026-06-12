@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "../../backendservice/hooks";
 import { PricingTablesView } from "./PricingTablesView";
 import { ServiceConfigManager } from "./ServiceConfigManager";
@@ -43,6 +44,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { subtab, modalType, itemId } = useParams<{ subtab: string; modalType: string; itemId: string }>();
   const { user, isAuthenticated, logout } = useAdminAuth();
 
@@ -231,13 +233,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {!isEmbedded && (
         <div className="admin-dashboard-top-bar" style={styles.topBar}>
           <div className="admin-dashboard-top-bar-left" style={styles.topBarLeft}>
-            <h1 className="admin-dashboard-logo" style={styles.logo}>Enviro-Master Admin</h1>
+            <h1 className="admin-dashboard-logo" style={styles.logo}>{t("adminDashboard.header.logo")}</h1>
             <div style={styles.userInfo}>
               <span className="admin-dashboard-user-name" style={styles.userName}>{user.username}</span>
             </div>
           </div>
           <button className="admin-dashboard-logout-button" style={styles.logoutButton} onClick={logout}>
-            Logout
+            {t("adminDashboard.header.logout")}
           </button>
         </div>
       )}
@@ -262,7 +264,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("pricing")}
           >
-            <MdAttachMoney size={20} style={{ marginRight: "8px" }} /> Pricing Tables
+            <MdAttachMoney size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.pricing")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -272,7 +274,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("services")}
           >
-            <MdSettings size={20} style={{ marginRight: "8px" }} /> Service Configs
+            <MdSettings size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.services")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -282,7 +284,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("products")}
           >
-            <MdInventory size={20} style={{ marginRight: "8px" }} /> Product Catalog
+            <MdInventory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.products")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -292,7 +294,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("backup")}
           >
-            <MdBackup size={20} style={{ marginRight: "8px" }} /> Backup Management
+            <MdBackup size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.backup")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -302,7 +304,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("workflow")}
           >
-            <MdWorkspaces size={20} style={{ marginRight: "8px" }} /> Workflow
+            <MdWorkspaces size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.workflow")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -312,7 +314,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("commissions")}
           >
-            <MdCalculate size={20} style={{ marginRight: "8px" }} /> Commissions
+            <MdCalculate size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.commissions")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -322,7 +324,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("quota")}
           >
-            <MdTrendingUp size={20} style={{ marginRight: "8px" }} /> Quota Tracking
+            <MdTrendingUp size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.quota")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -332,7 +334,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("customers")}
           >
-            <MdPeople size={20} style={{ marginRight: "8px" }} /> Customers
+            <MdPeople size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.customers")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -342,7 +344,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("audit")}
           >
-            <MdHistory size={20} style={{ marginRight: "8px" }} /> Audit History
+            <MdHistory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.audit")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -352,7 +354,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("bigin-companies")}
           >
-            <MdBusiness size={20} style={{ marginRight: "8px" }} /> Bigin Companies
+            <MdBusiness size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.biginCompanies")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -362,7 +364,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("company-mapping")}
           >
-            <MdLink size={20} style={{ marginRight: "8px" }} /> Company Mapping
+            <MdLink size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.companyMapping")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -372,7 +374,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("map-distance")}
           >
-            <MdMap size={20} style={{ marginRight: "8px" }} /> Map Distance
+            <MdMap size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.mapDistance")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -382,7 +384,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("map-distance-update")}
           >
-            <MdRefresh size={20} style={{ marginRight: "8px" }} /> Update Distance
+            <MdRefresh size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.mapDistanceUpdate")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -392,7 +394,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("inside-sales")}
           >
-            <MdVerifiedUser size={20} style={{ marginRight: "8px" }} /> Inside Sales
+            <MdVerifiedUser size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.insideSales")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -402,7 +404,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("account-type-detector")}
           >
-            <MdCategory size={20} style={{ marginRight: "8px" }} /> Account Type
+            <MdCategory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.accountType")}
           </button>
           <button
             className="admin-dashboard-nav-button"
@@ -412,7 +414,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             onClick={() => handleTabChange("payroll")}
           >
-            <MdPayment size={20} style={{ marginRight: "8px" }} /> Payroll
+            <MdPayment size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.payroll")}
           </button>
         </div>
           <button
@@ -430,7 +432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={handleExportPdf}
           disabled={exportingPdf}
         >
-          {exportingPdf ? <><FaHourglassHalf /> Generating...</> : <><FaDownload /> Export Pricing PDF</>}
+          {exportingPdf ? <><FaHourglassHalf /> {t("adminDashboard.actions.generating")}</> : <><FaDownload /> {t("adminDashboard.actions.exportPricingPdf")}</>}
         </button>
       </div>
 

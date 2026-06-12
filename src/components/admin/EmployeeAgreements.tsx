@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -38,42 +40,43 @@ interface EmployeeWithAgreements {
   loaded: boolean;
 }
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string, t: TFunction) {
   if (!iso) return "—";
   const diffMs = Date.now() - new Date(iso).getTime();
   const sec = Math.max(1, Math.floor(diffMs / 1000));
   const min = Math.floor(sec / 60);
   const hr = Math.floor(min / 60);
   const day = Math.floor(hr / 24);
-  if (day > 0) return `${day}d ago`;
-  if (hr > 0) return `${hr}h ago`;
-  if (min > 0) return `${min}m ago`;
-  return `${sec}s ago`;
+  if (day > 0) return t("employeeAgreements.timeAgoDay", { count: day });
+  if (hr > 0) return t("employeeAgreements.timeAgoHour", { count: hr });
+  if (min > 0) return t("employeeAgreements.timeAgoMin", { count: min });
+  return t("employeeAgreements.timeAgoSec", { count: sec });
 }
 
-const getStatusConfig = (status: string) => {
+const getStatusConfig = (status: string, t: TFunction) => {
   const configs: Record<string, { label: string; color: string; bg: string }> = {
-    draft: { label: "Draft", color: "#6b7280", bg: "#f3f4f6" },
-    saved: { label: "Saved", color: "#059669", bg: "#d1fae5" },
-    pending_approval: { label: "Pending", color: "#d97706", bg: "#fef3c7" },
-    approved_salesman: { label: "Approved", color: "#2563eb", bg: "#dbeafe" },
-    approved_admin: { label: "Completed", color: "#059669", bg: "#d1fae5" },
-    finalized: { label: "Finalized", color: "#7c3aed", bg: "#ede9fe" },
+    draft: { label: t("employeeAgreements.statusDraft"), color: "#6b7280", bg: "#f3f4f6" },
+    saved: { label: t("employeeAgreements.statusSaved"), color: "#059669", bg: "#d1fae5" },
+    pending_approval: { label: t("employeeAgreements.statusPending"), color: "#d97706", bg: "#fef3c7" },
+    approved_salesman: { label: t("employeeAgreements.statusApproved"), color: "#2563eb", bg: "#dbeafe" },
+    approved_admin: { label: t("employeeAgreements.statusCompleted"), color: "#059669", bg: "#d1fae5" },
+    finalized: { label: t("employeeAgreements.statusFinalized"), color: "#7c3aed", bg: "#ede9fe" },
   };
   return configs[status] || { label: status, color: "#6b7280", bg: "#f3f4f6" };
 };
 
-const getFileTypeConfig = (fileType: string) => {
+const getFileTypeConfig = (fileType: string, t: TFunction) => {
   const configs: Record<string, { label: string; color: string }> = {
-    main_pdf: { label: "Main PDF", color: "#2563eb" },
-    version_pdf: { label: "Version", color: "#7c3aed" },
-    attached_pdf: { label: "Attached", color: "#059669" },
-    version_log: { label: "Log", color: "#d97706" },
+    main_pdf: { label: t("employeeAgreements.fileTypeMainPdf"), color: "#2563eb" },
+    version_pdf: { label: t("employeeAgreements.fileTypeVersion"), color: "#7c3aed" },
+    attached_pdf: { label: t("employeeAgreements.fileTypeAttached"), color: "#059669" },
+    version_log: { label: t("employeeAgreements.fileTypeLog"), color: "#d97706" },
   };
   return configs[fileType] || { label: fileType, color: "#6b7280" };
 };
 
 export function EmployeeAgreements() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [employees, setEmployees] = useState<EmployeeWithAgreements[]>([]);
   const [allAgreements, setAllAgreements] = useState<SavedFileGroup[]>([]);
@@ -101,8 +104,8 @@ export function EmployeeAgreements() {
         setDefaultEmailTemplate({ subject: template.subject, body: template.body });
       } catch (err) {
         setDefaultEmailTemplate({
-          subject: "Document from EnviroMaster",
-          body: "Hello,\n\nPlease find the attached document.\n\nBest regards,\nEnviroMaster Team",
+          subject: t("employeeAgreements.defaultEmailSubject"),
+          body: t("employeeAgreements.defaultEmailBody"),
         });
       }
     };
@@ -164,7 +167,7 @@ export function EmployeeAgreements() {
       setEmployees(employeeList);
     } catch (err) {
       console.error("Failed to fetch data:", err);
-      setToastMessage({ message: "Failed to load data", type: "error" });
+      setToastMessage({ message: t("employeeAgreements.failedToLoadData"), type: "error" });
     } finally {
       setLoading(false);
     }
@@ -251,7 +254,7 @@ export function EmployeeAgreements() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setToastMessage({ message: "Failed to download file", type: "error" });
+      setToastMessage({ message: t("employeeAgreements.failedToDownload"), type: "error" });
     }
   };
 
@@ -271,7 +274,7 @@ export function EmployeeAgreements() {
       (f) => f.hasPdf || f.fileType === "version_log" || f.fileType === "attached_pdf"
     );
     if (uploadableFiles.length === 0) {
-      setToastMessage({ message: "No uploadable files in this agreement", type: "error" });
+      setToastMessage({ message: t("employeeAgreements.noUploadableFiles"), type: "error" });
       return;
     }
     if (uploadableFiles.length === 1) {
@@ -295,10 +298,10 @@ export function EmployeeAgreements() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
         <div>
           <h2 style={{ fontSize: "22px", fontWeight: "700", color: "#374151", margin: "0 0 4px 0" }}>
-            Employee Agreements
+            {t("employeeAgreements.title")}
           </h2>
           <p style={{ fontSize: "14px", color: "#6b7280", margin: 0 }}>
-            View agreements organized by employee
+            {t("employeeAgreements.subtitle")}
           </p>
         </div>
         <button
@@ -320,7 +323,7 @@ export function EmployeeAgreements() {
           }}
         >
           <FontAwesomeIcon icon={faSync} spin={loading} style={{ fontSize: "12px" }} />
-          Refresh
+          {t("employeeAgreements.refresh")}
         </button>
       </div>
 
@@ -340,7 +343,7 @@ export function EmployeeAgreements() {
         <FontAwesomeIcon icon={faSearch} style={{ color: "#9ca3af", fontSize: "14px" }} />
         <input
           type="text"
-          placeholder="Search employees or agreements..."
+          placeholder={t("employeeAgreements.searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -378,7 +381,7 @@ export function EmployeeAgreements() {
           <FontAwesomeIcon icon={faUsers} style={{ color: "#c00000", fontSize: "18px" }} />
           <div>
             <div style={{ fontSize: "18px", fontWeight: "700", color: "#374151" }}>{filteredEmployees.length}</div>
-            <div style={{ fontSize: "12px", color: "#6b7280" }}>Employees</div>
+            <div style={{ fontSize: "12px", color: "#6b7280" }}>{t("employeeAgreements.employees")}</div>
           </div>
         </div>
         <div
@@ -397,7 +400,7 @@ export function EmployeeAgreements() {
             <div style={{ fontSize: "18px", fontWeight: "700", color: "#374151" }}>
               {filteredEmployees.reduce((sum, e) => sum + e.agreements.length, 0)}
             </div>
-            <div style={{ fontSize: "12px", color: "#6b7280" }}>Agreements</div>
+            <div style={{ fontSize: "12px", color: "#6b7280" }}>{t("employeeAgreements.agreements")}</div>
           </div>
         </div>
       </div>
@@ -406,16 +409,16 @@ export function EmployeeAgreements() {
       {loading ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 20px" }}>
           <FontAwesomeIcon icon={faSync} spin style={{ fontSize: "24px", color: "#c00000", marginBottom: "12px" }} />
-          <span style={{ fontSize: "14px", color: "#6b7280" }}>Loading...</span>
+          <span style={{ fontSize: "14px", color: "#6b7280" }}>{t("employeeAgreements.loading")}</span>
         </div>
       ) : filteredEmployees.length === 0 ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "60px 20px" }}>
           <FontAwesomeIcon icon={faUsers} style={{ fontSize: "40px", color: "#d1d5db", marginBottom: "12px" }} />
           <span style={{ fontSize: "16px", fontWeight: "600", color: "#374151" }}>
-            {searchQuery ? "No Results" : "No Employees with Agreements"}
+            {searchQuery ? t("employeeAgreements.noResults") : t("employeeAgreements.noEmployeesWithAgreements")}
           </span>
           <span style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>
-            {searchQuery ? "Try a different search term" : "Agreements will appear here once created"}
+            {searchQuery ? t("employeeAgreements.tryDifferentSearch") : t("employeeAgreements.agreementsWillAppear")}
           </span>
         </div>
       ) : (
@@ -499,7 +502,7 @@ export function EmployeeAgreements() {
                           borderRadius: "4px",
                         }}
                       >
-                        {employee.agreements.length} agreement{employee.agreements.length !== 1 ? "s" : ""}
+                        {t("employeeAgreements.agreementCount", { count: employee.agreements.length })}
                       </span>
                     </div>
                   </div>
@@ -514,12 +517,12 @@ export function EmployeeAgreements() {
                   <div style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
                     {employee.agreements.length === 0 ? (
                       <div style={{ padding: "20px", textAlign: "center", color: "#6b7280", fontSize: "13px" }}>
-                        No agreements found
+                        {t("employeeAgreements.noAgreementsFound")}
                       </div>
                     ) : (
                       employee.agreements.map((agreement) => {
                         const isAgreementExpanded = expandedAgreements.has(agreement.id);
-                        const statusCfg = getStatusConfig(agreement.agreementStatus);
+                        const statusCfg = getStatusConfig(agreement.agreementStatus, t);
                         
                         const employeeFiles = agreement.files.filter(
                           (file) =>
@@ -564,7 +567,7 @@ export function EmployeeAgreements() {
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "3px" }}>
                                   <span style={{ fontSize: "11px", color: "#6b7280" }}>
-                                    {employeeFileCount} file{employeeFileCount !== 1 ? "s" : ""} · {timeAgo(agreement.latestUpdate)}
+                                    {t("employeeAgreements.fileCount", { count: employeeFileCount })} · {timeAgo(agreement.latestUpdate, t)}
                                   </span>
                                   <span
                                     style={{
@@ -589,7 +592,7 @@ export function EmployeeAgreements() {
                                       (f) => f.hasPdf || f.fileType === "version_log" || f.fileType === "attached_pdf"
                                     );
                                     if (uploadableFiles.length === 0) {
-                                      setToastMessage({ message: "No uploadable files from this employee", type: "error" });
+                                      setToastMessage({ message: t("employeeAgreements.noUploadableFilesEmployee"), type: "error" });
                                       return;
                                     }
                                     if (uploadableFiles.length === 1) {
@@ -601,7 +604,7 @@ export function EmployeeAgreements() {
                                     }
                                     setZohoUploadOpen(true);
                                   }}
-                                  title="Upload to Bigin"
+                                  title={t("employeeAgreements.uploadToBigin")}
                                   style={{
                                     width: "28px",
                                     height: "28px",
@@ -618,7 +621,7 @@ export function EmployeeAgreements() {
                                 </button>
                                 <button
                                   onClick={() => handleTaskCreate(agreement)}
-                                  title="Create Task"
+                                  title={t("employeeAgreements.createTask")}
                                   style={{
                                     width: "28px",
                                     height: "28px",
@@ -640,8 +643,8 @@ export function EmployeeAgreements() {
                             {isAgreementExpanded && (
                               <div style={{ background: "#fff" }}>
                                 {employeeFiles.map((file) => {
-                                  const fileTypeCfg = getFileTypeConfig(file.fileType);
-                                  const fileStatusCfg = getStatusConfig(file.status);
+                                  const fileTypeCfg = getFileTypeConfig(file.fileType, t);
+                                  const fileStatusCfg = getStatusConfig(file.status, t);
                                   return (
                                     <div
                                       key={file.id}
@@ -681,7 +684,7 @@ export function EmployeeAgreements() {
                                           </span>
                                           <span style={{ fontSize: "10px", color: "#9ca3af" }}>·</span>
                                           <span style={{ fontSize: "10px", color: "#9ca3af" }}>
-                                            {timeAgo(file.updatedAt)}
+                                            {timeAgo(file.updatedAt, t)}
                                           </span>
                                           <span
                                             style={{
@@ -701,7 +704,7 @@ export function EmployeeAgreements() {
                                       <div style={{ display: "flex", gap: "4px" }}>
                                         <button
                                           onClick={() => handleView(file)}
-                                          title="View"
+                                          title={t("employeeAgreements.view")}
                                           disabled={!file.hasPdf && file.fileType !== "version_log"}
                                           style={{
                                             width: "26px",
@@ -720,7 +723,7 @@ export function EmployeeAgreements() {
                                         </button>
                                         <button
                                           onClick={() => handleDownload(file)}
-                                          title="Download"
+                                          title={t("employeeAgreements.download")}
                                           disabled={!file.hasPdf && file.fileType !== "version_log"}
                                           style={{
                                             width: "26px",
@@ -739,7 +742,7 @@ export function EmployeeAgreements() {
                                         </button>
                                         <button
                                           onClick={() => handleEmail(file)}
-                                          title="Email"
+                                          title={t("employeeAgreements.email")}
                                           disabled={!file.hasPdf}
                                           style={{
                                             width: "26px",
@@ -758,7 +761,7 @@ export function EmployeeAgreements() {
                                         </button>
                                         <button
                                           onClick={() => handleZohoUpload(file)}
-                                          title="Upload to Bigin"
+                                          title={t("employeeAgreements.uploadToBigin")}
                                           disabled={!file.hasPdf && file.fileType !== "version_log"}
                                           style={{
                                             width: "26px",
@@ -817,7 +820,7 @@ export function EmployeeAgreements() {
               documentType,
               watermark: emailData.attachment?.watermark || false,
             });
-            setToastMessage({ message: "Email sent successfully!", type: "success" });
+            setToastMessage({ message: t("employeeAgreements.emailSentSuccess"), type: "success" });
             setEmailComposerOpen(false);
             setCurrentEmailFile(null);
           }}
@@ -828,7 +831,7 @@ export function EmployeeAgreements() {
             watermark: false,
           }}
           defaultSubject={defaultEmailTemplate?.subject || `${currentEmailFile.title}`}
-          defaultBody={defaultEmailTemplate?.body || `Please find the attached document.\n\nDocument: ${currentEmailFile.title}`}
+          defaultBody={defaultEmailTemplate?.body || t("employeeAgreements.fallbackEmailBody", { title: currentEmailFile.title })}
         />
       )}
 
@@ -836,7 +839,7 @@ export function EmployeeAgreements() {
       {zohoUploadOpen && (
         <ZohoUpload
           agreementId={currentZohoFile?.agreementId || currentZohoFile?.id || bulkZohoFiles[0]?.agreementId || ""}
-          agreementTitle={bulkZohoFiles.length > 1 ? `Bulk Upload - ${bulkZohoFiles.length} files` : currentZohoFile?.title || ""}
+          agreementTitle={bulkZohoFiles.length > 1 ? t("employeeAgreements.bulkUploadTitle", { count: bulkZohoFiles.length }) : currentZohoFile?.title || ""}
           bulkFiles={bulkZohoFiles.map((f) => ({
             id: f.id,
             fileName: f.fileName,
@@ -852,7 +855,7 @@ export function EmployeeAgreements() {
             setZohoUploadOpen(false);
             setCurrentZohoFile(null);
             setBulkZohoFiles([]);
-            setToastMessage({ message: "Uploaded to Bigin successfully!", type: "success" });
+            setToastMessage({ message: t("employeeAgreements.uploadedSuccess"), type: "success" });
           }}
         />
       )}
@@ -867,7 +870,7 @@ export function EmployeeAgreements() {
             setCurrentTaskAgreement(null);
           }}
           onSuccess={() => {
-            setToastMessage({ message: "Task created in Bigin!", type: "success" });
+            setToastMessage({ message: t("employeeAgreements.taskCreated"), type: "success" });
           }}
         />
       )}

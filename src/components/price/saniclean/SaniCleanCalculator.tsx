@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { money, unmoney } from "../shared/money";
 import InlineMoneyEditor from "../shared/InlineMoneyEditor";
 import TripChargeSelector from "../shared/TripChargeSelector";
@@ -6,6 +7,7 @@ import TotalsBar from "../shared/TotalsBar";
 import { SC_DEFAULTS, SC_UI as UI } from "./constants";
 
 export default function SaniCleanCalculator() {
+  const { t } = useTranslation();
   const [master, setMaster] = useState(SC_DEFAULTS);
 
   const [region, setRegion] = useState("inside");        
@@ -41,15 +43,15 @@ export default function SaniCleanCalculator() {
 
     let perVisitCalc = Math.max(unit * fx + trip, regMin || 0);
     let rule = isAllInc
-      ? "All-Inclusive: trip waived; other services bundled."
-      : `Trip = ${money(trip)}; Regional minimum = ${regMin ? money(regMin) : "—"}.`;
+      ? t("pricingCalc.saniClean.rules.allInclusive")
+      : t("pricingCalc.saniClean.rules.standard", { trip: money(trip), min: regMin ? money(regMin) : "—" });
 
     if (!isAllInc && fx > 0 && fx <= Math.max(0, Number(smallThreshold) || 0)) {
       perVisitCalc = Math.max(perVisitCalc, master.smallMin);
-      rule = `Small-account rule: fixtures ≤ ${smallThreshold}, minimum ${money(master.smallMin)} (trip included).`;
+      rule = t("pricingCalc.saniClean.rules.smallAccount", { threshold: smallThreshold, min: money(master.smallMin) });
     }
 
-    const perMonthCalc = perVisitCalc * 4.33; 
+    const perMonthCalc = perVisitCalc * 4.33;
     const months = Math.max(1, Number(agreementMonths) || 1);
     const agreementCalc = perMonthCalc * months;
 
@@ -62,20 +64,20 @@ export default function SaniCleanCalculator() {
       <div style={UI.card}>
         <div style={UI.grid}>
           <div style={UI.field}>
-            <label>Region</label>
+            <label>{t("pricingCalc.saniClean.region.label")}</label>
             <select style={UI.input} value={region} onChange={(e) => setRegion(e.target.value)}>
-              <option value="inside">Inside Beltway</option>
-              <option value="outside">Outside Beltway</option>
+              <option value="inside">{t("pricingCalc.saniClean.region.inside")}</option>
+              <option value="outside">{t("pricingCalc.saniClean.region.outside")}</option>
             </select>
           </div>
 
           <div style={UI.field}>
-            <label>Fixtures (count)</label>
+            <label>{t("pricingCalc.saniClean.fixtures")}</label>
             <input style={UI.input} type="number" min={0} value={fixtures} onChange={(e) => setFixtures(e.target.value)} />
           </div>
 
           <div style={UI.field}>
-            <label>Agreement Months</label>
+            <label>{t("pricingCalc.common.agreementMonths")}</label>
             <input style={UI.input} type="number" min={1} value={agreementMonths} onChange={(e) => setAgreementMonths(e.target.value)} />
           </div>
 
@@ -87,41 +89,41 @@ export default function SaniCleanCalculator() {
           />
 
           <div style={UI.field}>
-            <label>All-Inclusive?</label>
+            <label>{t("pricingCalc.saniClean.allInclusive.label")}</label>
             <select style={UI.input} value={allInclusive} onChange={(e) => setAllInclusive(e.target.value)}>
-              <option value="no">No</option>
-              <option value="yes">Yes (Trip waived, $20/fixture)</option>
+              <option value="no">{t("pricingCalc.saniClean.allInclusive.no")}</option>
+              <option value="yes">{t("pricingCalc.saniClean.allInclusive.yes")}</option>
             </select>
           </div>
 
           <div style={UI.field}>
-            <label>Small-Account Threshold</label>
+            <label>{t("pricingCalc.saniClean.smallThreshold.label")}</label>
             <input style={UI.input} type="number" min={0} value={smallThreshold} onChange={(e) => setSmallThreshold(e.target.value)} />
-            <small style={{ color: "#4a4a4a" }}>≤ threshold → $50 visit incl. trip</small>
+            <small style={{ color: "#4a4a4a" }}>{t("pricingCalc.saniClean.smallThreshold.hint")}</small>
           </div>
         </div>
       </div>
 
       <div style={UI.card}>
-        <h3 style={{ margin: "0 0 10px" }}>Master Rates</h3>
+        <h3 style={{ margin: "0 0 10px" }}>{t("pricingCalc.saniClean.masterRatesHeading")}</h3>
         <table style={UI.table}>
           <thead>
-            <tr><th style={UI.thtd}>Item</th><th style={UI.thtd}>Key</th><th style={UI.thtd}>Value</th><th style={UI.thtd}>Notes</th></tr>
+            <tr><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.item")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.key")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.value")}</th><th style={UI.thtd}>{t("pricingCalc.common.masterRatesTable.notes")}</th></tr>
           </thead>
           <tbody>
             {[
-              ["Inside Beltway (per fixture)", "insidePrice", "Base rate inside beltway"],
-              ["Inside Min (per visit)", "insideMin", "Regional minimum"],
-              ["Trip — Beltway", "beltwayTrip", "Standard $8"],
-              ["Outside Beltway (per fixture)", "outsidePrice", "Base rate outside beltway"],
-              ["Outside Min (per visit)", "outsideMin", "— if none"],
-              ["Trip — Outside (PDF line)", "outsideTripPDF", "SaniClean line says $8"],
-              ["Trip — Paid base", "paidBase", "+ parking pass-through"],
-              ["Small-Account Min (≤ threshold)", "smallMin", "Includes trip"],
-              ["All-Inclusive (per fixture)", "allIncPrice", "Trip waived"],
-            ].map(([label, key, note]) => (
+              "insidePrice",
+              "insideMin",
+              "beltwayTrip",
+              "outsidePrice",
+              "outsideMin",
+              "outsideTripPDF",
+              "paidBase",
+              "smallMin",
+              "allIncPrice",
+            ].map((key) => (
               <tr key={key}>
-                <td style={UI.thtd}>{label}</td>
+                <td style={UI.thtd}>{t(`pricingCalc.saniClean.rates.${key}`)}</td>
                 <td style={UI.thtd}>{key}</td>
                 <td style={UI.thtd}>
                   <InlineMoneyEditor
@@ -130,7 +132,7 @@ export default function SaniCleanCalculator() {
                     onCommit={(v) => updateMaster(key, v)}
                   />
                 </td>
-                <td style={UI.thtd}>{note}</td>
+                <td style={UI.thtd}>{t(`pricingCalc.saniClean.notes.${key}`)}</td>
               </tr>
             ))}
           </tbody>
@@ -143,7 +145,7 @@ export default function SaniCleanCalculator() {
         agreement={agreement}
         months={agreementMonths}
         ruleText={ruleText}
-        monthlyLabel="Per Month (×4.33)"
+        monthlyLabel={t("pricingCalc.saniClean.monthlyLabel")}
       />
     </div>
   );

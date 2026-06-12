@@ -1,0 +1,39 @@
+{
+  "title": "Corbeille",
+  "description": "Consultez et gérez les contrats et fichiers supprimés. Les éléments de la corbeille peuvent être restaurés ou supprimés définitivement.",
+  "searchPlaceholder": "Rechercher des éléments supprimés...",
+  "selectAll": "Tout sélectionner",
+  "noResults": "Aucun élément supprimé ne correspond à « {{query}} »",
+  "empty": "La corbeille est vide",
+  "pageInfo": "Affichage de {{from}} à {{to}} sur {{total}} contrats supprimés",
+  "stats": {
+    "deletedFiles": "Fichiers supprimés",
+    "deletedFolders": "Dossiers supprimés"
+  },
+  "toast": {
+    "viewFailed": "Impossible d'afficher le fichier. Veuillez réessayer.",
+    "downloaded": "Téléchargé : {{name}}",
+    "downloadFailed": "Impossible de télécharger le fichier. Veuillez réessayer.",
+    "restoredAgreement": "Contrat restauré : {{title}}",
+    "restoredFile": "Fichier restauré : {{title}}",
+    "restoreFailedFolder": "Impossible de restaurer le dossier. Veuillez réessayer.",
+    "restoreFailedFile": "Impossible de restaurer le fichier. Veuillez réessayer.",
+    "adminRequired": "Un accès administrateur est requis pour supprimer définitivement des éléments. Veuillez accéder à cette page depuis le panneau d'administration pour effectuer des suppressions définitives.",
+    "deletedAgreement": "Contrat supprimé définitivement : {{title}}",
+    "deletedFile": "Fichier supprimé définitivement : {{title}}",
+    "deleteFailedFolder": "Impossible de supprimer définitivement le dossier. Veuillez réessayer.",
+    "deleteFailedFile": "Impossible de supprimer définitivement le fichier. Veuillez réessayer.",
+    "emailSent": "E-mail envoyé avec succès !"
+  },
+  "deleteModal": {
+    "titleAgreement": "Supprimer définitivement le contrat ?",
+    "titleFile": "Supprimer définitivement le fichier ?",
+    "warningPrefix": "Cela va",
+    "permanentlyDelete": "supprimer définitivement",
+    "cannotBeUndone": "Cette action est irréversible !",
+    "understandAgreement": "Je comprends que cela supprimera définitivement ce contrat",
+    "understandFile": "Je comprends que cela supprimera définitivement ce fichier",
+    "typeToConfirm": "pour confirmer :",
+    "typeDeletePlaceholder": "Saisissez DELETE"
+  }
+}

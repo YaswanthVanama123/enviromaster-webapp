@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from './auth';
 import { quotaApi } from '../backendservice/api/quotaApi';
 import type { QuotaStatusResponse, QuotaPeriod } from '../backendservice/types/quota.types';
@@ -38,6 +39,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function MyQuota() {
+  const { t } = useTranslation();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +81,7 @@ export default function MyQuota() {
       <div className="my-quota">
         <div className="my-quota__loading">
           <div className="my-quota__spinner" />
-          <p>Loading your quota...</p>
+          <p>{t('quota.loading')}</p>
         </div>
       </div>
     );
@@ -89,7 +91,7 @@ export default function MyQuota() {
     return (
       <div className="my-quota">
         <div className="my-quota__error">
-          <h2>Error</h2>
+          <h2>{t('quota.error')}</h2>
           <p>{error}</p>
         </div>
       </div>
@@ -100,8 +102,8 @@ export default function MyQuota() {
     return (
       <div className="my-quota">
         <div className="my-quota__empty">
-          <h2>No Quota Data</h2>
-          <p>No quota data available for your account.</p>
+          <h2>{t('quota.noData')}</h2>
+          <p>{t('quota.noDataMessage')}</p>
         </div>
       </div>
     );
@@ -114,20 +116,20 @@ export default function MyQuota() {
     <div className="my-quota">
       <header className="my-quota__header">
         <div className="my-quota__title-row">
-          <h1>My Quota</h1>
+          <h1>{t('quota.title')}</h1>
           <span className="my-quota__user-badge">
             {user?.fullName || user?.username}
           </span>
         </div>
         <p className="my-quota__subtitle">
-          Track your sales quota progress
+          {t('quota.subtitle')}
         </p>
       </header>
 
       {}
       <div className="my-quota__period-toggle">
         <button className="my-quota__period-btn active" disabled>
-          Weekly
+          {t('quota.period.weekly')}
         </button>
       </div>
 
@@ -139,7 +141,7 @@ export default function MyQuota() {
             className="my-quota__level-badge"
             style={{ backgroundColor: levelConfig.bgColor, color: levelConfig.color }}
           >
-            {levelConfig.label} ({levelConfig.rate})
+            {t('quota.levelBadge', { label: t(`quota.level.${quotaStatus.quota.level}`), rate: levelConfig.rate })}
           </span>
         </div>
 
@@ -155,34 +157,34 @@ export default function MyQuota() {
             />
             <div className="my-quota__progress-markers">
               <div className="my-quota__marker" style={{ left: '50%' }}>
-                <span>100%</span>
+                <span>{t('quota.marker100')}</span>
               </div>
               <div className="my-quota__marker" style={{ left: '100%' }}>
-                <span>200%</span>
+                <span>{t('quota.marker200')}</span>
               </div>
             </div>
           </div>
           <div className="my-quota__progress-label">
-            {quotaStatus.quota.percentage.toFixed(1)}% of quota
+            {t('quota.progressLabel', { percent: quotaStatus.quota.percentage.toFixed(1) })}
           </div>
         </div>
 
         {}
         <div className="my-quota__stats-grid">
           <div className="my-quota__stat-card">
-            <span className="my-quota__stat-label">Target</span>
+            <span className="my-quota__stat-label">{t('quota.stats.target')}</span>
             <span className="my-quota__stat-value">{formatMoney(quotaStatus.quota.target)}</span>
           </div>
           <div className="my-quota__stat-card">
-            <span className="my-quota__stat-label">Actual Sales</span>
+            <span className="my-quota__stat-label">{t('quota.stats.actualSales')}</span>
             <span className="my-quota__stat-value">{formatMoney(quotaStatus.quota.actual)}</span>
           </div>
           <div className="my-quota__stat-card">
-            <span className="my-quota__stat-label">Commission Rate</span>
+            <span className="my-quota__stat-label">{t('quota.stats.commissionRate')}</span>
             <span className="my-quota__stat-value">{quotaStatus.quota.commissionRate}%</span>
           </div>
           <div className="my-quota__stat-card">
-            <span className="my-quota__stat-label">Earned</span>
+            <span className="my-quota__stat-label">{t('quota.stats.earned')}</span>
             <span className="my-quota__stat-value">{formatMoney(quotaStatus.commission.earned)}</span>
           </div>
         </div>
@@ -190,24 +192,24 @@ export default function MyQuota() {
 
       {}
       <div className="my-quota__next-tier">
-        <h3>Progress to Next Tier</h3>
+        <h3>{t('quota.nextTier.title')}</h3>
         <div className="my-quota__tier-grid">
           {quotaStatus.quota.level === 'below' && (
             <div className="my-quota__tier-card">
-              <span className="my-quota__tier-label">To reach quota (6% rate):</span>
+              <span className="my-quota__tier-label">{t('quota.nextTier.toReachQuota')}</span>
               <span className="my-quota__tier-value">{formatMoney(quotaStatus.progress.toReachQuota)}</span>
             </div>
           )}
           {quotaStatus.quota.level !== 'double' && (
             <div className="my-quota__tier-card">
-              <span className="my-quota__tier-label">To reach double (9% rate):</span>
+              <span className="my-quota__tier-label">{t('quota.nextTier.toReachDouble')}</span>
               <span className="my-quota__tier-value">{formatMoney(quotaStatus.progress.toReachDouble)}</span>
             </div>
           )}
           {quotaStatus.quota.level === 'double' && (
             <div className="my-quota__tier-card my-quota__tier-card--achieved">
-              <span className="my-quota__tier-label">You've reached the highest tier!</span>
-              <span className="my-quota__tier-value">9% Commission</span>
+              <span className="my-quota__tier-label">{t('quota.nextTier.achieved')}</span>
+              <span className="my-quota__tier-value">{t('quota.nextTier.achievedValue')}</span>
             </div>
           )}
         </div>
@@ -215,19 +217,19 @@ export default function MyQuota() {
 
       {/* Agreement Stats */}
       <div className="my-quota__agreement-stats">
-        <h3>Agreement Stats</h3>
+        <h3>{t('quota.agreementStats.title')}</h3>
         <div className="my-quota__agreement-grid">
           <div className="my-quota__agreement-stat">
             <span className="my-quota__agreement-value">{quotaStatus.progress.agreementCount}</span>
-            <span className="my-quota__agreement-label">Total Agreements</span>
+            <span className="my-quota__agreement-label">{t('quota.agreementStats.totalAgreements')}</span>
           </div>
           <div className="my-quota__agreement-stat">
             <span className="my-quota__agreement-value">{quotaStatus.progress.newBusinessCount}</span>
-            <span className="my-quota__agreement-label">New Business</span>
+            <span className="my-quota__agreement-label">{t('quota.agreementStats.newBusiness')}</span>
           </div>
           <div className="my-quota__agreement-stat">
             <span className="my-quota__agreement-value">{quotaStatus.progress.renewalCount}</span>
-            <span className="my-quota__agreement-label">Renewals</span>
+            <span className="my-quota__agreement-label">{t('quota.agreementStats.renewals')}</span>
           </div>
         </div>
       </div>
@@ -235,7 +237,7 @@ export default function MyQuota() {
       {/* Recent Agreements */}
       {quotaStatus.recentAgreements && quotaStatus.recentAgreements.length > 0 && (
         <div className="my-quota__recent">
-          <h3>Recent Agreements</h3>
+          <h3>{t('quota.recent.title')}</h3>
           <div className="my-quota__recent-list">
             {quotaStatus.recentAgreements.map((agreement) => (
               <div key={agreement._id} className="my-quota__recent-item">
@@ -244,7 +246,7 @@ export default function MyQuota() {
                   <span className="my-quota__recent-date">{formatDate(agreement.signedDate)}</span>
                 </div>
                 <div className="my-quota__recent-value">
-                  {formatMoney(agreement.monthlyValue)}/mo
+                  {t('quota.recent.perMonth', { amount: formatMoney(agreement.monthlyValue) })}
                 </div>
               </div>
             ))}
@@ -255,7 +257,7 @@ export default function MyQuota() {
       {/* Quota History */}
       {quotaHistory.length > 0 && (
         <div className="my-quota__history">
-          <h3>Quota History</h3>
+          <h3>{t('quota.history.title')}</h3>
           <div className="my-quota__history-list">
             {quotaHistory.map((period) => {
               const periodConfig = QUOTA_LEVEL_CONFIG[period.quotaLevel];
@@ -272,7 +274,7 @@ export default function MyQuota() {
                   </div>
                   <div className="my-quota__history-details">
                     <span>{formatMoney(period.actualSales)} / {formatMoney(period.quotaTarget)}</span>
-                    <span>{period.agreementCount} agreements</span>
+                    <span>{t('quota.history.agreements', { count: period.agreementCount })}</span>
                   </div>
                 </div>
               );

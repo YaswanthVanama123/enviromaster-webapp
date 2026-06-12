@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { agreementApi, salesPersonApi } from "../../../backendservice/api/quotaApi";
 import type {
   Agreement,
@@ -24,6 +25,7 @@ export const AgreementList: React.FC<AgreementListProps> = ({
   initialSalesPersonId,
   onClearFilter,
 }) => {
+  const { t } = useTranslation();
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [salesPersons, setSalesPersons] = useState<SalesPerson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,12 +122,12 @@ export const AgreementList: React.FC<AgreementListProps> = ({
       {}
       <div className="filters-bar">
         <div className="filter-group">
-          <label>Sales Person</label>
+          <label>{t("adminQuota.agreementList.salesPerson")}</label>
           <select
             value={filterSalesPersonId}
             onChange={(e) => setFilterSalesPersonId(e.target.value)}
           >
-            <option value="">All Sales Persons</option>
+            <option value="">{t("adminQuota.agreementList.allSalesPersons")}</option>
             {salesPersons.map((sp) => (
               <option key={sp.employeeId} value={sp.employeeId}>
                 {sp.name}
@@ -134,19 +136,19 @@ export const AgreementList: React.FC<AgreementListProps> = ({
           </select>
         </div>
         <div className="filter-group">
-          <label>Status</label>
+          <label>{t("adminQuota.agreementList.status")}</label>
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
-            <option value="">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="pending_approval">Pending Approval</option>
-            <option value="approved">Approved</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="">{t("adminQuota.agreementList.allStatuses")}</option>
+            <option value="draft">{t("adminQuota.agreementList.statusDraft")}</option>
+            <option value="pending_approval">{t("adminQuota.agreementList.statusPendingApproval")}</option>
+            <option value="approved">{t("adminQuota.agreementList.statusApproved")}</option>
+            <option value="active">{t("adminQuota.agreementList.statusActive")}</option>
+            <option value="completed">{t("adminQuota.agreementList.statusCompleted")}</option>
+            <option value="cancelled">{t("adminQuota.agreementList.statusCancelled")}</option>
           </select>
         </div>
         <div className="filter-group">
-          <label>From Date</label>
+          <label>{t("adminQuota.agreementList.fromDate")}</label>
           <input
             type="date"
             value={filterStartDate}
@@ -154,7 +156,7 @@ export const AgreementList: React.FC<AgreementListProps> = ({
           />
         </div>
         <div className="filter-group">
-          <label>To Date</label>
+          <label>{t("adminQuota.agreementList.toDate")}</label>
           <input
             type="date"
             value={filterEndDate}
@@ -162,19 +164,19 @@ export const AgreementList: React.FC<AgreementListProps> = ({
           />
         </div>
         <button className="clear-filters-btn" onClick={handleClearFilters}>
-          Clear Filters
+          {t("adminQuota.agreementList.clearFilters")}
         </button>
       </div>
 
       {}
       <div className="results-info">
-        Showing {agreements.length} of {total} agreements
+        {t("adminQuota.agreementList.showingCount", { shown: agreements.length, total })}
       </div>
 
       {loading && agreements.length === 0 ? (
-        <div className="loading-state">Loading agreements...</div>
+        <div className="loading-state">{t("adminQuota.agreementList.loading")}</div>
       ) : agreements.length === 0 ? (
-        <div className="empty-state">No agreements found matching your filters.</div>
+        <div className="empty-state">{t("adminQuota.agreementList.noAgreements")}</div>
       ) : (
         <>
           <div className="agreements-grid">
@@ -199,15 +201,15 @@ export const AgreementList: React.FC<AgreementListProps> = ({
                 <div className="agreement-customer">{agreement.customer.name}</div>
                 <div className="agreement-details">
                   <div className="detail-row">
-                    <span className="label">Monthly Value:</span>
+                    <span className="label">{t("adminQuota.agreementList.monthlyValue")}</span>
                     <span className="value">{formatCurrency(agreement.monthlyValue)}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="label">Term:</span>
+                    <span className="label">{t("adminQuota.agreementList.term")}</span>
                     <span className="value">{getAgreementTermLabel(agreement.agreementTerm)}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="label">Account Type:</span>
+                    <span className="label">{t("adminQuota.agreementList.accountType")}</span>
                     <span
                       className="account-type-badge"
                       style={{
@@ -232,7 +234,7 @@ export const AgreementList: React.FC<AgreementListProps> = ({
           {hasMore && (
             <div className="load-more-container">
               <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
-                {loading ? "Loading..." : "Load More"}
+                {loading ? t("adminQuota.agreementList.loadingMore") : t("adminQuota.agreementList.loadMore")}
               </button>
             </div>
           )}
@@ -243,29 +245,29 @@ export const AgreementList: React.FC<AgreementListProps> = ({
       {selectedAgreement && (
         <div className="detail-panel">
           <div className="detail-panel-header">
-            <h3>Agreement Details</h3>
+            <h3>{t("adminQuota.agreementList.detailsTitle")}</h3>
             <button className="close-btn" onClick={() => setSelectedAgreement(null)}>
               &times;
             </button>
           </div>
           <div className="detail-panel-content">
             <div className="detail-section">
-              <h4>Basic Information</h4>
+              <h4>{t("adminQuota.agreementList.basicInformation")}</h4>
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="label">Agreement #</span>
+                  <span className="label">{t("adminQuota.agreementList.agreementNumber")}</span>
                   <span className="value">{selectedAgreement.agreementNumber}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Customer</span>
+                  <span className="label">{t("adminQuota.agreementList.customer")}</span>
                   <span className="value">{selectedAgreement.customer.name}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Sales Person</span>
+                  <span className="label">{t("adminQuota.agreementList.salesPerson")}</span>
                   <span className="value">{selectedAgreement.salesPerson.name}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Status</span>
+                  <span className="label">{t("adminQuota.agreementList.status")}</span>
                   <select
                     value={selectedAgreement.status}
                     onChange={(e) =>
@@ -273,94 +275,94 @@ export const AgreementList: React.FC<AgreementListProps> = ({
                     }
                     style={{ color: getAgreementStatusColor(selectedAgreement.status) }}
                   >
-                    <option value="draft">Draft</option>
-                    <option value="pending_approval">Pending Approval</option>
-                    <option value="approved">Approved</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="draft">{t("adminQuota.agreementList.statusDraft")}</option>
+                    <option value="pending_approval">{t("adminQuota.agreementList.statusPendingApproval")}</option>
+                    <option value="approved">{t("adminQuota.agreementList.statusApproved")}</option>
+                    <option value="active">{t("adminQuota.agreementList.statusActive")}</option>
+                    <option value="completed">{t("adminQuota.agreementList.statusCompleted")}</option>
+                    <option value="cancelled">{t("adminQuota.agreementList.statusCancelled")}</option>
                   </select>
                 </div>
               </div>
             </div>
 
             <div className="detail-section">
-              <h4>Financial Details</h4>
+              <h4>{t("adminQuota.agreementList.financialDetails")}</h4>
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="label">Monthly Value</span>
+                  <span className="label">{t("adminQuota.agreementList.monthlyValue")}</span>
                   <span className="value">{formatCurrency(selectedAgreement.monthlyValue)}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Total Contract</span>
+                  <span className="label">{t("adminQuota.agreementList.totalContract")}</span>
                   <span className="value">
                     {formatCurrency(selectedAgreement.totalContractValue)}
                   </span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Agreement Term</span>
+                  <span className="label">{t("adminQuota.agreementList.agreementTerm")}</span>
                   <span className="value">
                     {getAgreementTermLabel(selectedAgreement.agreementTerm)}
                   </span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Pricing Line</span>
+                  <span className="label">{t("adminQuota.agreementList.pricingLine")}</span>
                   <span className="value">{selectedAgreement.pricingLine}</span>
                 </div>
               </div>
             </div>
 
             <div className="detail-section">
-              <h4>Commission Details</h4>
+              <h4>{t("adminQuota.agreementList.commissionDetails")}</h4>
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="label">Quota Level (at time)</span>
+                  <span className="label">{t("adminQuota.agreementList.quotaLevelAtTime")}</span>
                   <span className="value">{selectedAgreement.commission.quotaLevelAtTime}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Final Commission Rate</span>
+                  <span className="label">{t("adminQuota.agreementList.finalCommissionRate")}</span>
                   <span className="value">
                     {selectedAgreement.commission.finalCommissionRate.toFixed(2)}%
                   </span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Weekly Commission</span>
+                  <span className="label">{t("adminQuota.agreementList.weeklyCommission")}</span>
                   <span className="value">
                     {formatCurrency(selectedAgreement.commission.weeklyCommission)}
                   </span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Total Commission</span>
+                  <span className="label">{t("adminQuota.agreementList.totalCommission")}</span>
                   <span className="value">
                     {formatCurrency(selectedAgreement.commission.totalCommission)}
                   </span>
                 </div>
               </div>
               <div className="commission-breakdown">
-                <h5>Breakdown:</h5>
+                <h5>{t("adminQuota.agreementList.breakdown")}</h5>
                 <ul>
                   <li>
-                    Base Rate: {selectedAgreement.commission.breakdown.baseRate}%
+                    {t("adminQuota.agreementList.baseRate", { rate: selectedAgreement.commission.breakdown.baseRate })}
                   </li>
                   <li>
-                    Agreement Multiplier: {selectedAgreement.commission.breakdown.agreementMultiplier}%
+                    {t("adminQuota.agreementList.agreementMultiplier", { value: selectedAgreement.commission.breakdown.agreementMultiplier })}
                   </li>
                   <li>
-                    Account Type Adj: {selectedAgreement.commission.breakdown.accountTypeAdjustment}%
+                    {t("adminQuota.agreementList.accountTypeAdj", { value: selectedAgreement.commission.breakdown.accountTypeAdjustment })}
                   </li>
                   {selectedAgreement.commission.breakdown.greenlineBonus !== 0 && (
                     <li>
-                      Greenline Bonus: +{selectedAgreement.commission.breakdown.greenlineBonus}%
+                      {t("adminQuota.agreementList.greenlineBonus", { value: selectedAgreement.commission.breakdown.greenlineBonus })}
                     </li>
                   )}
                   {selectedAgreement.commission.breakdown.renewalBonus !== 0 && (
                     <li>
-                      Renewal Bonus: +{selectedAgreement.commission.breakdown.renewalBonus}%
+                      {t("adminQuota.agreementList.renewalBonus", { value: selectedAgreement.commission.breakdown.renewalBonus })}
                     </li>
                   )}
                   {selectedAgreement.commission.breakdown.insideSalesDeduction !== 0 && (
                     <li>
-                      Inside Sales: {selectedAgreement.commission.breakdown.insideSalesDeduction}%
+                      {t("adminQuota.agreementList.insideSalesBreakdown", { value: selectedAgreement.commission.breakdown.insideSalesDeduction })}
                     </li>
                   )}
                 </ul>
@@ -369,7 +371,7 @@ export const AgreementList: React.FC<AgreementListProps> = ({
 
             {selectedAgreement.notes && (
               <div className="detail-section">
-                <h4>Notes</h4>
+                <h4>{t("adminQuota.agreementList.notes")}</h4>
                 <p className="notes-text">{selectedAgreement.notes}</p>
               </div>
             )}
