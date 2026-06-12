@@ -409,7 +409,7 @@ export default function AdminCommissions() {
             <div className="admin-commissions__summary-content">
               <span className="admin-commissions__summary-label">Avg Commission Rate</span>
               <span className="admin-commissions__summary-value">
-                {totals.averageCommissionRate}%
+                {Number(totals.averageCommissionRate).toFixed(2)}%
               </span>
             </div>
           </div>
@@ -497,7 +497,7 @@ export default function AdminCommissions() {
                             {formatMoney(agreement.commission.total)}
                           </span>
                           <span className="admin-commissions__rate-badge">
-                            {agreement.commission.rate}%
+                            {Number(agreement.commission.rate).toFixed(2)}%
                           </span>
                         </div>
                       </div>
@@ -544,7 +544,7 @@ export default function AdminCommissions() {
                             )}
                             <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--total">
                               <span>Final Rate</span>
-                              <span>{agreement.commission.rate}%</span>
+                              <span>{Number(agreement.commission.rate).toFixed(2)}%</span>
                             </div>
                             <div className="admin-commissions__breakdown-item admin-commissions__breakdown-item--total">
                               <span>Monthly Commission</span>

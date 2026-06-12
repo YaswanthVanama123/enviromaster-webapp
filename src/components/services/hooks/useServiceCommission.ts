@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useServicesContext, AccountTypeCacheEntry } from '../ServicesContext';
 import { getFrequencyNumber, BACKEND_TO_FREQUENCY } from './useAccountTypeDetection';
 import {
@@ -16,10 +16,8 @@ import {
   DEFAULT_QUOTA_TIER_CUTOFFS,
   getPricingTierFromList,
   PRICING_TIERS,
-  resolveCommissionRules,
   type ResolvedCommissionRules,
 } from '../../../backendservice/types/commission.types';
-import { commissionApi } from '../../../backendservice/api/commissionApi';
 import type { AccountType } from '../../../backendservice/api/accountTypeApi';
 import type { ServiceFrequency, AgreementTerm } from '../../../backendservice/types/commission.types.v2';
 
@@ -340,29 +338,7 @@ export interface GlobalCommissionResult {
 }
 
 export function useGlobalCommission(commissionRate: number = 6): GlobalCommissionResult {
-  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit } = useServicesContext();
-
-  const [activeRules, setActiveRules] = useState<ResolvedCommissionRules>(() =>
-    resolveCommissionRules(null),
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    commissionApi
-      .getActiveRules()
-      .then(response => {
-        if (cancelled) return;
-        if (response?.data) {
-          setActiveRules(resolveCommissionRules(response.data));
-        }
-      })
-      .catch(err => {
-        console.error('[RULES] useGlobalCommission failed to load active rules:', err);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit, effectiveCommissionRules } = useServicesContext();
 
   return useMemo(
     () =>
@@ -371,10 +347,10 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
         accountTypeCache,
         globalContractMonths,
         commissionRate,
-        activeRules,
+        effectiveCommissionRules,
         effectivePriorQuotaCredit,
       ),
-    [servicesState, accountTypeCache, commissionRate, globalContractMonths, activeRules, effectivePriorQuotaCredit],
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit],
   );
 }
 

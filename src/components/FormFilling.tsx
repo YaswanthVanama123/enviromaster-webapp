@@ -56,9 +56,7 @@ import {
   ANCHOR_BONUS_MULTIPLIER,
   resolveCommissionRules,
   getPricingTierFromList,
-  type ResolvedCommissionRules,
 } from "../backendservice/types/commission.types";
-import { commissionApi } from "../backendservice/api/commissionApi";
 
 type HeaderRow = {
   labelLeft: string;
@@ -289,6 +287,7 @@ function ContractSummary({
     setGlobalTripChargeFrequency,
     globalParkingChargeFrequency,
     setGlobalParkingChargeFrequency,
+    effectiveCommissionRules,
   } = useServicesContext();
 
   const { monthlyTotal: productMonthlyTotal = 0, contractTotal: productContractTotal = 0 } =
@@ -331,34 +330,10 @@ function ContractSummary({
 
   
 
-  
-  const [activeRules, setActiveRules] = useState<ResolvedCommissionRules>(() =>
-    resolveCommissionRules(null),
-  );
 
-  useEffect(() => {
-    let cancelled = false;
-    commissionApi
-      .getActiveRules()
-      .then((response) => {
-        if (cancelled) return;
-        if (response?.data) {
-          setActiveRules(resolveCommissionRules(response.data));
-        }
-      })
-      .catch((err) => {
-        
-        console.error("[RULES] Failed to load active commission rules:", err);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  
 
   const calculateCommission = useMemo((): CommissionResult => {
-    const rules = activeRules;
+    const rules = effectiveCommissionRules;
 
     const monthlyRecurring = totalMonthlyRecurring || 0;
 
@@ -567,7 +542,7 @@ function ContractSummary({
     isInsideSales,
     isNewLocation,
     repActualSalesBefore,
-    activeRules,
+    effectiveCommissionRules,
   ]);
 
   useEffect(() => {
@@ -1436,6 +1411,8 @@ function FormFillingContent({
     quotaLevel,
     effectivePriorQuotaCredit,
     setLoadedPriorQuotaCredit,
+    setLoadedCommissionRules,
+    effectiveCommissionRules,
     isRouteStarMapped,
 
   } = useServicesContext();
@@ -1505,6 +1482,11 @@ function FormFillingContent({
       setLoadedPriorQuotaCredit(priorQuotaCredit);
     }
 
+    const savedRulesSnapshot = (payload as any)?.commission?.rulesSnapshot;
+    if (savedRulesSnapshot && typeof savedRulesSnapshot === 'object') {
+      setLoadedCommissionRules(resolveCommissionRules(savedRulesSnapshot));
+    }
+
     if (contractMonths !== undefined && contractMonths !== null) {
       setGlobalContractMonths(contractMonths);
     }
@@ -1541,6 +1523,7 @@ function FormFillingContent({
     setGlobalParkingChargeFrequency,
     setProductTotals,
     setLoadedPriorQuotaCredit,
+    setLoadedCommissionRules,
   ]);
 
   const getDocumentStatus = useCallback((): 'saved' | 'pending_approval' => {
@@ -1969,10 +1952,11 @@ function FormFillingContent({
           annualCommission: commissionData.annualCommission,
           contractCommission: commissionData.contractCommission,
           finalCommissionRate: commissionData.finalCommissionRate,
+          rulesSnapshot: commissionData.rulesSnapshot,
           breakdown: {
             baseRate: commissionData.baseRate,
             agreementMultiplier: commissionData.agreementMultiplier,
-            quotaLevel: quotaLevel, 
+            quotaLevel: quotaLevel,
           },
           input: {
             baseRate: baseCommissionRate,
