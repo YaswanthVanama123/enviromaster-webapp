@@ -24,7 +24,7 @@ export function AuthGuard({ requireAdmin = false, children }: AuthGuardProps) {
   if (!isAuthenticated) {
     return (
       <Navigate
-        to="/login"
+        to="/"
         state={{ from: location, message: 'Please log in to continue', reason: 'unauthorized' }}
         replace
       />

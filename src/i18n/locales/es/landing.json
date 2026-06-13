@@ -1,0 +1,53 @@
+{
+  "tagline": "Precios y acuerdos de servicio",
+  "badge": "Plataforma de acuerdos y comisiones",
+  "login": "Iniciar sesión",
+  "getStarted": "Comenzar",
+  "heroTitle": "Bienvenido a Enviro-Master",
+  "heroSubtitle": "Sistema profesional de gestión de acuerdos",
+  "heroDescription": "Cree, gestione y mantenga acuerdos de servicio al cliente con facilidad. Optimice su flujo de trabajo, controle las comisiones y alcance su cuota, todo en una sola plataforma.",
+  "highlights": {
+    "guided": "Formularios guiados",
+    "pdf": "PDF instantáneos",
+    "multilingual": "EN · ES · FR"
+  },
+  "featuresTitle": "Todo lo que necesita para cerrar ventas",
+  "featuresSubtitle": "Desde la primera cotización hasta el acuerdo firmado, y cada comisión en el medio.",
+  "features": {
+    "agreements": {
+      "title": "Gestión de acuerdos",
+      "description": "Cree, extienda y edite acuerdos de servicio profesionales con formularios guiados y PDF instantáneos."
+    },
+    "commissions": {
+      "title": "Seguimiento de comisiones",
+      "description": "Vea sus ganancias por acuerdo con cálculos de comisiones transparentes y por niveles."
+    },
+    "quota": {
+      "title": "Progreso de cuota",
+      "description": "Controle el progreso de su cuota semanal y por período y sepa exactamente cuánto le falta para el siguiente nivel."
+    },
+    "documents": {
+      "title": "Documentos guardados",
+      "description": "Mantenga cada versión de cada acuerdo organizada, fácil de buscar y lista para enviar."
+    }
+  },
+  "howTitle": "Cómo funciona",
+  "howSubtitle": "Tres pasos sencillos desde el inicio de sesión hasta la venta cerrada.",
+  "steps": {
+    "one": {
+      "title": "Inicie sesión",
+      "description": "Acceda con su cuenta de Enviro-Master para llegar a su panel personalizado."
+    },
+    "two": {
+      "title": "Cree el acuerdo",
+      "description": "Use formularios guiados de servicios y productos para crear, extender o editar un acuerdo de cliente."
+    },
+    "three": {
+      "title": "Genere y controle",
+      "description": "Produzca un PDF profesional y vea cómo su comisión y su cuota se actualizan al instante."
+    }
+  },
+  "ctaTitle": "¿Listo para comenzar?",
+  "ctaDescription": "Inicie sesión para acceder a su panel, acuerdos y comisiones.",
+  "footer": "Enviro-Master Services International. Todos los derechos reservados."
+}

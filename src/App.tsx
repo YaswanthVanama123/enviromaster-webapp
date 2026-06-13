@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import "./App.css";
 import NavBar from "./components/NavBar";
 import Home from "./components/Home";
+import Landing from "./components/Landing";
 import FormFilling from "./components/FormFilling";
 import SavedFilesAgreements from "./components/SavedFilesAgreements";
 import TrashView from "./components/TrashView";
@@ -22,12 +23,16 @@ function AppContent() {
   const location = useLocation();
   const isEditMode = location.pathname.startsWith('/edit/pdf');
   const isLoginPage = location.pathname === '/login';
+  const isLandingPage = location.pathname === '/';
 
   return (
     <div className={`shell ${isEditMode ? 'edit-mode' : ''}`}>
-      {!isEditMode && !isLoginPage && <NavBar />}
+      {!isEditMode && !isLoginPage && !isLandingPage && <NavBar />}
       <main className={`page-body ${isEditMode ? 'edit-mode-body' : ''}`}>
         <Routes>
+          {/* Public landing page (logged-out visitors). Redirects to /home if authenticated. */}
+          <Route path="/" element={<Landing />} />
+
           {}
           <Route path="/login" element={<LoginPage />} />
 
@@ -36,7 +41,6 @@ function AppContent() {
 
           {}
           <Route element={<AuthGuard />}>
-            <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/form-filling" element={<FormFilling />} />
             <Route path="/edit/pdf/:id?" element={<FormFilling />} />

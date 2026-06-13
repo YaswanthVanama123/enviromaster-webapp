@@ -18,6 +18,8 @@ import {
   FiCheck,
   FiX,
 } from "react-icons/fi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import "./NavBar.css";
 import logo from "../assets/em-logo.png";
 import { useAuthContext } from "./auth";
@@ -36,6 +38,29 @@ export default function NavBar() {
   const { user, isAdmin, logout } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+  const [navScroll, setNavScroll] = useState({ left: false, right: false });
+
+  const updateNavScroll = () => {
+    const el = menuRef.current;
+    if (!el) return;
+    const left = el.scrollLeft > 2;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+    setNavScroll((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+  };
+
+  const scrollMenu = (direction: number) => {
+    menuRef.current?.scrollBy({ left: direction * 220, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    updateNavScroll();
+    const el = menuRef.current;
+    const active = el?.querySelector(".topnav__item--active") as HTMLElement | null;
+    if (active) active.scrollIntoView({ inline: "nearest", block: "nearest" });
+    window.addEventListener("resize", updateNavScroll);
+    return () => window.removeEventListener("resize", updateNavScroll);
+  }, [location.pathname, isAdmin]);
 
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => {
@@ -114,18 +139,40 @@ export default function NavBar() {
         <img src={logo} alt="EM" className="topnav__logo" />
       </div>
 
-      <nav className="topnav__menu desktop">
-        {links.map((link) => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className={`topnav__item ${isActive(link.path) ? "topnav__item--active" : ""}`}
+      <div className="topnav__menu-wrap desktop">
+        {navScroll.left && (
+          <button
+            type="button"
+            className="topnav__scroll-btn topnav__scroll-btn--left"
+            onClick={() => scrollMenu(-1)}
+            aria-label="Scroll navigation left"
           >
-            <span className="topnav__item-icon">{link.icon}</span>
-            <span>{link.label}</span>
-          </Link>
-        ))}
-      </nav>
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+        )}
+        <nav className="topnav__menu" ref={menuRef} onScroll={updateNavScroll}>
+          {links.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`topnav__item ${isActive(link.path) ? "topnav__item--active" : ""}`}
+            >
+              <span className="topnav__item-icon">{link.icon}</span>
+              <span>{link.label}</span>
+            </Link>
+          ))}
+        </nav>
+        {navScroll.right && (
+          <button
+            type="button"
+            className="topnav__scroll-btn topnav__scroll-btn--right"
+            onClick={() => scrollMenu(1)}
+            aria-label="Scroll navigation right"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        )}
+      </div>
 
       <div className="topnav__right desktop">
         <div className="topnav__lang" ref={langMenuRef}>

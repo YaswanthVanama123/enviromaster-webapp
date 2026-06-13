@@ -10,21 +10,50 @@
   background: #fff;
   border-bottom: 1px solid #eceef1;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
 .topnav__brand{ display:flex; align-items:center; flex-shrink:0; }
 .topnav__logo{ height:40px; width:auto; object-fit:contain; }
 
-.topnav__menu{
-  margin-left:auto;
+.topnav__menu-wrap{
+  flex:1 1 0;
+  min-width:0;
   display:flex;
   align-items:center;
   gap:4px;
-  flex-wrap:nowrap;
+}
+
+.topnav__scroll-btn{
+  flex-shrink:0;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#4b5563;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:15px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+  transition: background .15s ease, color .15s ease;
+}
+.topnav__scroll-btn:hover{ background:#fdeaea; color:#c00000; }
+
+.topnav__menu{
+  flex:1 1 0;
   min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:4px;
+  flex-wrap:nowrap;
   overflow-x:auto;
+  overflow-y:hidden;
   scrollbar-width:none;
   -ms-overflow-style:none;
 }

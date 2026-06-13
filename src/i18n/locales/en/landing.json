@@ -1,0 +1,53 @@
+{
+  "tagline": "Service Pricing & Agreements",
+  "badge": "Agreement & Commission Platform",
+  "login": "Log In",
+  "getStarted": "Get Started",
+  "heroTitle": "Welcome to Enviro-Master",
+  "heroSubtitle": "Professional Agreement Management System",
+  "heroDescription": "Create, manage, and maintain customer service agreements with ease. Streamline your workflow, track commissions, and hit your quota — all in one platform.",
+  "highlights": {
+    "guided": "Guided forms",
+    "pdf": "Instant PDFs",
+    "multilingual": "EN · ES · FR"
+  },
+  "featuresTitle": "Everything you need to close deals",
+  "featuresSubtitle": "From the first quote to the signed agreement — and every commission in between.",
+  "features": {
+    "agreements": {
+      "title": "Agreement Management",
+      "description": "Create, extend, and edit professional service agreements with guided forms and instant PDFs."
+    },
+    "commissions": {
+      "title": "Commission Tracking",
+      "description": "See your earnings per agreement with transparent, tier-based commission calculations."
+    },
+    "quota": {
+      "title": "Quota Progress",
+      "description": "Track weekly and period quota progress and know exactly how far you are from the next tier."
+    },
+    "documents": {
+      "title": "Saved Documents",
+      "description": "Keep every version of every agreement organized, searchable, and ready to send."
+    }
+  },
+  "howTitle": "How it works",
+  "howSubtitle": "Three simple steps from login to signed deal.",
+  "steps": {
+    "one": {
+      "title": "Log in",
+      "description": "Sign in with your Enviro-Master account to reach your personalized dashboard."
+    },
+    "two": {
+      "title": "Build the agreement",
+      "description": "Use guided service and product forms to create, extend, or edit a customer agreement."
+    },
+    "three": {
+      "title": "Generate & track",
+      "description": "Produce a polished PDF and watch your commission and quota update instantly."
+    }
+  },
+  "ctaTitle": "Ready to get started?",
+  "ctaDescription": "Log in to access your dashboard, agreements, and commissions.",
+  "footer": "Enviro-Master Services International. All rights reserved."
+}

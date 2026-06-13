@@ -1754,9 +1754,11 @@ function FormFillingContent({
           },
           customColumns: fromBackend.customColumns ?? { products: [], dispensers: [] }, 
           includeProductsTable: (fromBackend as any).includeProductsTable !== false,
-          serviceAgreement: fromBackend.serviceAgreement, 
+          serviceAgreement: fromBackend.serviceAgreement,
           summary: fromBackend.summary,
         };
+
+        (cleanPayload as any).commission = (fromBackend as any).commission ?? null;
 
         setPayload(cleanPayload);
 

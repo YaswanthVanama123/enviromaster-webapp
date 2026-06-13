@@ -12,6 +12,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple
   grid-template-rows:auto 1fr;
   width:100%;
   max-width:100%;
+  min-width:0;
+  overflow-x:clip;
 }
 
 .page-body{

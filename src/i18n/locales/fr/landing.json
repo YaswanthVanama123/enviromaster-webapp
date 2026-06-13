@@ -1,0 +1,53 @@
+{
+  "tagline": "Tarification et contrats de service",
+  "badge": "Plateforme de contrats et commissions",
+  "login": "Se connecter",
+  "getStarted": "Commencer",
+  "heroTitle": "Bienvenue chez Enviro-Master",
+  "heroSubtitle": "Système professionnel de gestion des contrats",
+  "heroDescription": "Créez, gérez et maintenez facilement les contrats de service client. Optimisez votre flux de travail, suivez les commissions et atteignez votre quota, le tout sur une seule plateforme.",
+  "highlights": {
+    "guided": "Formulaires guidés",
+    "pdf": "PDF instantanés",
+    "multilingual": "EN · ES · FR"
+  },
+  "featuresTitle": "Tout ce qu'il vous faut pour conclure des ventes",
+  "featuresSubtitle": "Du premier devis au contrat signé, et chaque commission entre les deux.",
+  "features": {
+    "agreements": {
+      "title": "Gestion des contrats",
+      "description": "Créez, prolongez et modifiez des contrats de service professionnels avec des formulaires guidés et des PDF instantanés."
+    },
+    "commissions": {
+      "title": "Suivi des commissions",
+      "description": "Consultez vos gains par contrat grâce à des calculs de commissions transparents et par paliers."
+    },
+    "quota": {
+      "title": "Progression du quota",
+      "description": "Suivez la progression de votre quota hebdomadaire et par période et sachez exactement ce qu'il vous reste pour atteindre le palier suivant."
+    },
+    "documents": {
+      "title": "Documents enregistrés",
+      "description": "Gardez chaque version de chaque contrat organisée, consultable et prête à être envoyée."
+    }
+  },
+  "howTitle": "Comment ça marche",
+  "howSubtitle": "Trois étapes simples, de la connexion au contrat signé.",
+  "steps": {
+    "one": {
+      "title": "Connectez-vous",
+      "description": "Connectez-vous avec votre compte Enviro-Master pour accéder à votre tableau de bord personnalisé."
+    },
+    "two": {
+      "title": "Créez le contrat",
+      "description": "Utilisez des formulaires guidés de services et de produits pour créer, prolonger ou modifier un contrat client."
+    },
+    "three": {
+      "title": "Générez et suivez",
+      "description": "Produisez un PDF professionnel et voyez votre commission et votre quota se mettre à jour instantanément."
+    }
+  },
+  "ctaTitle": "Prêt à commencer ?",
+  "ctaDescription": "Connectez-vous pour accéder à votre tableau de bord, vos contrats et vos commissions.",
+  "footer": "Enviro-Master Services International. Tous droits réservés."
+}
