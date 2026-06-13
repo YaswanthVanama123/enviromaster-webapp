@@ -23,6 +23,7 @@
   min-width:0;
   display:flex;
   align-items:center;
+  justify-content:flex-end;
   gap:4px;
 }
 
@@ -30,6 +31,7 @@
   flex-shrink:0;
   width:30px;
   height:30px;
+  padding:0;
   border-radius:50%;
   border:1px solid #e5e7eb;
   background:#fff;
@@ -39,17 +41,18 @@
   justify-content:center;
   cursor:pointer;
   font-size:15px;
+  line-height:1;
   box-shadow:0 1px 4px rgba(0,0,0,.08);
   transition: background .15s ease, color .15s ease;
 }
 .topnav__scroll-btn:hover{ background:#fdeaea; color:#c00000; }
 
 .topnav__menu{
-  flex:1 1 0;
+  flex:0 1 auto;
   min-width:0;
   display:flex;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:flex-start;
   gap:4px;
   flex-wrap:nowrap;
   overflow-x:auto;
