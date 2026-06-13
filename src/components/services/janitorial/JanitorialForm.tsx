@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useJanitorialCalc } from "./useJanitorialCalc";
@@ -26,6 +27,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
   onRemove
 }) => {
 
+  const { t } = useTranslation();
   const { form, onChange, calc, quote, refreshConfig, isLoadingConfig, updateField } = useJanitorialCalc(initialData);
 
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
@@ -252,7 +254,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
     const newField: CustomField = {
       id: Date.now().toString(),
       type,
-      label: type === "text" ? "Custom Field" : type === "money" ? "Custom Charge" : "Custom Calculation",
+      label: type === "text" ? t("serviceForms.janitorial.customField") : type === "money" ? t("serviceForms.janitorial.customCharge") : t("serviceForms.janitorial.customCalculation"),
       value: type === "calc" ? { qty: 0, rate: 0, total: 0 } : "",
     };
     setCustomFields(prev => [...prev, newField]);
@@ -271,7 +273,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
   return (
     <ServiceCard
-      title="Pure Janitorial"
+      title={t("serviceForms.janitorial.title")}
       headerActions={
         <>
           <button
@@ -279,7 +281,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             className="svc-mini"
             onClick={refreshConfig}
             disabled={isLoadingConfig}
-            title="Refresh config from database"
+            title={t("serviceForms.janitorial.refreshConfig")}
           >
             <FontAwesomeIcon
               icon={isLoadingConfig ? faSpinner : faSync}
@@ -289,7 +291,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           <button
             type="button"
             className="svc-mini svc-mini--neg"
-            title="Remove service"
+            title={t("serviceForms.janitorial.removeService")}
             onClick={onRemove}
           >
             –
@@ -300,7 +302,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
       <div className="svc-form">
         {}
         <div className="svc-row">
-          <label>Service Type</label>
+          <label>{t("serviceForms.janitorial.serviceType")}</label>
           <div className="svc-row-right">
             <select
               name="serviceType"
@@ -308,15 +310,15 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
               onChange={onChange}
               className="svc-in"
             >
-              <option value="recurringService">Recurring Service</option>
-              <option value="oneTimeService">One-Time Service</option>
+              <option value="recurringService">{t("serviceForms.janitorial.recurringService")}</option>
+              <option value="oneTimeService">{t("serviceForms.janitorial.oneTimeService")}</option>
             </select>
           </div>
         </div>
 
         {}
         <div className="svc-row">
-          <label>Service</label>
+          <label>{t("serviceForms.janitorial.service")}</label>
           <div className="svc-row-right">
             <div className="svc-inline svc-inline--tight">
               <input
@@ -345,7 +347,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 onChange={handleLocalChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                title={form.serviceType === "recurringService" ? "Recurring service rate (editable with yellow highlight if overridden)" : "One-time service rate (editable with yellow highlight if overridden)"}
+                title={form.serviceType === "recurringService" ? t("serviceForms.janitorial.recurringRateTitle") : t("serviceForms.janitorial.oneTimeRateTitle")}
                 style={{
                   backgroundColor: form.serviceType === "recurringService"
                     ? (form.customRecurringServiceRate !== undefined ? '#fffacd' : 'white')
@@ -368,7 +370,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
         {}
         <div className="svc-row">
-          <label>Vacuuming</label>
+          <label>{t("serviceForms.janitorial.vacuuming")}</label>
           <div className="svc-row-right">
             <div className="svc-inline svc-inline--tight">
               <input
@@ -380,7 +382,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 value={form.vacuumingHours || ""}
                 onChange={onChange}
               />
-              <span>hrs @</span>
+              <span>{t("serviceForms.janitorial.hrsAt")}</span>
               <span>$</span>
               <input
                 name="customVacuumingRatePerHour"
@@ -395,7 +397,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 onChange={handleLocalChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                title="Vacuuming rate per hour (editable with yellow highlight if overridden)"
+                title={t("serviceForms.janitorial.vacuumingRateTitle")}
                 style={{
                   backgroundColor: form.customVacuumingRatePerHour !== undefined ? '#fffacd' : 'white'
                 }}
@@ -416,7 +418,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
         {}
         <div className="svc-row">
-          <label>Dusting</label>
+          <label>{t("serviceForms.janitorial.dusting")}</label>
           <div className="svc-row-right">
             <div className="svc-inline svc-inline--tight">
               <input
@@ -428,7 +430,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 value={form.dustingHours || ""}
                 onChange={onChange}
               />
-              <span>places @</span>
+              <span>{t("serviceForms.janitorial.placesAt")}</span>
               <span>$</span>
               <input
                 name="customDustingRatePerHour"
@@ -443,7 +445,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 onChange={handleLocalChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                title="Dusting rate per place (editable with yellow highlight if overridden)"
+                title={t("serviceForms.janitorial.dustingRateTitle")}
                 style={{
                   backgroundColor: form.customDustingRatePerHour !== undefined ? '#fffacd' : 'white'
                 }}
@@ -465,7 +467,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
         {}
         {form.serviceType === "recurringService" && (
           <div className="svc-row">
-            <label>Frequency</label>
+            <label>{t("serviceForms.common.frequency")}</label>
             <div className="svc-row-right">
               <select
                 name="frequency"
@@ -473,10 +475,10 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 onChange={onChange}
                 className="svc-in"
               >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Bi-weekly</option>
-                <option value="monthly">Monthly</option>
+                <option value="daily">{t("serviceForms.janitorial.freq.daily")}</option>
+                <option value="weekly">{t("serviceForms.janitorial.freq.weekly")}</option>
+                <option value="biweekly">{t("serviceForms.janitorial.freq.biweekly")}</option>
+                <option value="monthly">{t("serviceForms.janitorial.freq.monthly")}</option>
               </select>
             </div>
           </div>
@@ -484,7 +486,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
         {}
         <div className="svc-row">
-          <label>Location</label>
+          <label>{t("serviceForms.common.location")}</label>
           <div className="svc-row-right">
             <select
               name="location"
@@ -492,9 +494,9 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
               onChange={onChange}
               className="svc-in"
             >
-              <option value="insideBeltway">Inside Beltway</option>
-              <option value="outsideBeltway">Outside Beltway</option>
-              <option value="paidParking">Paid Parking</option>
+              <option value="insideBeltway">{t("serviceForms.common.insideBeltway")}</option>
+              <option value="outsideBeltway">{t("serviceForms.common.outsideBeltway")}</option>
+              <option value="paidParking">{t("serviceForms.janitorial.paidParking")}</option>
             </select>
           </div>
         </div>
@@ -502,7 +504,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
         {}
         {form.location === "paidParking" && (
           <div className="svc-row">
-            <label>Parking Cost</label>
+            <label>{t("serviceForms.janitorial.parkingCost")}</label>
             <div className="svc-row-right">
               <div className="svc-dollar">
                 <span>$</span>
@@ -523,7 +525,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
         {}
         {form.serviceType === "recurringService" && (
           <div className="svc-row">
-            <label>Contract Months</label>
+            <label>{t("serviceForms.janitorial.contractMonths")}</label>
             <div className="svc-row-right">
               <input
                 name="contractMonths"
@@ -603,7 +605,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
               <button
                 type="button"
                 className="svc-mini svc-mini--inline"
-                title="Remove"
+                title={t("serviceForms.janitorial.remove")}
                 onClick={() => removeCustomField(field.id)}
               >
                 –
@@ -617,7 +619,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           <button
             type="button"
             className="svc-mini"
-            title="Add field"
+            title={t("serviceForms.janitorial.addField")}
             onClick={() => setShowAddDropdown(!showAddDropdown)}
           >
             +
@@ -629,26 +631,26 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
                 className="svc-btn svc-btn--small"
                 onClick={() => addCustomField("text")}
               >
-                Text
+                {t("serviceForms.janitorial.text")}
               </button>
               <button
                 type="button"
                 className="svc-btn svc-btn--small"
                 onClick={() => addCustomField("money")}
               >
-                Money
+                {t("serviceForms.janitorial.money")}
               </button>
               <button
                 type="button"
                 className="svc-btn svc-btn--small"
                 onClick={() => addCustomField("calc")}
               >
-                Calc
+                {t("serviceForms.janitorial.calc")}
               </button>
               <button
                 type="button"
                 className="svc-mini svc-mini--neg"
-                title="Close"
+                title={t("serviceForms.janitorial.close")}
                 onClick={() => setShowAddDropdown(false)}
               >
                 ×
@@ -660,16 +662,16 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
         {}
         <div className="svc-summary">
           <div className="svc-summary-row">
-            <span>Per Visit:</span>
+            <span>{t("serviceForms.janitorial.perVisit")}</span>
             <span className="svc-summary-amount">${quote.perVisitPrice.toFixed(2)}</span>
           </div>
           <div className="svc-summary-row">
-            <span>Monthly:</span>
+            <span>{t("serviceForms.janitorial.monthly")}</span>
             <span className="svc-summary-amount">${quote.monthlyPrice.toFixed(2)}</span>
           </div>
           {form.serviceType === "recurringService" && (
             <div className="svc-summary-row">
-              <span>Contract Total ({form.contractMonths} months):</span>
+              <span>{t("serviceForms.janitorial.contractTotalMonths", { count: form.contractMonths })}</span>
               <span className="svc-summary-amount">${quote.contractTotal.toFixed(2)}</span>
             </div>
           )}
@@ -678,7 +680,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
         {}
         {calc.appliedRules.length > 0 && (
           <div className="svc-details">
-            <small>Applied Rules:</small>
+            <small>{t("serviceForms.janitorial.appliedRules")}</small>
             <ul>
               {calc.appliedRules.map((rule, i) => (
                 <li key={i} style={{ fontSize: "11px", color: "#666" }}>{rule}</li>
@@ -689,7 +691,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
         {}
         {isLoadingConfig && (
-          <div className="svc-loading">Loading pricing configuration...</div>
+          <div className="svc-loading">{t("serviceForms.common.loadingPricingConfiguration")}</div>
         )}
       </div>
     </ServiceCard>

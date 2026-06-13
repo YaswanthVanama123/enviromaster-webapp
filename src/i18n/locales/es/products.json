@@ -1,0 +1,75 @@
+{
+  "section": {
+    "products": "PRODUCTOS",
+    "dispensers": "DISPENSADORES"
+  },
+  "tabs": {
+    "form": "Formulario",
+    "productsReference": "Referencia de Productos",
+    "dispensersReference": "Referencia de Dispensadores"
+  },
+  "reference": {
+    "productsTitle": "REFERENCIA DE PRODUCTOS - PARA VENDEDORES",
+    "dispensersTitle": "REFERENCIA DE DISPENSADORES - PARA VENDEDORES",
+    "productName": "Nombre del Producto",
+    "dispenserName": "Nombre del Dispensador",
+    "descriptionUseCase": "Descripción y Caso de Uso",
+    "family": "Familia",
+    "basePrice": "Precio Base",
+    "unit": "Unidad",
+    "caseInfo": "Información de Caja",
+    "warrantyRate": "Tarifa de Garantía",
+    "warrantyPeriod": "Período de Garantía",
+    "bestFor": "Mejor Para",
+    "each": "Cada uno",
+    "perWeek": "Por semana",
+    "notAvailable": "N/D",
+    "perCase": "{{count}} por caja",
+    "highTraffic": "Alto Tráfico",
+    "commercialUse": "Uso Comercial",
+    "standardUse": "Uso Estándar",
+    "allAreas": "Todas las Áreas"
+  },
+  "table": {
+    "products": "Productos",
+    "dispensers": "Dispensadores",
+    "qty": "Cant.",
+    "unitPriceAmount": "Precio Unitario/Importe",
+    "amount": "Importe",
+    "warranty": "Garantía",
+    "warrantyRate": "Tarifa de Garantía",
+    "replacementRateInstall": "Tarifa de Reemplazo/Instalación",
+    "frequencyOfService": "Frecuencia de Servicio",
+    "total": "Total"
+  },
+  "buttons": {
+    "addRow": "+ Fila"
+  },
+  "actions": {
+    "removeRow": "Eliminar fila",
+    "removeColumn": "Eliminar columna"
+  },
+  "name": {
+    "customProductPlaceholder": "Producto personalizado...",
+    "selectProduct": "Seleccionar producto...",
+    "searchProduct": "Buscar producto...",
+    "noProducts": "Sin productos",
+    "addCustomProduct": "+ Producto personalizado"
+  },
+  "frequency": {
+    "select": "Seleccionar...",
+    "daily": "Diario",
+    "weekly": "Semanal",
+    "biweekly": "Quincenal",
+    "monthly": "Mensual",
+    "yearly": "Anual"
+  },
+  "tooltips": {
+    "productWarranty": "Marque para facturación recurrente de garantía; desmarque para precio directo único",
+    "dispenserWarranty": "Marque para facturación recurrente de garantía; desmarque para precio directo/de reemplazo único"
+  },
+  "descriptions": {
+    "kindSuffix": "{{kind}} - Producto de limpieza profesional",
+    "default": "Producto de limpieza profesional para uso comercial"
+  }
+}

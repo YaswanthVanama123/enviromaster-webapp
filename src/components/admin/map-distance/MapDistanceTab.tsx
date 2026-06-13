@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mapDistanceApi, RouteStarCustomerOption, MapDistanceResult, MapDistanceSyncJob, MapDistanceStats } from '../../../backendservice/api/mapDistanceApi';
 import { MdSearch, MdDirectionsCar, MdLocationOn, MdStraighten, MdPerson, MdCalendarToday, MdSync, MdCancel, MdStorage, MdHistory, MdCheckCircle, MdError, MdSchedule, MdPlayArrow, MdPause } from 'react-icons/md';
 import './MapDistanceTab.css';
@@ -8,7 +9,7 @@ import './MapDistanceTab.css';
 type ViewMode = 'fetch' | 'stored' | 'history';
 
 export const MapDistanceTab: React.FC = () => {
-  
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('fetch');
 
   const [customers, setCustomers] = useState<RouteStarCustomerOption[]>([]);
@@ -140,7 +141,7 @@ export const MapDistanceTab: React.FC = () => {
       
       checkSyncStatus();
     } else {
-      setError(response.error || 'Failed to start fetch');
+      setError(response.error || t('adminTools.mapDistance.failedToStartFetch'));
     }
   };
 
@@ -150,7 +151,7 @@ export const MapDistanceTab: React.FC = () => {
     if (result.success) {
       checkSyncStatus();
     } else {
-      setError(result.error || 'Failed to start sync');
+      setError(result.error || t('adminTools.mapDistance.failedToStartSync'));
     }
   };
 
@@ -168,7 +169,7 @@ export const MapDistanceTab: React.FC = () => {
       checkSyncStatus();
       loadSyncHistory();
     } else {
-      setError(result.error || 'Failed to pause sync');
+      setError(result.error || t('adminTools.mapDistance.failedToPauseSync'));
     }
   };
 
@@ -186,7 +187,7 @@ export const MapDistanceTab: React.FC = () => {
     if (result.success) {
       checkSyncStatus();
     } else {
-      setError(result.error || 'Failed to resume sync');
+      setError(result.error || t('adminTools.mapDistance.failedToResumeSync'));
     }
   };
 
@@ -223,9 +224,9 @@ export const MapDistanceTab: React.FC = () => {
 
   const getJobTypeLabel = (jobType: string) => {
     switch (jobType) {
-      case 'single_fetch': return 'Single Fetch';
-      case 'full_sync': return 'Full Sync';
-      case 'update_sync': return 'Update Sync';
+      case 'single_fetch': return t('adminTools.mapDistance.jobTypeSingleFetch');
+      case 'full_sync': return t('adminTools.mapDistance.jobTypeFullSync');
+      case 'update_sync': return t('adminTools.mapDistance.jobTypeUpdateSync');
       default: return jobType;
     }
   };
@@ -254,9 +255,9 @@ export const MapDistanceTab: React.FC = () => {
       <div className="md-header">
         <div className="md-header-top">
           <div>
-            <h2>Map Distance</h2>
+            <h2>{t('adminTools.mapDistance.title')}</h2>
             <p className="md-subtitle">
-              Fetch and sync driving distance information from RouteStar
+              {t('adminTools.mapDistance.subtitle')}
             </p>
           </div>
           <div className="md-header-actions">
@@ -264,22 +265,22 @@ export const MapDistanceTab: React.FC = () => {
               <>
                 <button className="md-pause-btn" onClick={handlePauseSync}>
                   <MdPause size={18} />
-                  Pause
+                  {t('adminTools.mapDistance.pause')}
                 </button>
                 <button className="md-cancel-sync-btn" onClick={handleCancelSync}>
                   <MdCancel size={18} />
-                  Cancel
+                  {t('adminTools.mapDistance.cancel')}
                 </button>
               </>
             ) : (isBulkSyncInterrupted || isBulkSyncPaused) ? (
               <button className="md-resume-btn" onClick={() => syncStatus.job && handleResumeSync(syncStatus.job._id)}>
                 <MdPlayArrow size={18} />
-                Resume Sync ({syncStatus.job?.processedCustomers}/{syncStatus.job?.totalCustomers})
+                {t('adminTools.mapDistance.resumeSync', { processed: syncStatus.job?.processedCustomers, total: syncStatus.job?.totalCustomers })}
               </button>
             ) : (
               <button className="md-sync-btn" onClick={handleStartSync} disabled={isJobRunning || isJobInterrupted || isJobPaused}>
                 <MdSync size={18} />
-                Sync All Customers
+                {t('adminTools.mapDistance.syncAllCustomers')}
               </button>
             )}
           </div>
@@ -290,23 +291,23 @@ export const MapDistanceTab: React.FC = () => {
           <div className="md-stats-bar">
             <div className="md-stat">
               <span className="md-stat-value">{stats.totalRecords.toLocaleString()}</span>
-              <span className="md-stat-label">Total Records</span>
+              <span className="md-stat-label">{t('adminTools.mapDistance.totalRecords')}</span>
             </div>
             <div className="md-stat">
               <span className="md-stat-value">{stats.customersWithData.toLocaleString()}</span>
-              <span className="md-stat-label">Customers with Data</span>
+              <span className="md-stat-label">{t('adminTools.mapDistance.customersWithData')}</span>
             </div>
             <div className="md-stat">
               <span className="md-stat-value">{stats.storageSizeFormatted || 'N/A'}</span>
-              <span className="md-stat-label">Storage Size</span>
+              <span className="md-stat-label">{t('adminTools.mapDistance.storageSize')}</span>
             </div>
             <div className="md-stat">
               <span className="md-stat-value">{stats.avgBytesPerRecord || 0} B</span>
-              <span className="md-stat-label">Avg Per Record</span>
+              <span className="md-stat-label">{t('adminTools.mapDistance.avgPerRecord')}</span>
             </div>
             <div className="md-stat">
-              <span className="md-stat-value">{stats.lastSyncAt ? formatDate(stats.lastSyncAt) : 'Never'}</span>
-              <span className="md-stat-label">Last Sync</span>
+              <span className="md-stat-value">{stats.lastSyncAt ? formatDate(stats.lastSyncAt) : t('adminTools.mapDistance.never')}</span>
+              <span className="md-stat-label">{t('adminTools.mapDistance.lastSync')}</span>
             </div>
           </div>
         )}
@@ -317,7 +318,7 @@ export const MapDistanceTab: React.FC = () => {
             <div className="md-sync-progress-header">
               <span className="md-sync-progress-title">
                 <MdSync className="md-spin" size={16} />
-                {syncStatus.job.jobType === 'full_sync' ? 'Syncing' : 'Updating'}: {syncStatus.job.currentCustomerName || 'Starting...'}
+                {syncStatus.job.jobType === 'full_sync' ? t('adminTools.mapDistance.syncing') : t('adminTools.mapDistance.updating')}: {syncStatus.job.currentCustomerName || t('adminTools.mapDistance.starting')}
               </span>
               <span className="md-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -331,13 +332,13 @@ export const MapDistanceTab: React.FC = () => {
             </div>
             <div className="md-sync-stats">
               <span className="md-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistance.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="md-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistance.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="md-sync-stat records">
-                {syncStatus.job.recordsCreated} records created
+                {t('adminTools.mapDistance.recordsCreated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
           </div>
@@ -349,7 +350,7 @@ export const MapDistanceTab: React.FC = () => {
             <div className="md-sync-progress-header">
               <span className="md-sync-progress-title">
                 <MdError size={16} color="#f59e0b" />
-                Sync Interrupted: {syncStatus.job.currentCustomerName || 'Unknown'}
+                {t('adminTools.mapDistance.syncInterrupted', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistance.unknown') })}
               </span>
               <span className="md-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -363,23 +364,23 @@ export const MapDistanceTab: React.FC = () => {
             </div>
             <div className="md-sync-stats">
               <span className="md-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistance.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="md-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistance.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="md-sync-stat records">
-                {syncStatus.job.recordsCreated} records created
+                {t('adminTools.mapDistance.recordsCreated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
             <div className="md-sync-actions">
               <button className="md-resume-btn" onClick={() => handleResumeSync(syncStatus.job!._id)}>
                 <MdPlayArrow size={16} />
-                Resume Sync
+                {t('adminTools.mapDistance.resumeSyncShort')}
               </button>
               <button className="md-reset-btn" onClick={handleResetStuckJob}>
                 <MdCancel size={16} />
-                Cancel & Reset
+                {t('adminTools.mapDistance.cancelAndReset')}
               </button>
             </div>
           </div>
@@ -391,7 +392,7 @@ export const MapDistanceTab: React.FC = () => {
             <div className="md-sync-progress-header">
               <span className="md-sync-progress-title">
                 <MdPause size={16} color="#6366f1" />
-                Sync Paused: {syncStatus.job.currentCustomerName || 'Unknown'}
+                {t('adminTools.mapDistance.syncPaused', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistance.unknown') })}
               </span>
               <span className="md-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -405,23 +406,23 @@ export const MapDistanceTab: React.FC = () => {
             </div>
             <div className="md-sync-stats">
               <span className="md-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistance.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="md-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistance.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="md-sync-stat records">
-                {syncStatus.job.recordsCreated} records created
+                {t('adminTools.mapDistance.recordsCreated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
             <div className="md-sync-actions">
               <button className="md-resume-btn" onClick={() => handleResumeSync(syncStatus.job!._id)}>
                 <MdPlayArrow size={16} />
-                Resume Sync
+                {t('adminTools.mapDistance.resumeSyncShort')}
               </button>
               <button className="md-reset-btn" onClick={handleResetStuckJob}>
                 <MdCancel size={16} />
-                Cancel
+                {t('adminTools.mapDistance.cancel')}
               </button>
             </div>
           </div>
@@ -435,21 +436,21 @@ export const MapDistanceTab: React.FC = () => {
           onClick={() => setViewMode('fetch')}
         >
           <MdDirectionsCar size={16} />
-          Live Fetch
+          {t('adminTools.mapDistance.liveFetch')}
         </button>
         <button
           className={`md-view-tab ${viewMode === 'stored' ? 'active' : ''}`}
           onClick={() => setViewMode('stored')}
         >
           <MdStorage size={16} />
-          Stored Data
+          {t('adminTools.mapDistance.storedData')}
         </button>
         <button
           className={`md-view-tab ${viewMode === 'history' ? 'active' : ''}`}
           onClick={() => { setViewMode('history'); loadSyncHistory(); }}
         >
           <MdHistory size={16} />
-          Fetch History
+          {t('adminTools.mapDistance.fetchHistory')}
         </button>
       </div>
 
@@ -459,7 +460,7 @@ export const MapDistanceTab: React.FC = () => {
           {}
           <div className="md-search-section">
             <div className="md-search-group">
-              <label className="md-search-label">Select Customer</label>
+              <label className="md-search-label">{t('adminTools.mapDistance.selectCustomer')}</label>
               <div className="md-dropdown" ref={dropdownRef}>
                 <button
                   className="md-dropdown-trigger"
@@ -473,7 +474,7 @@ export const MapDistanceTab: React.FC = () => {
                         {selectedCustomer.city && ` - ${selectedCustomer.city}`}
                       </>
                     ) : (
-                      'Select a customer...'
+                      t('adminTools.mapDistance.selectACustomer')
                     )}
                   </span>
                   <MdSearch size={18} />
@@ -484,16 +485,16 @@ export const MapDistanceTab: React.FC = () => {
                     <input
                       type="text"
                       className="md-dropdown-search"
-                      placeholder="Search customers..."
+                      placeholder={t('adminTools.mapDistance.searchCustomersPlaceholder')}
                       value={dropdownSearch}
                       onChange={(e) => setDropdownSearch(e.target.value)}
                       autoFocus
                     />
                     <div className="md-dropdown-options">
                       {loadingCustomers ? (
-                        <div className="md-dropdown-loading">Loading customers...</div>
+                        <div className="md-dropdown-loading">{t('adminTools.mapDistance.loadingCustomers')}</div>
                       ) : filteredCustomers.length === 0 ? (
-                        <div className="md-dropdown-empty">No customers found</div>
+                        <div className="md-dropdown-empty">{t('adminTools.mapDistance.noCustomersFound')}</div>
                       ) : (
                         filteredCustomers.slice(0, 100).map((customer) => (
                           <div
@@ -522,14 +523,14 @@ export const MapDistanceTab: React.FC = () => {
               disabled={!selectedCustomer || isJobRunning}
             >
               <MdDirectionsCar size={18} />
-              {isSingleFetchRunning ? 'Fetching...' : 'Get Distance'}
+              {isSingleFetchRunning ? t('adminTools.mapDistance.fetching') : t('adminTools.mapDistance.getDistance')}
             </button>
           </div>
 
           {}
           {error && (
             <div className="md-error">
-              <strong>Error:</strong> {error}
+              <strong>{t('adminTools.mapDistance.error')}</strong> {error}
             </div>
           )}
 
@@ -537,9 +538,9 @@ export const MapDistanceTab: React.FC = () => {
           {isSingleFetchRunning && (
             <div className="md-loading">
               <div className="md-loading-spinner" />
-              <div className="md-loading-text">Fetching Distance Data</div>
+              <div className="md-loading-text">{t('adminTools.mapDistance.fetchingDistanceData')}</div>
               <div className="md-loading-subtext">
-                Automating RouteStar to get map distance for {syncStatus.job?.currentCustomerName || selectedCustomer?.name}...
+                {t('adminTools.mapDistance.automatingRouteStar', { name: syncStatus.job?.currentCustomerName || selectedCustomer?.name })}
               </div>
             </div>
           )}
@@ -548,10 +549,10 @@ export const MapDistanceTab: React.FC = () => {
           {!isSingleFetchRunning && results.length > 0 && (
             <div className="md-results">
               <div className="md-results-header">
-                <h3>Distance Results for {lastFetchedCustomer}</h3>
+                <h3>{t('adminTools.mapDistance.distanceResultsFor', { name: lastFetchedCustomer })}</h3>
                 {fetchedAt && (
                   <span className="md-results-meta">
-                    Fetched at {new Date(fetchedAt).toLocaleTimeString()}
+                    {t('adminTools.mapDistance.fetchedAt', { time: new Date(fetchedAt).toLocaleTimeString() })}
                   </span>
                 )}
               </div>
@@ -560,13 +561,13 @@ export const MapDistanceTab: React.FC = () => {
                 <table className="md-table">
                   <thead>
                     <tr>
-                      <th><MdPerson size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Assigned To</th>
-                      <th>Frequency</th>
-                      <th><MdCalendarToday size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Date</th>
-                      <th><MdLocationOn size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Customer</th>
-                      <th>Day</th>
-                      <th>Stop</th>
-                      <th><MdStraighten size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Distance (mi.)</th>
+                      <th><MdPerson size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {t('adminTools.mapDistance.colAssignedTo')}</th>
+                      <th>{t('adminTools.mapDistance.colFrequency')}</th>
+                      <th><MdCalendarToday size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {t('adminTools.mapDistance.colDate')}</th>
+                      <th><MdLocationOn size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {t('adminTools.mapDistance.colCustomer')}</th>
+                      <th>{t('adminTools.mapDistance.colDay')}</th>
+                      <th>{t('adminTools.mapDistance.colStop')}</th>
+                      <th><MdStraighten size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {t('adminTools.mapDistance.colDistance')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -593,8 +594,8 @@ export const MapDistanceTab: React.FC = () => {
               <div className="md-empty-icon">
                 <MdLocationOn size={48} />
               </div>
-              <h3>No Distance Data Found</h3>
-              <p>No map distance information was found for {lastFetchedCustomer}</p>
+              <h3>{t('adminTools.mapDistance.noDistanceDataTitle')}</h3>
+              <p>{t('adminTools.mapDistance.noDistanceDataText', { name: lastFetchedCustomer })}</p>
             </div>
           )}
 
@@ -604,8 +605,8 @@ export const MapDistanceTab: React.FC = () => {
               <div className="md-empty-icon">
                 <MdDirectionsCar size={48} />
               </div>
-              <h3>Select a Customer</h3>
-              <p>Choose a RouteStar customer from the dropdown above and click "Get Distance" to fetch their map distance information</p>
+              <h3>{t('adminTools.mapDistance.selectACustomerTitle')}</h3>
+              <p>{t('adminTools.mapDistance.selectACustomerText')}</p>
             </div>
           )}
         </>
@@ -618,18 +619,18 @@ export const MapDistanceTab: React.FC = () => {
             <div className="md-empty-icon">
               <MdStorage size={48} />
             </div>
-            <h3>Stored Distance Records</h3>
+            <h3>{t('adminTools.mapDistance.storedRecordsTitle')}</h3>
             <p>
               {stats ? (
                 <>
                   {stats.totalRecords > 0 ? (
-                    `${stats.totalRecords.toLocaleString()} records stored for ${stats.customersWithData} customers`
+                    t('adminTools.mapDistance.recordsStored', { records: stats.totalRecords.toLocaleString(), customers: stats.customersWithData })
                   ) : (
-                    'No records stored yet. Click "Sync All Customers" to fetch and store distance data.'
+                    t('adminTools.mapDistance.noRecordsStored')
                   )}
                 </>
               ) : (
-                'Loading...'
+                t('adminTools.mapDistance.loading')
               )}
             </p>
           </div>
@@ -644,22 +645,22 @@ export const MapDistanceTab: React.FC = () => {
               <div className="md-empty-icon">
                 <MdHistory size={48} />
               </div>
-              <h3>No Fetch History</h3>
-              <p>No fetch or sync jobs have been run yet.</p>
+              <h3>{t('adminTools.mapDistance.noFetchHistoryTitle')}</h3>
+              <p>{t('adminTools.mapDistance.noFetchHistoryText')}</p>
             </div>
           ) : (
             <div className="md-table-container">
               <table className="md-table">
                 <thead>
                   <tr>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Customer</th>
-                    <th>Started</th>
-                    <th>Completed</th>
-                    <th>Records</th>
-                    <th>Errors</th>
-                    <th>Action</th>
+                    <th>{t('adminTools.mapDistance.colType')}</th>
+                    <th>{t('adminTools.mapDistance.colStatus')}</th>
+                    <th>{t('adminTools.mapDistance.colCustomer')}</th>
+                    <th>{t('adminTools.mapDistance.colStarted')}</th>
+                    <th>{t('adminTools.mapDistance.colCompleted')}</th>
+                    <th>{t('adminTools.mapDistance.colRecords')}</th>
+                    <th>{t('adminTools.mapDistance.colErrors')}</th>
+                    <th>{t('adminTools.mapDistance.colAction')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -679,7 +680,7 @@ export const MapDistanceTab: React.FC = () => {
                       <td>
                         {job.jobType === 'single_fetch'
                           ? job.currentCustomerName || '-'
-                          : `${job.successfulCustomers}/${job.totalCustomers} customers`
+                          : t('adminTools.mapDistance.customersCount', { successful: job.successfulCustomers, total: job.totalCustomers })
                         }
                       </td>
                       <td>{formatDate(job.startedAt)}</td>
@@ -691,31 +692,31 @@ export const MapDistanceTab: React.FC = () => {
                           <button
                             className="md-resume-btn"
                             onClick={() => handleResumeSync(job._id)}
-                            title="Resume sync"
+                            title={t('adminTools.mapDistance.resumeSyncTitle')}
                             disabled={isJobRunning}
                           >
                             <MdPlayArrow size={16} />
-                            Resume
+                            {t('adminTools.mapDistance.resume')}
                           </button>
                         )}
                         {job.status === 'running' && !syncStatus.isRunning && (
                           <button
                             className="md-resume-btn"
                             onClick={() => handleResumeSync(job._id)}
-                            title="Resume interrupted sync"
+                            title={t('adminTools.mapDistance.resumeInterruptedTitle')}
                           >
                             <MdPlayArrow size={16} />
-                            Resume
+                            {t('adminTools.mapDistance.resume')}
                           </button>
                         )}
                         {job.status === 'running' && syncStatus.isRunning && (
                           <button
                             className="md-reset-btn"
                             onClick={handleResetStuckJob}
-                            title="Reset stuck job"
+                            title={t('adminTools.mapDistance.resetStuckTitle')}
                           >
                             <MdCancel size={16} />
-                            Reset
+                            {t('adminTools.mapDistance.reset')}
                           </button>
                         )}
                       </td>

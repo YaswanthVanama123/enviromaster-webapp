@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHourglassHalf, FaExclamationTriangle } from 'react-icons/fa';
 import { useServiceCommission } from '../hooks/useServiceCommission';
 import type { AccountType } from '../../../backendservice/api/accountTypeApi';
@@ -21,6 +22,7 @@ export function ServiceCommissionBadge({
   showDetails = true,
   commissionRate = 6,
 }: ServiceCommissionBadgeProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   const commission = useServiceCommission({
@@ -36,7 +38,7 @@ export function ServiceCommissionBadge({
     return (
       <div className="commission-badge commission-badge--pending">
         <span className="commission-badge__icon"><FaHourglassHalf /></span>
-        <span className="commission-badge__text">Detecting...</span>
+        <span className="commission-badge__text">{t("serviceComponents.commissionBadge.detecting")}</span>
       </div>
     );
   }
@@ -91,7 +93,7 @@ export function ServiceCommissionBadge({
       >
         <span>{commission.accountType}</span>
         <span style={{ fontWeight: 600 }}>
-          {commission.formatted.perVisitCommission}/visit
+          {commission.formatted.perVisitCommission}{t("serviceComponents.commissionBadge.perVisit")}
         </span>
         {showDetails && (
           <span style={{ fontSize: '10px', opacity: 0.7 }}>
@@ -103,13 +105,13 @@ export function ServiceCommissionBadge({
       {expanded && showDetails && (
         <div style={detailsStyle}>
           <div style={rowStyle}>
-            <span style={labelStyle}>Per-Visit Revenue:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.perVisitRevenue")}</span>
             <span style={valueStyle}>{commission.formatted.perVisitRevenue}</span>
           </div>
 
           {commission.revenueDeduction > 0 && (
             <div style={rowStyle}>
-              <span style={labelStyle}>Account Type Deduction:</span>
+              <span style={labelStyle}>{t("serviceComponents.commissionBadge.accountTypeDeduction")}</span>
               <span style={{ ...valueStyle, color: '#dc2626' }}>
                 -{commission.formatted.revenueDeduction}
               </span>
@@ -118,7 +120,7 @@ export function ServiceCommissionBadge({
 
           {commission.anchorBonus > 0 && (
             <div style={rowStyle}>
-              <span style={labelStyle}>Anchor Bonus (150%):</span>
+              <span style={labelStyle}>{t("serviceComponents.commissionBadge.anchorBonus")}</span>
               <span style={{ ...valueStyle, color: '#059669' }}>
                 +${commission.anchorBonus.toFixed(2)}
               </span>
@@ -126,42 +128,42 @@ export function ServiceCommissionBadge({
           )}
 
           <div style={rowStyle}>
-            <span style={labelStyle}>Commissionable Revenue:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.commissionableRevenue")}</span>
             <span style={valueStyle}>{commission.formatted.commissionableRevenue}</span>
           </div>
 
           <div style={{ ...rowStyle, borderTop: '1px solid #e5e7eb', paddingTop: '4px', marginTop: '4px' }}>
-            <span style={labelStyle}>Commission Rate:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.commissionRate")}</span>
             <span style={valueStyle}>{commission.commissionRate}%</span>
           </div>
 
           <div style={rowStyle}>
-            <span style={labelStyle}>Per-Visit Commission:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.perVisitCommission")}</span>
             <span style={{ ...valueStyle, color: '#059669' }}>
               {commission.formatted.perVisitCommission}
             </span>
           </div>
 
           <div style={rowStyle}>
-            <span style={labelStyle}>Annual Commission:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.annualCommission")}</span>
             <span style={{ ...valueStyle, color: '#059669', fontWeight: 600 }}>
               {commission.formatted.annualCommission}
             </span>
           </div>
 
           <div style={{ ...rowStyle, marginTop: '8px', borderTop: '1px solid #e5e7eb', paddingTop: '8px' }}>
-            <span style={labelStyle}>Frequency:</span>
+            <span style={labelStyle}>{t("serviceComponents.commissionBadge.frequency")}</span>
             <span style={valueStyle}>
-              {commission.frequencyLabel} ({commission.visitsPerYear} visits/year)
+              {t("serviceComponents.commissionBadge.frequencyVisits", { label: commission.frequencyLabel, visits: commission.visitsPerYear })}
             </span>
           </div>
 
           {commission.drivingTimeMinutes !== null && (
             <div style={rowStyle}>
-              <span style={labelStyle}>Driving Time:</span>
+              <span style={labelStyle}>{t("serviceComponents.commissionBadge.drivingTime")}</span>
               <span style={valueStyle}>
-                {commission.drivingTimeMinutes.toFixed(1)} min
-                {commission.nearestDestination && ` to ${commission.nearestDestination}`}
+                {t("serviceComponents.commissionBadge.drivingTimeValue", { minutes: commission.drivingTimeMinutes.toFixed(1) })}
+                {commission.nearestDestination && t("serviceComponents.commissionBadge.drivingTimeTo", { destination: commission.nearestDestination })}
               </span>
             </div>
           )}
@@ -174,7 +176,7 @@ export function ServiceCommissionBadge({
 
           {commission.usedFallback && (
             <div style={{ marginTop: '4px', fontSize: '11px', color: '#f59e0b' }}>
-              <FaExclamationTriangle /> Using estimated driving time
+              <FaExclamationTriangle /> {t("serviceComponents.commissionBadge.usingEstimated")}
             </div>
           )}
         </div>

@@ -1,0 +1,15 @@
+{
+  "includeServiceAgreement": "Include Service Agreement",
+  "loadingTemplate": "Loading service agreement template...",
+  "groupAriaLabel": "Service Agreement",
+  "logoAriaLabel": "Enviro-Master logo",
+  "logoAlt": "Enviro-Master Logo",
+  "documentTitleAriaLabel": "Document title",
+  "termsAriaLabel": "Terms and Conditions",
+  "dispenserOptionsAriaLabel": "Dispenser options",
+  "representativesAriaLabel": "Representatives",
+  "authorityAriaLabel": "Authority statement",
+  "signatureSectionAriaLabel": "Signature section",
+  "emSalesRepAriaLabel": "EM Sales Representative",
+  "insideSalesRepAriaLabel": "Inside Sales Representative"
+}

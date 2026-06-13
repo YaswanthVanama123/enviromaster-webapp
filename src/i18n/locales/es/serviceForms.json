@@ -416,7 +416,8 @@
     "recurringMonthTotal": "Total Mensual Recurrente",
     "recurringMonthTitle": "Total mensual recurrente - editable",
     "firstVisitTitle": "Total de la primera visita - editable",
-    "firstMonthTitle": "Total del primer mes - editable"
+    "firstMonthTitle": "Total del primer mes - editable",
+    "contractTotalTitle": "Total del contrato - editable"
   },
   "electrostatic": {
     "title": "ROCIADO ELECTROSTÁTICO",

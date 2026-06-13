@@ -416,7 +416,8 @@
     "recurringMonthTotal": "Recurring Month Total",
     "recurringMonthTitle": "Recurring month total - editable",
     "firstVisitTitle": "First visit total - editable",
-    "firstMonthTitle": "First month total - editable"
+    "firstMonthTitle": "First month total - editable",
+    "contractTotalTitle": "Contract total - editable"
   },
   "electrostatic": {
     "title": "ELECTROSTATIC SPRAY",

@@ -338,7 +338,7 @@ export interface GlobalCommissionResult {
 }
 
 export function useGlobalCommission(commissionRate: number = 6): GlobalCommissionResult {
-  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit, effectiveCommissionRules } = useServicesContext();
+  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit, effectiveCommissionRules, isNewLocation } = useServicesContext();
 
   return useMemo(
     () =>
@@ -349,8 +349,9 @@ export function useGlobalCommission(commissionRate: number = 6): GlobalCommissio
         commissionRate,
         effectiveCommissionRules,
         effectivePriorQuotaCredit,
+        isNewLocation,
       ),
-    [servicesState, accountTypeCache, commissionRate, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit],
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation],
   );
 }
 
@@ -438,6 +439,7 @@ export function computeGlobalCommission(
   commissionRate: number,
   rules: ResolvedCommissionRules,
   priorQuotaCredit: number = 0,
+  isNewLocation: boolean = true,
 ): GlobalCommissionResult {
 
     const visitsPerYearOf = (freqStr: string): number => {
@@ -602,10 +604,6 @@ export function computeGlobalCommission(
       const bread15Annual = pen.Bread15 * visits;
       const pitAnnual = pen.Pit * visits;
 
-      
-
-      
-      const isNewLocation = true;
       const adjusted = g.adjustedAnnual;
 
       switch (g.accountType) {

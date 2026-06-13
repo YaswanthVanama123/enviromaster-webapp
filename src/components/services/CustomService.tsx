@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./ServicesSection.css";
 import { CustomFieldManager, type CustomField } from "./CustomFieldManager";
 
@@ -20,6 +21,7 @@ export const CustomService: React.FC<CustomServiceProps> = ({
   onUpdate,
   onRemove,
 }) => {
+  const { t } = useTranslation();
   const [showAddDropdown, setShowAddDropdown] = useState(false);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,13 +41,13 @@ export const CustomService: React.FC<CustomServiceProps> = ({
           className="svc-h-editable"
           value={service.name}
           onChange={handleNameChange}
-          placeholder="Service name..."
+          placeholder={t("serviceComponents.customService.namePlaceholder")}
         />
         <button
           type="button"
           className="svc-mini"
           onClick={() => setShowAddDropdown(!showAddDropdown)}
-          title="Add custom field"
+          title={t("serviceComponents.customService.addCustomField")}
         >
           +
         </button>
@@ -53,7 +55,7 @@ export const CustomService: React.FC<CustomServiceProps> = ({
           type="button"
           className="svc-remove"
           onClick={onRemove}
-          title="Remove service"
+          title={t("serviceComponents.customService.removeService")}
         >
           −
         </button>

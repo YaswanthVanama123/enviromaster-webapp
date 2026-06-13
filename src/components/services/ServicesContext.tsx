@@ -55,6 +55,8 @@ export interface CommissionDataForSave {
   agreementMultiplier: number;
   baseRate: number;
   rulesSnapshot: ResolvedCommissionRules;
+  isNewLocation: boolean;
+  priorQuotaCredit: number;
   serviceBreakdown: Array<{
     serviceName: string;
     accountType: AccountType | null;
@@ -144,6 +146,9 @@ interface ServicesContextValue {
 
   effectiveCommissionRules: ResolvedCommissionRules;
   setLoadedCommissionRules: (rules: ResolvedCommissionRules | null) => void;
+
+  isNewLocation: boolean;
+  setIsNewLocation: (value: boolean) => void;
 }
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(
@@ -226,6 +231,13 @@ export const ServicesProvider: React.FC<{
   // A new agreement uses the live active rules.
   const [loadedCommissionRules, setLoadedCommissionRules] = useState<ResolvedCommissionRules | null>(null);
   const effectiveCommissionRules = loadedCommissionRules ?? activeCommissionRules;
+
+  // Whether this agreement is a brand-new location vs. an upsell/conversion of an
+  // existing location. New locations apply the Pit/Bread per-visit deductions;
+  // converting an existing small account (Pit) to a larger one (Anchor) pays
+  // commission on the full value (no deduction). Persisted & frozen with the
+  // agreement; only meaningful once Bigin-connected and RouteStar-mapped.
+  const [isNewLocation, setIsNewLocation] = useState<boolean>(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -643,6 +655,7 @@ export const ServicesProvider: React.FC<{
       rate,
       effectiveCommissionRules,
       effectivePriorQuotaCredit,
+      isNewLocation,
     );
 
     if (!global.services.length) {
@@ -659,6 +672,8 @@ export const ServicesProvider: React.FC<{
       agreementMultiplier: global.agreementMultiplier,
       baseRate: rate,
       rulesSnapshot: effectiveCommissionRules,
+      isNewLocation,
+      priorQuotaCredit: effectivePriorQuotaCredit,
       serviceBreakdown: global.services.map(s => ({
         serviceName: s.serviceName,
         accountType: s.accountType,
@@ -668,7 +683,7 @@ export const ServicesProvider: React.FC<{
         annualCommission: s.annualCommission,
       })),
     };
-  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit]);
+  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation]);
 
   const getQuotaCreditForSave = useCallback((rate: number = 6): number => {
     const global = computeGlobalCommission(
@@ -677,9 +692,11 @@ export const ServicesProvider: React.FC<{
       globalContractMonths,
       rate,
       effectiveCommissionRules,
+      effectivePriorQuotaCredit,
+      isNewLocation,
     );
     return Math.round((global.totalQuotaCredit || 0) * 100) / 100;
-  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules]);
+  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation]);
 
   const value = useMemo<ServicesContextValue>(() => {
 
@@ -759,8 +776,11 @@ export const ServicesProvider: React.FC<{
 
       effectiveCommissionRules,
       setLoadedCommissionRules,
+
+      isNewLocation,
+      setIsNewLocation,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules, isNewLocation]);
 
   return (
     <ServicesContext.Provider value={value}>

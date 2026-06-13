@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useElectrostaticSprayCalc } from "./useElectrostaticSprayCalc";
 import type { ElectrostaticSprayFormState } from "./electrostaticSprayTypes";
 import { electrostaticSprayPricingConfig as cfg } from "./electrostaticSprayConfig";
@@ -36,19 +37,6 @@ const FIELD_ORDER = {
 const formatNumber = (num: number): string =>
   num % 1 === 0 ? num.toString() : num.toFixed(2);
 
-const FREQUENCY_OPTIONS = [
-  { value: "oneTime", label: "One Time" },
-  { value: "weekly", label: "Weekly" },
-  { value: "biweekly", label: "Bi-Weekly (every 2 weeks)" },
-  { value: "twicePerMonth", label: "2× / Month" },
-  { value: "monthly", label: "Monthly" },
-  { value: "everyFourWeeks", label: "Every 4 Weeks" },
-  { value: "bimonthly", label: "Bi-Monthly (every 2 months)" },
-  { value: "quarterly", label: "Quarterly" },
-  { value: "biannual", label: "Bi-Annual" },
-  { value: "annual", label: "Annual" },
-];
-
 const VISIT_BASED_FREQUENCIES = new Set([
   "oneTime",
   "quarterly",
@@ -60,9 +48,23 @@ const VISIT_BASED_FREQUENCIES = new Set([
 export const ElectrostaticSprayForm: React.FC<
   ServiceInitialData<ElectrostaticSprayFormState>
 > = ({ initialData, onRemove }) => {
+  const { t } = useTranslation();
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
   );
+
+  const FREQUENCY_OPTIONS = [
+    { value: "oneTime", label: t("serviceForms.electrostatic.freq.oneTime") },
+    { value: "weekly", label: t("serviceForms.electrostatic.freq.weekly") },
+    { value: "biweekly", label: t("serviceForms.electrostatic.freq.biweekly") },
+    { value: "twicePerMonth", label: t("serviceForms.electrostatic.freq.twicePerMonth") },
+    { value: "monthly", label: t("serviceForms.electrostatic.freq.monthly") },
+    { value: "everyFourWeeks", label: t("serviceForms.electrostatic.freq.everyFourWeeks") },
+    { value: "bimonthly", label: t("serviceForms.electrostatic.freq.bimonthly") },
+    { value: "quarterly", label: t("serviceForms.electrostatic.freq.quarterly") },
+    { value: "biannual", label: t("serviceForms.electrostatic.freq.biannual") },
+    { value: "annual", label: t("serviceForms.electrostatic.freq.annual") },
+  ];
 
   const {
     form,
@@ -329,7 +331,7 @@ export const ElectrostaticSprayForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="ELECTROSTATIC SPRAY"
+      title={t("serviceForms.electrostatic.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -343,7 +345,7 @@ export const ElectrostaticSprayForm: React.FC<
               className="svc-field"
               style={{ textAlign: "center", padding: "10px", color: "#666" }}
             >
-              Loading pricing configuration...
+              {t("serviceForms.common.loadingPricingConfiguration")}
             </div>
           </div>
         )}
@@ -358,10 +360,9 @@ export const ElectrostaticSprayForm: React.FC<
         {isSanicleanAllInclusive && (
           <Banner
             tone="success"
-            title="✓ INCLUDED in SaniClean All-Inclusive Package"
+            title={t("serviceForms.electrostatic.includedTitle")}
           >
-            Electrostatic Spray is already included at no additional charge. This form
-            is for reference only.
+            {t("serviceForms.electrostatic.includedBody")}
           </Banner>
         )}
 
@@ -372,7 +373,7 @@ export const ElectrostaticSprayForm: React.FC<
               name="isCombinedWithSaniClean"
               checked={form.isCombinedWithSaniClean}
               onChange={onChange as any}
-              label="Combined with Sani-Clean"
+              label={t("serviceForms.electrostatic.combinedWithSaniClean")}
               className=""
             />
           </div>
@@ -380,7 +381,7 @@ export const ElectrostaticSprayForm: React.FC<
 
         <div className="svc-row">
           <div className="svc-label">
-            <span>Frequency</span>
+            <span>{t("serviceForms.common.frequency")}</span>
           </div>
           <div className="svc-field">
             <SelectField
@@ -396,7 +397,7 @@ export const ElectrostaticSprayForm: React.FC<
 
         <div className="svc-row">
           <div className="svc-label">
-            <span>Pricing Method</span>
+            <span>{t("serviceForms.electrostatic.pricingMethod")}</span>
           </div>
           <div className="svc-field">
             <SelectField
@@ -406,13 +407,11 @@ export const ElectrostaticSprayForm: React.FC<
               options={[
                 {
                   value: "byRoom",
-                  label: `By Room ($${formatNumber(form.ratePerRoom)} per room)`,
+                  label: t("serviceForms.electrostatic.byRoomOption", { rate: formatNumber(form.ratePerRoom) }),
                 },
                 {
                   value: "bySqFt",
-                  label: `By Square Feet ($${formatNumber(
-                    form.ratePerThousandSqFt
-                  )} per ${activeConfig.standardSprayPricing.sqFtUnit} sq ft)`,
+                  label: t("serviceForms.electrostatic.bySqFtOption", { rate: formatNumber(form.ratePerThousandSqFt), unit: activeConfig.standardSprayPricing.sqFtUnit }),
                 },
               ]}
               onChange={onChange as any}
@@ -424,11 +423,11 @@ export const ElectrostaticSprayForm: React.FC<
         <div className="svc-summary">
           {form.pricingMethod === "byRoom" && (
             <CalculationRow
-              label="Room Calculation"
+              label={t("serviceForms.electrostatic.roomCalculation")}
               qtyName="roomCount"
               qtyValue={form.roomCount || ""}
               qtyOnChange={onChange as any}
-              qtyTitle="Number of rooms"
+              qtyTitle={t("serviceForms.electrostatic.roomCount")}
               rateName="customRatePerRoom"
               rateValue={editable.getDisplayValue(
                 "customRatePerRoom",
@@ -440,7 +439,7 @@ export const ElectrostaticSprayForm: React.FC<
               rateOnFocus={editable.onFocus}
               rateOnBlur={editable.onBlur}
               rateOverridden={form.customRatePerRoom !== undefined}
-              rateTitle="Rate per room (editable - changes calculation)"
+              rateTitle={t("serviceForms.electrostatic.ratePerRoomTitle")}
               totalName="customServiceCharge"
               totalValue={editable.getDisplayValue(
                 "customServiceCharge",
@@ -454,17 +453,17 @@ export const ElectrostaticSprayForm: React.FC<
               totalOnBlur={editable.onBlur}
               totalOverridden={form.customServiceCharge !== undefined}
               totalReadOnly
-              totalTitle="Total service charge - editable"
+              totalTitle={t("serviceForms.electrostatic.totalServiceChargeTitle")}
             />
           )}
 
           {form.pricingMethod === "bySqFt" && (
             <CalculationRow
-              label="Square Feet Calculation"
+              label={t("serviceForms.electrostatic.squareFeetCalculation")}
               qtyName="squareFeet"
               qtyValue={form.squareFeet || ""}
               qtyOnChange={onChange as any}
-              qtyTitle="Total square feet"
+              qtyTitle={t("serviceForms.electrostatic.totalSquareFeet")}
               rateName="customRatePerThousandSqFt"
               rateValue={editable.getDisplayValue(
                 "customRatePerThousandSqFt",
@@ -476,7 +475,7 @@ export const ElectrostaticSprayForm: React.FC<
               rateOnFocus={editable.onFocus}
               rateOnBlur={editable.onBlur}
               rateOverridden={form.customRatePerThousandSqFt !== undefined}
-              rateTitle="Rate per 1000 sq ft (editable - changes calculation)"
+              rateTitle={t("serviceForms.electrostatic.ratePerThousandTitle")}
               totalName="customServiceCharge"
               totalValue={editable.getDisplayValue(
                 "customServiceCharge",
@@ -490,7 +489,7 @@ export const ElectrostaticSprayForm: React.FC<
               totalOnBlur={editable.onBlur}
               totalOverridden={form.customServiceCharge !== undefined}
               totalReadOnly
-              totalTitle="Total service charge - editable"
+              totalTitle={t("serviceForms.electrostatic.totalServiceChargeTitle")}
             />
           )}
 
@@ -502,7 +501,7 @@ export const ElectrostaticSprayForm: React.FC<
                   name="useExactCalculation"
                   checked={form.useExactCalculation}
                   onChange={onChange as any}
-                  label="Exact square feet calculation"
+                  label={t("serviceForms.electrostatic.exactSqftCalc")}
                   className=""
                 />
                 <div
@@ -510,8 +509,8 @@ export const ElectrostaticSprayForm: React.FC<
                   style={{ marginTop: "4px", fontSize: "0.85em", color: "#666" }}
                 >
                   {form.useExactCalculation
-                    ? "Calculating for exact square feet entered"
-                    : `Using minimum tier pricing (any amount ≤ ${activeConfig.standardSprayPricing.sqFtUnit} sq ft → ${activeConfig.standardSprayPricing.sqFtUnit} sq ft minimum, ${activeConfig.standardSprayPricing.sqFtUnit + 1} sq ft → ${activeConfig.standardSprayPricing.sqFtUnit * 2} sq ft tier, etc.)`}
+                    ? t("serviceForms.electrostatic.exactCalcNote")
+                    : t("serviceForms.electrostatic.tierCalcNote", { unit: activeConfig.standardSprayPricing.sqFtUnit, next: activeConfig.standardSprayPricing.sqFtUnit + 1, double: activeConfig.standardSprayPricing.sqFtUnit * 2 })}
                 </div>
               </div>
             </div>
@@ -521,7 +520,7 @@ export const ElectrostaticSprayForm: React.FC<
         <div className="svc-summary">
           <div className="svc-row">
             <div className="svc-label">
-              <span>Minimum Per Visit</span>
+              <span>{t("serviceForms.common.minimumPerVisit")}</span>
             </div>
             <div className="svc-field">
               <span className="svc-small">
@@ -532,7 +531,7 @@ export const ElectrostaticSprayForm: React.FC<
                   name="applyMinimum"
                   checked={form.applyMinimum !== false}
                   onChange={onChange as any}
-                  label="Apply Minimum"
+                  label={t("serviceForms.common.applyMinimum")}
                 />
               </span>
             </div>
@@ -540,7 +539,7 @@ export const ElectrostaticSprayForm: React.FC<
 
           <div className="svc-row">
             <div className="svc-label">
-              <span>Per Visit Total</span>
+              <span>{t("serviceForms.common.perVisitTotal")}</span>
             </div>
             <div className="svc-field svc-dollar">
               <span>$</span>
@@ -564,7 +563,7 @@ export const ElectrostaticSprayForm: React.FC<
                   backgroundColor:
                     form.customPerVisitPrice !== undefined ? "#fffacd" : "white",
                 }}
-                title="Per visit total (service + trip) - editable"
+                title={t("serviceForms.electrostatic.perVisitTotalTitle")}
               />
             </div>
           </div>
@@ -575,11 +574,11 @@ export const ElectrostaticSprayForm: React.FC<
               <div className="svc-field">
                 {calc.contractTotal > calc.originalContractTotal * 1.3 ? (
                   <span className="em-pricing-tier em-pricing-tier--green">
-                    <FaCircle color="#16a34a" /> Greenline Pricing
+                    <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
                   </span>
                 ) : (
                   <span className="em-pricing-tier em-pricing-tier--red">
-                    <FaCircle color="#dc2626" /> Redline Pricing
+                    <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
                   </span>
                 )}
               </div>
@@ -589,7 +588,7 @@ export const ElectrostaticSprayForm: React.FC<
           {!isVisitBasedFrequency && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Monthly Recurring</span>
+                <span>{t("serviceForms.common.monthlyRecurring")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -613,7 +612,7 @@ export const ElectrostaticSprayForm: React.FC<
                     backgroundColor:
                       form.customMonthlyRecurring !== undefined ? "#fffacd" : "white",
                   }}
-                  title="Monthly recurring charge - editable"
+                  title={t("serviceForms.electrostatic.monthlyRecurringTitle")}
                 />
               </div>
             </div>
@@ -622,7 +621,7 @@ export const ElectrostaticSprayForm: React.FC<
           {isVisitBasedFrequency && form.frequency !== "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Recurring Visit Total</span>
+                <span>{t("serviceForms.common.recurringVisitTotal")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -646,7 +645,7 @@ export const ElectrostaticSprayForm: React.FC<
                     backgroundColor:
                       form.customFirstMonthTotal !== undefined ? "#fffacd" : "white",
                   }}
-                  title="Recurring visit total - editable"
+                  title={t("serviceForms.electrostatic.recurringVisitTitle")}
                 />
               </div>
             </div>
@@ -655,7 +654,7 @@ export const ElectrostaticSprayForm: React.FC<
           {form.frequency === "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Total Price</span>
+                <span>{t("serviceForms.common.totalPrice")}</span>
               </div>
               <div className="svc-field svc-dollar">
                 <span>$</span>
@@ -679,7 +678,7 @@ export const ElectrostaticSprayForm: React.FC<
                     backgroundColor:
                       form.customFirstMonthTotal !== undefined ? "#fffacd" : "white",
                   }}
-                  title="Total price for one-time service - editable"
+                  title={t("serviceForms.electrostatic.totalPriceTitle")}
                 />
               </div>
             </div>
@@ -688,7 +687,7 @@ export const ElectrostaticSprayForm: React.FC<
           {form.frequency !== "oneTime" && (
             <div className="svc-row">
               <div className="svc-label">
-                <span>Contract Total</span>
+                <span>{t("serviceForms.common.contractTotal")}</span>
               </div>
               <div
                 className="svc-field"
@@ -702,7 +701,7 @@ export const ElectrostaticSprayForm: React.FC<
                 >
                   {contractMonthOptions.map((m) => (
                     <option key={m} value={m}>
-                      {m} months
+                      {t("serviceForms.common.months", { count: m })}
                     </option>
                   ))}
                 </select>
@@ -737,7 +736,7 @@ export const ElectrostaticSprayForm: React.FC<
                     padding: "4px",
                     width: "140px",
                   }}
-                  title="Contract total - editable"
+                  title={t("serviceForms.electrostatic.contractTotalTitle")}
                 />
               </div>
             </div>

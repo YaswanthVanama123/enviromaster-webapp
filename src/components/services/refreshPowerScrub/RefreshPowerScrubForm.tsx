@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useRefreshPowerScrubCalc } from "./useRefreshPowerScrubCalc";
 import type {
   RefreshAreaKey,
@@ -67,6 +68,30 @@ const PRICING_TYPES = [
 export const RefreshPowerScrubForm: React.FC<
   ServiceInitialData<RefreshPowerScrubFormState>
 > = ({ initialData, onRemove }) => {
+
+  const { t } = useTranslation();
+
+  const AREA_FREQ_KEY_BY_LABEL: Record<string, string> = {
+    "": "blank",
+    "One Time": "oneTime",
+    "Weekly": "weekly",
+    "Bi-weekly": "biweekly",
+    "2× / Month": "twicePerMonth",
+    "Monthly": "monthly",
+    "Every 4 Weeks": "everyFourWeeks",
+    "Bi-monthly": "bimonthly",
+    "Quarterly": "quarterly",
+    "Bi-annual": "biannual",
+    "Annual": "annual",
+  };
+
+  const PRICING_TYPE_LABELS: Record<string, string> = {
+    preset: t("serviceForms.refreshPowerScrub.pricingType.preset"),
+    perWorker: t("serviceForms.refreshPowerScrub.pricingType.perWorker"),
+    perHour: t("serviceForms.refreshPowerScrub.pricingType.perHour"),
+    squareFeet: t("serviceForms.refreshPowerScrub.pricingType.squareFeet"),
+    custom: t("serviceForms.refreshPowerScrub.pricingType.custom"),
+  };
 
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
@@ -499,7 +524,7 @@ const getKitchenLarge = (): number => {
                   border: '1px solid #ccc'
                 }}>
                   <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                    Patio Service (Base)
+                    {t("serviceForms.refreshPowerScrub.patioServiceBase")}
                   </div>
                   <div className="rps-inline" style={{ marginBottom: '6px' }}>
                     <input
@@ -509,7 +534,7 @@ const getKitchenLarge = (): number => {
                       value={area.presetQuantity || 1}
                       onChange={(e) => setAreaField(areaKey, "presetQuantity", e.target.value)}
                       style={{ width: '50px' }}
-                      title="Quantity - editable"
+                      title={t("serviceForms.refreshPowerScrub.quantityTitle")}
                     />
                     <span>@</span>
                     <span>$</span>
@@ -524,7 +549,7 @@ const getKitchenLarge = (): number => {
                         width: '80px',
                         backgroundColor: area.presetRateIsCustom ? '#fffacd' : 'white',
                       }}
-                      title="Patio base rate - editable"
+                      title={t("serviceForms.refreshPowerScrub.patioBaseRateTitle")}
                     />
                     <span>=</span>
                     <span>$</span>
@@ -543,7 +568,7 @@ const getKitchenLarge = (): number => {
                         width: '90px',
                         backgroundColor: area.customAmount > 0 ? '#fffacd' : 'white'
                       }}
-                      title={`Patio base total - editable (default: $${formatAmount((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPatioStandalone())))})`}
+                      title={t("serviceForms.refreshPowerScrub.patioBaseTotalTitle", { amount: formatAmount((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPatioStandalone()))) })}
                     />
                   </div>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
@@ -552,7 +577,7 @@ const getKitchenLarge = (): number => {
                       checked={area.includePatioAddon}
                       onChange={(e) => setAreaField(areaKey, "includePatioAddon", e.target.checked)}
                     />
-                    <span>Add-on Service: +$</span>
+                    <span>{t("serviceForms.refreshPowerScrub.addonService")}</span>
                     <input
                       className="rps-line rps-num"
                       type="number"
@@ -564,7 +589,7 @@ const getKitchenLarge = (): number => {
                         width: '60px',
                         backgroundColor: area.patioAddonRate !== undefined && area.patioAddonRate !== null ? '#fffacd' : 'white',
                       }}
-                      title="Add-on service price - editable"
+                      title={t("serviceForms.refreshPowerScrub.addonServiceTitle")}
                     />
                   </label>
                   <div style={{
@@ -573,7 +598,7 @@ const getKitchenLarge = (): number => {
                     fontWeight: 'bold',
                     color: '#0066cc'
                   }}>
-                    Total: ${formatAmount((area.customAmount > 0 ? area.customAmount : ((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPatioStandalone())))) + (area.includePatioAddon ? (area.patioAddonRate === null ? 0 : (area.patioAddonRate ?? getPatioUpsell())) : 0))}
+                    {t("serviceForms.refreshPowerScrub.total", { amount: formatAmount((area.customAmount > 0 ? area.customAmount : ((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPatioStandalone())))) + (area.includePatioAddon ? (area.patioAddonRate === null ? 0 : (area.patioAddonRate ?? getPatioUpsell())) : 0)) })}
                   </div>
                 </div>
               </div>
@@ -582,7 +607,7 @@ const getKitchenLarge = (): number => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {}
                 <div className="rps-inline">
-                  <span className="rps-label" style={{ fontSize: '11px' }}>S/M:</span>
+                  <span className="rps-label" style={{ fontSize: '11px' }}>{t("serviceForms.refreshPowerScrub.smLabel")}</span>
                   <input
                     className="rps-line rps-num"
                     type="number"
@@ -590,7 +615,7 @@ const getKitchenLarge = (): number => {
                     value={area.smallMediumQuantity || 0}
                     onChange={(e) => setAreaField(areaKey, "smallMediumQuantity", e.target.value)}
                     style={{ width: '50px' }}
-                    title="Small/Medium quantity - editable"
+                    title={t("serviceForms.refreshPowerScrub.smQtyTitle")}
                   />
                   <span>@</span>
                   <span>$</span>
@@ -605,7 +630,7 @@ const getKitchenLarge = (): number => {
                       width: '80px',
                       backgroundColor: area.smallMediumRateIsCustom ? '#fffacd' : 'white',
                     }}
-                    title="Small/Medium Kitchen rate - editable"
+                    title={t("serviceForms.refreshPowerScrub.smRateTitle")}
                   />
                   <span>=</span>
                   <span>$</span>
@@ -623,12 +648,12 @@ const getKitchenLarge = (): number => {
                       width: '90px',
                       backgroundColor: area.smallMediumCustomAmount > 0 ? '#fffacd' : 'white'
                     }}
-                    title={`Small/Medium Kitchen total - editable (default: $${formatAmount((area.smallMediumQuantity || 0) * (area.smallMediumRate === null ? 0 : (area.smallMediumRate ?? getKitchenSmallMed())))})`}
+                    title={t("serviceForms.refreshPowerScrub.smTotalTitle", { amount: formatAmount((area.smallMediumQuantity || 0) * (area.smallMediumRate === null ? 0 : (area.smallMediumRate ?? getKitchenSmallMed()))) })}
                   />
                 </div>
                 {}
                 <div className="rps-inline">
-                  <span className="rps-label" style={{ fontSize: '11px' }}>Large:</span>
+                  <span className="rps-label" style={{ fontSize: '11px' }}>{t("serviceForms.refreshPowerScrub.largeLabel")}</span>
                   <input
                     className="rps-line rps-num"
                     type="number"
@@ -636,7 +661,7 @@ const getKitchenLarge = (): number => {
                     value={area.largeQuantity || 0}
                     onChange={(e) => setAreaField(areaKey, "largeQuantity", e.target.value)}
                     style={{ width: '50px' }}
-                    title="Large quantity - editable"
+                    title={t("serviceForms.refreshPowerScrub.largeQtyTitle")}
                   />
                   <span>@</span>
                   <span>$</span>
@@ -651,7 +676,7 @@ const getKitchenLarge = (): number => {
                       width: '80px',
                       backgroundColor: area.largeRateIsCustom ? '#fffacd' : 'white',
                     }}
-                    title="Large Kitchen rate - editable"
+                    title={t("serviceForms.refreshPowerScrub.largeRateTitle")}
                   />
                   <span>=</span>
                   <span>$</span>
@@ -669,7 +694,7 @@ const getKitchenLarge = (): number => {
                       width: '90px',
                       backgroundColor: area.largeCustomAmount > 0 ? '#fffacd' : 'white'
                     }}
-                    title={`Large Kitchen total - editable (default: $${formatAmount((area.largeQuantity || 0) * (area.largeRate === null ? 0 : (area.largeRate ?? getKitchenLarge())))})`}
+                    title={t("serviceForms.refreshPowerScrub.largeTotalTitle", { amount: formatAmount((area.largeQuantity || 0) * (area.largeRate === null ? 0 : (area.largeRate ?? getKitchenLarge()))) })}
                   />
                 </div>
               </div>
@@ -683,7 +708,7 @@ const getKitchenLarge = (): number => {
                   value={area.presetQuantity || 1}
                   onChange={(e) => setAreaField(areaKey, "presetQuantity", e.target.value)}
                   style={{ width: '50px' }}
-                  title="Quantity - editable"
+                  title={t("serviceForms.refreshPowerScrub.quantityTitle")}
                 />
                 <span>@</span>
                 <span>$</span>
@@ -698,7 +723,7 @@ const getKitchenLarge = (): number => {
                     width: '80px',
                     backgroundColor: area.presetRateIsCustom ? '#fffacd' : 'white',
                   }}
-                  title="Rate - editable"
+                  title={t("serviceForms.refreshPowerScrub.rateTitle")}
                 />
                 <span>=</span>
                 <span>$</span>
@@ -716,7 +741,7 @@ const getKitchenLarge = (): number => {
                     width: '90px',
                     backgroundColor: area.customAmount > 0 ? '#fffacd' : 'white'
                   }}
-                  title={`Total - editable (default: $${formatAmount((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPresetAmount(areaKey))))})`}
+                  title={t("serviceForms.refreshPowerScrub.totalTitle", { amount: formatAmount((area.presetQuantity || 1) * (area.presetRate === null ? 0 : (area.presetRate ?? getPresetAmount(areaKey)))) })}
                 />
               </div>
             )}
@@ -726,7 +751,7 @@ const getKitchenLarge = (): number => {
       case "perWorker":
         return (
           <div className="rps-inline">
-            <span className="rps-label">Workers</span>
+            <span className="rps-label">{t("serviceForms.refreshPowerScrub.workers")}</span>
             <input
               className="rps-line rps-num"
               type="number"
@@ -747,16 +772,16 @@ const getKitchenLarge = (): number => {
                 width: '80px',
                 backgroundColor: area.workerRateIsCustom ? '#fffacd' : 'white',
               }}
-              title="Per worker rate - editable"
+              title={t("serviceForms.refreshPowerScrub.perWorkerRateTitle")}
             />
-            <span className="rps-label">= ${formatAmount((area.workers || 0) * area.workerRate)}</span>
+            <span className="rps-label">{t("serviceForms.refreshPowerScrub.equalsAmount", { amount: formatAmount((area.workers || 0) * area.workerRate) })}</span>
           </div>
         );
 
       case "perHour":
         return (
           <div className="rps-inline">
-            <span className="rps-label">Hours</span>
+            <span className="rps-label">{t("serviceForms.refreshPowerScrub.hours")}</span>
             <input
               className="rps-line rps-num"
               type="number"
@@ -777,9 +802,9 @@ const getKitchenLarge = (): number => {
                 width: '80px',
                 backgroundColor: area.hourlyRateIsCustom ? '#fffacd' : 'white',
               }}
-              title="Per hour rate - editable"
+              title={t("serviceForms.refreshPowerScrub.perHourRateTitle")}
             />
-            <span className="rps-label">= ${formatAmount((area.hours || 0) * area.hourlyRate)}</span>
+            <span className="rps-label">{t("serviceForms.refreshPowerScrub.equalsAmount", { amount: formatAmount((area.hours || 0) * area.hourlyRate) })}</span>
           </div>
         );
 
@@ -787,7 +812,7 @@ const getKitchenLarge = (): number => {
         return (
           <>
             <div className="rps-inline">
-              <span className="rps-label">Fixed:</span>
+              <span className="rps-label">{t("serviceForms.refreshPowerScrub.fixed")}</span>
               <span>$</span>
               <input
                 className="rps-line rps-num"
@@ -800,11 +825,11 @@ const getKitchenLarge = (): number => {
                   width: '80px',
                   backgroundColor: area.sqFtFixedFeeIsCustom ? '#fffacd' : 'white',
                 }}
-                title="Fixed fee - editable"
+                title={t("serviceForms.refreshPowerScrub.fixedFeeTitle")}
               />
             </div>
             <div className="rps-inline" style={{ marginTop: '4px' }}>
-              <span className="rps-label">Inside</span>
+              <span className="rps-label">{t("serviceForms.refreshPowerScrub.inside")}</span>
               <input
                 className="rps-line rps-num"
                 type="number"
@@ -825,12 +850,12 @@ const getKitchenLarge = (): number => {
                   width: '60px',
                   backgroundColor: area.insideRateIsCustom ? '#fffacd' : 'white',
                 }}
-                title="Inside rate - editable"
+                title={t("serviceForms.refreshPowerScrub.insideRateTitle")}
               />
-              <span>= ${formatAmount((area.insideSqFt || 0) * area.insideRate)}</span>
+              <span>{t("serviceForms.refreshPowerScrub.equalsAmount", { amount: formatAmount((area.insideSqFt || 0) * area.insideRate) })}</span>
             </div>
             <div className="rps-inline" style={{ marginTop: '4px' }}>
-              <span className="rps-label">Outside</span>
+              <span className="rps-label">{t("serviceForms.refreshPowerScrub.outside")}</span>
               <input
                 className="rps-line rps-num"
                 type="number"
@@ -851,9 +876,9 @@ const getKitchenLarge = (): number => {
                   width: '60px',
                   backgroundColor: area.outsideRateIsCustom ? '#fffacd' : 'white',
                 }}
-                title="Outside rate - editable"
+                title={t("serviceForms.refreshPowerScrub.outsideRateTitle")}
               />
-              <span>= ${formatAmount((area.outsideSqFt || 0) * area.outsideRate)}</span>
+              <span>{t("serviceForms.refreshPowerScrub.equalsAmount", { amount: formatAmount((area.outsideSqFt || 0) * area.outsideRate) })}</span>
             </div>
           </>
         );
@@ -880,7 +905,7 @@ const getKitchenLarge = (): number => {
 
   return (
     <ServiceCardShell
-      title="REFRESH POWER SCRUB"
+      title={t("serviceForms.refreshPowerScrub.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       className="svc-card svc-card-wide refresh-rps"
@@ -888,16 +913,16 @@ const getKitchenLarge = (): number => {
         <RefreshButton
           onClick={() => refreshConfig(true)}
           loading={isLoadingConfig}
-          title={isLoadingConfig ? "Loading config..." : "Refresh pricing config from backend"}
+          title={isLoadingConfig ? t("serviceForms.refreshPowerScrub.loadingTitle") : t("serviceForms.refreshPowerScrub.refreshTitle")}
         />
       }
     >
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
-            <span className="svc-sr-only">Loading configuration...</span>
+            <span className="svc-sr-only">{t("serviceForms.common.loadingConfiguration")}</span>
           </div>
-          <p className="svc-loading-text">Loading configuration...</p>
+          <p className="svc-loading-text">{t("serviceForms.common.loadingConfiguration")}</p>
         </div>
       )}
 
@@ -918,14 +943,14 @@ const getKitchenLarge = (): number => {
       {}
       <div className="rps-config-row">
         <div className="rps-inline">
-          <span className="rps-label">Minimum: ${form.minimumVisit}</span>
+          <span className="rps-label">{t("serviceForms.refreshPowerScrub.minimum", { amount: form.minimumVisit })}</span>
           <label className="svc-inline" style={{ marginLeft: '10px' }}>
             <input
               type="checkbox"
               checked={form.applyMinimum !== false}
               onChange={(e) => setApplyMinimum(e.target.checked)}
             />
-            <span>Apply Minimum</span>
+            <span>{t("serviceForms.common.applyMinimum")}</span>
           </label>
         </div>
       </div>
@@ -946,16 +971,16 @@ const getKitchenLarge = (): number => {
                   />
                   <span className="rps-label-strong">
                     {areaKey === "dumpster"
-                      ? "DUMPSTER"
+                      ? t("serviceForms.refreshPowerScrub.area.dumpster")
                       : areaKey === "patio"
-                      ? "PATIO"
+                      ? t("serviceForms.refreshPowerScrub.area.patio")
                       : areaKey === "walkway"
-                      ? "WALKWAY"
+                      ? t("serviceForms.refreshPowerScrub.area.walkway")
                       : areaKey === "foh"
-                      ? "FRONT HOUSE"
+                      ? t("serviceForms.refreshPowerScrub.area.foh")
                       : areaKey === "boh"
-                      ? "BACK HOUSE"
-                      : "OTHER"}
+                      ? t("serviceForms.refreshPowerScrub.area.boh")
+                      : t("serviceForms.refreshPowerScrub.area.other")}
                   </span>
                 </label>
                 <div className="rps-inline" style={{ marginTop: '8px' }}>
@@ -968,7 +993,7 @@ const getKitchenLarge = (): number => {
                   >
                     {PRICING_TYPES.map(type => (
                       <option key={type.value} value={type.value}>
-                        {type.label}
+                        {PRICING_TYPE_LABELS[type.value] ?? type.label}
                       </option>
                     ))}
                   </select>
@@ -986,7 +1011,7 @@ const getKitchenLarge = (): number => {
                 {form[areaKey].enabled && (
                   <>
                     <div className="rps-inline" style={{ marginTop: '8px' }}>
-                      <span className="rps-label">Freq</span>
+                      <span className="rps-label">{t("serviceForms.refreshPowerScrub.freqLabel")}</span>
                       <select
                         className="rps-line"
                         value={form[areaKey].frequencyLabel}
@@ -995,7 +1020,7 @@ const getKitchenLarge = (): number => {
                       >
                         {AREA_FREQ_OPTIONS.map((freq) => (
                           <option key={freq} value={freq}>
-                            {freq || "Select..."}
+                            {freq ? t(`serviceForms.refreshPowerScrub.areaFreq.${AREA_FREQ_KEY_BY_LABEL[freq]}`) : t("serviceForms.refreshPowerScrub.selectPlaceholder")}
                           </option>
                         ))}
                       </select>
@@ -1005,13 +1030,13 @@ const getKitchenLarge = (): number => {
                     {form[areaKey].frequencyLabel?.toLowerCase() === "one time" ? (
                       <div className="rps-inline" style={{ marginTop: '8px' }}>
                         <span className="rps-label" style={{ color: '#0066cc', fontWeight: 'bold' }}>
-                          Total Visit: ${formatAmount(areaTotals[areaKey])}
+                          {t("serviceForms.refreshPowerScrub.totalVisit", { amount: formatAmount(areaTotals[areaKey]) })}
                         </span>
                       </div>
                     ) : (
                       <>
                         <div className="rps-inline" style={{ marginTop: '8px' }}>
-                          <span className="rps-label">Total: ${formatAmount(areaTotals[areaKey])}</span>
+                          <span className="rps-label">{t("serviceForms.refreshPowerScrub.totalLabel", { amount: formatAmount(areaTotals[areaKey]) })}</span>
                         </div>
 
                         {}
@@ -1020,7 +1045,7 @@ const getKitchenLarge = (): number => {
                          form[areaKey].frequencyLabel?.toLowerCase() !== "bi-annual" &&
                          form[areaKey].frequencyLabel?.toLowerCase() !== "annual" && (
                           <div className="rps-inline" style={{ marginTop: '8px' }}>
-                            <span className="rps-label">Monthly: ${formatAmount(areaMonthlyTotals[areaKey])}</span>
+                            <span className="rps-label">{t("serviceForms.refreshPowerScrub.monthly", { amount: formatAmount(areaMonthlyTotals[areaKey]) })}</span>
                           </div>
                         )}
                       </>
@@ -1029,7 +1054,7 @@ const getKitchenLarge = (): number => {
                     {}
                     {form[areaKey].frequencyLabel?.toLowerCase() !== "one time" && (
                       <div className="rps-inline" style={{ marginTop: '8px' }}>
-                        <span className="rps-label">Contract:</span>
+                        <span className="rps-label">{t("serviceForms.refreshPowerScrub.contract")}</span>
                         <select
                           className="rps-line"
                           style={{ width: '60px', marginLeft: '4px', marginRight: '4px' }}
@@ -1040,40 +1065,40 @@ const getKitchenLarge = (): number => {
                           {form[areaKey].frequencyLabel?.toLowerCase() === "quarterly" ? (
 
                             Array.from({ length: 12 }, (_, i) => {
-                              const months = (i + 1) * 3; 
+                              const months = (i + 1) * 3;
                               return (
                                 <option key={months} value={months}>
-                                  {months} mo
+                                  {t("serviceForms.common.monthsShort", { count: months })}
                                 </option>
                               );
                             })
                           ) : form[areaKey].frequencyLabel?.toLowerCase() === "bi-annual" ? (
 
                             Array.from({ length: 6 }, (_, i) => {
-                              const months = (i + 1) * 6; 
+                              const months = (i + 1) * 6;
                               return (
                                 <option key={months} value={months}>
-                                  {months} mo
+                                  {t("serviceForms.common.monthsShort", { count: months })}
                                 </option>
                               );
                             })
                           ) : form[areaKey].frequencyLabel?.toLowerCase() === "annual" ? (
 
                             Array.from({ length: 3 }, (_, i) => {
-                              const months = (i + 1) * 12; 
+                              const months = (i + 1) * 12;
                               return (
                                 <option key={months} value={months}>
-                                  {months} mo
+                                  {t("serviceForms.common.monthsShort", { count: months })}
                                 </option>
                               );
                             })
                           ) : (
 
                             Array.from({ length: 35 }, (_, i) => {
-                              const months = i + 2; 
+                              const months = i + 2;
                               return (
                                 <option key={months} value={months}>
-                                  {months} mo
+                                  {t("serviceForms.common.monthsShort", { count: months })}
                                 </option>
                               );
                             })
@@ -1093,7 +1118,7 @@ const getKitchenLarge = (): number => {
       {}
           <div className="rps-config-row" style={{ marginTop: '16px', borderTop: '2px solid #ccc', paddingTop: '16px' }}>
         <div className="rps-inline">
-          <span className="rps-label-strong">TOTAL REFRESH POWER SCRUB COST: ${formatAmount(totalServiceCost)}</span>
+          <span className="rps-label-strong">{t("serviceForms.refreshPowerScrub.totalCost", { amount: formatAmount(totalServiceCost) })}</span>
         </div>
       </div>
 

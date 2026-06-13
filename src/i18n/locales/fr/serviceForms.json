@@ -416,7 +416,8 @@
     "recurringMonthTotal": "Total Mensuel Récurrent",
     "recurringMonthTitle": "Total mensuel récurrent - modifiable",
     "firstVisitTitle": "Total de la première visite - modifiable",
-    "firstMonthTitle": "Total du premier mois - modifiable"
+    "firstMonthTitle": "Total du premier mois - modifiable",
+    "contractTotalTitle": "Total du contrat - modifiable"
   },
   "electrostatic": {
     "title": "PULVÉRISATION ÉLECTROSTATIQUE",

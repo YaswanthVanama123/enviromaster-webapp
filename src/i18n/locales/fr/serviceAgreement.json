@@ -1,0 +1,15 @@
+{
+  "includeServiceAgreement": "Inclure l'accord de service",
+  "loadingTemplate": "Chargement du modèle d'accord de service...",
+  "groupAriaLabel": "Accord de service",
+  "logoAriaLabel": "Logo Enviro-Master",
+  "logoAlt": "Logo Enviro-Master",
+  "documentTitleAriaLabel": "Titre du document",
+  "termsAriaLabel": "Conditions générales",
+  "dispenserOptionsAriaLabel": "Options de distributeurs",
+  "representativesAriaLabel": "Représentants",
+  "authorityAriaLabel": "Déclaration d'autorité",
+  "signatureSectionAriaLabel": "Section des signatures",
+  "emSalesRepAriaLabel": "Représentant commercial EM",
+  "insideSalesRepAriaLabel": "Représentant des ventes internes"
+}

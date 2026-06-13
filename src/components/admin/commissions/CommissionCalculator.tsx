@@ -129,6 +129,7 @@ export const CommissionCalculator: React.FC<CommissionCalculatorProps> = ({ onRe
       baseCommissionRate,
       rules,
       positionBefore,
+      isNewLocation,
     );
 
     const svc = global.services[0];

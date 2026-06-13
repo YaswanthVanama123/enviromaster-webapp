@@ -1,0 +1,75 @@
+{
+  "section": {
+    "products": "PRODUCTS",
+    "dispensers": "DISPENSERS"
+  },
+  "tabs": {
+    "form": "Form",
+    "productsReference": "Products Reference",
+    "dispensersReference": "Dispensers Reference"
+  },
+  "reference": {
+    "productsTitle": "PRODUCTS REFERENCE - FOR SALESPEOPLE",
+    "dispensersTitle": "DISPENSERS REFERENCE - FOR SALESPEOPLE",
+    "productName": "Product Name",
+    "dispenserName": "Dispenser Name",
+    "descriptionUseCase": "Description & Use Case",
+    "family": "Family",
+    "basePrice": "Base Price",
+    "unit": "Unit",
+    "caseInfo": "Case Info",
+    "warrantyRate": "Warranty Rate",
+    "warrantyPeriod": "Warranty Period",
+    "bestFor": "Best For",
+    "each": "Each",
+    "perWeek": "Per week",
+    "notAvailable": "N/A",
+    "perCase": "{{count}} per case",
+    "highTraffic": "High Traffic",
+    "commercialUse": "Commercial Use",
+    "standardUse": "Standard Use",
+    "allAreas": "All Areas"
+  },
+  "table": {
+    "products": "Products",
+    "dispensers": "Dispensers",
+    "qty": "Qty",
+    "unitPriceAmount": "Unit Price/Amount",
+    "amount": "Amount",
+    "warranty": "Warranty",
+    "warrantyRate": "Warranty Rate",
+    "replacementRateInstall": "Replacement Rate/Install",
+    "frequencyOfService": "Frequency of Service",
+    "total": "Total"
+  },
+  "buttons": {
+    "addRow": "+ Row"
+  },
+  "actions": {
+    "removeRow": "Remove row",
+    "removeColumn": "Remove column"
+  },
+  "name": {
+    "customProductPlaceholder": "Custom product...",
+    "selectProduct": "Select product...",
+    "searchProduct": "Search product...",
+    "noProducts": "No products",
+    "addCustomProduct": "+ Custom product"
+  },
+  "frequency": {
+    "select": "Select...",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Bi-Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "tooltips": {
+    "productWarranty": "Check for recurring warranty billing; uncheck for one-time direct price",
+    "dispenserWarranty": "Check for recurring warranty billing; uncheck for one-time direct/replacement price"
+  },
+  "descriptions": {
+    "kindSuffix": "{{kind}} - Professional cleaning product",
+    "default": "Professional cleaning product for commercial use"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "includeServiceAgreement": "Incluir acuerdo de servicio",
+  "loadingTemplate": "Cargando plantilla de acuerdo de servicio...",
+  "groupAriaLabel": "Acuerdo de servicio",
+  "logoAriaLabel": "Logotipo de Enviro-Master",
+  "logoAlt": "Logotipo de Enviro-Master",
+  "documentTitleAriaLabel": "Título del documento",
+  "termsAriaLabel": "Términos y condiciones",
+  "dispenserOptionsAriaLabel": "Opciones de dispensadores",
+  "representativesAriaLabel": "Representantes",
+  "authorityAriaLabel": "Declaración de autoridad",
+  "signatureSectionAriaLabel": "Sección de firmas",
+  "emSalesRepAriaLabel": "Representante de ventas de EM",
+  "insideSalesRepAriaLabel": "Representante de ventas internas"
+}

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch, faTimes, faChevronDown, faChevronUp,
@@ -57,22 +58,22 @@ function classifyKey(key: string): VType {
   return "count";
 }
 
-function formatPrimitive(key: string, value: unknown): { display: string; unit: string; vtype: VType } {
-  if (typeof value === "boolean") return { display: value ? "Yes" : "No", unit: "", vtype: "bool" };
-  if (typeof value === "string")  return { display: value, unit: "", vtype: "text" };
-  if (typeof value !== "number")  return { display: String(value), unit: "", vtype: "text" };
+function formatPrimitive(key: string, value: unknown): { display: string; unitKey: string; vtype: VType; boolValue?: boolean } {
+  if (typeof value === "boolean") return { display: "", unitKey: "", vtype: "bool", boolValue: value };
+  if (typeof value === "string")  return { display: value, unitKey: "", vtype: "text" };
+  if (typeof value !== "number")  return { display: String(value), unitKey: "", vtype: "text" };
   const vtype = classifyKey(key);
   switch (vtype) {
-    case "dollar":     return { display: `$${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,  unit: "per visit",   vtype };
-    case "multiplier": return { display: `${value}×`,             unit: "multiplier",  vtype };
-    case "percent":    return { display: `${value}%`,             unit: "percent",     vtype };
-    case "months":     return { display: String(value),           unit: "months",      vtype };
-    case "sqft":       return { display: String(value),           unit: "sq ft",       vtype };
-    default:           return { display: String(value),           unit: "",            vtype: "count" };
+    case "dollar":     return { display: `$${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,  unitKey: "unitPerVisit",   vtype };
+    case "multiplier": return { display: `${value}×`,             unitKey: "unitMultiplier",  vtype };
+    case "percent":    return { display: `${value}%`,             unitKey: "unitPercent",     vtype };
+    case "months":     return { display: String(value),           unitKey: "unitMonths",      vtype };
+    case "sqft":       return { display: String(value),           unitKey: "unitSqFt",       vtype };
+    default:           return { display: String(value),           unitKey: "",            vtype: "count" };
   }
 }
 
-type FieldEntry  = { key: string; label: string; display: string; unit: string; vtype: VType };
+type FieldEntry  = { key: string; label: string; display: string; unitKey: string; vtype: VType; boolValue?: boolean };
 type Section     = { sectionKey: string; title: string; icon: IconDefinition; fields: FieldEntry[]; subsections: Section[] };
 
 const SECTION_ICONS: Record<string, IconDefinition> = {
@@ -144,14 +145,14 @@ function buildSections(obj: Record<string, unknown>): Section[] {
         if (typeof subVal === "object" && !Array.isArray(subVal)) {
           subsections.push(...buildSections({ [subKey]: subVal }));
         } else if (!Array.isArray(subVal)) {
-          const { display, unit, vtype } = formatPrimitive(subKey, subVal);
-          fields.push({ key: subKey, label: camelToLabel(subKey), display, unit, vtype });
+          const { display, unitKey, vtype, boolValue } = formatPrimitive(subKey, subVal);
+          fields.push({ key: subKey, label: camelToLabel(subKey), display, unitKey, vtype, boolValue });
         }
       }
       sections.push({ sectionKey: key, title: camelToLabel(key), icon: getIcon(key), fields, subsections });
     } else if (!Array.isArray(value)) {
-      const { display, unit, vtype } = formatPrimitive(key, value);
-      const entry: FieldEntry = { key, label: camelToLabel(key), display, unit, vtype };
+      const { display, unitKey, vtype, boolValue } = formatPrimitive(key, value);
+      const entry: FieldEntry = { key, label: camelToLabel(key), display, unitKey, vtype, boolValue };
       const existing = sections.find((s) => s.sectionKey === "__root__");
       if (existing) existing.fields.push(entry);
       else sections.unshift({ sectionKey: "__root__", title: "General", icon: faCog, fields: [entry], subsections: [] });
@@ -160,7 +161,8 @@ function buildSections(obj: Record<string, unknown>): Section[] {
   return sections;
 }
 
-function FieldRow({ label, display, unit, vtype }: FieldEntry) {
+function FieldRow({ label, display, unitKey, vtype, boolValue }: FieldEntry) {
+  const { t } = useTranslation();
   const valueClass = {
     dollar: "srf-val--dollar", multiplier: "srf-val--multiplier",
     percent: "srf-val--percent", months: "srf-val--months",
@@ -168,25 +170,37 @@ function FieldRow({ label, display, unit, vtype }: FieldEntry) {
     bool: "srf-val--bool", text: "srf-val--text",
   }[vtype] ?? "srf-val--count";
 
+  const valueDisplay =
+    vtype === "bool"
+      ? boolValue
+        ? t("serviceComponents.servicesReference.yes")
+        : t("serviceComponents.servicesReference.no")
+      : display;
+
   return (
     <div className="srf-field">
       <div className="srf-field__label">{label}</div>
       <div className="srf-field__right">
-        <span className={`srf-field__value ${valueClass}`}>{display}</span>
-        {unit && <span className="srf-field__unit">{unit}</span>}
+        <span className={`srf-field__value ${valueClass}`}>{valueDisplay}</span>
+        {unitKey && <span className="srf-field__unit">{t(`serviceComponents.servicesReference.${unitKey}`)}</span>}
       </div>
     </div>
   );
 }
 
 function SubSection({ section }: { section: Section }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
   if (section.fields.length === 0 && section.subsections.length === 0) return null;
+  const sectionTitle =
+    section.sectionKey === "__root__"
+      ? t("serviceComponents.servicesReference.general")
+      : section.title;
   return (
     <div className="srf-subsection">
       <button type="button" className="srf-subsection__toggle" onClick={() => setOpen((o) => !o)}>
         <FontAwesomeIcon icon={section.icon} className="srf-subsection__icon" />
-        <span>{section.title}</span>
+        <span>{sectionTitle}</span>
         <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className="srf-subsection__chevron" />
       </button>
       {open && (
@@ -200,6 +214,7 @@ function SubSection({ section }: { section: Section }) {
 }
 
 function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -255,7 +270,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
               icon={config.isActive ? faCheckCircle : faTimesCircle}
               className="srf-badge__icon"
             />
-            {config.isActive ? "Active" : "Inactive"}
+            {config.isActive ? t("serviceComponents.servicesReference.active") : t("serviceComponents.servicesReference.inactive")}
           </span>
         </div>
 
@@ -282,7 +297,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
       {expanded && (
         <div className="srf-card__body">
           {allTabs.length === 0 ? (
-            <p className="srf-empty">No pricing configuration available.</p>
+            <p className="srf-empty">{t("serviceComponents.servicesReference.noConfig")}</p>
           ) : (
             <>
               {}
@@ -298,7 +313,13 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
                     onClick={() => setActiveSection(s.sectionKey)}
                   >
                     <FontAwesomeIcon icon={s.icon} className="srf-tab__icon" />
-                    <span>{s.title}</span>
+                    <span>
+                      {s.sectionKey === "__desc__"
+                        ? t("serviceComponents.servicesReference.description")
+                        : s.sectionKey === "__root__"
+                        ? t("serviceComponents.servicesReference.general")
+                        : s.title}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -320,7 +341,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
                       <SubSection key={sub.sectionKey} section={sub} />
                     ))}
                     {activeSecObj.fields.length === 0 && activeSecObj.subsections.length === 0 && (
-                      <p className="srf-empty">No fields in this section.</p>
+                      <p className="srf-empty">{t("serviceComponents.servicesReference.noFieldsSection")}</p>
                     )}
                   </div>
                 )
@@ -333,7 +354,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
             <div className="srf-media-section">
               <div className="srf-media-header">
                 <FontAwesomeIcon icon={faImage} className="srf-media-icon" />
-                <span>Images</span>
+                <span>{t("serviceComponents.servicesReference.images")}</span>
               </div>
               <div className="srf-image-grid">
                 {config.images.map((img, idx) => {
@@ -342,7 +363,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
                     : img.url;
                   return (
                     <div key={idx} className="srf-image-card">
-                      <img src={src} alt={img.caption || "service image"} className="srf-image-thumb" />
+                      <img src={src} alt={img.caption || t("serviceComponents.servicesReference.serviceImageAlt")} className="srf-image-thumb" />
                       {img.caption && <p className="srf-image-caption">{img.caption}</p>}
                     </div>
                   );
@@ -356,7 +377,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
             <div className="srf-media-section">
               <div className="srf-media-header">
                 <FontAwesomeIcon icon={faLink} className="srf-media-icon" />
-                <span>Links</span>
+                <span>{t("serviceComponents.servicesReference.links")}</span>
               </div>
               <div className="srf-links-list">
                 {config.links.map((link, idx) => (
@@ -383,6 +404,7 @@ function ServiceReferenceCard({ config }: { config: ServiceConfig }) {
 interface Props { configs: ServiceConfig[] }
 
 export function ServicesReferenceSection({ configs }: Props) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -401,9 +423,9 @@ export function ServicesReferenceSection({ configs }: Props) {
     <div className="srf-root">
       {}
       <div className="srf-banner">
-        <div className="srf-banner__title">SERVICES REFERENCE</div>
+        <div className="srf-banner__title">{t("serviceComponents.servicesReference.banner")}</div>
         <div className="srf-banner__sub">
-          FOR SALESPEOPLE &mdash; click any service card to expand its full pricing
+          {t("serviceComponents.servicesReference.bannerSub")}
         </div>
       </div>
 
@@ -414,7 +436,7 @@ export function ServicesReferenceSection({ configs }: Props) {
           <input
             className="srf-search"
             type="text"
-            placeholder="Search by name, service ID, tag or description…"
+            placeholder={t("serviceComponents.servicesReference.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -425,33 +447,33 @@ export function ServicesReferenceSection({ configs }: Props) {
           )}
         </div>
         <span className="srf-count">
-          {filtered.length} of {configs.length} service{configs.length !== 1 ? "s" : ""}
+          {t("serviceComponents.servicesReference.count", { filtered: filtered.length, total: configs.length, count: configs.length })}
         </span>
       </div>
 
       {}
       <div className="srf-legend">
         <span className="srf-legend__item srf-val--dollar">
-          <FontAwesomeIcon icon={faDollarSign} style={{ marginRight: 4 }} /> Price / Rate
+          <FontAwesomeIcon icon={faDollarSign} style={{ marginRight: 4 }} /> {t("serviceComponents.servicesReference.legendPriceRate")}
         </span>
         <span className="srf-legend__item srf-val--multiplier">
-          <FontAwesomeIcon icon={faTimes} style={{ marginRight: 4 }} /> Multiplier
+          <FontAwesomeIcon icon={faTimes} style={{ marginRight: 4 }} /> {t("serviceComponents.servicesReference.legendMultiplier")}
         </span>
         <span className="srf-legend__item srf-val--percent">
-          <FontAwesomeIcon icon={faChartBar} style={{ marginRight: 4 }} /> Percent
+          <FontAwesomeIcon icon={faChartBar} style={{ marginRight: 4 }} /> {t("serviceComponents.servicesReference.legendPercent")}
         </span>
         <span className="srf-legend__item srf-val--months">
-          <FontAwesomeIcon icon={faCalendar} style={{ marginRight: 4 }} /> Duration
+          <FontAwesomeIcon icon={faCalendar} style={{ marginRight: 4 }} /> {t("serviceComponents.servicesReference.legendDuration")}
         </span>
         <span className="srf-legend__item srf-val--count">
-          <FontAwesomeIcon icon={faLayerGroup} style={{ marginRight: 4 }} /> Count / Other
+          <FontAwesomeIcon icon={faLayerGroup} style={{ marginRight: 4 }} /> {t("serviceComponents.servicesReference.legendCountOther")}
         </span>
       </div>
 
       {}
       <div className="srf-list">
         {filtered.length === 0 ? (
-          <div className="srf-no-results">No services match &ldquo;{search}&rdquo;</div>
+          <div className="srf-no-results">{t("serviceComponents.servicesReference.noResults", { search })}</div>
         ) : (
           filtered.map((c) => <ServiceReferenceCard key={c.serviceId} config={c} />)
         )}

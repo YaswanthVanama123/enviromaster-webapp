@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { adminSettingsApi, type AdminSettings } from '../../backendservice/api/adminSettingsApi';
 import { zohoApi, type ZohoUser } from '../../backendservice/api/zohoApi';
 import { Toast } from './Toast';
@@ -8,6 +9,7 @@ import { faSave, faUserCog, faBell, faSearch, faTimes, faInfoCircle } from '@for
 import './ApprovalTaskSettings.css';
 
 export const ApprovalTaskSettings: React.FC = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AdminSettings | null>(null);
   const [users, setUsers] = useState<ZohoUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export const ApprovalTaskSettings: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading approval task settings:', error);
-      setToastMessage({ message: 'Failed to load settings', type: 'error' });
+      setToastMessage({ message: t('adminTools.approvalSettings.failedToLoad'), type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -67,10 +69,10 @@ export const ApprovalTaskSettings: React.FC = () => {
       });
       setSettings(updated);
       setHasChanges(false);
-      setToastMessage({ message: 'Settings saved successfully!', type: 'success' });
+      setToastMessage({ message: t('adminTools.approvalSettings.savedSuccess'), type: 'success' });
     } catch (error) {
       console.error('Error saving settings:', error);
-      setToastMessage({ message: 'Failed to save settings', type: 'error' });
+      setToastMessage({ message: t('adminTools.approvalSettings.failedToSave'), type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -97,7 +99,7 @@ export const ApprovalTaskSettings: React.FC = () => {
     return (
       <div className="ats-loading">
         <div className="ats-spinner" />
-        <p className="ats-loading-text">Loading workflow settings…</p>
+        <p className="ats-loading-text">{t('adminTools.approvalSettings.loadingSettings')}</p>
       </div>
     );
   }
@@ -117,9 +119,9 @@ export const ApprovalTaskSettings: React.FC = () => {
           <FontAwesomeIcon icon={faUserCog} />
         </div>
         <div>
-          <h2 className="ats-title">Approval Task Workflow</h2>
+          <h2 className="ats-title">{t('adminTools.approvalSettings.title')}</h2>
           <p className="ats-subtitle">
-            Configure automatic Bigin task creation when an agreement is saved with pending-approval (red-line) pricing.
+            {t('adminTools.approvalSettings.subtitle')}
           </p>
         </div>
       </div>
@@ -127,8 +129,7 @@ export const ApprovalTaskSettings: React.FC = () => {
       <div className="ats-info-banner">
         <FontAwesomeIcon icon={faInfoCircle} className="ats-info-icon" />
         <span>
-          When an agreement is saved with red-line pricing <strong>and</strong> a Bigin company/pipeline is already linked,
-          a task will be automatically created in Bigin and assigned to the owner selected below.
+          <Trans i18nKey="adminTools.approvalSettings.infoBanner" components={{ 1: <strong /> }} />
         </span>
       </div>
 
@@ -136,10 +137,10 @@ export const ApprovalTaskSettings: React.FC = () => {
         <div className="ats-field-group">
           <label className="ats-label">
             <FontAwesomeIcon icon={faUserCog} className="ats-label-icon" />
-            Default Task Owner
+            {t('adminTools.approvalSettings.defaultTaskOwner')}
           </label>
           <p className="ats-field-hint">
-            The Bigin user who will be assigned the approval task automatically.
+            {t('adminTools.approvalSettings.defaultTaskOwnerHint')}
           </p>
 
           {selectedOwner.id ? (
@@ -150,12 +151,12 @@ export const ApprovalTaskSettings: React.FC = () => {
               <div className="ats-selected-user-info">
                 <span className="ats-selected-user-name">{selectedOwner.name}</span>
               </div>
-              <button className="ats-clear-btn" onClick={handleClearOwner} title="Remove owner">
+              <button className="ats-clear-btn" onClick={handleClearOwner} title={t('adminTools.approvalSettings.removeOwner')}>
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
           ) : (
-            <div className="ats-no-owner">No default owner set — tasks will be unassigned</div>
+            <div className="ats-no-owner">{t('adminTools.approvalSettings.noOwnerSet')}</div>
           )}
 
           <div className="ats-user-search-wrapper">
@@ -164,7 +165,7 @@ export const ApprovalTaskSettings: React.FC = () => {
               <input
                 type="text"
                 className="ats-search-input"
-                placeholder="Search Bigin users…"
+                placeholder={t('adminTools.approvalSettings.searchUsersPlaceholder')}
                 value={userSearch}
                 onChange={(e) => {
                   setUserSearch(e.target.value);
@@ -176,7 +177,7 @@ export const ApprovalTaskSettings: React.FC = () => {
             {showUserDropdown && userSearch.length > 0 && (
               <div className="ats-user-dropdown">
                 {filteredUsers.length === 0 ? (
-                  <div className="ats-dropdown-empty">No users found</div>
+                  <div className="ats-dropdown-empty">{t('adminTools.approvalSettings.noUsersFound')}</div>
                 ) : (
                   filteredUsers.slice(0, 10).map((u) => (
                     <button
@@ -200,23 +201,27 @@ export const ApprovalTaskSettings: React.FC = () => {
         <div className="ats-field-group">
           <label className="ats-label">
             <FontAwesomeIcon icon={faBell} className="ats-label-icon" />
-            Task Subject Template
+            {t('adminTools.approvalSettings.taskSubjectTemplate')}
           </label>
           <p className="ats-field-hint">
-            Use <code>{'{{agreementTitle}}'}</code> as a placeholder for the agreement name.
+            <Trans
+              i18nKey="adminTools.approvalSettings.subjectHint"
+              values={{ placeholder: '{{agreementTitle}}' }}
+              components={{ 1: <code /> }}
+            />
           </p>
           <input
             type="text"
             className="ats-subject-input"
             value={subjectTemplate}
             onChange={(e) => setSubjectTemplate(e.target.value)}
-            placeholder='e.g. Agreement "{{agreementTitle}}" needs your approval'
+            placeholder={t('adminTools.approvalSettings.subjectPlaceholder', { placeholder: '{{agreementTitle}}' })}
           />
           {subjectTemplate.includes('{{agreementTitle}}') && (
             <div className="ats-preview">
-              <span className="ats-preview-label">Preview:</span>{' '}
+              <span className="ats-preview-label">{t('adminTools.approvalSettings.preview')}</span>{' '}
               <span className="ats-preview-text">
-                {subjectTemplate.replace('{{agreementTitle}}', 'Acme Corp Service Agreement')}
+                {subjectTemplate.replace('{{agreementTitle}}', t('adminTools.approvalSettings.previewSample'))}
               </span>
             </div>
           )}
@@ -230,10 +235,10 @@ export const ApprovalTaskSettings: React.FC = () => {
           disabled={saving || !hasChanges}
         >
           <FontAwesomeIcon icon={faSave} className="ats-save-icon" />
-          {saving ? 'Saving…' : 'Save Settings'}
+          {saving ? t('adminTools.approvalSettings.saving') : t('adminTools.approvalSettings.saveSettings')}
         </button>
         {!hasChanges && !saving && settings && (
-          <span className="ats-no-changes">No unsaved changes</span>
+          <span className="ats-no-changes">{t('adminTools.approvalSettings.noUnsavedChanges')}</span>
         )}
       </div>
     </div>

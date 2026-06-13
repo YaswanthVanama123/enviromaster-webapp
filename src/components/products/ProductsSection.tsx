@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 import "./ProductsSection.css";
 import { useActiveProductCatalog } from "../../backendservice/hooks";
 import type { ColumnKey, EnvProduct, ProductRow } from "./productsTypes";
@@ -352,13 +353,14 @@ type FrequencyCellProps = {
 };
 
 const FrequencyCell = React.memo(function FrequencyCell({ value, onChange }: FrequencyCellProps) {
+  const { t } = useTranslation();
   const frequencyOptions = [
-    { value: "", label: "Select..." },
-    { value: "daily", label: "Daily" },
-    { value: "weekly", label: "Weekly" },
-    { value: "bi-weekly", label: "Bi-Weekly" },
-    { value: "monthly", label: "Monthly" },
-    { value: "yearly", label: "Yearly" },
+    { value: "", label: t("products.frequency.select") },
+    { value: "daily", label: t("products.frequency.daily") },
+    { value: "weekly", label: t("products.frequency.weekly") },
+    { value: "bi-weekly", label: t("products.frequency.biweekly") },
+    { value: "monthly", label: t("products.frequency.monthly") },
+    { value: "yearly", label: t("products.frequency.yearly") },
   ];
 
   return (
@@ -408,6 +410,7 @@ const NameCell = React.memo(function NameCell({
   onChangeCustomName,
   onSelectCustom,
 }: NameCellProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -441,13 +444,13 @@ const NameCell = React.memo(function NameCell({
         <input
           className="in"
           value={customName ?? ""}
-          placeholder="Custom product..."
+          placeholder={t("products.name.customProductPlaceholder")}
           onChange={(e) => onChangeCustomName?.(e.target.value)}
         />
         {onRemove && (
           <button
             className="row-remove"
-            title="Remove row"
+            title={t("products.actions.removeRow")}
             type="button"
             onClick={onRemove}
           >
@@ -478,7 +481,7 @@ const NameCell = React.memo(function NameCell({
         onClick={() => setOpen((prev) => !prev)}
       >
         <span className="namecell-text">
-          {product?.name ?? "Select product..."}
+          {product?.name ?? t("products.name.selectProduct")}
         </span>
         <span className="namecell-caret">▾</span>
       </button>
@@ -486,7 +489,7 @@ const NameCell = React.memo(function NameCell({
       {onRemove && (
         <button
           className="row-remove"
-          title="Remove row"
+          title={t("products.actions.removeRow")}
           type="button"
           onClick={onRemove}
         >
@@ -498,14 +501,14 @@ const NameCell = React.memo(function NameCell({
         <div className="namecell-dropdown">
           <input
             className="namecell-search"
-            placeholder="Search product..."
+            placeholder={t("products.name.searchProduct")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="namecell-options">
             {filteredOptions.length === 0 ? (
               <div className="namecell-option namecell-option--empty">
-                No products
+                {t("products.name.noProducts")}
               </div>
             ) : (
               <>
@@ -525,7 +528,7 @@ const NameCell = React.memo(function NameCell({
                   className="namecell-option namecell-option--custom"
                   onClick={handleSelectCustom}
                 >
-                  + Custom product
+                  {t("products.name.addCustomProduct")}
                 </button>
               </>
             )}
@@ -694,6 +697,7 @@ function convertInitialToRows(
 
 const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>((props, ref) => {
   const { initialSmallProducts, initialDispensers, initialBigProducts, initialCustomColumns, activeTab, onTabChange, onTotalsChange } = props;
+  const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const servicesContext = useServicesContextOptional();
   const isSanicleanAllInclusive =
@@ -1263,10 +1267,10 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
     }
 
     if (product.kind) {
-      return `${product.kind} - Professional cleaning product`;
+      return t("products.descriptions.kindSuffix", { kind: product.kind });
     }
 
-    return 'Professional cleaning product for commercial use';
+    return t("products.descriptions.default");
   };
 
   const productsForReference = useMemo(() =>
@@ -1283,7 +1287,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
     return (
       <div className="reference-table-container">
         <div className="prod__ribbon">
-          <div className="prod__title">PRODUCTS REFERENCE - FOR SALESPEOPLE</div>
+          <div className="prod__title">{t("products.reference.productsTitle")}</div>
         </div>
         <div className="reference-table-wrapper" style={{
           overflowX: 'auto',
@@ -1299,12 +1303,12 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
           }}>
             <thead>
               <tr>
-                <th className="h h-blue" style={{ width: '20%', minWidth: '180px' }}>Product Name</th>
-                <th className="h h-blue" style={{ width: '30%', minWidth: '250px' }}>Description & Use Case</th>
-                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>Family</th>
-                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>Base Price</th>
-                <th className="h h-blue center" style={{ width: '10%', minWidth: '80px' }}>Unit</th>
-                <th className="h h-blue center" style={{ width: '16%', minWidth: '120px' }}>Case Info</th>
+                <th className="h h-blue" style={{ width: '20%', minWidth: '180px' }}>{t("products.reference.productName")}</th>
+                <th className="h h-blue" style={{ width: '30%', minWidth: '250px' }}>{t("products.reference.descriptionUseCase")}</th>
+                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>{t("products.reference.family")}</th>
+                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>{t("products.reference.basePrice")}</th>
+                <th className="h h-blue center" style={{ width: '10%', minWidth: '80px' }}>{t("products.reference.unit")}</th>
+                <th className="h h-blue center" style={{ width: '16%', minWidth: '120px' }}>{t("products.reference.caseInfo")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1340,20 +1344,20 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     fontWeight: '600',
                     color: '#059669'
                   }}>
-                    ${product.basePrice?.amount ? product.basePrice.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}
+                    ${product.basePrice?.amount ? product.basePrice.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : t("products.reference.notAvailable")}
                   </td>
                   <td className="center" style={{
                     padding: '12px 8px',
                     borderBottom: '1px solid #e5e7eb'
                   }}>
-                    {product.basePrice?.uom || 'Each'}
+                    {product.basePrice?.uom || t("products.reference.each")}
                   </td>
                   <td className="center" style={{
                     padding: '12px 8px',
                     borderBottom: '1px solid #e5e7eb',
                     fontSize: '12px'
                   }}>
-                    {product.quantityPerCase ? `${product.quantityPerCase} per case` : 'N/A'}
+                    {product.quantityPerCase ? t("products.reference.perCase", { count: product.quantityPerCase }) : t("products.reference.notAvailable")}
                     {product.basePrice?.unitSizeLabel && (
                       <div style={{fontSize: '11px', color: '#666', marginTop: '2px'}}>
                         {product.basePrice.unitSizeLabel}
@@ -1427,7 +1431,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
     return (
       <div className="reference-table-container">
         <div className="prod__ribbon">
-          <div className="prod__title">DISPENSERS REFERENCE - FOR SALESPEOPLE</div>
+          <div className="prod__title">{t("products.reference.dispensersTitle")}</div>
         </div>
         <div className="reference-table-wrapper" style={{
           overflowX: 'auto',
@@ -1443,13 +1447,13 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
           }}>
             <thead>
               <tr>
-                <th className="h h-blue" style={{ width: '18%', minWidth: '160px' }}>Dispenser Name</th>
-                <th className="h h-blue" style={{ width: '25%', minWidth: '220px' }}>Description & Use Case</th>
-                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>Base Price</th>
-                <th className="h h-blue center" style={{ width: '10%', minWidth: '80px' }}>Unit</th>
-                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>Warranty Rate</th>
-                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>Warranty Period</th>
-                <th className="h h-blue center" style={{ width: '11%', minWidth: '90px' }}>Best For</th>
+                <th className="h h-blue" style={{ width: '18%', minWidth: '160px' }}>{t("products.reference.dispenserName")}</th>
+                <th className="h h-blue" style={{ width: '25%', minWidth: '220px' }}>{t("products.reference.descriptionUseCase")}</th>
+                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>{t("products.reference.basePrice")}</th>
+                <th className="h h-blue center" style={{ width: '10%', minWidth: '80px' }}>{t("products.reference.unit")}</th>
+                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>{t("products.reference.warrantyRate")}</th>
+                <th className="h h-blue center" style={{ width: '12%', minWidth: '100px' }}>{t("products.reference.warrantyPeriod")}</th>
+                <th className="h h-blue center" style={{ width: '11%', minWidth: '90px' }}>{t("products.reference.bestFor")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1479,13 +1483,13 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     fontWeight: '600',
                     color: '#059669'
                   }}>
-                    ${dispenser.basePrice?.amount ? dispenser.basePrice.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}
+                    ${dispenser.basePrice?.amount ? dispenser.basePrice.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : t("products.reference.notAvailable")}
                   </td>
                   <td className="center" style={{
                     padding: '12px 8px',
                     borderBottom: '1px solid #e5e7eb'
                   }}>
-                    {dispenser.basePrice?.uom || 'Each'}
+                    {dispenser.basePrice?.uom || t("products.reference.each")}
                   </td>
                   <td className="center" style={{
                     padding: '12px 8px',
@@ -1493,14 +1497,14 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     fontWeight: '600',
                     color: '#dc2626'
                   }}>
-                    ${dispenser.warrantyPricePerUnit?.amount ? dispenser.warrantyPricePerUnit.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}
+                    ${dispenser.warrantyPricePerUnit?.amount ? dispenser.warrantyPricePerUnit.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : t("products.reference.notAvailable")}
                   </td>
                   <td className="center" style={{
                     padding: '12px 8px',
                     borderBottom: '1px solid #e5e7eb',
                     fontSize: '12px'
                   }}>
-                    {dispenser.warrantyPricePerUnit?.billingPeriod || 'Per week'}
+                    {dispenser.warrantyPricePerUnit?.billingPeriod || t("products.reference.perWeek")}
                   </td>
                   <td className="center" style={{
                     fontSize: '12px',
@@ -1509,10 +1513,10 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     padding: '12px 8px',
                     borderBottom: '1px solid #e5e7eb'
                   }}>
-                    {dispenser.name.toLowerCase().includes('automatic') || dispenser.name.toLowerCase().includes('sensor') ? 'High Traffic' :
-                     dispenser.name.toLowerCase().includes('premium') || dispenser.name.toLowerCase().includes('commercial') ? 'Commercial Use' :
-                     dispenser.name.toLowerCase().includes('basic') || dispenser.name.toLowerCase().includes('standard') ? 'Standard Use' :
-                     'All Areas'}
+                    {dispenser.name.toLowerCase().includes('automatic') || dispenser.name.toLowerCase().includes('sensor') ? t("products.reference.highTraffic") :
+                     dispenser.name.toLowerCase().includes('premium') || dispenser.name.toLowerCase().includes('commercial') ? t("products.reference.commercialUse") :
+                     dispenser.name.toLowerCase().includes('basic') || dispenser.name.toLowerCase().includes('standard') ? t("products.reference.standardUse") :
+                     t("products.reference.allAreas")}
                   </td>
                 </tr>
               ))}
@@ -1531,21 +1535,21 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
           className={`product-tab ${currentTab === 'form' ? 'active' : ''}`}
           onClick={() => handleTabChange('form')}
         >
-          Form
+          {t("products.tabs.form")}
         </button>
         <button
           type="button"
           className={`product-tab ${currentTab === 'products' ? 'active' : ''}`}
           onClick={() => handleTabChange('products')}
         >
-          Products Reference
+          {t("products.tabs.productsReference")}
         </button>
         <button
           type="button"
           className={`product-tab ${currentTab === 'dispensers' ? 'active' : ''}`}
           onClick={() => handleTabChange('dispensers')}
         >
-          Dispensers Reference
+          {t("products.tabs.dispensersReference")}
         </button>
       </div>
     </div>
@@ -1556,10 +1560,10 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
       <>
         <div className="prod__ribbon">
           <div className="prod__title prod__title--hasActions">
-            PRODUCTS
+            {t("products.section.products")}
             <div className="prod__title-actions">
               <button className="prod__add" onClick={addRowAll} type="button">
-                + Row
+                {t("products.buttons.addRow")}
               </button>
                 {}
             </div>
@@ -1571,12 +1575,12 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
             <thead>
               <tr>
                 {}
-                <th className="h h-blue">Products</th>
-                <th className="h h-blue center">Qty</th>
-                <th className="h h-blue center">Unit Price/Amount</th>
-                <th className="h h-blue center">Warranty</th>
-                <th className="h h-blue center">Frequency of Service</th>
-                <th className="h h-blue center">Total</th>
+                <th className="h h-blue">{t("products.table.products")}</th>
+                <th className="h h-blue center">{t("products.table.qty")}</th>
+                <th className="h h-blue center">{t("products.table.unitPriceAmount")}</th>
+                <th className="h h-blue center">{t("products.table.warranty")}</th>
+                <th className="h h-blue center">{t("products.table.frequencyOfService")}</th>
+                <th className="h h-blue center">{t("products.table.total")}</th>
                 {extraCols.products.map((col) => (
                   <th className="h h-blue center th-edit" key={col.id}>
                     <textarea
@@ -1589,7 +1593,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     />
                     <button
                       className="th-remove"
-                      title="Remove column"
+                      title={t("products.actions.removeColumn")}
                       type="button"
                       onClick={() => removeCol("products", col.id)}
                     >
@@ -1599,13 +1603,13 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                 ))}
 
                 {}
-                <th className="h h-blue">Dispensers</th>
-                <th className="h h-blue center">Qty</th>
-                <th className="h h-blue center">Warranty Rate</th>
-                <th className="h h-blue center">Replacement Rate/Install</th>
-                <th className="h h-blue center">Warranty</th>
-                <th className="h h-blue center">Frequency of Service</th>
-                <th className="h h-blue center">Total</th>
+                <th className="h h-blue">{t("products.table.dispensers")}</th>
+                <th className="h h-blue center">{t("products.table.qty")}</th>
+                <th className="h h-blue center">{t("products.table.warrantyRate")}</th>
+                <th className="h h-blue center">{t("products.table.replacementRateInstall")}</th>
+                <th className="h h-blue center">{t("products.table.warranty")}</th>
+                <th className="h h-blue center">{t("products.table.frequencyOfService")}</th>
+                <th className="h h-blue center">{t("products.table.total")}</th>
                 {extraCols.dispensers.map((col) => (
                   <th className="h h-blue center th-edit" key={col.id}>
                     <textarea
@@ -1618,7 +1622,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                     />
                     <button
                       className="th-remove"
-                      title="Remove column"
+                      title={t("products.actions.removeColumn")}
                       type="button"
                       onClick={() => removeCol("dispensers", col.id)}
                     >
@@ -1711,7 +1715,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                         <td className="center">
                           <input
                             type="checkbox"
-                            title="Check for recurring warranty billing; uncheck for one-time direct price"
+                            title={t("products.tooltips.productWarranty")}
                             checked={(rowProduct.costType ?? 'productCost') === 'warranty'}
                             onChange={(e) =>
                               updateRowField("products", rowProduct.id, {
@@ -1871,7 +1875,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                         <td className="center">
                           <input
                             type="checkbox"
-                            title="Check for recurring warranty billing; uncheck for one-time direct/replacement price"
+                            title={t("products.tooltips.dispenserWarranty")}
                             checked={(rowDisp.costType ?? 'productCost') === 'warranty'}
                             onChange={(e) =>
                               updateRowField("dispensers", rowDisp.id, {
@@ -1972,7 +1976,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
     <div className="gwrap">
       <div className="gactions">
         <button className="prod__add" onClick={onAddRow} type="button">
-          + Row
+          {t("products.buttons.addRow")}
         </button>
         {}
       </div>
@@ -2004,31 +2008,31 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
               <th className="h h-blue">{title}</th>
               {bucket === "products" ? (
                 <>
-                  <th className="h h-blue center">Qty</th>
-                  <th className="h h-blue center">Unit Price/Amount</th>
-                  <th className="h h-blue center">Warranty</th>
-                  <th className="h h-blue center">Frequency of Service</th>
-                  <th className="h h-blue center">Total</th>
+                  <th className="h h-blue center">{t("products.table.qty")}</th>
+                  <th className="h h-blue center">{t("products.table.unitPriceAmount")}</th>
+                  <th className="h h-blue center">{t("products.table.warranty")}</th>
+                  <th className="h h-blue center">{t("products.table.frequencyOfService")}</th>
+                  <th className="h h-blue center">{t("products.table.total")}</th>
                 </>
               ) : bucket === "dispensers" ? (
                 <>
-                  <th className="h h-blue center">Qty</th>
-                  <th className="h h-blue center">Warranty Rate</th>
+                  <th className="h h-blue center">{t("products.table.qty")}</th>
+                  <th className="h h-blue center">{t("products.table.warrantyRate")}</th>
                   <th className="h h-blue center">
-                    Replacement Rate/Install
+                    {t("products.table.replacementRateInstall")}
                   </th>
-                  <th className="h h-blue center">Warranty</th>
-                  <th className="h h-blue center">Frequency of Service</th>
-                  <th className="h h-blue center">Total</th>
+                  <th className="h h-blue center">{t("products.table.warranty")}</th>
+                  <th className="h h-blue center">{t("products.table.frequencyOfService")}</th>
+                  <th className="h h-blue center">{t("products.table.total")}</th>
                 </>
               ) : (
                 <>
-                  <th className="h h-blue center">Qty</th>
-                  <th className="h h-blue center">Amount</th>
+                  <th className="h h-blue center">{t("products.table.qty")}</th>
+                  <th className="h h-blue center">{t("products.table.amount")}</th>
                   <th className="h h-blue center">
-                    Frequency of Service
+                    {t("products.table.frequencyOfService")}
                   </th>
-                  <th className="h h-blue center">Total</th>
+                  <th className="h h-blue center">{t("products.table.total")}</th>
                 </>
               )}
               {extraCols[extraKey].map((col) => (
@@ -2043,7 +2047,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                   />
                   <button
                     className="th-remove"
-                    title="Remove column"
+                    title={t("products.actions.removeColumn")}
                     type="button"
                     onClick={() => removeCol(extraKey, col.id)}
                   >
@@ -2113,12 +2117,12 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
     return (
       <>
         <div className="prod__ribbon">
-          <div className="prod__title">PRODUCTS</div>
+          <div className="prod__title">{t("products.section.products")}</div>
         </div>
 
         {}
         <GroupedTable
-          title="Products"
+          title={t("products.table.products")}
           bucket="products"
           renderAmountCells={(row, product) => {
 
@@ -2164,7 +2168,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
                 <td className="center">
                   <input
                     type="checkbox"
-                    title="Check for recurring warranty billing; uncheck for one-time direct price"
+                    title={t("products.tooltips.productWarranty")}
                     checked={(row.costType ?? 'productCost') === 'warranty'}
                     onChange={(e) =>
                       updateRowField("products", row.id, {
@@ -2218,7 +2222,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
 
         {}
         <GroupedTable
-          title="Dispensers"
+          title={t("products.table.dispensers")}
           bucket="dispensers"
           renderAmountCells={(row, product) => (
             <>
@@ -2277,7 +2281,7 @@ const ProductsSection = forwardRef<ProductsSectionHandle, ProductsSectionProps>(
               <td className="center">
                 <input
                   type="checkbox"
-                  title="Check for recurring warranty billing; uncheck for one-time direct/replacement price"
+                  title={t("products.tooltips.dispenserWarranty")}
                   checked={(row.costType ?? 'productCost') === 'warranty'}
                   onChange={(e) =>
                     updateRowField("dispensers", row.id, {

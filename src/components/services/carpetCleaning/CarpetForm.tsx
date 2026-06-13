@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useCarpetCalc } from "./useCarpetCalc";
 import type { CarpetFormState, CarpetFrequency } from "./carpetTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
@@ -66,6 +67,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
   onQuoteChange,
   onRemove,
 }) => {
+  const { t } = useTranslation();
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
   );
@@ -282,7 +284,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
   return (
     <ServiceCardShell
-      title="CARPET CLEANING"
+      title={t("serviceForms.carpet.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -292,9 +294,9 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
-            <span className="svc-sr-only">Loading configuration...</span>
+            <span className="svc-sr-only">{t("serviceForms.common.loadingConfiguration")}</span>
           </div>
-          <p className="svc-loading-text">Loading configuration...</p>
+          <p className="svc-loading-text">{t("serviceForms.common.loadingConfiguration")}</p>
         </div>
       )}
 
@@ -306,7 +308,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       />
 
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <SelectField
             label=""
@@ -323,7 +325,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       </div>
 
       <div className="svc-row">
-        <label>First {form.unitSqFt || 500} sq ft Rate</label>
+        <label>{t("serviceForms.carpet.firstSqftRate", { units: form.unitSqFt || 500 })}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -343,7 +345,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
               onFocus={editable.onFocus}
               onBlur={editable.onBlur}
               style={overrideStyle(form.customFirstUnitRate !== undefined)}
-              title={`Rate for first ${form.unitSqFt || 500} sq ft (from backend, editable)`}
+              title={t("serviceForms.carpet.firstSqftRateTitle", { units: form.unitSqFt || 500 })}
             />
           </div>
           <span className="svc-small">
@@ -361,7 +363,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       </div>
 
       <div className="svc-row">
-        <label>Additional Rate</label>
+        <label>{t("serviceForms.carpet.additionalRate")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -381,7 +383,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
               onFocus={editable.onFocus}
               onBlur={editable.onBlur}
               style={overrideStyle(form.customAdditionalUnitRate !== undefined)}
-              title={`Rate per additional ${form.unitSqFt || 500} sq ft block (from backend, editable)`}
+              title={t("serviceForms.carpet.additionalRateTitle", { units: form.unitSqFt || 500 })}
             />
           </div>
           <span className="svc-small">
@@ -399,7 +401,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
       </div>
 
       <div className="svc-row">
-        <label>Minimum Charge</label>
+        <label>{t("serviceForms.common.minimumCharge")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -419,23 +421,23 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
               onFocus={editable.onFocus}
               onBlur={editable.onBlur}
               style={overrideStyle(form.customPerVisitMinimum !== undefined)}
-              title="Minimum charge per visit (from backend, editable)"
+              title={t("serviceForms.carpet.minimumChargeTitle")}
             />
           </div>
-          <span className="svc-small">/ visit</span>
+          <span className="svc-small">{t("serviceForms.carpet.perVisit")}</span>
           <span style={{ marginLeft: "10px" }}>
             <Checkbox
               name="applyMinimum"
               checked={form.applyMinimum !== false}
               onChange={onChange as any}
-              label="Apply Minimum"
+              label={t("serviceForms.common.applyMinimum")}
             />
           </span>
         </div>
       </div>
 
       <div className="svc-row">
-        <label>Carpet Area</label>
+        <label>{t("serviceForms.carpet.carpetArea")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -445,12 +447,12 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
             value={form.areaSqFt || ""}
             onChange={onChange as any}
           />
-          <span className="svc-small">sq ft</span>
+          <span className="svc-small">{t("serviceForms.common.sqFt")}</span>
           <span>@</span>
           <span className="svc-small">
             {form.areaSqFt > 0 && form.areaSqFt <= (form.unitSqFt || 500)
-              ? `first ${form.unitSqFt || 500} rate`
-              : `calculated rate`}
+              ? t("serviceForms.carpet.firstRate", { units: form.unitSqFt || 500 })
+              : t("serviceForms.carpet.calculatedRate")}
           </span>
           <span>=</span>
           <div className="svc-dollar field-qty">
@@ -471,45 +473,48 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
               onFocus={editable.onFocus}
               onBlur={editable.onBlur}
               style={overrideStyle(form.customPerVisitPrice !== undefined)}
-              title="Per visit total (editable)"
+              title={t("serviceForms.carpet.perVisitTotalTitle")}
             />
           </div>
         </div>
       </div>
 
       <div className="svc-row">
-        <label>Calculation Method</label>
+        <label>{t("serviceForms.common.calculationMethod")}</label>
         <div className="svc-row-right">
           <Checkbox
             name="useExactSqft"
             checked={form.useExactSqft}
             onChange={onChange as any}
-            label="Exact sq ft calculation"
+            label={t("serviceForms.common.exactSqftCalculation")}
           />
           <small style={{ color: "#666", fontSize: "11px", marginLeft: "10px" }}>
             {form.useExactSqft
-              ? `(Excess × $${(
-                  ((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) /
-                  (form.unitSqFt || 500)
-                ).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}/sq ft)`
-              : `(Excess in ${form.unitSqFt || 500} sq ft blocks × $${
-                  (form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125
-                })`}
+              ? t("serviceForms.carpet.exactCalc", {
+                  perSqFt: (
+                    ((form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125) /
+                    (form.unitSqFt || 500)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }),
+                })
+              : t("serviceForms.carpet.blockCalc", {
+                  units: form.unitSqFt || 500,
+                  block: (form.customAdditionalUnitRate ?? form.additionalUnitRate) || 125,
+                })}
           </small>
         </div>
       </div>
 
       <div className="svc-row">
-        <label>Installation</label>
+        <label>{t("serviceForms.carpet.installation")}</label>
         <div className="svc-row-right">
           <Checkbox
             name="includeInstall"
             checked={form.includeInstall}
             onChange={onChange as any}
-            label="Include Install"
+            label={t("serviceForms.carpet.includeInstall")}
           />
           {form.includeInstall && (
             <>
@@ -517,7 +522,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 name="isDirtyInstall"
                 checked={form.isDirtyInstall}
                 onChange={onChange as any}
-                label="Dirty"
+                label={t("serviceForms.carpet.dirty")}
               />
               <div className="svc-dollar">
                 <span>×</span>
@@ -537,10 +542,10 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                       : form.installMultiplierClean || ""
                   }
                   onChange={onChange as any}
-                  title={`${form.isDirtyInstall ? "Dirty" : "Clean"} install multiplier (from backend)`}
+                  title={t("serviceForms.carpet.installMultiplierTitle", { type: form.isDirtyInstall ? t("serviceForms.carpet.dirtyType") : t("serviceForms.carpet.cleanType") })}
                 />
               </div>
-              <span className="svc-small">monthly base</span>
+              <span className="svc-small">{t("serviceForms.carpet.monthlyBase")}</span>
             </>
           )}
         </div>
@@ -548,7 +553,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
       {form.includeInstall && calc.installOneTime > 0 && (
         <div className="svc-row svc-row-charge">
-          <label>Installation Total</label>
+          <label>{t("serviceForms.common.installationTotal")}</label>
           <div className="svc-row-right">
             <div className="svc-dollar">
               <span>$</span>
@@ -568,7 +573,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 onFocus={editable.onFocus}
                 onBlur={editable.onBlur}
                 style={overrideStyle(form.customInstallationFee !== undefined)}
-                title="Installation fee total (editable)"
+                title={t("serviceForms.carpet.installationFeeTitle")}
               />
             </div>
           </div>
@@ -581,8 +586,8 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
           form.frequency === "quarterly" ||
           form.frequency === "biannual" ||
           form.frequency === "annual"
-            ? "Recurring Visit Total"
-            : "Per Visit Total"}
+            ? t("serviceForms.common.recurringVisitTotal")
+            : t("serviceForms.common.perVisitTotal")}
         </label>
         <div className="svc-dollar">
           $
@@ -611,8 +616,8 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
               form.frequency === "quarterly" ||
               form.frequency === "biannual" ||
               form.frequency === "annual"
-                ? "Recurring visit total - editable"
-                : "Per visit total - editable"
+                ? t("serviceForms.carpet.recurringVisitTitle")
+                : t("serviceForms.carpet.perVisitEditTitle")
             }
           />
         </div>
@@ -624,11 +629,11 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.3 ? (
               <span className="em-pricing-tier em-pricing-tier--green">
-                <FaCircle color="#16a34a" /> Greenline Pricing
+                <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
               </span>
             ) : (
               <span className="em-pricing-tier em-pricing-tier--red">
-                <FaCircle color="#dc2626" /> Redline Pricing
+                <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
               </span>
             )}
           </div>
@@ -637,7 +642,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
       {form.frequency === "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Total Price</label>
+          <label>{t("serviceForms.common.totalPrice")}</label>
           <div className="svc-dollar">
             $
             <input
@@ -667,7 +672,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
       {calc.isVisitBasedFrequency && form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>First Visit Total</label>
+          <label>{t("serviceForms.common.firstVisitTotal")}</label>
           <div className="svc-dollar">
             $
             <input
@@ -690,7 +695,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 border: "none",
                 width: "100px",
               }}
-              title="First visit total - editable"
+              title={t("serviceForms.carpet.firstVisitTitle")}
             />
           </div>
         </div>
@@ -698,7 +703,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
       {!calc.isVisitBasedFrequency && form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>First Month Total</label>
+          <label>{t("serviceForms.common.firstMonthTotal")}</label>
           <div className="svc-dollar">
             $
             <input
@@ -721,7 +726,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 border: "none",
                 width: "100px",
               }}
-              title="First month total - editable"
+              title={t("serviceForms.carpet.firstMonthTitle")}
             />
           </div>
         </div>
@@ -732,7 +737,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
         form.frequency === "monthly" ||
         form.frequency === "twicePerMonth") && (
         <div className="svc-row svc-row-total">
-          <label>Recurring Month Total</label>
+          <label>{t("serviceForms.carpet.recurringMonthTotal")}</label>
           <div className="svc-dollar">
             $
             <input
@@ -755,7 +760,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 border: "none",
                 width: "100px",
               }}
-              title="Recurring month total - editable"
+              title={t("serviceForms.carpet.recurringMonthTitle")}
             />
           </div>
         </div>
@@ -763,7 +768,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
 
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div
             className="svc-row-right"
             style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -776,7 +781,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
             >
               {getContractOptions(form.frequency).map((m) => (
                 <option key={m} value={m}>
-                  {m} months
+                  {t("serviceForms.common.months", { count: m })}
                 </option>
               ))}
             </select>
@@ -808,7 +813,7 @@ export const CarpetForm: React.FC<ServiceInitialData<CarpetFormState>> = ({
                 padding: "4px",
                 width: "140px",
               }}
-              title="Contract total - editable"
+              title={t("serviceForms.carpet.contractTotalTitle")}
             />
           </div>
         </div>

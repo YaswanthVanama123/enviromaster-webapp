@@ -1,12 +1,13 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mapDistanceApi, MapDistanceSyncJob, MapDistanceStats, MapDistanceRecord, RouteStarCustomerOption } from '../../../backendservice/api/mapDistanceApi';
 import { MdRefresh, MdCancel, MdStorage, MdHistory, MdPerson, MdCalendarToday, MdLocationOn, MdStraighten, MdCheckCircle, MdError, MdSchedule, MdSync, MdPlayArrow, MdPause, MdFilterList, MdClose, MdExpandMore, MdDeleteForever } from 'react-icons/md';
 import './MapDistanceUpdateTab.css';
 
 export const MapDistanceUpdateTab: React.FC = () => {
-  
+  const { t } = useTranslation();
   const [syncStatus, setSyncStatus] = useState<{ isRunning: boolean; isInterrupted: boolean; isPaused: boolean; job: MapDistanceSyncJob | null }>({
     isRunning: false,
     isInterrupted: false,
@@ -115,9 +116,9 @@ export const MapDistanceUpdateTab: React.FC = () => {
   };
 
   const getSelectedCustomerName = () => {
-    if (!selectedCustomerId) return 'All Customers';
+    if (!selectedCustomerId) return t('adminTools.mapDistanceUpdate.allCustomers');
     const customer = customersWithData.find(c => c._id === selectedCustomerId);
-    return customer?.name || 'Unknown';
+    return customer?.name || t('adminTools.mapDistanceUpdate.unknown');
   };
 
   const filteredCustomers = customersWithData.filter(c =>
@@ -141,7 +142,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
       checkSyncStatus();
       setSelectedCustomerId(null);
     } else {
-      setError(result.error || 'Failed to delete records');
+      setError(result.error || t('adminTools.mapDistanceUpdate.failedToDelete'));
     }
   };
 
@@ -151,7 +152,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
     if (result.success) {
       checkSyncStatus();
     } else {
-      setError(result.error || 'Failed to start update sync');
+      setError(result.error || t('adminTools.mapDistanceUpdate.failedToStartUpdate'));
     }
   };
 
@@ -169,7 +170,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
       checkSyncStatus();
       loadSyncHistory();
     } else {
-      setError(result.error || 'Failed to pause sync');
+      setError(result.error || t('adminTools.mapDistanceUpdate.failedToPauseSync'));
     }
   };
 
@@ -187,7 +188,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
     if (result.success) {
       checkSyncStatus();
     } else {
-      setError(result.error || 'Failed to resume sync');
+      setError(result.error || t('adminTools.mapDistanceUpdate.failedToResumeSync'));
     }
   };
 
@@ -205,9 +206,9 @@ export const MapDistanceUpdateTab: React.FC = () => {
 
   const getJobTypeLabel = (jobType: string) => {
     switch (jobType) {
-      case 'single_fetch': return 'Single Fetch';
-      case 'full_sync': return 'Full Sync';
-      case 'update_sync': return 'Update Sync';
+      case 'single_fetch': return t('adminTools.mapDistanceUpdate.jobTypeSingleFetch');
+      case 'full_sync': return t('adminTools.mapDistanceUpdate.jobTypeFullSync');
+      case 'update_sync': return t('adminTools.mapDistanceUpdate.jobTypeUpdateSync');
       default: return jobType;
     }
   };
@@ -236,9 +237,9 @@ export const MapDistanceUpdateTab: React.FC = () => {
       <div className="mdu-header">
         <div className="mdu-header-top">
           <div>
-            <h2>Update Distance Data</h2>
+            <h2>{t('adminTools.mapDistanceUpdate.title')}</h2>
             <p className="mdu-subtitle">
-              Refresh and update existing map distance records from RouteStar
+              {t('adminTools.mapDistanceUpdate.subtitle')}
             </p>
           </div>
           <div className="mdu-header-actions">
@@ -246,17 +247,17 @@ export const MapDistanceUpdateTab: React.FC = () => {
               <>
                 <button className="mdu-pause-btn" onClick={handlePauseSync}>
                   <MdPause size={18} />
-                  Pause
+                  {t('adminTools.mapDistanceUpdate.pause')}
                 </button>
                 <button className="mdu-cancel-btn" onClick={handleCancelSync}>
                   <MdCancel size={18} />
-                  Cancel
+                  {t('adminTools.mapDistanceUpdate.cancel')}
                 </button>
               </>
             ) : (isUpdateSyncInterrupted || isUpdateSyncPaused) ? (
               <button className="mdu-resume-btn" onClick={() => syncStatus.job && handleResumeSync(syncStatus.job._id)}>
                 <MdPlayArrow size={18} />
-                Resume Update ({syncStatus.job?.processedCustomers}/{syncStatus.job?.totalCustomers})
+                {t('adminTools.mapDistanceUpdate.resumeUpdate', { processed: syncStatus.job?.processedCustomers, total: syncStatus.job?.totalCustomers })}
               </button>
             ) : (
               <>
@@ -267,18 +268,18 @@ export const MapDistanceUpdateTab: React.FC = () => {
                 >
                   <MdRefresh size={18} />
                   {stats && stats.customersWithData > 0
-                    ? `Update All Data (${stats.customersWithData} customers)`
-                    : 'No Data to Update'
+                    ? t('adminTools.mapDistanceUpdate.updateAllData', { count: stats.customersWithData })
+                    : t('adminTools.mapDistanceUpdate.noDataToUpdate')
                   }
                 </button>
                 <button
                   className="mdu-delete-btn"
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={!stats || stats.totalRecords === 0 || isJobRunning}
-                  title="Delete all records and start fresh"
+                  title={t('adminTools.mapDistanceUpdate.deleteAllTitle')}
                 >
                   <MdDeleteForever size={18} />
-                  Delete All
+                  {t('adminTools.mapDistanceUpdate.deleteAll')}
                 </button>
               </>
             )}
@@ -291,11 +292,10 @@ export const MapDistanceUpdateTab: React.FC = () => {
             <div className="mdu-modal">
               <div className="mdu-modal-header">
                 <MdDeleteForever size={24} color="#dc2626" />
-                <h3>Delete All Records?</h3>
+                <h3>{t('adminTools.mapDistanceUpdate.deleteRecordsTitle')}</h3>
               </div>
               <p className="mdu-modal-text">
-                This will permanently delete all {stats?.totalRecords.toLocaleString()} distance records
-                and sync history. You'll need to run a new sync to get fresh data.
+                {t('adminTools.mapDistanceUpdate.deleteRecordsText', { count: stats?.totalRecords.toLocaleString() })}
               </p>
               <div className="mdu-modal-actions">
                 <button
@@ -303,14 +303,14 @@ export const MapDistanceUpdateTab: React.FC = () => {
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
                 >
-                  Cancel
+                  {t('adminTools.mapDistanceUpdate.cancel')}
                 </button>
                 <button
                   className="mdu-modal-delete"
                   onClick={handleDeleteAllRecords}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? 'Deleting...' : 'Yes, Delete All'}
+                  {isDeleting ? t('adminTools.mapDistanceUpdate.deleting') : t('adminTools.mapDistanceUpdate.yesDeleteAll')}
                 </button>
               </div>
             </div>
@@ -322,15 +322,15 @@ export const MapDistanceUpdateTab: React.FC = () => {
           <div className="mdu-stats-bar">
             <div className="mdu-stat">
               <span className="mdu-stat-value">{stats.totalRecords.toLocaleString()}</span>
-              <span className="mdu-stat-label">Total Records</span>
+              <span className="mdu-stat-label">{t('adminTools.mapDistanceUpdate.totalRecords')}</span>
             </div>
             <div className="mdu-stat">
               <span className="mdu-stat-value">{stats.customersWithData.toLocaleString()}</span>
-              <span className="mdu-stat-label">Customers with Data</span>
+              <span className="mdu-stat-label">{t('adminTools.mapDistanceUpdate.customersWithData')}</span>
             </div>
             <div className="mdu-stat">
-              <span className="mdu-stat-value">{stats.lastSyncAt ? formatDate(stats.lastSyncAt) : 'Never'}</span>
-              <span className="mdu-stat-label">Last Sync</span>
+              <span className="mdu-stat-value">{stats.lastSyncAt ? formatDate(stats.lastSyncAt) : t('adminTools.mapDistanceUpdate.never')}</span>
+              <span className="mdu-stat-label">{t('adminTools.mapDistanceUpdate.lastSync')}</span>
             </div>
           </div>
         )}
@@ -338,7 +338,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
         {/* Error */}
         {error && (
           <div className="mdu-error">
-            <strong>Error:</strong> {error}
+            <strong>{t('adminTools.mapDistanceUpdate.error')}</strong> {error}
           </div>
         )}
 
@@ -348,7 +348,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
             <div className="mdu-sync-progress-header">
               <span className="mdu-sync-progress-title">
                 <MdRefresh className="mdu-spin" size={16} />
-                Updating: {syncStatus.job.currentCustomerName || 'Starting...'}
+                {t('adminTools.mapDistanceUpdate.updating', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistanceUpdate.starting') })}
               </span>
               <span className="mdu-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -362,13 +362,13 @@ export const MapDistanceUpdateTab: React.FC = () => {
             </div>
             <div className="mdu-sync-stats">
               <span className="mdu-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistanceUpdate.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="mdu-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistanceUpdate.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="mdu-sync-stat records">
-                {syncStatus.job.recordsCreated} records updated
+                {t('adminTools.mapDistanceUpdate.recordsUpdated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
           </div>
@@ -380,7 +380,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
             <div className="mdu-sync-progress-header">
               <span className="mdu-sync-progress-title">
                 <MdError size={16} color="#f59e0b" />
-                Update Interrupted: {syncStatus.job.currentCustomerName || 'Unknown'}
+                {t('adminTools.mapDistanceUpdate.updateInterrupted', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistanceUpdate.unknown') })}
               </span>
               <span className="mdu-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -394,23 +394,23 @@ export const MapDistanceUpdateTab: React.FC = () => {
             </div>
             <div className="mdu-sync-stats">
               <span className="mdu-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistanceUpdate.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="mdu-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistanceUpdate.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="mdu-sync-stat records">
-                {syncStatus.job.recordsCreated} records updated
+                {t('adminTools.mapDistanceUpdate.recordsUpdated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
             <div className="mdu-sync-actions">
               <button className="mdu-resume-btn" onClick={() => handleResumeSync(syncStatus.job!._id)}>
                 <MdPlayArrow size={16} />
-                Resume Update
+                {t('adminTools.mapDistanceUpdate.resumeUpdateShort')}
               </button>
               <button className="mdu-reset-btn" onClick={handleResetStuckJob}>
                 <MdCancel size={16} />
-                Cancel & Reset
+                {t('adminTools.mapDistanceUpdate.cancelAndReset')}
               </button>
             </div>
           </div>
@@ -422,7 +422,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
             <div className="mdu-sync-progress-header">
               <span className="mdu-sync-progress-title">
                 <MdPause size={16} color="#6366f1" />
-                Update Paused: {syncStatus.job.currentCustomerName || 'Unknown'}
+                {t('adminTools.mapDistanceUpdate.updatePaused', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistanceUpdate.unknown') })}
               </span>
               <span className="mdu-sync-progress-count">
                 {syncStatus.job.processedCustomers} / {syncStatus.job.totalCustomers}
@@ -436,23 +436,23 @@ export const MapDistanceUpdateTab: React.FC = () => {
             </div>
             <div className="mdu-sync-stats">
               <span className="mdu-sync-stat success">
-                {syncStatus.job.successfulCustomers} successful
+                {t('adminTools.mapDistanceUpdate.successful', { count: syncStatus.job.successfulCustomers })}
               </span>
               <span className="mdu-sync-stat failed">
-                {syncStatus.job.failedCustomers} failed
+                {t('adminTools.mapDistanceUpdate.failedCount', { count: syncStatus.job.failedCustomers })}
               </span>
               <span className="mdu-sync-stat records">
-                {syncStatus.job.recordsCreated} records updated
+                {t('adminTools.mapDistanceUpdate.recordsUpdated', { count: syncStatus.job.recordsCreated })}
               </span>
             </div>
             <div className="mdu-sync-actions">
               <button className="mdu-resume-btn" onClick={() => handleResumeSync(syncStatus.job!._id)}>
                 <MdPlayArrow size={16} />
-                Resume Update
+                {t('adminTools.mapDistanceUpdate.resumeUpdateShort')}
               </button>
               <button className="mdu-reset-btn" onClick={handleResetStuckJob}>
                 <MdCancel size={16} />
-                Cancel
+                {t('adminTools.mapDistanceUpdate.cancel')}
               </button>
             </div>
           </div>
@@ -466,14 +466,14 @@ export const MapDistanceUpdateTab: React.FC = () => {
           onClick={() => setViewMode('records')}
         >
           <MdStorage size={16} />
-          Stored Records
+          {t('adminTools.mapDistanceUpdate.storedRecords')}
         </button>
         <button
           className={`mdu-view-tab ${viewMode === 'history' ? 'active' : ''}`}
           onClick={() => { setViewMode('history'); loadSyncHistory(); }}
         >
           <MdHistory size={16} />
-          Update History
+          {t('adminTools.mapDistanceUpdate.updateHistory')}
         </button>
       </div>
 
@@ -485,7 +485,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
             <div className="mdu-filter-section">
               <div className="mdu-filter-label">
                 <MdFilterList size={16} />
-                Select Source Customer:
+                {t('adminTools.mapDistanceUpdate.selectSourceCustomer')}
               </div>
               <div className="mdu-filter-dropdown" ref={filterDropdownRef}>
                 <button
@@ -503,7 +503,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
                     <input
                       type="text"
                       className="mdu-filter-search"
-                      placeholder="Search customers..."
+                      placeholder={t('adminTools.mapDistanceUpdate.searchCustomersPlaceholder')}
                       value={filterSearch}
                       onChange={(e) => setFilterSearch(e.target.value)}
                       autoFocus
@@ -513,8 +513,8 @@ export const MapDistanceUpdateTab: React.FC = () => {
                         className={`mdu-filter-option ${selectedCustomerId === null ? 'selected' : ''}`}
                         onClick={() => handleCustomerFilterSelect(null)}
                       >
-                        <span className="mdu-option-name">All Customers</span>
-                        <span className="mdu-option-details">{customersWithData.length} customers with data</span>
+                        <span className="mdu-option-name">{t('adminTools.mapDistanceUpdate.allCustomers')}</span>
+                        <span className="mdu-option-details">{t('adminTools.mapDistanceUpdate.customersWithDataCount', { count: customersWithData.length })}</span>
                       </div>
                       {filteredCustomers.map(customer => (
                         <div
@@ -530,7 +530,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
                         </div>
                       ))}
                       {filteredCustomers.length === 0 && filterSearch && (
-                        <div className="mdu-filter-empty">No customers found</div>
+                        <div className="mdu-filter-empty">{t('adminTools.mapDistanceUpdate.noCustomersFound')}</div>
                       )}
                     </div>
                   </div>
@@ -540,10 +540,10 @@ export const MapDistanceUpdateTab: React.FC = () => {
                 <button
                   className="mdu-filter-clear"
                   onClick={() => handleCustomerFilterSelect(null)}
-                  title="Clear filter"
+                  title={t('adminTools.mapDistanceUpdate.clearFilterTitle')}
                 >
                   <MdClose size={16} />
-                  Clear
+                  {t('adminTools.mapDistanceUpdate.clear')}
                 </button>
               )}
             </div>
@@ -554,11 +554,11 @@ export const MapDistanceUpdateTab: React.FC = () => {
               <div className="mdu-empty-icon">
                 <MdStorage size={48} />
               </div>
-              <h3>{selectedCustomerId ? 'No Distance Data' : 'No Stored Records'}</h3>
+              <h3>{selectedCustomerId ? t('adminTools.mapDistanceUpdate.noDistanceDataTitle') : t('adminTools.mapDistanceUpdate.noStoredRecordsTitle')}</h3>
               <p>
                 {selectedCustomerId
-                  ? `No distance data found for ${getSelectedCustomerName()}. This customer may need to be re-synced.`
-                  : 'No distance records found. Run a full sync from the Map Distance tab first, then select a source customer to view distances.'
+                  ? t('adminTools.mapDistanceUpdate.noDistanceDataText', { name: getSelectedCustomerName() })
+                  : t('adminTools.mapDistanceUpdate.noStoredRecordsText')
                 }
               </p>
               {selectedCustomerId && (
@@ -568,7 +568,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
                   onClick={() => handleCustomerFilterSelect(null)}
                 >
                   <MdClose size={16} />
-                  Clear Selection
+                  {t('adminTools.mapDistanceUpdate.clearSelection')}
                 </button>
               )}
             </div>
@@ -577,8 +577,8 @@ export const MapDistanceUpdateTab: React.FC = () => {
               <div className="mdu-records-header">
                 <span>
                   {selectedCustomerId
-                    ? `Showing ${storedRecords.length} of ${totalRecords} destinations from ${getSelectedCustomerName()} (50 per page)`
-                    : `Showing ${storedRecords.length} of ${totalRecords} records (select a source customer to filter)`
+                    ? t('adminTools.mapDistanceUpdate.showingFiltered', { shown: storedRecords.length, total: totalRecords, name: getSelectedCustomerName() })
+                    : t('adminTools.mapDistanceUpdate.showingAll', { shown: storedRecords.length, total: totalRecords })
                   }
                 </span>
                 {totalPages > 1 && (
@@ -587,14 +587,14 @@ export const MapDistanceUpdateTab: React.FC = () => {
                       onClick={() => loadStoredRecords(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
-                      Previous
+                      {t('adminTools.mapDistanceUpdate.previous')}
                     </button>
-                    <span>Page {currentPage} of {totalPages}</span>
+                    <span>{t('adminTools.mapDistanceUpdate.pageOf', { current: currentPage, total: totalPages })}</span>
                     <button
                       onClick={() => loadStoredRecords(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      Next
+                      {t('adminTools.mapDistanceUpdate.next')}
                     </button>
                   </div>
                 )}
@@ -603,13 +603,13 @@ export const MapDistanceUpdateTab: React.FC = () => {
                 <table className="mdu-table">
                   <thead>
                     <tr>
-                      <th><MdLocationOn size={14} /> Destination Customer</th>
-                      <th><MdPerson size={14} /> Assigned To</th>
-                      <th>Frequency</th>
-                      <th><MdCalendarToday size={14} /> Date</th>
-                      <th>Day</th>
-                      <th>Stop</th>
-                      <th><MdStraighten size={14} /> Distance</th>
+                      <th><MdLocationOn size={14} /> {t('adminTools.mapDistanceUpdate.colDestinationCustomer')}</th>
+                      <th><MdPerson size={14} /> {t('adminTools.mapDistanceUpdate.colAssignedTo')}</th>
+                      <th>{t('adminTools.mapDistanceUpdate.colFrequency')}</th>
+                      <th><MdCalendarToday size={14} /> {t('adminTools.mapDistanceUpdate.colDate')}</th>
+                      <th>{t('adminTools.mapDistanceUpdate.colDay')}</th>
+                      <th>{t('adminTools.mapDistanceUpdate.colStop')}</th>
+                      <th><MdStraighten size={14} /> {t('adminTools.mapDistanceUpdate.colDistance')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -624,7 +624,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
                         <td>{record.dayOfWeek || '-'}</td>
                         <td>{record.stopNumber || '-'}</td>
                         <td className="mdu-distance">
-                          {record.distanceMiles ? `${record.distanceMiles.toFixed(2)} mi` : record.distanceRaw || '-'}
+                          {record.distanceMiles ? t('adminTools.mapDistanceUpdate.miles', { value: record.distanceMiles.toFixed(2) }) : record.distanceRaw || '-'}
                         </td>
                       </tr>
                     ))}
@@ -644,22 +644,22 @@ export const MapDistanceUpdateTab: React.FC = () => {
               <div className="mdu-empty-icon">
                 <MdHistory size={48} />
               </div>
-              <h3>No Update History</h3>
-              <p>No sync jobs have been run yet.</p>
+              <h3>{t('adminTools.mapDistanceUpdate.noUpdateHistoryTitle')}</h3>
+              <p>{t('adminTools.mapDistanceUpdate.noUpdateHistoryText')}</p>
             </div>
           ) : (
             <div className="mdu-table-container">
               <table className="mdu-table">
                 <thead>
                   <tr>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Started</th>
-                    <th>Completed</th>
-                    <th>Customers</th>
-                    <th>Records</th>
-                    <th>Errors</th>
-                    <th>Action</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colType')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colStatus')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colStarted')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colCompleted')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colCustomers')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colRecords')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colErrors')}</th>
+                    <th>{t('adminTools.mapDistanceUpdate.colAction')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -686,31 +686,31 @@ export const MapDistanceUpdateTab: React.FC = () => {
                           <button
                             className="mdu-resume-btn"
                             onClick={() => handleResumeSync(job._id)}
-                            title="Resume sync"
+                            title={t('adminTools.mapDistanceUpdate.resumeSyncTitle')}
                             disabled={isJobRunning}
                           >
                             <MdPlayArrow size={16} />
-                            Resume
+                            {t('adminTools.mapDistanceUpdate.resume')}
                           </button>
                         )}
                         {job.status === 'running' && !syncStatus.isRunning && (
                           <button
                             className="mdu-resume-btn"
                             onClick={() => handleResumeSync(job._id)}
-                            title="Resume interrupted sync"
+                            title={t('adminTools.mapDistanceUpdate.resumeInterruptedTitle')}
                           >
                             <MdPlayArrow size={16} />
-                            Resume
+                            {t('adminTools.mapDistanceUpdate.resume')}
                           </button>
                         )}
                         {job.status === 'running' && syncStatus.isRunning && (
                           <button
                             className="mdu-reset-btn"
                             onClick={handleResetStuckJob}
-                            title="Reset stuck job"
+                            title={t('adminTools.mapDistanceUpdate.resetStuckTitle')}
                           >
                             <MdCancel size={16} />
-                            Reset
+                            {t('adminTools.mapDistanceUpdate.reset')}
                           </button>
                         )}
                       </td>

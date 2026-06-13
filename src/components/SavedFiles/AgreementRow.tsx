@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFolder, faFolderOpen, faChevronDown, faChevronRight,
@@ -23,13 +24,13 @@ function timeAgo(iso: string) {
   return `${sec} sec ago`;
 }
 
-function formatDeletionMeta(deletedBy?: string | null, deletedAt?: string | null) {
+function formatDeletionMeta(t: (key: string, opts?: Record<string, unknown>) => string, deletedBy?: string | null, deletedAt?: string | null) {
   const parts: string[] = [];
-  if (deletedBy) parts.push(`by ${deletedBy}`);
+  if (deletedBy) parts.push(t("savedFiles.rows.deletedBy", { name: deletedBy }));
   if (deletedAt) {
     const timestamp = new Date(deletedAt);
     if (!Number.isNaN(timestamp.getTime())) {
-      parts.push(`on ${timestamp.toLocaleString()}`);
+      parts.push(t("savedFiles.rows.deletedOn", { date: timestamp.toLocaleString() }));
     }
   }
   return parts.length > 0 ? parts.join(" ") : null;
@@ -96,6 +97,7 @@ interface AgreementRowProps {
 }
 
 export const AgreementRow = memo((props: AgreementRowProps) => {
+  const { t } = useTranslation();
   const {
     agreement,
     isExpanded,
@@ -128,7 +130,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
     file.hasPdf || file.fileType === 'version_log' || file.fileType === 'attached_pdf'
   );
 
-  const agreementDeletionInfo = isTrashView ? formatDeletionMeta(agreement.deletedBy, agreement.deletedAt) : null;
+  const agreementDeletionInfo = isTrashView ? formatDeletionMeta(t, agreement.deletedBy, agreement.deletedAt) : null;
   const hasActiveVersions = agreement.files.some(file =>
     file.fileType === 'version_pdf' && file.isDeleted !== true
   );
@@ -228,7 +230,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
           fontSize: '13px',
           color: '#6b7280'
         }}>
-          <span>{agreement.fileCount} files</span>
+          <span>{t("savedFiles.rows.filesCount", { count: agreement.fileCount })}</span>
           <span>{timeAgo(agreement.latestUpdate)}</span>
           {agreement.hasUploads && (
               <span style={{
@@ -243,7 +245,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 gap: '4px'
               }}>
                 <FontAwesomeIcon icon={faCloudUploadAlt} style={{ fontSize: '10px' }} />
-                Bigin
+                {t("savedFiles.rows.bigin")}
               </span>
             )}
             {agreement.isDraftOnly && (
@@ -259,7 +261,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 gap: '4px'
               }}>
                 <FontAwesomeIcon icon={faFileAlt} style={{ fontSize: '10px' }} />
-                {getStatusConfig('draft').label}
+                {t("savedFiles.status.draft")}
               </span>
           )}
         </div>
@@ -284,7 +286,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
               gap: '4px'
             }}>
               <FontAwesomeIcon icon={faUserPlus} style={{ fontSize: '9px' }} />
-              Created: {createdBy}
+              {t("savedFiles.rows.created", { name: createdBy })}
             </span>
           )}
           {lastEditedBy && lastEditedBy !== createdBy && (
@@ -300,7 +302,9 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
               gap: '4px'
             }}>
               <FontAwesomeIcon icon={faEdit} style={{ fontSize: '9px' }} />
-              Edited: {lastEditedBy}{formattedEditTime && ` • ${formattedEditTime}`}
+              {formattedEditTime
+                ? t("savedFiles.rows.editedWithTime", { name: lastEditedBy, time: formattedEditTime })
+                : t("savedFiles.rows.edited", { name: lastEditedBy })}
             </span>
           )}
           {lastEditedBy && lastEditedBy === createdBy && formattedEditTime && (
@@ -316,7 +320,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
               gap: '4px'
             }}>
               <FontAwesomeIcon icon={faEdit} style={{ fontSize: '9px' }} />
-              Last Edit: {formattedEditTime}
+              {t("savedFiles.rows.lastEdit", { time: formattedEditTime })}
             </span>
           )}
         </div>
@@ -326,7 +330,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
             fontSize: '12px',
             color: '#9ca3af'
           }}>
-            Deleted {agreementDeletionInfo}
+            {t("savedFiles.rows.deleted", { info: agreementDeletionInfo })}
           </div>
         )}
       </div>
@@ -364,10 +368,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   e.stopPropagation();
                   onRestore('folder', agreement.id, agreement.agreementTitle);
                 }}
-                title="Restore this agreement"
+                title={t("savedFiles.rows.restoreAgreementTitle")}
               >
                 <FontAwesomeIcon icon={faRedo} style={{ fontSize: '10px' }} />
-                <span className="ag-act-label">Restore</span>
+                <span className="ag-act-label">{t("savedFiles.rows.restore")}</span>
               </button>
 
               {agreement.isDeleted === true && (
@@ -389,10 +393,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                     e.stopPropagation();
                     handleDelete();
                   }}
-                  title="Permanently delete this agreement"
+                  title={t("savedFiles.rows.permanentDeleteAgreementTitle")}
                 >
                   <FontAwesomeIcon icon={faTrash} style={{ fontSize: '10px' }} />
-                  <span className="ag-act-label">Permanent Delete</span>
+                  <span className="ag-act-label">{t("savedFiles.rows.permanentDelete")}</span>
                 </button>
               )}
             </>
@@ -418,10 +422,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   handleZohoUpload();
                 }}
                 disabled={uploadableFiles.length === 0}
-                title={`Upload ${uploadableFiles.length} files to Bigin`}
+                title={t("savedFiles.rows.uploadFilesToBiginTitle", { count: uploadableFiles.length })}
               >
                 <FontAwesomeIcon icon={faCloudUploadAlt} style={{ fontSize: '10px' }} />
-                <span className="ag-act-label">Bigin</span>
+                <span className="ag-act-label">{t("savedFiles.rows.bigin")}</span>
               </button>
 
               <button
@@ -442,10 +446,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   e.stopPropagation();
                   handleTaskCreate();
                 }}
-                title="Create a Bigin task for this agreement"
+                title={t("savedFiles.rows.createTaskTitle")}
               >
                 <FontAwesomeIcon icon={faTasks} style={{ fontSize: '10px' }} />
-                <span className="ag-act-label">Task</span>
+                <span className="ag-act-label">{t("savedFiles.rows.task")}</span>
               </button>
 
               <button
@@ -466,10 +470,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   e.stopPropagation();
                   handleAddFile();
                 }}
-                title="Add file to this agreement"
+                title={t("savedFiles.rows.addFileTitle")}
               >
                 <FontAwesomeIcon icon={faPlus} style={{ fontSize: '10px' }} />
-                <span className="ag-act-label">Add</span>
+                <span className="ag-act-label">{t("savedFiles.rows.add")}</span>
               </button>
 
               {showAgreementLevelEdit && (
@@ -491,10 +495,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                     e.stopPropagation();
                     handleEditAgreement();
                   }}
-                  title="Edit this draft agreement"
+                  title={t("savedFiles.rows.editDraftAgreementTitle")}
                 >
                   <FontAwesomeIcon icon={faPencilAlt} style={{ fontSize: '10px' }} />
-                  <span className="ag-act-label">Edit Agreement</span>
+                  <span className="ag-act-label">{t("savedFiles.rows.editAgreement")}</span>
                 </button>
               )}
 
@@ -517,10 +521,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                   e.stopPropagation();
                   handleDelete();
                 }}
-                title="Delete this agreement (move to trash)"
+                title={t("savedFiles.rows.deleteAgreementTitle")}
               >
                 <FontAwesomeIcon icon={faTrash} style={{ fontSize: '10px' }} />
-                <span className="ag-act-label">Delete</span>
+                <span className="ag-act-label">{t("savedFiles.rows.delete")}</span>
               </button>
             </>
           )}

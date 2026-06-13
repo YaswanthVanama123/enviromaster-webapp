@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FaCircle } from "react-icons/fa";
@@ -30,10 +31,18 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
   initialData,
   onRemove,
 }) => {
+  const { t } = useTranslation();
   const { form, setForm, onChange, calc, adminRates, refreshConfig, isLoadingConfig } =
     useJanitorialCalc(initialData);
   const servicesContext = useServicesContextOptional();
   const prevDataRef = useRef<string>("");
+
+  const placeTypeOptionLabel = (key: string): string => {
+    const known = ["office", "home", "restaurant", "businessPlace"];
+    return known.includes(key)
+      ? t(`serviceForms.pureJanitorial.placeType.${key}`)
+      : placeTypeLabel(key);
+  };
 
   const updateSupply = (index: number, rawValue: string) => {
     const amount = rawValue === "" ? 0 : parseFloat(rawValue);
@@ -177,14 +186,14 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
     <div className="svc-card">
       {}
       <div className="svc-h-row">
-        <div className="svc-h">JANITORIAL</div>
+        <div className="svc-h">{t("serviceForms.pureJanitorial.title")}</div>
         <div className="svc-h-actions">
           <button
             type="button"
             className="svc-mini"
             onClick={refreshConfig}
             disabled={isLoadingConfig}
-            title="Refresh config from database"
+            title={t("serviceForms.pureJanitorial.refreshConfig")}
           >
             <FontAwesomeIcon icon={isLoadingConfig ? faSpinner : faSync} spin={isLoadingConfig} />
           </button>
@@ -193,7 +202,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
               type="button"
               className="svc-mini svc-mini--neg"
               onClick={onRemove}
-              title="Remove this service"
+              title={t("serviceForms.pureJanitorial.removeService")}
             >
               −
             </button>
@@ -203,7 +212,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select className="svc-in" name="frequency" value={form.frequency} onChange={onChange}>
             {janitorialFrequencyList.map(key => (
@@ -217,7 +226,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Visits per Week</label>
+        <label>{t("serviceForms.pureJanitorial.visitsPerWeek")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -233,7 +242,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Place Type</label>
+        <label>{t("serviceForms.pureJanitorial.placeTypeLabel")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -241,7 +250,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             onChange={e => setForm(prev => ({ ...prev, placeType: e.target.value }))}
           >
             {Object.keys(adminRates.productionRates).map(key => (
-              <option key={key} value={key}>{placeTypeLabel(key)}</option>
+              <option key={key} value={key}>{placeTypeOptionLabel(key)}</option>
             ))}
           </select>
         </div>
@@ -249,7 +258,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Square Feet</label>
+        <label>{t("serviceForms.pureJanitorial.squareFeet")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -261,13 +270,13 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             onChange={onChange}
             placeholder="0"
           />
-          <span className="svc-small">sq ft</span>
+          <span className="svc-small">{t("serviceForms.common.sqFt")}</span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Hours Per Visit</label>
+        <label>{t("serviceForms.pureJanitorial.hoursPerVisit")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -275,7 +284,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             readOnly
             value={`${calc.hoursPerVisit.toFixed(2)} hrs`}
             style={{ backgroundColor: "#f0f8ff" }}
-            title={`Production rate: ${adminRates.productionRates[form.placeType]} sq ft/hr`}
+            title={t("serviceForms.pureJanitorial.productionRateTitle", { rate: adminRates.productionRates[form.placeType] })}
           />
         </div>
       </div>
@@ -284,7 +293,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Cost Per Hour</label>
+        <label>{t("serviceForms.pureJanitorial.costPerHour")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -298,13 +307,13 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
               onChange={onChange}
             />
           </div>
-          <span className="svc-small">/hr (admin default: ${adminRates.costPerHour})</span>
+          <span className="svc-small">{t("serviceForms.pureJanitorial.costPerHourNote", { rate: adminRates.costPerHour })}</span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Labor Tax %</label>
+        <label>{t("serviceForms.pureJanitorial.laborTaxPct")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -315,13 +324,13 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             value={form.laborTaxPct || ""}
             onChange={onChange}
           />
-          <span className="svc-small">% (admin default: {adminRates.laborTaxPct}%)</span>
+          <span className="svc-small">{t("serviceForms.pureJanitorial.laborTaxNote", { rate: adminRates.laborTaxPct })}</span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Gross Profit %</label>
+        <label>{t("serviceForms.pureJanitorial.grossProfitPct")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small"
@@ -333,7 +342,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             value={form.grossProfitPct || ""}
             onChange={onChange}
           />
-          <span className="svc-small">% (admin default: {adminRates.grossProfitPct}%)</span>
+          <span className="svc-small">{t("serviceForms.pureJanitorial.grossProfitNote", { rate: adminRates.grossProfitPct })}</span>
         </div>
       </div>
 
@@ -341,7 +350,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-h-row svc-h-row-sub">
-        <div className="svc-h-sub">Supply Line Items (Annual)</div>
+        <div className="svc-h-sub">{t("serviceForms.pureJanitorial.supplyLineItems")}</div>
       </div>
       {form.supplies.map((s, i) => (
         <div key={i} className="svc-row">
@@ -367,11 +376,11 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
       {form.sqFt > 0 && (
         <>
           <div className="svc-h-row svc-h-row-sub">
-            <div className="svc-h-sub">Pricing Summary</div>
+            <div className="svc-h-sub">{t("serviceForms.pureJanitorial.pricingSummary")}</div>
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Annual Base Labor</label>
+            <label>{t("serviceForms.pureJanitorial.annualBaseLabor")}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.annualBaseLabor)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -379,7 +388,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Annual Labor Tax ({form.laborTaxPct}%)</label>
+            <label>{t("serviceForms.pureJanitorial.annualLaborTax", { rate: form.laborTaxPct })}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.annualLaborTax)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -387,7 +396,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Total Annual Labor</label>
+            <label>{t("serviceForms.pureJanitorial.totalAnnualLabor")}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.annualBaseLabor + calc.annualLaborTax)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -395,7 +404,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Annual Supplies</label>
+            <label>{t("serviceForms.pureJanitorial.annualSupplies")}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.totalAnnualSupplies)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -403,7 +412,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Total Annual Cost</label>
+            <label>{t("serviceForms.pureJanitorial.totalAnnualCost")}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.totalAnnualCost)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -411,7 +420,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Gross Profit ({form.grossProfitPct}%)</label>
+            <label>{t("serviceForms.pureJanitorial.grossProfit", { rate: form.grossProfitPct })}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.grossProfit)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -419,7 +428,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           </div>
 
           <div className="svc-row svc-row-charge">
-            <label>Annual Contract Value</label>
+            <label>{t("serviceForms.pureJanitorial.annualContractValue")}</label>
             <div className="svc-row-right">
               <span className="svc-small">$</span>
               <input className="svc-in" type="text" readOnly value={fmt(calc.annualContractValue)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -429,7 +438,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           {}
           {form.frequency !== "oneTime" && !VISIT_BASED_FREQUENCIES.includes(form.frequency) && (
             <div className="svc-row svc-row-charge">
-              <label>Monthly Recurring</label>
+              <label>{t("serviceForms.pureJanitorial.monthlyRecurring")}</label>
               <div className="svc-row-right">
                 <span className="svc-small">$</span>
                 <input className="svc-in" type="text" readOnly value={fmt(calc.monthlyRecurring)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -440,7 +449,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
           {}
           {VISIT_BASED_FREQUENCIES.includes(form.frequency) && (
             <div className="svc-row svc-row-charge">
-              <label>Recurring Visit Total</label>
+              <label>{t("serviceForms.pureJanitorial.recurringVisitTotal")}</label>
               <div className="svc-row-right">
                 <span className="svc-small">$</span>
                 <input className="svc-in" type="text" readOnly value={fmt(calc.perVisit)} style={{ backgroundColor: "white", border: "none", width: "100px" }} />
@@ -454,11 +463,11 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             <div className="svc-row-right">
               {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
                 <span style={{ color: "#388e3c", fontSize: "13px", fontWeight: 600, padding: "4px 8px", backgroundColor: "#e8f5e9", borderRadius: "4px", display: "inline-block" }}>
-                  <FaCircle color="#16a34a" /> Greenline Pricing
+                  <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
                 </span>
               ) : (
                 <span style={{ color: "#d32f2f", fontSize: "13px", fontWeight: 600, padding: "4px 8px", backgroundColor: "#ffebee", borderRadius: "4px", display: "inline-block" }}>
-                  <FaCircle color="#dc2626" /> Redline Pricing
+                  <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
                 </span>
               )}
             </div>
@@ -466,7 +475,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
           {}
           <div className="svc-row svc-row-charge">
-            <label>{form.frequency === "oneTime" ? "Total Price" : `Contract Total (${form.contractMonths} mo)`}</label>
+            <label>{form.frequency === "oneTime" ? t("serviceForms.common.totalPrice") : t("serviceForms.pureJanitorial.contractTotalMo", { count: form.contractMonths })}</label>
             <div className="svc-row-right">
               <span style={{ fontSize: "18px", fontWeight: "bold", marginLeft: "10px" }}>$</span>
               <input
@@ -494,7 +503,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
 
       {}
       <div className="svc-row">
-        <label>Notes</label>
+        <label>{t("serviceForms.common.notes")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in"
@@ -502,7 +511,7 @@ export const JanitorialForm: React.FC<ServiceInitialData<JanitorialFormState>> =
             name="notes"
             value={form.notes ?? ""}
             onChange={onChange}
-            placeholder="Service notes..."
+            placeholder={t("serviceForms.pureJanitorial.notesPlaceholder")}
           />
         </div>
       </div>

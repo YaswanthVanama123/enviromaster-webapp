@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./CustomFieldManager.css";
 
 export type FieldType = "text" | "calc" | "dollar";
@@ -26,6 +27,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
   showAddDropdown = false,
   onToggleAddDropdown,
 }) => {
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState<FieldType>("text");
 
   const handleAddField = () => {
@@ -67,7 +69,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
               className="svc-label-edit"
               value={field.name}
               onChange={(e) => handleUpdateField(field.id, { name: e.target.value })}
-              placeholder="Field name"
+              placeholder={t("serviceComponents.customFieldManager.fieldNamePlaceholder")}
             />
           </label>
 
@@ -80,7 +82,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
                 className="svc-in"
                 value={field.value || ""}
                 onChange={(e) => handleUpdateField(field.id, { value: e.target.value })}
-                placeholder="Enter value"
+                placeholder={t("serviceComponents.customFieldManager.enterValue")}
               />
             )}
 
@@ -119,7 +121,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
                       calcValues: { left, middle, right },
                     });
                   }}
-                  placeholder="Qty"
+                  placeholder={t("serviceComponents.customFieldManager.qty")}
                 />
                 <span>@</span>
                 {}
@@ -140,7 +142,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
                       calcValues: { left, middle, right },
                     });
                   }}
-                  placeholder="Rate"
+                  placeholder={t("serviceComponents.customFieldManager.rate")}
                 />
                 <span>=</span>
                 {}
@@ -154,8 +156,8 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
                     cursor: 'not-allowed',
                     fontWeight: '600'
                   }}
-                  placeholder="Total"
-                  title="Auto-calculated: Quantity × Rate"
+                  placeholder={t("serviceComponents.customFieldManager.total")}
+                  title={t("serviceComponents.customFieldManager.autoCalculated")}
                 />
               </div>
             )}
@@ -165,7 +167,7 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
               type="button"
               className="svc-mini svc-mini--neg"
               onClick={() => handleRemoveField(field.id)}
-              title="Remove field"
+              title={t("serviceComponents.customFieldManager.removeField")}
             >
               −
             </button>
@@ -176,22 +178,22 @@ export const CustomFieldManager: React.FC<CustomFieldManagerProps> = ({
       {}
       {showAddDropdown && (
         <div className="custom-field__add-dropdown">
-          <span className="custom-field__add-label">Add</span>
+          <span className="custom-field__add-label">{t("serviceComponents.customFieldManager.add")}</span>
           <select
             className="custom-field__type-select"
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value as FieldType)}
           >
-            <option value="text">Text</option>
-            <option value="calc">Calc</option>
-            <option value="dollar">Dollar</option>
+            <option value="text">{t("serviceComponents.customFieldManager.text")}</option>
+            <option value="calc">{t("serviceComponents.customFieldManager.calc")}</option>
+            <option value="dollar">{t("serviceComponents.customFieldManager.dollar")}</option>
           </select>
           <button
             type="button"
             className="svc-btn svc-btn--small"
             onClick={handleAddField}
           >
-            Add
+            {t("serviceComponents.customFieldManager.add")}
           </button>
           <button
             type="button"

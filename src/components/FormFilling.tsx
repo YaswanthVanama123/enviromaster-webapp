@@ -1387,6 +1387,7 @@ function FormFillingContent({
     setLoadedPriorQuotaCredit,
     setLoadedCommissionRules,
     effectiveCommissionRules,
+    setIsNewLocation,
     isRouteStarMapped,
 
   } = useServicesContext();
@@ -1462,13 +1463,24 @@ function FormFillingContent({
       priorQuotaCredit,
     } = payload.summary;
 
-    if (typeof priorQuotaCredit === 'number') {
-      setLoadedPriorQuotaCredit(priorQuotaCredit);
+    const savedCommission = (payload as any)?.commission;
+
+    const savedPriorQuotaCredit =
+      typeof savedCommission?.priorQuotaCredit === 'number'
+        ? savedCommission.priorQuotaCredit
+        : priorQuotaCredit;
+    if (typeof savedPriorQuotaCredit === 'number') {
+      setLoadedPriorQuotaCredit(savedPriorQuotaCredit);
     }
 
-    const savedRulesSnapshot = (payload as any)?.commission?.rulesSnapshot;
+    const savedRulesSnapshot = savedCommission?.rulesSnapshot;
     if (savedRulesSnapshot && typeof savedRulesSnapshot === 'object') {
       setLoadedCommissionRules(resolveCommissionRules(savedRulesSnapshot));
+    }
+
+    const savedIsNewLocation = savedCommission?.isNewLocation;
+    if (typeof savedIsNewLocation === 'boolean') {
+      setIsNewLocation(savedIsNewLocation);
     }
 
     if (contractMonths !== undefined && contractMonths !== null) {
@@ -1508,6 +1520,7 @@ function FormFillingContent({
     setProductTotals,
     setLoadedPriorQuotaCredit,
     setLoadedCommissionRules,
+    setIsNewLocation,
   ]);
 
   const getDocumentStatus = useCallback((): 'saved' | 'pending_approval' => {
@@ -1939,6 +1952,8 @@ function FormFillingContent({
           contractCommission: commissionData.contractCommission,
           finalCommissionRate: commissionData.finalCommissionRate,
           rulesSnapshot: commissionData.rulesSnapshot,
+          isNewLocation: commissionData.isNewLocation,
+          priorQuotaCredit: commissionData.priorQuotaCredit,
           breakdown: {
             baseRate: commissionData.baseRate,
             agreementMultiplier: commissionData.agreementMultiplier,

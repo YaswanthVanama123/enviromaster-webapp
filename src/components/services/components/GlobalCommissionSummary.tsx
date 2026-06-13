@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaSync, FaHourglassHalf, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useGlobalCommission } from '../hooks/useServiceCommission';
 import { useAccountTypeDetection } from '../hooks/useAccountTypeDetection';
@@ -40,16 +41,18 @@ interface GlobalCommissionSummaryProps {
 export function GlobalCommissionSummary({
   showDetectButton = true,
 }: GlobalCommissionSummaryProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
 
-  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped } = useServicesContext();
+  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped, isNewLocation, setIsNewLocation } = useServicesContext();
   const commissionRate = baseCommissionRate;
 
   const global = useGlobalCommission(commissionRate);
   const { detectAccountTypes, isDetecting, error, isCompanyMapped } = useAccountTypeDetection();
 
   const quotaDisplay = QUOTA_LEVEL_DISPLAY[quotaLevel];
+  const quotaLabel = t(`serviceComponents.commissionSummary.quota.${quotaLevel}`);
 
   const blendedQuotaRate =
     global.agreementMultiplier > 0
@@ -73,7 +76,7 @@ export function GlobalCommissionSummary({
       <div className="commission-summary">
         <div className="commission-summary__header">
           <div className="commission-summary__title">
-            <span>Commission Summary</span>
+            <span>{t("serviceComponents.commissionSummary.title")}</span>
           </div>
           {showDetectButton && (
             <button
@@ -82,12 +85,12 @@ export function GlobalCommissionSummary({
               disabled={isDetecting}
             >
               <span><FaSync /></span>
-              {isDetecting ? 'Connecting…' : 'Connect to Bigin'}
+              {isDetecting ? t("serviceComponents.commissionSummary.connecting") : t("serviceComponents.commissionSummary.connectToBigin")}
             </button>
           )}
         </div>
         <div className="commission-summary__warning">
-          Please connect to Bigin to calculate commission.
+          {t("serviceComponents.commissionSummary.connectToBiginWarning")}
         </div>
         {error && <div className="commission-summary__error">{error}</div>}
       </div>
@@ -101,12 +104,11 @@ export function GlobalCommissionSummary({
       <div className="commission-summary">
         <div className="commission-summary__header">
           <div className="commission-summary__title">
-            <span>Commission Summary</span>
+            <span>{t("serviceComponents.commissionSummary.title")}</span>
           </div>
         </div>
         <div className="commission-summary__warning">
-          This company isn't mapped to a RouteStar customer yet. Map it under
-          Pricing Details → Company Mapping to calculate commission and count it toward quota.
+          {t("serviceComponents.commissionSummary.notMappedWarning")}
         </div>
         {error && <div className="commission-summary__error">{error}</div>}
       </div>
@@ -118,21 +120,21 @@ export function GlobalCommissionSummary({
       {}
       <div className="commission-summary__header">
         <div className="commission-summary__title">
-          <span>Commission Summary</span>
+          <span>{t("serviceComponents.commissionSummary.title")}</span>
           <span className="commission-summary__service-count">
-            ({global.serviceCount} service{global.serviceCount !== 1 ? 's' : ''})
+            {t("serviceComponents.commissionSummary.serviceCount", { count: global.serviceCount })}
           </span>
           {}
           <span
             className="commission-summary__quota-badge"
             style={{ backgroundColor: quotaDisplay.bgColor, color: quotaDisplay.color }}
           >
-            {quotaDisplay.label} ({commissionRate}%)
+            {t("serviceComponents.commissionSummary.quotaBadge", { label: quotaLabel, rate: commissionRate })}
           </span>
           {isDetecting && (
             <span className="commission-summary__detecting">
               <span className="animate-spin"><FaHourglassHalf /></span>
-              Detecting...
+              {t("serviceComponents.commissionSummary.detecting")}
             </span>
           )}
         </div>
@@ -143,7 +145,7 @@ export function GlobalCommissionSummary({
             onClick={() => detectAccountTypes()}
           >
             <span><FaSync /></span>
-            Re-detect
+            {t("serviceComponents.commissionSummary.redetect")}
           </button>
         )}
       </div>
@@ -156,22 +158,30 @@ export function GlobalCommissionSummary({
       )}
 
       {}
-      {!isCompanyMapped && (
-        <div className="commission-summary__warning">
-          Connect to Bigin to detect account types automatically
-        </div>
-      )}
+      <label className="commission-summary__newloc">
+        <input
+          type="checkbox"
+          checked={isNewLocation}
+          onChange={(e) => setIsNewLocation(e.target.checked)}
+        />
+        <span className="commission-summary__newloc-text">
+          <span className="commission-summary__newloc-title">{t("serviceComponents.commissionSummary.newLocationTitle")}</span>
+          <span className="commission-summary__newloc-hint">
+            {t("serviceComponents.commissionSummary.newLocationHint")}
+          </span>
+        </span>
+      </label>
 
       {}
       <div className="commission-summary__totals">
         <div className="commission-summary__total-item">
-          <div className="commission-summary__total-label">Weekly</div>
+          <div className="commission-summary__total-label">{t("serviceComponents.commissionSummary.weekly")}</div>
           <div className="commission-summary__total-value">
             {global.formatted.totalWeeklyCommission}
           </div>
         </div>
         <div className="commission-summary__total-item">
-          <div className="commission-summary__total-label">Annual</div>
+          <div className="commission-summary__total-label">{t("serviceComponents.commissionSummary.annual")}</div>
           <div className="commission-summary__total-value">
             {global.formatted.totalAnnualCommission}
           </div>
@@ -182,7 +192,7 @@ export function GlobalCommissionSummary({
           className="commission-summary__toggle-btn"
           onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? 'Hide Details' : 'Show Details'}
+          {expanded ? t("serviceComponents.commissionSummary.hideDetails") : t("serviceComponents.commissionSummary.showDetails")}
           <span style={{ fontSize: '10px' }}>{expanded ? '▲' : '▼'}</span>
         </button>
       </div>
@@ -198,12 +208,14 @@ export function GlobalCommissionSummary({
           }}
         >
           <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
-            Quota Tier Breakdown
+            {t("serviceComponents.commissionSummary.quotaTierBreakdown")}
           </div>
           <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px' }}>
-            This agreement adds {fmtMoney(global.totalQuotaCredit)} of quota credit on top of{' '}
-            {fmtMoney(global.priorQuotaCredit)} already earned this week (weekly target{' '}
-            {fmtMoney(global.quotaTarget)}). It is split across rate tiers as:
+            {t("serviceComponents.commissionSummary.quotaCreditIntro", {
+              credit: fmtMoney(global.totalQuotaCredit),
+              prior: fmtMoney(global.priorQuotaCredit),
+              target: fmtMoney(global.quotaTarget),
+            })}
           </div>
           {global.quotaTierBreakdown
             .filter(tier => tier.quotaCredit > 0)
@@ -220,10 +232,10 @@ export function GlobalCommissionSummary({
                 }}
               >
                 <span style={{ color: QUOTA_TIER_LEVEL_COLOR[tier.level], fontWeight: 600 }}>
-                  {tier.label} @ {tier.rate}%
+                  {t("serviceComponents.commissionSummary.tierAtRate", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`), rate: tier.rate })}
                 </span>
                 <span style={{ color: '#334155' }}>
-                  {fmtMoney(tier.quotaCredit)} × {tier.rate}% = {fmtMoney(tier.commission)}
+                  {t("serviceComponents.commissionSummary.tierCalc", { credit: fmtMoney(tier.quotaCredit), rate: tier.rate, commission: fmtMoney(tier.commission) })}
                 </span>
               </div>
             ))}
@@ -235,7 +247,7 @@ export function GlobalCommissionSummary({
         <div className="commission-summary__expanded">
           {}
           <div className="commission-summary__breakdown-title">
-            Service Breakdown
+            {t("serviceComponents.commissionSummary.serviceBreakdown")}
           </div>
 
           {global.services.map((service, index) => {
@@ -274,13 +286,13 @@ export function GlobalCommissionSummary({
                   </div>
                   <div className="service-row__commissions">
                     <div className="service-row__commission-item">
-                      <div className="service-row__commission-label">Weekly</div>
+                      <div className="service-row__commission-label">{t("serviceComponents.commissionSummary.weekly")}</div>
                       <div className="service-row__commission-value">
                         {service.formatted.weeklyCommission}
                       </div>
                     </div>
                     <div className="service-row__commission-item">
-                      <div className="service-row__commission-label">Annual</div>
+                      <div className="service-row__commission-label">{t("serviceComponents.commissionSummary.annual")}</div>
                       <div className="service-row__commission-value">
                         {service.formatted.annualCommission}
                       </div>
@@ -294,27 +306,27 @@ export function GlobalCommissionSummary({
                     {}
                     <div className="service-details__section">
                       <div className="service-details__section-title">
-                        Revenue Calculation
+                        {t("serviceComponents.commissionSummary.revenueCalculation")}
                       </div>
                       <div className="service-details__list">
                         <div className="service-details__row">
-                          <span className="service-details__label">Original Annual (Redline):</span>
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.originalAnnualRedline")}</span>
                           <span className="service-details__value">{service.formatted.annualOriginalRevenue}</span>
                         </div>
                         <div className="service-details__row">
-                          <span className="service-details__label">Current Annual Revenue:</span>
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.currentAnnualRevenue")}</span>
                           <span className="service-details__value">{service.formatted.perVisitRevenue}</span>
                         </div>
 
                         {}
                         <div className="service-details__row">
                           <span className="service-details__label">
-                            Price Ratio (Current ÷ Redline):
+                            {t("serviceComponents.commissionSummary.priceRatio")}
                           </span>
                           <span className="service-details__value">{service.formatted.priceRatio}</span>
                         </div>
                         <div className="service-details__row">
-                          <span className="service-details__label">Pricing Tier:</span>
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.pricingTier")}</span>
                           <span
                             className="service-details__value"
                             style={{ fontWeight: 600 }}
@@ -324,7 +336,7 @@ export function GlobalCommissionSummary({
                         </div>
                         <div className="service-details__row">
                           <span className="service-details__label">
-                            Pricing Multiplier:
+                            {t("serviceComponents.commissionSummary.pricingMultiplier")}
                           </span>
                           <span
                             className={`service-details__value${
@@ -341,7 +353,7 @@ export function GlobalCommissionSummary({
                         {service.pricingMultiplier !== 1 && (
                           <div className="service-details__row">
                             <span className="service-details__label">
-                              Adjusted Annual ({service.formatted.perVisitRevenue} × {service.formatted.pricingMultiplier}):
+                              {t("serviceComponents.commissionSummary.adjustedAnnual", { revenue: service.formatted.perVisitRevenue, multiplier: service.formatted.pricingMultiplier })}
                             </span>
                             <span className="service-details__value">
                               {service.formatted.adjustedAnnualRevenue}
@@ -352,7 +364,7 @@ export function GlobalCommissionSummary({
                         {service.revenueDeduction > 0 && (
                           <div className="service-details__row">
                             <span className="service-details__label">
-                              Account Type Deduction ({service.accountType}: {fmtMoney(service.visitsPerYear > 0 ? service.revenueDeduction / service.visitsPerYear : 0)}/visit × {service.visitsPerYear} visits):
+                              {t("serviceComponents.commissionSummary.accountTypeDeduction", { type: service.accountType, perVisit: fmtMoney(service.visitsPerYear > 0 ? service.revenueDeduction / service.visitsPerYear : 0), visits: service.visitsPerYear })}
                             </span>
                             <span className="service-details__value service-details__value--red">
                               -{service.formatted.revenueDeduction}
@@ -362,7 +374,7 @@ export function GlobalCommissionSummary({
 
                         {service.anchorBonus > 0 && (
                           <div className="service-details__row">
-                            <span className="service-details__label">Anchor Bonus (150% on excess over $200):</span>
+                            <span className="service-details__label">{t("serviceComponents.commissionSummary.anchorBonus")}</span>
                             <span className="service-details__value service-details__value--green">
                               +${service.anchorBonus.toFixed(2)}
                             </span>
@@ -370,7 +382,7 @@ export function GlobalCommissionSummary({
                         )}
 
                         <div className="service-details__row service-details__total-row">
-                          <span className="service-details__total-label">Commissionable Revenue:</span>
+                          <span className="service-details__total-label">{t("serviceComponents.commissionSummary.commissionableRevenue")}</span>
                           <span className="service-details__total-value">{service.formatted.commissionableRevenue}</span>
                         </div>
                       </div>
@@ -379,7 +391,7 @@ export function GlobalCommissionSummary({
                     {}
                     <div className="service-details__section">
                       <div className="service-details__section-title">
-                        Commission Rate Calculation
+                        {t("serviceComponents.commissionSummary.commissionRateCalculation")}
                       </div>
                       <div className="service-details__list">
                         {hasCommissionTiers ? (
@@ -387,12 +399,12 @@ export function GlobalCommissionSummary({
                             .filter(tier => tier.base > 0)
                             .map(tier => (
                               <div className="service-details__row" key={tier.level}>
-                                <span className="service-details__label">{tier.label} Rate:</span>
+                                <span className="service-details__label">{t("serviceComponents.commissionSummary.tierRate", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`) })}</span>
                                 <span
                                   className="service-details__value"
                                   style={{ color: QUOTA_TIER_LEVEL_COLOR[tier.level], fontWeight: 600 }}
                                 >
-                                  {tier.rate}% × {global.agreementMultiplier}% = {tier.effectiveRate.toFixed(2)}%
+                                  {t("serviceComponents.commissionSummary.tierRateCalc", { rate: tier.rate, multiplier: global.agreementMultiplier, effective: tier.effectiveRate.toFixed(2) })}
                                 </span>
                               </div>
                             ))
@@ -400,7 +412,7 @@ export function GlobalCommissionSummary({
                           <>
                             <div className="service-details__row">
                               <span className="service-details__label">
-                                Base Commission Rate ({quotaDisplay.label}):
+                                {t("serviceComponents.commissionSummary.baseCommissionRate", { label: quotaLabel })}
                               </span>
                               <span
                                 className="service-details__value"
@@ -411,7 +423,7 @@ export function GlobalCommissionSummary({
                             </div>
                             <div className="service-details__row service-details__total-row">
                               <span className="service-details__total-label">
-                                Effective Rate ({commissionRate}% × {global.agreementMultiplier}%):
+                                {t("serviceComponents.commissionSummary.effectiveRate", { rate: commissionRate, multiplier: global.agreementMultiplier })}
                               </span>
                               <span className="service-details__total-value service-details__value--blue">
                                 {global.effectiveCommissionRate.toFixed(2)}%
@@ -425,7 +437,7 @@ export function GlobalCommissionSummary({
                     {}
                     <div className="service-details__section">
                       <div className="service-details__section-title">
-                        Commission Calculation
+                        {t("serviceComponents.commissionSummary.commissionCalculation")}
                       </div>
                       <div className="service-details__list service-details__list--green">
                         {hasCommissionTiers ? (
@@ -437,7 +449,7 @@ export function GlobalCommissionSummary({
                               return (
                                 <div className="service-details__row" key={tier.level}>
                                   <span className="service-details__label">
-                                    {tier.label} ({fmtMoney(tierBase)} × {tier.effectiveRate.toFixed(2)}%):
+                                    {t("serviceComponents.commissionSummary.tierCommissionLabel", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`), base: fmtMoney(tierBase), rate: tier.effectiveRate.toFixed(2) })}
                                   </span>
                                   <span
                                     className="service-details__value"
@@ -451,7 +463,7 @@ export function GlobalCommissionSummary({
                         ) : (
                           <div className="service-details__row">
                             <span className="service-details__label">
-                              Per-Visit Commission ({service.formatted.commissionableRevenue} × {global.effectiveCommissionRate.toFixed(2)}%):
+                              {t("serviceComponents.commissionSummary.perVisitCommissionLabel", { revenue: service.formatted.commissionableRevenue, rate: global.effectiveCommissionRate.toFixed(2) })}
                             </span>
                             <span className="service-details__value service-details__value--green">
                               {service.formatted.perVisitCommission}
@@ -461,7 +473,7 @@ export function GlobalCommissionSummary({
 
                         <div className="service-details__row service-details__total-row">
                           <span className="service-details__total-label">
-                            Annual Commission{hasCommissionTiers ? ' (sum of tiers)' : ''}:
+                            {hasCommissionTiers ? t("serviceComponents.commissionSummary.annualCommissionSumOfTiers") : t("serviceComponents.commissionSummary.annualCommission")}
                           </span>
                           <span className="service-details__total-value service-details__value--green">
                             {service.formatted.annualCommission}
@@ -469,15 +481,15 @@ export function GlobalCommissionSummary({
                         </div>
 
                         <div className="service-details__row">
-                          <span className="service-details__label">Frequency:</span>
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.frequency")}</span>
                           <span className="service-details__value">
-                            {service.frequencyLabel} ({service.visitsPerYear} visits/year)
+                            {t("serviceComponents.commissionSummary.frequencyVisits", { label: service.frequencyLabel, visits: service.visitsPerYear })}
                           </span>
                         </div>
 
                         <div className="service-details__row">
                           <span className="service-details__label">
-                            Per-Visit Commission ({service.formatted.annualCommission} ÷ {service.visitsPerYear} visits):
+                            {t("serviceComponents.commissionSummary.perVisitCommissionDivide", { commission: service.formatted.annualCommission, visits: service.visitsPerYear })}
                           </span>
                           <span className="service-details__value service-details__value--green">
                             {service.formatted.perVisitCommission}
@@ -486,7 +498,7 @@ export function GlobalCommissionSummary({
 
                         <div className="service-details__row">
                           <span className="service-details__label">
-                            Weekly Commission ({service.formatted.annualCommission} ÷ 52 weeks):
+                            {t("serviceComponents.commissionSummary.weeklyCommissionDivide", { commission: service.formatted.annualCommission })}
                           </span>
                           <span className="service-details__total-value service-details__value--green">
                             {service.formatted.weeklyCommission}
@@ -502,7 +514,7 @@ export function GlobalCommissionSummary({
                         style={{ backgroundColor: colors.bg, color: colors.text }}
                       >
                         <div className="service-details__account-title">
-                          Account Type: {service.accountType}
+                          {t("serviceComponents.commissionSummary.accountType", { type: service.accountType })}
                         </div>
                         {service.reason && (
                           <div className="service-details__account-reason">
@@ -511,22 +523,22 @@ export function GlobalCommissionSummary({
                         )}
                         {service.accountType === 'Anchor' && (
                           <div className="service-details__account-explanation">
-                            High-value account ($200+/visit). No deduction + 150% bonus on excess revenue.
+                            {t("serviceComponents.commissionSummary.anchorExplanation")}
                           </div>
                         )}
                         {service.accountType === 'Bread5' && (
                           <div className="service-details__account-explanation">
-                            Within 5 min drive to anchor. $50 revenue deduction applied.
+                            {t("serviceComponents.commissionSummary.bread5Explanation")}
                           </div>
                         )}
                         {service.accountType === 'Bread15' && (
                           <div className="service-details__account-explanation">
-                            5-15 min drive to anchor. $75 revenue deduction applied.
+                            {t("serviceComponents.commissionSummary.bread15Explanation")}
                           </div>
                         )}
                         {service.accountType === 'Pit' && (
                           <div className="service-details__account-explanation">
-                            Over 15 min drive to anchor. $100 revenue deduction applied.
+                            {t("serviceComponents.commissionSummary.pitExplanation")}
                           </div>
                         )}
                       </div>
@@ -539,7 +551,7 @@ export function GlobalCommissionSummary({
 
           {}
           <div className="commission-summary__rate-footer">
-            Rate: {blendedQuotaRate.toFixed(2)}% × {global.agreementMultiplier}% = {global.effectiveCommissionRate.toFixed(2)}%
+            {t("serviceComponents.commissionSummary.rate", { blended: blendedQuotaRate.toFixed(2), multiplier: global.agreementMultiplier, effective: global.effectiveCommissionRate.toFixed(2) })}
           </div>
         </div>
       )}
@@ -547,7 +559,7 @@ export function GlobalCommissionSummary({
       {}
       {!expanded && (
         <div className="commission-summary__rate-footer">
-          Rate: {blendedQuotaRate.toFixed(2)}% × {global.agreementMultiplier}% = {global.effectiveCommissionRate.toFixed(2)}%
+          {t("serviceComponents.commissionSummary.rate", { blended: blendedQuotaRate.toFixed(2), multiplier: global.agreementMultiplier, effective: global.effectiveCommissionRate.toFixed(2) })}
         </div>
       )}
     </div>

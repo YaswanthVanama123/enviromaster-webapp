@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo, ChangeEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileAlt, faEye, faDownload, faEnvelope,
@@ -38,17 +39,30 @@ const getAvailableStatusesForDropdown = (currentStatus: string, isLatestVersion:
   });
 };
 
-function formatDeletionMeta(deletedBy?: string | null, deletedAt?: string | null) {
+function formatDeletionMeta(t: (key: string, opts?: Record<string, unknown>) => string, deletedBy?: string | null, deletedAt?: string | null) {
   const parts: string[] = [];
-  if (deletedBy) parts.push(`by ${deletedBy}`);
+  if (deletedBy) parts.push(t("savedFiles.rows.deletedBy", { name: deletedBy }));
   if (deletedAt) {
     const timestamp = new Date(deletedAt);
     if (!Number.isNaN(timestamp.getTime())) {
-      parts.push(`on ${timestamp.toLocaleString()}`);
+      parts.push(t("savedFiles.rows.deletedOn", { date: timestamp.toLocaleString() }));
     }
   }
   return parts.length > 0 ? parts.join(" ") : null;
 }
+
+const STATUS_KEY_MAP: Record<string, string> = {
+  draft: "draft",
+  saved: "saved",
+  uploaded: "uploaded",
+  processing: "processing",
+  completed: "completed",
+  failed: "failed",
+  pending_approval: "pendingApproval",
+  approved_salesman: "approvedSalesman",
+  approved_admin: "approvedAdmin",
+  attached: "attached",
+};
 
 interface FileRowProps {
   file: SavedFileListItem;
@@ -70,6 +84,7 @@ interface FileRowProps {
 }
 
 export const FileRow = memo((props: FileRowProps) => {
+  const { t } = useTranslation();
   const {
     file,
     isSelected,
@@ -89,7 +104,12 @@ export const FileRow = memo((props: FileRowProps) => {
     isTrashView
   } = props;
 
-  const fileDeletionInfo = isTrashView ? formatDeletionMeta(file.deletedBy, file.deletedAt) : null;
+  const fileDeletionInfo = isTrashView ? formatDeletionMeta(t, file.deletedBy, file.deletedAt) : null;
+
+  const statusLabel = useCallback(
+    (status: string) => t(`savedFiles.status.${STATUS_KEY_MAP[status] || status}`, { defaultValue: getStatusConfig(status).label }),
+    [t]
+  );
 
   const formattedEditInfo = useMemo(() => {
     if (!file.updatedAt || !file.updatedBy) return null;
@@ -219,12 +239,12 @@ export const FileRow = memo((props: FileRowProps) => {
           fontWeight: '600'
         }}>
           {file.fileType === 'main_pdf'
-            ? 'Main Agreement'
+            ? t("savedFiles.rows.mainAgreement")
             : file.fileType === 'version_pdf'
-            ? `Version ${(file as any).versionNumber || ''}`
+            ? t("savedFiles.rows.version", { number: (file as any).versionNumber || '' })
             : file.fileType === 'version_log'
-            ? `Log v${(file as any).versionNumber || ''}`
-            : 'Attached'}
+            ? t("savedFiles.rows.log", { number: (file as any).versionNumber || '' })
+            : t("savedFiles.rows.attached")}
         </span>
 
         {file.description && (
@@ -253,7 +273,7 @@ export const FileRow = memo((props: FileRowProps) => {
               gap: '4px'
             }}>
               <FontAwesomeIcon icon={faPencilAlt} style={{ fontSize: '9px' }} />
-              Edited by {formattedEditInfo.by} • {formattedEditInfo.time}
+              {t("savedFiles.rows.editedByTime", { name: formattedEditInfo.by, time: formattedEditInfo.time })}
             </span>
           </div>
         )}
@@ -262,7 +282,7 @@ export const FileRow = memo((props: FileRowProps) => {
             fontSize: '11px',
             color: '#9ca3af'
           }}>
-            Deleted {fileDeletionInfo}
+            {t("savedFiles.rows.deleted", { info: fileDeletionInfo })}
           </div>
         )}
       </div>
@@ -311,7 +331,7 @@ export const FileRow = memo((props: FileRowProps) => {
               icon={watermarkEnabled ? faTint : faStar}
               style={{ fontSize: '10px' }}
             />
-            {watermarkEnabled ? 'Draft' : 'Normal'}
+            {watermarkEnabled ? t("savedFiles.rows.draft") : t("savedFiles.rows.normal")}
           </span>
         </div>
       )}
@@ -320,7 +340,7 @@ export const FileRow = memo((props: FileRowProps) => {
         {!isTrashView && canEdit && (
           <button
             className="iconbtn"
-            title="Edit Agreement"
+            title={t("savedFiles.rows.editAgreementTitle")}
             onClick={handleEdit}
           >
             <FontAwesomeIcon icon={faPencilAlt} />
@@ -328,7 +348,7 @@ export const FileRow = memo((props: FileRowProps) => {
         )}
         <button
           className="iconbtn"
-          title="View"
+          title={t("savedFiles.rows.viewTitle")}
           onClick={handleView}
           disabled={!file.hasPdf && file.fileType !== 'version_log'}
         >
@@ -336,7 +356,7 @@ export const FileRow = memo((props: FileRowProps) => {
         </button>
         <button
           className="iconbtn"
-          title="Download"
+          title={t("savedFiles.rows.downloadTitle")}
           onClick={handleDownload}
           disabled={!file.hasPdf && file.fileType !== 'version_log'}
         >
@@ -346,7 +366,7 @@ export const FileRow = memo((props: FileRowProps) => {
           <>
             <button
               className="iconbtn"
-              title="Share via Email"
+              title={t("savedFiles.rows.shareViaEmailTitle")}
               onClick={handleEmail}
               disabled={!file.hasPdf && file.fileType !== 'version_log'}
             >
@@ -354,7 +374,7 @@ export const FileRow = memo((props: FileRowProps) => {
             </button>
             <button
               className="iconbtn zoho-upload-btn"
-              title="Upload to Bigin"
+              title={t("savedFiles.rows.uploadToBiginTitle")}
               onClick={handleZohoUpload}
               disabled={!file.hasPdf && file.fileType !== 'version_log'}
             >
@@ -381,11 +401,11 @@ export const FileRow = memo((props: FileRowProps) => {
                   outline: 'none',
                   minWidth: '120px'
                 }}
-                title="Change status"
+                title={t("savedFiles.rows.changeStatusTitle")}
               >
                 {availableStatuses.map(status => (
                   <option key={status.value} value={status.value} style={{ color: '#000' }}>
-                    {status.label}
+                    {statusLabel(status.value)}
                   </option>
                 ))}
               </select>
@@ -403,9 +423,9 @@ export const FileRow = memo((props: FileRowProps) => {
                   display: 'inline-block',
                   textAlign: 'center'
                 }}
-                title={statusChangeLoading ? "Updating status..." : "Status (read-only)"}
+                title={statusChangeLoading ? t("savedFiles.rows.updatingStatusTitle") : t("savedFiles.rows.statusReadOnlyTitle")}
               >
-                {statusChangeLoading ? "Updating..." : statusConfig.label}
+                {statusChangeLoading ? t("savedFiles.rows.updating") : statusLabel(file.status)}
               </span>
             )}
           </div>
@@ -415,7 +435,7 @@ export const FileRow = memo((props: FileRowProps) => {
           <>
             <button
               className="iconbtn"
-              title="Restore file"
+              title={t("savedFiles.rows.restoreFileTitle")}
               onClick={handleRestoreClick}
               style={{
                 color: '#10b981',
@@ -426,7 +446,7 @@ export const FileRow = memo((props: FileRowProps) => {
             </button>
             <button
               className="iconbtn"
-              title="Permanently delete file"
+              title={t("savedFiles.rows.permanentDeleteFileTitle")}
               onClick={handleDeleteClick}
               style={{
                 color: '#dc2626',
@@ -439,7 +459,7 @@ export const FileRow = memo((props: FileRowProps) => {
         ) : (
           <button
             className="iconbtn"
-            title="Delete file (move to trash)"
+            title={t("savedFiles.rows.deleteFileTitle")}
             onClick={handleDeleteClick}
             style={{
               color: '#dc2626',

@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStripWaxCalc } from "./useStripWaxCalc";
 import type { StripWaxFormState } from "./stripWaxTypes";
 import { stripWaxPricingConfig as cfg } from "./stripWaxConfig";
@@ -28,6 +29,7 @@ export const StripWaxForm: React.FC<
   ServiceInitialData<StripWaxFormState>
 > = ({ initialData, onRemove }) => {
 
+  const { t } = useTranslation();
   const [customFields, setCustomFields] = useState<CustomField[]>(
     initialData?.customFields || []
   );
@@ -266,7 +268,7 @@ export const StripWaxForm: React.FC<
 
   return (
     <ServiceCardShell
-      title="STRIP & WAX FLOOR"
+      title={t("serviceForms.stripWax.title")}
       onAddCustom={() => setShowAddDropdown(!showAddDropdown)}
       onRemove={onRemove}
       headerActions={
@@ -277,9 +279,9 @@ export const StripWaxForm: React.FC<
       {isLoadingConfig && (
         <div className="svc-loading-overlay">
           <div className="svc-loading-spinner">
-            <span className="svc-sr-only">Loading configuration...</span>
+            <span className="svc-sr-only">{t("serviceForms.common.loadingConfiguration")}</span>
           </div>
-          <p className="svc-loading-text">Loading configuration...</p>
+          <p className="svc-loading-text">{t("serviceForms.common.loadingConfiguration")}</p>
         </div>
       )}
 
@@ -293,7 +295,7 @@ export const StripWaxForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Frequency</label>
+        <label>{t("serviceForms.common.frequency")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -301,23 +303,23 @@ export const StripWaxForm: React.FC<
             value={form.frequency}
             onChange={onChange}
           >
-            <option value="oneTime">One Time</option>
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Bi-Weekly</option>
-            <option value="twicePerMonth">2× / Month</option>
-            <option value="monthly">Monthly</option>
-            <option value="everyFourWeeks">Every 4 Weeks</option>
-            <option value="bimonthly">Every 2 Months</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="biannual">Bi-Annual</option>
-            <option value="annual">Annual</option>
+            <option value="oneTime">{t("serviceForms.stripWax.freq.oneTime")}</option>
+            <option value="weekly">{t("serviceForms.stripWax.freq.weekly")}</option>
+            <option value="biweekly">{t("serviceForms.stripWax.freq.biweekly")}</option>
+            <option value="twicePerMonth">{t("serviceForms.stripWax.freq.twicePerMonth")}</option>
+            <option value="monthly">{t("serviceForms.stripWax.freq.monthly")}</option>
+            <option value="everyFourWeeks">{t("serviceForms.stripWax.freq.everyFourWeeks")}</option>
+            <option value="bimonthly">{t("serviceForms.stripWax.freq.bimonthly")}</option>
+            <option value="quarterly">{t("serviceForms.stripWax.freq.quarterly")}</option>
+            <option value="biannual">{t("serviceForms.stripWax.freq.biannual")}</option>
+            <option value="annual">{t("serviceForms.stripWax.freq.annual")}</option>
           </select>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Service Type</label>
+        <label>{t("serviceForms.stripWax.serviceType")}</label>
         <div className="svc-row-right">
           <select
             className="svc-in"
@@ -340,7 +342,7 @@ export const StripWaxForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>Floor Area</label>
+        <label>{t("serviceForms.stripWax.floorArea")}</label>
         <div className="svc-row-right">
           <input
             className="svc-in svc-in-small field-qty"
@@ -366,7 +368,7 @@ export const StripWaxForm: React.FC<
                 onChange={handleLocalChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                title="Rate per sq ft (from backend, editable)"
+                title={t("serviceForms.stripWax.ratePerSqFtTitle")}
                 style={{
                   backgroundColor: form.customRatePerSqFt !== undefined ? '#fffacd' : 'white',
                 }}
@@ -385,14 +387,14 @@ export const StripWaxForm: React.FC<
         <label></label>
         <div className="svc-row-right">
             <span className="svc-small">
-              (Direct: area × $${formatDisplayNumber(form.ratePerSqFt)}/sq ft, min $${formatDisplayNumber(form.minCharge)})
+              {t("serviceForms.stripWax.directCalcNote", { rate: formatDisplayNumber(form.ratePerSqFt), min: formatDisplayNumber(form.minCharge) })}
             </span>
         </div>
       </div>
 
       {}
       <div className="svc-row">
-        <label>Minimum Charge</label>
+        <label>{t("serviceForms.common.minimumCharge")}</label>
         <div className="svc-row-right">
           <div className="svc-dollar">
             <span>$</span>
@@ -404,13 +406,13 @@ export const StripWaxForm: React.FC<
               name="minCharge"
               value={form.minCharge || ""}
               onChange={onChange}
-              title="Minimum charge per visit (from backend, editable)"
+              title={t("serviceForms.stripWax.minimumChargeTitle")}
               style={{
                 backgroundColor: form.customMinCharge !== undefined ? '#fffacd' : 'white',
               }}
             />
           </div>
-          <span className="svc-small">minimum</span>
+          <span className="svc-small">{t("serviceForms.stripWax.minimum")}</span>
           <label className="svc-inline" style={{ marginLeft: '10px' }}>
             <input
               type="checkbox"
@@ -418,7 +420,7 @@ export const StripWaxForm: React.FC<
               checked={form.applyMinimum !== false}
               onChange={onChange}
             />
-            <span>Apply Minimum</span>
+            <span>{t("serviceForms.common.applyMinimum")}</span>
           </label>
         </div>
       </div>
@@ -428,7 +430,7 @@ export const StripWaxForm: React.FC<
 
       {}
       <div className="svc-row svc-row-total">
-        <label>Per Visit Total</label>
+        <label>{t("serviceForms.common.perVisitTotal")}</label>
         <div className="svc-dollar">
           $<input
             type="text"
@@ -452,7 +454,7 @@ export const StripWaxForm: React.FC<
               border: 'none',
               width: '100px'
             }}
-            title="Per visit total - editable"
+            title={t("serviceForms.stripWax.perVisitTotalTitle")}
           />
         </div>
       </div>
@@ -461,7 +463,7 @@ export const StripWaxForm: React.FC<
       {isVisitBasedFrequency && form.frequency !== "oneTime" || form.frequency === "quarterly" ||
     form.frequency === "biannual" || form.frequency === "annual" || form.frequency === "bimonthly" && (
         <div className="svc-row svc-row-total">
-          <label>First Visit Total</label>
+          <label>{t("serviceForms.common.firstVisitTotal")}</label>
           <div className="svc-dollar">
             $<input
               type="text"
@@ -485,7 +487,7 @@ export const StripWaxForm: React.FC<
                 border: 'none',
                 width: '100px'
               }}
-              title="First visit total - editable"
+              title={t("serviceForms.stripWax.firstVisitTitle")}
             />
           </div>
         </div>
@@ -498,11 +500,11 @@ export const StripWaxForm: React.FC<
           <div className="svc-row-right">
             {calc.contractTotal > calc.originalContractTotal * 1.30 ? (
               <span className="em-pricing-tier em-pricing-tier--green">
-                <FaCircle color="#16a34a" /> Greenline Pricing
+                <FaCircle color="#16a34a" /> {t("serviceForms.common.greenlinePricing")}
               </span>
             ) : (
               <span className="em-pricing-tier em-pricing-tier--red">
-                <FaCircle color="#dc2626" /> Redline Pricing
+                <FaCircle color="#dc2626" /> {t("serviceForms.common.redlinePricing")}
               </span>
             )}
           </div>
@@ -514,7 +516,7 @@ export const StripWaxForm: React.FC<
         form.frequency === "biannual" || form.frequency === "annual" ||
         form.frequency === "everyFourWeeks") && (
         <div className="svc-row svc-row-total">
-          <label>Recurring Visit Total</label>
+          <label>{t("serviceForms.common.recurringVisitTotal")}</label>
           <div className="svc-dollar">
             ${formatCalcValue(calc.perVisit)}
           </div>
@@ -524,7 +526,7 @@ export const StripWaxForm: React.FC<
       {}
       {form.frequency === "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Total Price</label>
+          <label>{t("serviceForms.common.totalPrice")}</label>
           <div className="svc-dollar">
             $<input
               type="number"
@@ -546,7 +548,7 @@ export const StripWaxForm: React.FC<
                 border: 'none',
                 width: '100px'
               }}
-              title="Total price for one-time service - editable"
+              title={t("serviceForms.stripWax.totalPriceTitle")}
             />
           </div>
         </div>
@@ -555,7 +557,7 @@ export const StripWaxForm: React.FC<
       {}
       {!isVisitBasedFrequency && (
         <div className="svc-row svc-row-total">
-          <label>First Month Total</label>
+          <label>{t("serviceForms.common.firstMonthTotal")}</label>
           <div className="svc-dollar">
             $<input
               type="text"
@@ -579,7 +581,7 @@ export const StripWaxForm: React.FC<
                 border: 'none',
                 width: '100px'
               }}
-              title="First month total - editable"
+              title={t("serviceForms.stripWax.firstMonthTitle")}
             />
           </div>
         </div>
@@ -588,7 +590,7 @@ export const StripWaxForm: React.FC<
       {}
       {!isVisitBasedFrequency && (
         <div className="svc-row svc-row-total">
-          <label>Monthly Recurring</label>
+          <label>{t("serviceForms.common.monthlyRecurring")}</label>
           <div className="svc-dollar">
             $<input
               type="text"
@@ -612,7 +614,7 @@ export const StripWaxForm: React.FC<
                 border: 'none',
                 width: '100px'
               }}
-              title="Ongoing monthly - editable"
+              title={t("serviceForms.stripWax.ongoingMonthlyTitle")}
             />
           </div>
         </div>
@@ -621,7 +623,7 @@ export const StripWaxForm: React.FC<
       {}
       {form.frequency !== "oneTime" && (
         <div className="svc-row svc-row-total">
-          <label>Contract Total</label>
+          <label>{t("serviceForms.common.contractTotal")}</label>
           <div className="svc-row-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <select
               className="svc-in"
@@ -631,7 +633,7 @@ export const StripWaxForm: React.FC<
             >
               {contractMonthOptions.map((m) => (
                 <option key={m} value={m}>
-                  {m} months
+                  {t("serviceForms.common.months", { count: m })}
                 </option>
               ))}
             </select>
@@ -663,7 +665,7 @@ export const StripWaxForm: React.FC<
                 padding: '4px',
                 width: '140px'
               }}
-              title="Contract total - editable"
+              title={t("serviceForms.stripWax.contractTotalTitle")}
             />
           </div>
         </div>

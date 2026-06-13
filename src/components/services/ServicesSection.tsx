@@ -1,4 +1,5 @@
 import React, { useState, useImperativeHandle, forwardRef, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import "./ServicesSection.css";
@@ -75,6 +76,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
   onTabChange,
 }, ref) => {
 
+  const { t } = useTranslation();
   const { configs, loading } = useServiceConfigs();
   const servicesContext = useServicesContextOptional();
 
@@ -300,7 +302,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
   if (loading) {
     return (
       <section className="svc">
-        <div className="svc-title">SERVICES</div>
+        <div className="svc-title">{t("serviceComponents.servicesSection.title")}</div>
         <div style={{ padding: "20px", textAlign: "center" }}>
           <FontAwesomeIcon icon={faSpinner} spin size="2x" style={{ color: "#3b82f6" }} />
         </div>
@@ -311,7 +313,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
   return (
     <section className="svc">
       <div className="svc-title svc-title--hasActions">
-        SERVICES
+        {t("serviceComponents.servicesSection.title")}
         <div className="svc-actions">
           <div className="svc-chooser-wrap">
             <button
@@ -342,20 +344,20 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
                   defaultValue=""
                 >
                   <option value="" disabled>
-                    Select service...
+                    {t("serviceComponents.servicesSection.selectService")}
                   </option>
                   {availableServices.map((config) => (
                     <option key={config.serviceId} value={config.serviceId}>
                       {config.label || config.serviceId}
                     </option>
                   ))}
-                  <option value="custom">Custom</option>
+                  <option value="custom">{t("serviceComponents.servicesSection.custom")}</option>
                 </select>
                 <button
                   type="button"
                   className="svc-mini svc-mini--neg"
                   onClick={() => setShowNewServiceDropdown(false)}
-                  title="Close"
+                  title={t("serviceComponents.servicesSection.close")}
                 >
                   ×
                 </button>
@@ -375,7 +377,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
                   defaultValue=""
                 >
                   <option value="" disabled>
-                    Select service to remove...
+                    {t("serviceComponents.servicesSection.selectServiceToRemove")}
                   </option>
                   {Array.from(visibleServices).map((serviceId) => {
                     const config = configs.find(c => c.serviceId === serviceId);
@@ -390,7 +392,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
                   type="button"
                   className="svc-mini svc-mini--neg"
                   onClick={() => setShowRemoveServiceDropdown(false)}
-                  title="Close"
+                  title={t("serviceComponents.servicesSection.close")}
                 >
                   ×
                 </button>
@@ -408,7 +410,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
             className={`svc-tab ${!currentTab ? 'svc-tab--active' : ''}`}
             onClick={() => onTabChange(null)}
           >
-            All Services
+            {t("serviceComponents.servicesSection.allServices")}
           </button>
           {activeVisibleServices.map((config) => (
             <button
@@ -425,7 +427,7 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
             className={`svc-tab svc-tab--ref ${currentTab === 'reference' ? 'svc-tab--active' : ''}`}
             onClick={() => onTabChange('reference')}
           >
-            Services Reference
+            {t("serviceComponents.servicesSection.servicesReference")}
           </button>
         </div>
       )}
@@ -453,18 +455,18 @@ export const ServicesSection = forwardRef<ServicesSectionHandle, ServicesSection
               >
                 <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#ffc107' }} />
-                  Service Not Available
+                  {t("serviceComponents.servicesSection.serviceNotAvailable")}
                 </div>
-                <div>Service ID: {config.serviceId}</div>
+                <div>{t("serviceComponents.servicesSection.serviceId", { id: config.serviceId })}</div>
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  This service ({config.label || config.serviceId}) is configured in the backend but doesn't have a corresponding form component.
+                  {t("serviceComponents.servicesSection.serviceNotAvailableBody", { name: config.label || config.serviceId })}
                 </div>
                 <button
                   type="button"
                   onClick={() => handleRemoveService(config.serviceId)}
                   style={{ marginTop: '10px', padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                 >
-                  Remove
+                  {t("serviceComponents.servicesSection.remove")}
                 </button>
               </div>
             );

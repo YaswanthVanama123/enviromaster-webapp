@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './ServiceAgreement.css';
 import logo from "../../assets/em-logo.png";
 import { addTextChange } from '../../utils/fileLogger';
@@ -58,6 +59,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
   templateData,
   templateLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [showAgreement, setShowAgreement] = useState(initialData?.includeInPdf ?? true);
   const [isLoadingTemplate, setIsLoadingTemplate] = useState(!initialData && templateLoading);
   const [agreementData, setAgreementData] = useState<ServiceAgreementData>(() => {
@@ -329,7 +331,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
               cursor: 'pointer'
             }}
           />
-          <span>Include Service Agreement</span>
+          <span>{t('serviceAgreement.includeServiceAgreement')}</span>
         </label>
       </div>
 
@@ -358,7 +360,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
             color: '#6b7280',
             fontWeight: '500'
           }}>
-            Loading service agreement template...
+            {t('serviceAgreement.loadingTemplate')}
           </p>
           <style>
             {`
@@ -371,11 +373,11 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
       )}
 
       {showAgreement && !isLoadingTemplate && (
-        <div className="sa-page" role="group" aria-label="Service Agreement">
+        <div className="sa-page" role="group" aria-label={t('serviceAgreement.groupAriaLabel')}>
           <header className="sa-header">
-            <div className="sa-logo" aria-label="Enviro-Master logo">
+            <div className="sa-logo" aria-label={t('serviceAgreement.logoAriaLabel')}>
 
-                <img src={logo} alt="Enviro-Master Logo" className="cua2__logo-img" />
+                <img src={logo} alt={t('serviceAgreement.logoAlt')} className="cua2__logo-img" />
 
                 <svg className="sa-logo-fallback" viewBox="0 0 160 80" aria-hidden="true">
                   <rect x="0" y="0" width="160" height="80" fill="#ffffff" />
@@ -391,7 +393,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
 
             <div
               className="sa-title-box"
-              aria-label="Document title"
+              aria-label={t('serviceAgreement.documentTitleAriaLabel')}
               contentEditable
               suppressContentEditableWarning
               onBlur={(e) => handleTextEdit('titleText', e.currentTarget.textContent || '')}
@@ -413,7 +415,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
             {agreementData.subtitleText}
           </div>
 
-          <div className="sa-terms" aria-label="Terms and Conditions">
+          <div className="sa-terms" aria-label={t('serviceAgreement.termsAriaLabel')}>
             <p className="sa-term">
               <span className="sa-term-num">1.</span>
               <span
@@ -506,7 +508,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
             </p>
           </div>
 
-          <div className="sa-dispenser-row" aria-label="Dispenser options">
+          <div className="sa-dispenser-row" aria-label={t('serviceAgreement.dispenserOptionsAriaLabel')}>
             <label className="sa-dispenser-option">
               <span
                 className="sa-dispenser-text"
@@ -554,7 +556,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
             {agreementData.noteText}
           </p>
 
-          <div className="sa-reps-row" aria-label="Representatives">
+          <div className="sa-reps-row" aria-label={t('serviceAgreement.representativesAriaLabel')}>
             <div className="sa-line-field">
               <span
                 className="sa-line-label"
@@ -571,7 +573,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
                 name="emSalesRepresentative"
                 value={agreementData.emSalesRepresentative}
                 onChange={handleInputChange}
-                aria-label="EM Sales Representative"
+                aria-label={t('serviceAgreement.emSalesRepAriaLabel')}
               />
             </div>
 
@@ -591,14 +593,14 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
                 name="insideSalesRepresentative"
                 value={agreementData.insideSalesRepresentative}
                 onChange={handleInputChange}
-                aria-label="Inside Sales Representative"
+                aria-label={t('serviceAgreement.insideSalesRepAriaLabel')}
               />
             </div>
           </div>
 
           <div
             className="sa-authority"
-            aria-label="Authority statement"
+            aria-label={t('serviceAgreement.authorityAriaLabel')}
             contentEditable
             suppressContentEditableWarning
             onBlur={(e) => handleTextEdit('authorityText', e.currentTarget.textContent || '')}
@@ -607,7 +609,7 @@ export const ServiceAgreement: React.FC<ServiceAgreementProps> = ({
             {agreementData.authorityText}
           </div>
 
-          <div className="sa-signatures" aria-label="Signature section">
+          <div className="sa-signatures" aria-label={t('serviceAgreement.signatureSectionAriaLabel')}>
             <div className="sa-sig-row">
               <div className="sa-inline-field sa-field-contact">
                 <span

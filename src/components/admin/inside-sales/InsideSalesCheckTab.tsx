@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { biginAuditApi } from '../../../backendservice/api/biginAuditApi';
 import { userManagementApi } from '../../../backendservice/api/userManagementApi';
 import './InsideSalesCheckTab.css';
@@ -42,6 +43,7 @@ interface InsideSalesResult {
 }
 
 export const InsideSalesCheckTab: React.FC = () => {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState<string>('');
@@ -58,7 +60,7 @@ export const InsideSalesCheckTab: React.FC = () => {
         }
       } catch (err) {
         console.error('Error loading employees:', err);
-        setError('Failed to load employees');
+        setError(t('adminTools.insideSales.failedToLoadEmployees'));
       } finally {
         setLoading(false);
       }
@@ -69,7 +71,7 @@ export const InsideSalesCheckTab: React.FC = () => {
 
   const handleCheck = async () => {
     if (!selectedEmployee) {
-      setError('Please select an employee');
+      setError(t('adminTools.insideSales.pleaseSelectEmployee'));
       return;
     }
 
@@ -90,11 +92,11 @@ export const InsideSalesCheckTab: React.FC = () => {
       if (response?.success && response.data) {
         setResult(response.data);
       } else {
-        setError('Failed to check inside sales eligibility');
+        setError(t('adminTools.insideSales.checkFailed'));
       }
     } catch (err) {
       console.error('Error checking inside sales:', err);
-      setError('Error checking inside sales eligibility');
+      setError(t('adminTools.insideSales.checkError'));
     } finally {
       setChecking(false);
     }
@@ -116,8 +118,8 @@ export const InsideSalesCheckTab: React.FC = () => {
       {}
       <div className="isc-header">
         <div className="isc-header-content">
-          <h2>Inside Sales Check</h2>
-          <p className="isc-subtitle">Check if an employee has Inside Sales eligibility based on Lisa Rothwell's audit history</p>
+          <h2>{t('adminTools.insideSales.title')}</h2>
+          <p className="isc-subtitle">{t('adminTools.insideSales.subtitle')}</p>
         </div>
       </div>
 
@@ -125,7 +127,7 @@ export const InsideSalesCheckTab: React.FC = () => {
       <div className="isc-selection-card">
         <div className="isc-selection-row">
           <div className="isc-select-group">
-            <label htmlFor="employee-select">Select Employee</label>
+            <label htmlFor="employee-select">{t('adminTools.insideSales.selectEmployee')}</label>
             <select
               id="employee-select"
               value={selectedEmployee}
@@ -136,7 +138,7 @@ export const InsideSalesCheckTab: React.FC = () => {
               }}
               disabled={loading || checking}
             >
-              <option value="">-- Select an Employee --</option>
+              <option value="">{t('adminTools.insideSales.selectAnEmployee')}</option>
               {employees.map((emp) => (
                 <option key={emp.id} value={emp.id}>
                   {emp.fullName || emp.username} {emp.email ? `(${emp.email})` : ''}
@@ -152,7 +154,7 @@ export const InsideSalesCheckTab: React.FC = () => {
             {checking ? (
               <>
                 <span className="isc-spinner"></span>
-                Checking...
+                {t('adminTools.insideSales.checking')}
               </>
             ) : (
               <>
@@ -160,7 +162,7 @@ export const InsideSalesCheckTab: React.FC = () => {
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.35-4.35" />
                 </svg>
-                Check Eligibility
+                {t('adminTools.insideSales.checkEligibility')}
               </>
             )}
           </button>
@@ -200,19 +202,19 @@ export const InsideSalesCheckTab: React.FC = () => {
               <h3>{result.salespersonName}</h3>
               <p className="isc-status-text">
                 {result.isInsideSales ? (
-                  <span className="status-has-deduction">Inside Sales (3% Deduction)</span>
+                  <span className="status-has-deduction">{t('adminTools.insideSales.statusHasDeduction')}</span>
                 ) : (
-                  <span className="status-no-deduction">No Inside Sales Deduction</span>
+                  <span className="status-no-deduction">{t('adminTools.insideSales.statusNoDeduction')}</span>
                 )}
               </p>
               <p className="isc-match-count">
                 {result.totalAgreementsByUser !== undefined && (
-                  <>{result.totalAgreementsByUser} total agreement{result.totalAgreementsByUser !== 1 ? 's' : ''} • </>
+                  <>{t('adminTools.insideSales.totalAgreements', { count: result.totalAgreementsByUser })} • </>
                 )}
                 {result.agreementCount !== undefined && (
-                  <>{result.agreementCount} with Bigin ID{result.agreementCount !== 1 ? 's' : ''} • </>
+                  <>{t('adminTools.insideSales.withBiginId', { count: result.agreementCount })} • </>
                 )}
-                {result.matchCount} audit record{result.matchCount !== 1 ? 's' : ''} matched (last 1 year)
+                {t('adminTools.insideSales.auditRecordsMatched', { count: result.matchCount })}
               </p>
               {result.message && (
                 <p className="isc-match-count" style={{ fontStyle: 'italic' }}>{result.message}</p>
@@ -222,16 +224,16 @@ export const InsideSalesCheckTab: React.FC = () => {
 
           {result.matchCount > 0 && result.matchDetails.length > 0 && (
             <div className="isc-match-details">
-              <h4>Matching Audit Records</h4>
+              <h4>{t('adminTools.insideSales.matchingAuditRecords')}</h4>
               <div className="isc-matches-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Bigin ID</th>
-                      <th>Record Name</th>
-                      <th>Action</th>
-                      <th>Module</th>
-                      <th>Timestamp</th>
+                      <th>{t('adminTools.insideSales.colBiginId')}</th>
+                      <th>{t('adminTools.insideSales.colRecordName')}</th>
+                      <th>{t('adminTools.insideSales.colAction')}</th>
+                      <th>{t('adminTools.insideSales.colModule')}</th>
+                      <th>{t('adminTools.insideSales.colTimestamp')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -254,17 +256,17 @@ export const InsideSalesCheckTab: React.FC = () => {
 
           {/* Agreements with Bigin IDs */}
           <div className="isc-match-details" style={{ marginTop: '20px' }}>
-            <h4>Employee's Agreements ({result.totalAgreementsByUser || 0} total, {result.agreementCount || 0} uploaded to Bigin)</h4>
+            <h4>{t('adminTools.insideSales.employeesAgreements', { total: result.totalAgreementsByUser || 0, uploaded: result.agreementCount || 0 })}</h4>
             {result.agreementDetails && result.agreementDetails.length > 0 ? (
               <div className="isc-matches-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Agreement Title</th>
-                      <th>Bigin Deal ID</th>
-                      <th>Deal Name</th>
-                      <th>Created At</th>
-                      <th>Status</th>
+                      <th>{t('adminTools.insideSales.colAgreementTitle')}</th>
+                      <th>{t('adminTools.insideSales.colBiginDealId')}</th>
+                      <th>{t('adminTools.insideSales.colDealName')}</th>
+                      <th>{t('adminTools.insideSales.colCreatedAt')}</th>
+                      <th>{t('adminTools.insideSales.colStatus')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -275,22 +277,22 @@ export const InsideSalesCheckTab: React.FC = () => {
                         <tr key={idx} style={{ backgroundColor: isMatched ? '#dcfce7' : !hasBiginId ? '#fef3c7' : 'transparent' }}>
                           <td>{agreement.title}</td>
                           <td style={{ fontFamily: 'monospace', fontSize: '13px' }}>
-                            {hasBiginId ? agreement.biginId : <span style={{ color: '#9ca3af' }}>Not uploaded</span>}
+                            {hasBiginId ? agreement.biginId : <span style={{ color: '#9ca3af' }}>{t('adminTools.insideSales.notUploaded')}</span>}
                           </td>
                           <td>{agreement.dealName || '-'}</td>
                           <td>{formatDate(agreement.createdAt)}</td>
                           <td>
                             {!hasBiginId ? (
                               <span className="isc-action-badge" style={{ background: '#fef3c7', color: '#d97706' }}>
-                                Not Uploaded
+                                {t('adminTools.insideSales.statusNotUploaded')}
                               </span>
                             ) : isMatched ? (
                               <span className="isc-action-badge" style={{ background: '#dcfce7', color: '#059669' }}>
-                                Found in Audit
+                                {t('adminTools.insideSales.statusFoundInAudit')}
                               </span>
                             ) : (
                               <span className="isc-action-badge" style={{ background: '#f1f5f9', color: '#64748b' }}>
-                                Not in Audit
+                                {t('adminTools.insideSales.statusNotInAudit')}
                               </span>
                             )}
                           </td>
@@ -302,7 +304,7 @@ export const InsideSalesCheckTab: React.FC = () => {
               </div>
             ) : (
               <p style={{ color: '#64748b', fontStyle: 'italic', marginTop: '12px' }}>
-                No agreements found for this employee.
+                {t('adminTools.insideSales.noAgreements')}
               </p>
             )}
           </div>
@@ -311,13 +313,13 @@ export const InsideSalesCheckTab: React.FC = () => {
 
       {}
       <div className="isc-info-card">
-        <h4>How It Works</h4>
+        <h4>{t('adminTools.insideSales.howItWorks')}</h4>
         <ul>
-          <li>Select an employee from the dropdown to check their Inside Sales status</li>
-          <li>The system finds all agreements created by this employee that have been pushed to Bigin</li>
-          <li>It then checks if any of those agreements' Bigin IDs appear in Lisa Rothwell's audit history within the last 1 year</li>
-          <li>If a match is found, the employee has <strong>Inside Sales (3% Deduction)</strong></li>
-          <li>If no matches, <strong>No deduction</strong> - employee keeps full commission</li>
+          <li>{t('adminTools.insideSales.howItWorks1')}</li>
+          <li>{t('adminTools.insideSales.howItWorks2')}</li>
+          <li>{t('adminTools.insideSales.howItWorks3')}</li>
+          <li><Trans i18nKey="adminTools.insideSales.howItWorks4" components={{ 1: <strong /> }} /></li>
+          <li><Trans i18nKey="adminTools.insideSales.howItWorks5" components={{ 1: <strong /> }} /></li>
         </ul>
       </div>
     </div>
