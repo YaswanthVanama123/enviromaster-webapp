@@ -65,7 +65,7 @@ function getActionConfig(action: EditHistoryItem["action"], t: TFunction): {
     case "edited":
       return { icon: faEdit, color: "#2563eb", bg: "#dbeafe", label: t("editHistory.actionEdited") };
     case "version_added":
-      return { icon: faCodeBranch, color: "#7c3aed", bg: "#f3e8ff", label: t("editHistory.actionVersionAdded") };
+      return { icon: faCodeBranch, color: "#c00000", bg: "#fdeaea", label: t("editHistory.actionVersionAdded") };
     case "attachment_added":
       return { icon: faPaperclip, color: "#ea580c", bg: "#fff7ed", label: t("editHistory.actionAttachmentAdded") };
     default:

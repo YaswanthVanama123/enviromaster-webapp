@@ -14,7 +14,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   color: white;
   position: sticky;
   top: 0;
@@ -48,7 +48,7 @@
 
 .spd__close:hover {
   background: white;
-  color: #667eea;
+  color: #c00000;
 }
 
 .spd__tabs {
@@ -80,17 +80,17 @@
 }
 
 .spd__tab:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #c00000;
+  color: #c00000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 8px rgba(192, 0, 0, 0.15);
 }
 
 .spd__tab--active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   color: white;
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  border-color: #c00000;
+  box-shadow: 0 4px 12px rgba(192, 0, 0, 0.3);
 }
 
 .spd__tab-icon {
@@ -121,8 +121,8 @@
 }
 
 .spd__field:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  border-color: #c00000;
+  box-shadow: 0 4px 12px rgba(192, 0, 0, 0.1);
 }
 
 .spd__field-info {
@@ -177,7 +177,7 @@
 .spd__input {
   width: 120px;
   padding: 10px 14px;
-  border: 2px solid #667eea;
+  border: 2px solid #c00000;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 700;
@@ -187,8 +187,8 @@
 }
 
 .spd__input:focus {
-  border-color: #764ba2;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #a00000;
+  box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.1);
 }
 
 .spd__actions {
@@ -207,14 +207,14 @@
 }
 
 .spd__btn--edit {
-  background: #667eea;
+  background: #c00000;
   color: white;
 }
 
 .spd__btn--edit:hover {
-  background: #764ba2;
+  background: #a00000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 8px rgba(192, 0, 0, 0.3);
 }
 
 .spd__btn--save {

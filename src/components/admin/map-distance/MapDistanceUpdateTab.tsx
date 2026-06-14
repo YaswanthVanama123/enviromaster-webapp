@@ -421,7 +421,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
           <div className="mdu-sync-paused">
             <div className="mdu-sync-progress-header">
               <span className="mdu-sync-progress-title">
-                <MdPause size={16} color="#6366f1" />
+                <MdPause size={16} color="#c00000" />
                 {t('adminTools.mapDistanceUpdate.updatePaused', { name: syncStatus.job.currentCustomerName || t('adminTools.mapDistanceUpdate.unknown') })}
               </span>
               <span className="mdu-sync-progress-count">

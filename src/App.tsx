@@ -22,13 +22,16 @@ import { AuthProvider, AuthGuard } from "./components/auth";
 function AppContent() {
   const location = useLocation();
   const isEditMode = location.pathname.startsWith('/edit/pdf');
-  const isLoginPage = location.pathname === '/login';
+  const isLoginPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isLandingPage = location.pathname === '/';
+  const isFormFilling = isEditMode || location.pathname.startsWith('/form-filling');
+  const isOverlayPage = isFormFilling || isLoginPage || isLandingPage;
 
   return (
     <div className={`shell ${isEditMode ? 'edit-mode' : ''}`}>
       {!isEditMode && !isLoginPage && !isLandingPage && <NavBar />}
       <main className={`page-body ${isEditMode ? 'edit-mode-body' : ''}`}>
+        <div className={isOverlayPage ? undefined : 'page-enter'} key={location.pathname}>
         <Routes>
           {/* Public landing page (logged-out visitors). Redirects to /home if authenticated. */}
           <Route path="/" element={<Landing />} />
@@ -69,6 +72,7 @@ function AppContent() {
           {/* Any unknown path redirects to the home page */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </div>
       </main>
     </div>
   );

@@ -170,7 +170,7 @@ export default function MyQuota() {
         </div>
 
         {}
-        <div className="my-quota__stats-grid">
+        <div className="my-quota__stats-grid em-stagger">
           <div className="my-quota__stat-card">
             <span className="my-quota__stat-label">{t('quota.stats.target')}</span>
             <span className="my-quota__stat-value">{formatMoney(quotaStatus.quota.target)}</span>
@@ -193,7 +193,7 @@ export default function MyQuota() {
       {}
       <div className="my-quota__next-tier">
         <h3>{t('quota.nextTier.title')}</h3>
-        <div className="my-quota__tier-grid">
+        <div className="my-quota__tier-grid em-stagger">
           {quotaStatus.quota.level === 'below' && (
             <div className="my-quota__tier-card">
               <span className="my-quota__tier-label">{t('quota.nextTier.toReachQuota')}</span>
@@ -238,7 +238,7 @@ export default function MyQuota() {
       {quotaStatus.recentAgreements && quotaStatus.recentAgreements.length > 0 && (
         <div className="my-quota__recent">
           <h3>{t('quota.recent.title')}</h3>
-          <div className="my-quota__recent-list">
+          <div className="my-quota__recent-list em-stagger">
             {quotaStatus.recentAgreements.map((agreement) => (
               <div key={agreement._id} className="my-quota__recent-item">
                 <div className="my-quota__recent-info">
@@ -258,7 +258,7 @@ export default function MyQuota() {
       {quotaHistory.length > 0 && (
         <div className="my-quota__history">
           <h3>{t('quota.history.title')}</h3>
-          <div className="my-quota__history-list">
+          <div className="my-quota__history-list em-stagger">
             {quotaHistory.map((period) => {
               const periodConfig = QUOTA_LEVEL_CONFIG[period.quotaLevel];
               return (

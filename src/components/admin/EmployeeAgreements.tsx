@@ -60,7 +60,7 @@ const getStatusConfig = (status: string, t: TFunction) => {
     pending_approval: { label: t("employeeAgreements.statusPending"), color: "#d97706", bg: "#fef3c7" },
     approved_salesman: { label: t("employeeAgreements.statusApproved"), color: "#2563eb", bg: "#dbeafe" },
     approved_admin: { label: t("employeeAgreements.statusCompleted"), color: "#059669", bg: "#d1fae5" },
-    finalized: { label: t("employeeAgreements.statusFinalized"), color: "#7c3aed", bg: "#ede9fe" },
+    finalized: { label: t("employeeAgreements.statusFinalized"), color: "#c00000", bg: "#fdeaea" },
   };
   return configs[status] || { label: status, color: "#6b7280", bg: "#f3f4f6" };
 };
@@ -68,7 +68,7 @@ const getStatusConfig = (status: string, t: TFunction) => {
 const getFileTypeConfig = (fileType: string, t: TFunction) => {
   const configs: Record<string, { label: string; color: string }> = {
     main_pdf: { label: t("employeeAgreements.fileTypeMainPdf"), color: "#2563eb" },
-    version_pdf: { label: t("employeeAgreements.fileTypeVersion"), color: "#7c3aed" },
+    version_pdf: { label: t("employeeAgreements.fileTypeVersion"), color: "#c00000" },
     attached_pdf: { label: t("employeeAgreements.fileTypeAttached"), color: "#059669" },
     version_log: { label: t("employeeAgreements.fileTypeLog"), color: "#d97706" },
   };

@@ -12,6 +12,7 @@ import {
   faBolt,
   faLanguage,
   faRightToBracket,
+  faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthContext } from "./auth";
 import { SUPPORTED_LANGUAGES } from "../i18n";
@@ -98,6 +99,10 @@ export default function Landing() {
           <span className="landing__hero-badge landing__anim landing__anim--1">{t("landing.badge")}</span>
           <h1 className="landing__hero-title landing__anim landing__anim--2">{t("landing.heroTitle")}</h1>
           <p className="landing__hero-subtitle landing__anim landing__anim--3">{t("landing.heroSubtitle")}</p>
+          <p className="landing__hero-region landing__anim landing__anim--3">
+            <FontAwesomeIcon icon={faLocationDot} />
+            {t("landing.region")}
+          </p>
           <p className="landing__hero-desc landing__anim landing__anim--4">{t("landing.heroDescription")}</p>
           <div className="landing__hero-actions landing__anim landing__anim--5">
             <button className="landing__cta-primary" type="button" onClick={() => navigate("/login")}>

@@ -293,7 +293,7 @@ export const BackupStatisticsView: React.FC<BackupStatisticsViewProps> = ({
     '#10b981', 
     '#f59e0b', 
     '#ef4444', 
-    '#8b5cf6', 
+    '#c00000', 
     '#f97316'  
   ];
 

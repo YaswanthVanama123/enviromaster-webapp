@@ -774,8 +774,8 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#1d4ed8',
   },
   employeeBadge: {
-    backgroundColor: '#e0e7ff',
-    color: '#4338ca',
+    backgroundColor: '#fdeaea',
+    color: '#a00000',
   },
   activeBadge: {
     backgroundColor: '#dcfce7',

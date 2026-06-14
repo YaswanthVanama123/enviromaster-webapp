@@ -457,7 +457,7 @@ export default function Home() {
           <h2 className="home__section-title">{t("home.sectionTitle")}</h2>
         </div>
 
-        <div className="home__cards">
+        <div className="home__cards em-stagger">
           {agreementOptions.map((option) => (
             <div
               key={option.id}

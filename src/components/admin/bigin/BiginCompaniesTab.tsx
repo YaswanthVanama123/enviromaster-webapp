@@ -239,7 +239,7 @@ export const BiginCompaniesTab: React.FC = () => {
       ) : companies.length === 0 ? (
         <div className="bc-empty">
           <div className="bc-empty-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c00000" strokeWidth="1.5">
               <path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" />
               <path d="M8 14v3M12 14v3M16 14v3" />
             </svg>

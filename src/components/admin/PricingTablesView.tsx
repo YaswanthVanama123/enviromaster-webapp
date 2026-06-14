@@ -1105,7 +1105,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   viewAllFieldsBtn: {
     padding: "12px 24px",
-    backgroundColor: "#8b5cf6",
+    backgroundColor: "#c00000",
     color: "white",
     border: "none",
     borderRadius: "8px",

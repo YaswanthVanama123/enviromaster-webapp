@@ -375,7 +375,7 @@ export default function AdminCommissions() {
         </header>
 
         {/* Summary Cards */}
-        <div className="admin-commissions__summary-grid">
+        <div className="admin-commissions__summary-grid em-stagger">
           <div className="admin-commissions__summary-card admin-commissions__summary-card--primary">
             <div className="admin-commissions__summary-icon">$</div>
             <div className="admin-commissions__summary-content">
@@ -453,7 +453,7 @@ export default function AdminCommissions() {
               <p>{t('adminCommissions.noResults')}</p>
             </div>
           ) : (
-            <div className="admin-commissions__agreements">
+            <div className="admin-commissions__agreements em-stagger">
               {filteredCommissions.map((agreement) => {
                 const statusStyle = STATUS_COLORS[agreement.status] || STATUS_COLORS.draft;
                 const isExpanded = expandedId === agreement.id;
@@ -638,7 +638,7 @@ export default function AdminCommissions() {
 
       {/* Summary Totals */}
       {employeesData && (
-        <div className="admin-commissions__summary-grid">
+        <div className="admin-commissions__summary-grid em-stagger">
           <div className="admin-commissions__summary-card admin-commissions__summary-card--primary">
             <div className="admin-commissions__summary-icon">$</div>
             <div className="admin-commissions__summary-content">
@@ -691,7 +691,7 @@ export default function AdminCommissions() {
             <p>{t('adminCommissions.noEmployees')}</p>
           </div>
         ) : (
-          <div className="admin-commissions__employees-grid">
+          <div className="admin-commissions__employees-grid em-stagger">
             {filteredEmployees.map((employee, index) => (
               <div
                 key={employee.userId || `employee-${index}`}

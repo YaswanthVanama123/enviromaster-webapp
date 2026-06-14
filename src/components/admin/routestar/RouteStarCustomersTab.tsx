@@ -214,7 +214,7 @@ export const RouteStarCustomersTab: React.FC = () => {
       ) : customers.length === 0 ? (
         <div className="rs-empty">
           <div className="rs-empty-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c00000" strokeWidth="1.5">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />

@@ -152,7 +152,7 @@ export const QuotaDashboard: React.FC<QuotaDashboardProps> = ({ onViewAgreements
           </div>
 
           {}
-          <div className="stats-grid">
+          <div className="stats-grid em-stagger">
             <div className="stat-card">
               <div className="stat-label">{t("adminQuota.dashboard.agreementsClosed")}</div>
               <div className="stat-value">{quotaStatus.progress.agreementCount}</div>

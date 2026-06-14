@@ -1134,7 +1134,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                     <FontAwesomeIcon icon={faCaretRight} />
                                   </span>
                                   <strong><FontAwesomeIcon icon={faCog} /> {t("adminTools.backup.details.configurationSettings")}</strong>
-                                  <span style={{...styles.badge, backgroundColor: '#e0e7ff', color: '#3730a3', marginLeft: '12px'}}>
+                                  <span style={{...styles.badge, backgroundColor: '#fdeaea', color: '#a00000', marginLeft: '12px'}}>
                                     {t("adminTools.backup.details.settingsBadge", { count: Object.keys(config.settings).length })}
                                   </span>
                                 </div>
@@ -1188,7 +1188,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                         </span>
                                       )}
                                       {hasStandardPricing && (
-                                        <span style={{...styles.badge, backgroundColor: '#e0e7ff', color: '#3730a3'}}>
+                                        <span style={{...styles.badge, backgroundColor: '#fdeaea', color: '#a00000'}}>
                                           {Object.keys(config.pricing).length !== 1 ? t("adminTools.backup.details.tierOther", { count: Object.keys(config.pricing).length }) : t("adminTools.backup.details.tierOne", { count: Object.keys(config.pricing).length })}
                                         </span>
                                       )}
@@ -1279,7 +1279,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                             <h4 style={{
                                               fontSize: '16px',
                                               fontWeight: '600',
-                                              color: '#3730a3',
+                                              color: '#a00000',
                                               marginBottom: '12px',
                                               display: 'flex',
                                               alignItems: 'center',
@@ -1291,7 +1291,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
                                               <div key={tierKey} style={{
                                                 padding: '16px',
                                                 margin: '6px 0',
-                                                backgroundColor: '#3730a3',
+                                                backgroundColor: '#a00000',
                                                 color: 'white',
                                                 borderRadius: '8px',
                                                 display: 'flex',

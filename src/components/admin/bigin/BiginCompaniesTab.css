@@ -117,8 +117,8 @@
 }
 
 .bc-stat-card:nth-child(4) {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-  border-color: #ddd6fe;
+  background: linear-gradient(135deg, #f5f3ff 0%, #fdeaea 100%);
+  border-color: #f3d3d3;
 }
 
 .bc-stat-value {
@@ -131,7 +131,7 @@
 .bc-stat-card:nth-child(1) .bc-stat-value { color: #2563eb; }
 .bc-stat-card:nth-child(2) .bc-stat-value { color: #059669; }
 .bc-stat-card:nth-child(3) .bc-stat-value { color: #d97706; }
-.bc-stat-card:nth-child(4) .bc-stat-value { color: #7c3aed; }
+.bc-stat-card:nth-child(4) .bc-stat-value { color: #c00000; }
 
 .bc-stat-label {
   font-size: 13px;

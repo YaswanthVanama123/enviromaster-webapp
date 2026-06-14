@@ -390,7 +390,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   viewButton: {
     padding: "10px 20px",
-    backgroundColor: "#6366f1",
+    backgroundColor: "#c00000",
     color: "white",
     border: "none",
     borderRadius: "8px",

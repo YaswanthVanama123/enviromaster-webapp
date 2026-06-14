@@ -123,7 +123,7 @@ export const AccountTypeDetector: React.FC<AccountTypeDetectorProps> = ({
       case 'Bread5':
         return '#2563eb'; 
       case 'Bread15':
-        return '#7c3aed'; 
+        return '#c00000'; 
       case 'Pit':
         return '#dc2626'; 
       default:

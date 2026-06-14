@@ -358,7 +358,7 @@ export const PayrollTab: React.FC = () => {
   ) => (
     <>
       {tot && (
-        <div className="payroll-summary-grid">
+        <div className="payroll-summary-grid em-stagger">
           <div className="payroll-summary-card primary">
             <div className="summary-icon">
               <FaDollarSign />
@@ -405,7 +405,7 @@ export const PayrollTab: React.FC = () => {
             <p>{t("payroll.employees.noAgreements")}</p>
           </div>
         ) : (
-          <div className="payroll-employees-list">
+          <div className="payroll-employees-list em-stagger">
             {emps.map((emp) => (
               <div
                 key={emp.username}
@@ -682,7 +682,7 @@ export const PayrollTab: React.FC = () => {
                 <p>{t("payroll.history.noHistory")}</p>
               </div>
             ) : (
-              <div className="history-list">
+              <div className="history-list em-stagger">
                 {history.map((period, idx) => (
                   <div
                     key={idx}

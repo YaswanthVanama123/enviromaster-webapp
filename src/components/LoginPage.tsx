@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faCheck,
+  faRightToBracket,
+  faTriangleExclamation,
+  faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAuthContext } from "./auth";
 import { Spinner } from "./atoms/Spinner";
 import type { UserRole } from "../backendservice/types/api.types";
 import logo from "../assets/em-logo.png";
+import "./LoginPage.css";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +35,7 @@ export const LoginPage: React.FC = () => {
     if (isAuthenticated && !hasNavigated) {
       setHasNavigated(true);
       const from = (location.state as any)?.from?.pathname || "/home";
-      
+
       setTimeout(() => {
         navigate(from, { replace: true });
       }, 0);
@@ -43,289 +55,165 @@ export const LoginPage: React.FC = () => {
     setLoginError(null);
     try {
       await login({ username, password }, activeTab);
-      
     } catch (err: any) {
       setLoginError(err?.message || t("auth.loginFailed"));
     }
   };
 
+  const roleLabel =
+    activeTab === "admin" ? t("auth.tabs.admin") : t("auth.tabs.employee");
+
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {}
-        <div style={styles.header}>
-          <div style={styles.logoContainer}>
-            <img src={logo} alt="EnviroMaster" style={styles.logo} />
-          </div>
-          <h1 style={styles.title}>EnviroMaster</h1>
-          <p style={styles.subtitle}>{t("auth.subtitle")}</p>
+    <div className="login">
+      <aside className="login__brand">
+        <div className="login__brand-bg" aria-hidden="true">
+          <span className="login__blob login__blob--1" />
+          <span className="login__blob login__blob--2" />
+          <span className="login__blob login__blob--3" />
         </div>
-
-        {}
-        <div style={styles.tabContainer}>
-          <button
-            type="button"
-            style={{
-              ...styles.tab,
-              ...(activeTab === "employee" ? styles.tabActive : styles.tabInactive),
-            }}
-            onClick={() => setActiveTab("employee")}
-          >
-            {t("auth.tabs.employee")}
-          </button>
-          <button
-            type="button"
-            style={{
-              ...styles.tab,
-              ...(activeTab === "admin" ? styles.tabActive : styles.tabInactive),
-            }}
-            onClick={() => setActiveTab("admin")}
-          >
-            {t("auth.tabs.admin")}
-          </button>
-        </div>
-
-        {}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>{t("auth.username")}</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-              placeholder={t("auth.usernamePlaceholder")}
-              required
-              autoComplete="username"
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>{t("auth.password")}</label>
-            <div style={styles.passwordContainer}>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={styles.passwordInput}
-                placeholder={t("auth.passwordPlaceholder")}
-                required
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                style={styles.eyeButton}
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-              >
-                {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {loginError && <div style={styles.error}>{loginError}</div>}
-
-          <button
-            type="submit"
-            style={{
-              ...styles.button,
-              ...(loading ? styles.buttonDisabled : {}),
-            }}
-            disabled={loading}
-          >
-            {loading ? (
-              <span style={styles.buttonContent}>
-                <Spinner size="sm" className="em-spinner--inline" />
-                {t("auth.signingIn")}
+        <div className="login__brand-inner">
+          <img src={logo} alt="EnviroMaster" className="login__brand-logo" />
+          <h1 className="login__brand-title">{t("auth.brand.title")}</h1>
+          <p className="login__brand-region">
+            <FontAwesomeIcon icon={faLocationDot} />
+            {t("auth.brand.region")}
+          </p>
+          <p className="login__brand-desc">{t("auth.brand.desc")}</p>
+          <ul className="login__brand-points">
+            <li className="login__brand-point">
+              <span className="login__brand-point-icon">
+                <FontAwesomeIcon icon={faCheck} />
               </span>
-            ) : (
-              t("auth.signInAs", { role: activeTab === "admin" ? t("auth.tabs.admin") : t("auth.tabs.employee") })
-            )}
-          </button>
-        </form>
+              {t("auth.brand.point1")}
+            </li>
+            <li className="login__brand-point">
+              <span className="login__brand-point-icon">
+                <FontAwesomeIcon icon={faCheck} />
+              </span>
+              {t("auth.brand.point2")}
+            </li>
+            <li className="login__brand-point">
+              <span className="login__brand-point-icon">
+                <FontAwesomeIcon icon={faCheck} />
+              </span>
+              {t("auth.brand.point3")}
+            </li>
+          </ul>
+        </div>
+      </aside>
 
-        {}
-        <p style={styles.infoText}>
-          {activeTab === "admin"
-            ? t("auth.info.admin")
-            : t("auth.info.employee")}
-        </p>
-      </div>
+      <section className="login__panel">
+        <div className="login__card">
+          <img src={logo} alt="EnviroMaster" className="login__mobile-logo" />
+          <div className="login__heading">
+            <h2 className="login__title">{t("auth.welcomeBack")}</h2>
+            <p className="login__subtitle">{t("auth.subtitle")}</p>
+          </div>
+
+          <div className="login__tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "employee"}
+              className={`login__tab ${activeTab === "employee" ? "active" : ""}`}
+              onClick={() => setActiveTab("employee")}
+            >
+              {t("auth.tabs.employee")}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "admin"}
+              className={`login__tab ${activeTab === "admin" ? "active" : ""}`}
+              onClick={() => setActiveTab("admin")}
+            >
+              {t("auth.tabs.admin")}
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="login__form">
+            <div className="login__group">
+              <label className="login__label" htmlFor="login-username">
+                {t("auth.username")}
+              </label>
+              <div className="login__input-wrap">
+                <span className="login__field-icon">
+                  <FontAwesomeIcon icon={faUser} />
+                </span>
+                <input
+                  id="login-username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="login__input"
+                  placeholder={t("auth.usernamePlaceholder")}
+                  required
+                  autoComplete="username"
+                />
+              </div>
+            </div>
+
+            <div className="login__group">
+              <label className="login__label" htmlFor="login-password">
+                {t("auth.password")}
+              </label>
+              <div className="login__input-wrap">
+                <span className="login__field-icon">
+                  <FontAwesomeIcon icon={faLock} />
+                </span>
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="login__input login__input--password"
+                  placeholder={t("auth.passwordPlaceholder")}
+                  required
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="login__eye"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </button>
+              </div>
+            </div>
+
+            {loginError && (
+              <div className="login__error" role="alert">
+                <FontAwesomeIcon icon={faTriangleExclamation} />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <button type="submit" className="login__submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner size="sm" className="em-spinner--inline" />
+                  {t("auth.signingIn")}
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faRightToBracket} />
+                  {t("auth.signInAs", { role: roleLabel })}
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="login__info">
+            {activeTab === "admin"
+              ? t("auth.info.admin")
+              : t("auth.info.employee")}
+          </p>
+        </div>
+      </section>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    padding: "20px",
-    zIndex: 9999,
-  },
-  card: {
-    backgroundColor: "white",
-    borderRadius: "16px",
-    padding: "40px",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.1)",
-    width: "100%",
-    maxWidth: "420px",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "32px",
-  },
-  logoContainer: {
-    width: "80px",
-    height: "80px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 16px",
-  },
-  logo: {
-    width: "100%",
-    height: "auto",
-    objectFit: "contain",
-  },
-  title: {
-    fontSize: "24px",
-    fontWeight: "700",
-    color: "#1e293b",
-    margin: "0 0 4px 0",
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#64748b",
-    margin: 0,
-  },
-  tabContainer: {
-    display: "flex",
-    backgroundColor: "#f1f1f1",
-    borderRadius: "10px",
-    padding: "4px",
-    marginBottom: "24px",
-  },
-  tab: {
-    flex: 1,
-    padding: "10px 16px",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
-  tabActive: {
-    backgroundColor: "#c00000",
-    color: "white",
-    boxShadow: "0 2px 4px rgba(192,0,0,0.2)",
-  },
-  tabInactive: {
-    backgroundColor: "transparent",
-    color: "#666",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-  },
-  formGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  label: {
-    fontSize: "14px",
-    fontWeight: "500",
-    color: "#374151",
-  },
-  input: {
-    padding: "12px 14px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    fontSize: "14px",
-    outline: "none",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  },
-  passwordContainer: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-  },
-  passwordInput: {
-    width: "100%",
-    padding: "12px 44px 12px 14px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    fontSize: "14px",
-    outline: "none",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  },
-  eyeButton: {
-    position: "absolute",
-    right: "12px",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: "4px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button: {
-    padding: "14px",
-    backgroundColor: "#c00000",
-    color: "white",
-    border: "none",
-    borderRadius: "10px",
-    fontSize: "15px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "background-color 0.2s",
-    marginTop: "8px",
-  },
-  buttonDisabled: {
-    backgroundColor: "#e57373",
-    cursor: "not-allowed",
-  },
-  buttonContent: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-  },
-  error: {
-    padding: "12px",
-    backgroundColor: "#fef2f2",
-    color: "#dc2626",
-    borderRadius: "10px",
-    fontSize: "14px",
-    border: "1px solid #fecaca",
-  },
-  infoText: {
-    marginTop: "24px",
-    fontSize: "13px",
-    color: "#888",
-    textAlign: "center",
-    lineHeight: "1.5",
-  },
 };
 
 export default LoginPage;

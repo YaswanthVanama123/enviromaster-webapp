@@ -165,7 +165,7 @@
 }
 
 .md-sync-stat.records {
-  color: #6366f1;
+  color: #c00000;
 }
 
 .md-sync-interrupted {
@@ -196,22 +196,22 @@
 
 .md-sync-paused {
   padding: 16px 20px;
-  background: #eef2ff;
+  background: #fdeaea;
   border: 1px solid #c7d2fe;
   border-radius: 10px;
   margin-bottom: 16px;
 }
 
 .md-sync-paused .md-sync-progress-title {
-  color: #4338ca;
+  color: #a00000;
 }
 
 .md-sync-paused .md-sync-progress-count {
-  color: #4338ca;
+  color: #a00000;
 }
 
 .md-progress-fill.paused {
-  background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(90deg, #c00000 0%, #a00000 100%);
 }
 
 .md-pause-btn {
@@ -427,8 +427,8 @@
 
 .md-dropdown-trigger:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #c00000;
+  box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.1);
 }
 
 .md-dropdown-value {
@@ -484,7 +484,7 @@
 }
 
 .md-dropdown-option.selected {
-  background: #eef2ff;
+  background: #fdeaea;
 }
 
 .md-option-name {
@@ -514,7 +514,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: #6366f1;
+  background: #c00000;
   color: white;
   border: none;
   border-radius: 8px;
@@ -525,7 +525,7 @@
 }
 
 .md-fetch-btn:hover:not(:disabled) {
-  background: #4f46e5;
+  background: #a00000;
 }
 
 .md-fetch-btn:disabled {
@@ -546,7 +546,7 @@
   width: 48px;
   height: 48px;
   border: 3px solid #e2e8f0;
-  border-top-color: #6366f1;
+  border-top-color: #c00000;
   border-radius: 50%;
   animation: md-spin 0.8s linear infinite;
   margin-bottom: 16px;
@@ -643,7 +643,7 @@
 }
 
 .md-duration {
-  color: #6366f1;
+  color: #c00000;
 }
 
 .md-empty {

@@ -94,13 +94,13 @@
 }
 
 .cm-save-btn.has-changes {
-  background: #6366f1;
+  background: #c00000;
   color: white;
   cursor: pointer;
 }
 
 .cm-save-btn.has-changes:hover:not(:disabled) {
-  background: #4f46e5;
+  background: #a00000;
 }
 
 .cm-save-btn:disabled {
@@ -162,8 +162,8 @@
 
 .cm-search-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #c00000;
+  box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.1);
 }
 
 .cm-search-btn {
@@ -217,7 +217,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid #e2e8f0;
-  border-top-color: #6366f1;
+  border-top-color: #c00000;
   border-radius: 50%;
   animation: cm-spin 0.8s linear infinite;
 }
@@ -412,7 +412,7 @@
 }
 
 .cm-dropdown-option.selected {
-  background: #eef2ff;
+  background: #fdeaea;
 }
 
 .cm-dropdown-option.cm-clear-option {

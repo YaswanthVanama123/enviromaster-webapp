@@ -11,3 +11,72 @@
   from { transform: translateY(8px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+@keyframes em-fade-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes em-scale-in {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes em-pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes em-slide-in-right {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes em-shimmer {
+  from { background-position: -160% 0; }
+  to { background-position: 160% 0; }
+}
+
+@keyframes em-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.em-anim-fade-up { animation: em-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.em-anim-scale-in { animation: em-scale-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.em-anim-fade-in { animation: em-fade-in 0.4s ease both; }
+
+.page-enter {
+  animation: em-fade-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.em-stagger > * {
+  animation: em-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.em-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.em-stagger > *:nth-child(2) { animation-delay: 0.07s; }
+.em-stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.em-stagger > *:nth-child(4) { animation-delay: 0.17s; }
+.em-stagger > *:nth-child(5) { animation-delay: 0.22s; }
+.em-stagger > *:nth-child(6) { animation-delay: 0.27s; }
+.em-stagger > *:nth-child(7) { animation-delay: 0.32s; }
+.em-stagger > *:nth-child(8) { animation-delay: 0.37s; }
+
+.em-skeleton {
+  background: linear-gradient(90deg, #eef2f6 25%, #f6f8fa 37%, #eef2f6 63%);
+  background-size: 320% 100%;
+  animation: em-shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .em-anim-fade-up,
+  .em-anim-scale-in,
+  .em-anim-fade-in,
+  .page-enter,
+  .em-stagger > *,
+  .em-skeleton {
+    animation: none !important;
+  }
+}

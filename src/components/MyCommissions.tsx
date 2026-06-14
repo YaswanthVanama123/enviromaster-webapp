@@ -487,7 +487,7 @@ export default function MyCommissions() {
       </div>
 
       {/* Summary Cards */}
-      <div className="my-commissions__summary-grid">
+      <div className="my-commissions__summary-grid em-stagger">
         <div className="my-commissions__summary-card my-commissions__summary-card--primary">
           <div className="my-commissions__summary-icon">$</div>
           <div className="my-commissions__summary-content">
@@ -565,7 +565,7 @@ export default function MyCommissions() {
             <p>{t('commissions.noResults')}</p>
           </div>
         ) : (
-          <div className="my-commissions__agreements">
+          <div className="my-commissions__agreements em-stagger">
             {filteredCommissions.map((agreement) => {
               const statusStyle = STATUS_COLORS[agreement.status] || STATUS_COLORS.draft;
               const isExpanded = expandedId === agreement.id;

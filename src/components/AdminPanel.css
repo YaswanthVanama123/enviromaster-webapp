@@ -40,7 +40,7 @@
 .brand-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -48,13 +48,13 @@
   color: white;
   font-size: 16px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(192, 0, 0, 0.3);
 }
 
 .brand-name {
   font-size: 18px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -89,8 +89,8 @@
 
 .modern-search:focus-within {
   background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(102, 126, 234, 0.3);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+  border-color: rgba(192, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(192, 0, 0, 0.15);
 }
 
 .search-icon-modern {
@@ -143,7 +143,7 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,6 +205,9 @@
   margin-top: -8px;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 4px;
+  scroll-behavior: smooth;
 }
 
 .secondary-nav-wrap {
@@ -216,7 +219,7 @@
 }
 
 .secondary-nav-wrap .secondary-nav {
-  padding: 0;
+  padding: 4px;
   margin-top: 0;
   flex: 1;
   min-width: 0;
@@ -272,6 +275,7 @@
   gap: 8px;
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
 }
 
 .secondary-nav-item:hover {
@@ -282,9 +286,9 @@
 }
 
 .secondary-nav-item.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   color: white;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(192, 0, 0, 0.5);
   border-color: transparent;
   transform: translateY(-2px);
 }
@@ -425,8 +429,8 @@
 }
 
 .view-all-btn:hover {
-  background: rgba(102, 126, 234, 0.15);
-  color: #667eea;
+  background: rgba(192, 0, 0, 0.15);
+  color: #c00000;
   transform: scale(1.1);
 }
 
@@ -704,8 +708,8 @@
 }
 
 .pie-filter-dropdown:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  border-color: #c00000;
+  box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.15);
 }
 
 .pie-chart-container {
@@ -870,9 +874,9 @@
 
 .date-picker-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #c00000;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px rgba(192, 0, 0, 0.15);
 }
 
 .date-picker-actions {
@@ -883,7 +887,7 @@
 .date-picker-apply {
   flex: 1;
   padding: 14px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -891,12 +895,12 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(192, 0, 0, 0.4);
 }
 
 .date-picker-apply:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 8px 28px rgba(192, 0, 0, 0.5);
 }
 
 .date-picker-apply:active:not(:disabled) {
@@ -956,7 +960,7 @@
 .welcome-name {
   font-size: 30px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #c00000 0%, #a00000 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

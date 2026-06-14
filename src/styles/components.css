@@ -9,8 +9,18 @@
   cursor: pointer;
   transition: background-color var(--em-transition-base),
               border-color var(--em-transition-base),
-              color var(--em-transition-base);
+              color var(--em-transition-base),
+              transform var(--em-transition-fast),
+              box-shadow var(--em-transition-base);
   font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.em-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.em-btn:active:not(:disabled) { transform: translateY(0) scale(0.985); }
+.em-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--em-shadow-focus-primary);
 }
 .em-btn:disabled { cursor: not-allowed; opacity: 0.7; }
 .em-btn--block { width: 100%; }
@@ -24,7 +34,10 @@
   background-color: var(--em-color-primary);
   color: var(--em-color-text-inverse);
 }
-.em-btn--primary:hover:not(:disabled) { background-color: var(--em-color-primary-hover); }
+.em-btn--primary:hover:not(:disabled) {
+  background-color: var(--em-color-primary-hover);
+  box-shadow: 0 6px 16px rgba(192, 0, 0, 0.28);
+}
 .em-btn--primary:disabled { background-color: var(--em-color-primary-disabled); }
 
 .em-btn--secondary {
@@ -192,6 +205,7 @@
   font-weight: var(--em-font-weight-medium);
   text-transform: capitalize;
   line-height: 1;
+  animation: em-pop 0.28s var(--em-ease-spring) both;
 }
 .em-badge--neutral { background: var(--em-color-bg-muted); color: var(--em-color-text-muted); }
 .em-badge--primary { background: var(--em-color-info-bg); color: var(--em-color-info); }
@@ -206,6 +220,52 @@
   justify-content: center;
   color: currentColor;
   flex-shrink: 0;
+}
+
+.my-commissions__summary-card,
+.admin-commissions__summary-card,
+.my-quota__stat-card,
+.payroll-summary-card,
+.admin-commissions__employee-card,
+.payroll-employee-card,
+.my-commissions__agreement,
+.my-quota__recent-item,
+.my-quota__history-item {
+  transition: transform var(--em-transition-spring),
+              box-shadow var(--em-transition-base),
+              border-color var(--em-transition-base);
+  will-change: transform;
+}
+
+.my-commissions__summary-card:hover,
+.admin-commissions__summary-card:hover,
+.my-quota__stat-card:hover,
+.payroll-summary-card:hover,
+.admin-commissions__employee-card:hover,
+.payroll-employee-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--em-shadow-hover);
+}
+
+.my-commissions__agreement:hover,
+.my-quota__recent-item:hover,
+.my-quota__history-item:hover {
+  transform: translateX(3px);
+  border-color: var(--em-color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-commissions__summary-card,
+  .admin-commissions__summary-card,
+  .my-quota__stat-card,
+  .payroll-summary-card,
+  .admin-commissions__employee-card,
+  .payroll-employee-card,
+  .my-commissions__agreement,
+  .my-quota__recent-item,
+  .my-quota__history-item {
+    transition: none;
+  }
 }
 
 .em-field {
@@ -261,7 +321,7 @@
   width: 100%;
   max-height: 90vh;
   overflow: auto;
-  animation: em-slide-in-up 0.18s ease;
+  animation: em-scale-in 0.22s var(--em-ease-spring);
   box-shadow: var(--em-shadow-lg);
 }
 .em-modal--sm { max-width: 420px; }
@@ -303,7 +363,7 @@
   font-size: var(--em-font-size-md);
   z-index: var(--em-z-toast);
   box-shadow: var(--em-shadow-md);
-  animation: em-slide-in-up 0.2s ease;
+  animation: em-slide-in-right 0.28s var(--em-ease-spring);
   min-width: 240px;
   max-width: 480px;
 }
