@@ -237,7 +237,7 @@ export const ServicesProvider: React.FC<{
   // converting an existing small account (Pit) to a larger one (Anchor) pays
   // commission on the full value (no deduction). Persisted & frozen with the
   // agreement; only meaningful once Bigin-connected and RouteStar-mapped.
-  const [isNewLocation, setIsNewLocation] = useState<boolean>(true);
+  const [isNewLocation, setIsNewLocation] = useState<boolean>(false);
 
   useEffect(() => {
     let cancelled = false;

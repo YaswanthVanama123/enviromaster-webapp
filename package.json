@@ -16,6 +16,8 @@
     "preview": "vite preview",
     "type-check": "tsc -b --noEmit",
     "clean": "rm -rf dist node_modules/.vite",
+    "build:commission-engine": "esbuild src/shared/commission-engine/index.ts --bundle --format=esm --platform=node --target=node18 --legal-comments=none --banner:js=\"// GENERATED FILE - do not edit by hand. Source: enviromaster-webapp/src/shared/commission-engine. Rebuild: npm run build:commission-engine\" --outfile=../enviromaster-server/src/shared/commission-engine/engine.mjs",
+    "check:commission-engine": "node scripts/check-commission-engine-sync.mjs",
     "vercel-build": "npm run build"
   },
   "dependencies": {
