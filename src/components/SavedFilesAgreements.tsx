@@ -81,8 +81,6 @@ const getStatusConfig = (status: string) => {
   return config || { value: status, label: status, color: '#6b7280', canManuallySelect: false };
 };
 
-let hasInitiallyLoaded = false;
-
 let cachedEmailTemplate: { subject: string; body: string } | null = null;
 let isLoadingEmailTemplate = false;
 
@@ -105,6 +103,8 @@ export default function SavedFilesAgreements() {
   const isFetchingRef = useRef(false);
 
   const isFirstSearchRender = useRef(true);
+
+  const hasInitiallyLoadedRef = useRef(false);
 
   const [selectedFiles, setSelectedFiles] = useState<Record<string, boolean>>({});
 
@@ -369,25 +369,17 @@ export default function SavedFilesAgreements() {
   };
 
   useEffect(() => {
-    if (!hasInitiallyLoaded) {
-      hasInitiallyLoaded = true;
+    if (!hasInitiallyLoadedRef.current) {
+      hasInitiallyLoadedRef.current = true;
       console.log(`📁 [SAVED-FILES-AGREEMENTS] Initial load (context: ${isInAdminContext ? 'admin' : 'normal'})`);
       fetchAgreements(1, query);
     } else {
       console.log('⏭️ [SAVED-FILES-AGREEMENTS] Skipping duplicate initial load (React Strict Mode remount)');
     }
-
-    return () => {
-      setTimeout(() => {
-        hasInitiallyLoaded = false;
-        isFirstSearchRender.current = true;
-        console.log('🔄 [SAVED-FILES-AGREEMENTS] Flags reset after unmount (navigating away)');
-      }, 50);
-    };
   }, []);
 
   useEffect(() => {
-    if (!hasInitiallyLoaded) return;
+    if (!hasInitiallyLoadedRef.current) return;
 
     if (isFirstSearchRender.current) {
       isFirstSearchRender.current = false;
