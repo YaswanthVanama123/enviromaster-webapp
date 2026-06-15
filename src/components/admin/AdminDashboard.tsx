@@ -13,19 +13,37 @@ import { RouteStarCustomersTab } from "./routestar/RouteStarCustomersTab";
 import { BiginAuditTab } from "./bigin/BiginAuditTab";
 import { BiginCompaniesTab } from "./bigin/BiginCompaniesTab";
 import { CompanyMappingTab } from "./company-mapping/CompanyMappingTab";
-import { MapDistanceTab } from "./map-distance/MapDistanceTab";
 import { MapDistanceUpdateTab } from "./map-distance/MapDistanceUpdateTab";
 import { InsideSalesCheckTab } from "./inside-sales/InsideSalesCheckTab";
 import { AccountTypeDetectorTab } from "./account-type/AccountTypeDetectorTab";
 import { PayrollTab } from "./payroll/PayrollTab";
 import { pdfApi } from "../../backendservice/api/pdfApi";
-import { MdAttachMoney, MdSettings, MdInventory, MdBackup, MdWorkspaces, MdCalculate, MdTrendingUp, MdPeople, MdHistory, MdBusiness, MdLink, MdMap, MdRefresh, MdVerifiedUser, MdCategory, MdPayment } from "react-icons/md";
+import { MdAttachMoney, MdSettings, MdInventory, MdBackup, MdWorkspaces, MdCalculate, MdTrendingUp, MdPeople, MdHistory, MdBusiness, MdLink, MdRefresh, MdVerifiedUser, MdCategory, MdPayment } from "react-icons/md";
+import type { IconType } from "react-icons";
 import { FaHourglassHalf, FaDownload } from "react-icons/fa";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import "./AdminDashboard.css";
 
-type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll";
+type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll";
+
+const TABS: { key: TabType; Icon: IconType; labelKey: string }[] = [
+  { key: "pricing", Icon: MdAttachMoney, labelKey: "adminDashboard.tabs.pricing" },
+  { key: "services", Icon: MdSettings, labelKey: "adminDashboard.tabs.services" },
+  { key: "products", Icon: MdInventory, labelKey: "adminDashboard.tabs.products" },
+  { key: "backup", Icon: MdBackup, labelKey: "adminDashboard.tabs.backup" },
+  { key: "workflow", Icon: MdWorkspaces, labelKey: "adminDashboard.tabs.workflow" },
+  { key: "commissions", Icon: MdCalculate, labelKey: "adminDashboard.tabs.commissions" },
+  { key: "quota", Icon: MdTrendingUp, labelKey: "adminDashboard.tabs.quota" },
+  { key: "customers", Icon: MdPeople, labelKey: "adminDashboard.tabs.customers" },
+  { key: "audit", Icon: MdHistory, labelKey: "adminDashboard.tabs.audit" },
+  { key: "bigin-companies", Icon: MdBusiness, labelKey: "adminDashboard.tabs.biginCompanies" },
+  { key: "company-mapping", Icon: MdLink, labelKey: "adminDashboard.tabs.companyMapping" },
+  { key: "map-distance-update", Icon: MdRefresh, labelKey: "adminDashboard.tabs.mapDistanceUpdate" },
+  { key: "inside-sales", Icon: MdVerifiedUser, labelKey: "adminDashboard.tabs.insideSales" },
+  { key: "account-type-detector", Icon: MdCategory, labelKey: "adminDashboard.tabs.accountType" },
+  { key: "payroll", Icon: MdPayment, labelKey: "adminDashboard.tabs.payroll" },
+];
 
 interface AdminDashboardProps {
   isEmbedded?: boolean;
@@ -89,9 +107,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (path.includes('/admin-panel/') && (path.includes('/map-distance-update') || path.includes('/map-distance-update/'))) {
         return "map-distance-update";
       }
-      if (path.includes('/admin-panel/') && (path.includes('/map-distance') || path.includes('/map-distance/'))) {
-        return "map-distance";
-      }
       if (path.includes('/admin-panel/') && (path.includes('/inside-sales') || path.includes('/inside-sales/'))) {
         return "inside-sales";
       }
@@ -103,7 +118,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       }
 
       if (!currentSubtab) return "pricing";
-      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
       return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
     }
 
@@ -140,9 +155,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (path.includes('/pricing-tables/map-distance-update')) {
       return "map-distance-update";
     }
-    if (path.includes('/pricing-tables/map-distance')) {
-      return "map-distance";
-    }
     if (path.includes('/pricing-tables/inside-sales')) {
       return "inside-sales";
     }
@@ -154,7 +166,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
 
     if (!currentSubtab) return "pricing";
-    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
     return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
   };
 
@@ -177,6 +189,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     window.addEventListener("resize", updateNavScroll);
     return () => window.removeEventListener("resize", updateNavScroll);
   }, [updateNavScroll, activeTab]);
+
+  useEffect(() => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    const activeBtn = el.querySelector<HTMLElement>('[data-tab-active="true"]');
+    if (!activeBtn) return;
+    const containerRect = el.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+    const delta = (btnRect.left - containerRect.left) - (el.clientWidth - btnRect.width) / 2;
+    el.scrollTo({ left: el.scrollLeft + delta, behavior: "smooth" });
+  }, [activeTab]);
 
   const scrollNav = useCallback((direction: number) => {
     const el = navScrollRef.current;
@@ -256,166 +279,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
           <div className="apd-nav-scroll" ref={navScrollRef} onScroll={updateNavScroll} style={styles.navTabs}>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "pricing" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("pricing")}
-          >
-            <MdAttachMoney size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.pricing")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "services" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("services")}
-          >
-            <MdSettings size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.services")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "products" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("products")}
-          >
-            <MdInventory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.products")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "backup" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("backup")}
-          >
-            <MdBackup size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.backup")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "workflow" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("workflow")}
-          >
-            <MdWorkspaces size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.workflow")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "commissions" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("commissions")}
-          >
-            <MdCalculate size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.commissions")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "quota" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("quota")}
-          >
-            <MdTrendingUp size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.quota")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "customers" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("customers")}
-          >
-            <MdPeople size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.customers")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "audit" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("audit")}
-          >
-            <MdHistory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.audit")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "bigin-companies" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("bigin-companies")}
-          >
-            <MdBusiness size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.biginCompanies")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "company-mapping" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("company-mapping")}
-          >
-            <MdLink size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.companyMapping")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "map-distance" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("map-distance")}
-          >
-            <MdMap size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.mapDistance")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "map-distance-update" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("map-distance-update")}
-          >
-            <MdRefresh size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.mapDistanceUpdate")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "inside-sales" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("inside-sales")}
-          >
-            <MdVerifiedUser size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.insideSales")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "account-type-detector" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("account-type-detector")}
-          >
-            <MdCategory size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.accountType")}
-          </button>
-          <button
-            className="admin-dashboard-nav-button"
-            style={{
-              ...styles.navButton,
-              ...(activeTab === "payroll" ? styles.navButtonActive : {}),
-            }}
-            onClick={() => handleTabChange("payroll")}
-          >
-            <MdPayment size={20} style={{ marginRight: "8px" }} /> {t("adminDashboard.tabs.payroll")}
-          </button>
+          {TABS.map(({ key, Icon, labelKey }) => (
+            <button
+              key={key}
+              className="admin-dashboard-nav-button"
+              data-tab-active={activeTab === key}
+              style={{
+                ...styles.navButton,
+                ...(activeTab === key ? styles.navButtonActive : {}),
+              }}
+              onClick={() => handleTabChange(key)}
+            >
+              <Icon size={20} style={{ marginRight: "8px" }} /> {t(labelKey)}
+            </button>
+          ))}
         </div>
           <button
             type="button"
@@ -467,7 +344,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {activeTab === "audit" && <BiginAuditTab />}
         {activeTab === "bigin-companies" && <BiginCompaniesTab />}
         {activeTab === "company-mapping" && <CompanyMappingTab />}
-        {activeTab === "map-distance" && <MapDistanceTab />}
         {activeTab === "map-distance-update" && <MapDistanceUpdateTab />}
         {activeTab === "inside-sales" && <InsideSalesCheckTab />}
         {activeTab === "account-type-detector" && <AccountTypeDetectorTab />}
