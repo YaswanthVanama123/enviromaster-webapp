@@ -161,26 +161,10 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
   }, [lastEditTime]);
 
   return (
-    <div
-      className="agreement-card"
-      style={{
-        background: '#fff',
-        border: '1px solid #e6e6e6',
-        borderRadius: '10px',
-        marginBottom: '8px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-        position: 'relative'
-      }}
-    >
+    <div className="agreement-card">
       <div
         className="agreement-header"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '16px',
-          cursor: 'pointer',
-          borderBottom: isExpanded ? '1px solid #f0f0f0' : 'none'
-        }}
+        style={{ borderBottom: isExpanded ? '1px solid #f0f0f0' : 'none' }}
       >
         <div className="agreement-main-content">
           <div style={{ marginRight: '12px' }} onClick={(e) => e.stopPropagation()}>
@@ -214,7 +198,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
             }}
           />
 
-          <div style={{ flex: 1 }} onClick={handleToggleExpand}>
+          <div style={{ flex: 1, minWidth: 0 }} onClick={handleToggleExpand}>
           <span style={{
             fontWeight: '600',
             fontSize: '16px',

@@ -162,18 +162,11 @@ export const FileRow = memo((props: FileRowProps) => {
     <div
       className="file-row"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '12px',
         background: isSelected ? '#f0f9ff' : '#fafafa',
-        border: '1px solid',
-        borderColor: isSelected ? '#bae6fd' : '#f0f0f0',
-        borderRadius: '8px',
-        marginBottom: '8px',
-        transition: 'all 0.2s ease'
+        borderColor: isSelected ? '#bae6fd' : '#f0f0f0'
       }}
     >
-      <div className="file-row-checkbox" style={{ marginRight: '12px' }}>
+      <div className="file-row-checkbox">
         <FontAwesomeIcon
           icon={isSelected ? faCheckSquare : faSquare}
           style={{
@@ -185,8 +178,8 @@ export const FileRow = memo((props: FileRowProps) => {
         />
       </div>
 
-      <div className="file-row-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div className="file-row-info-main" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="file-row-info">
+        <div className="file-row-info-main">
         <FontAwesomeIcon
           icon={faFileAlt}
           style={{
@@ -336,7 +329,7 @@ export const FileRow = memo((props: FileRowProps) => {
         </div>
       )}
 
-      <div className="file-row-actions" style={{ display: 'flex', gap: '6px' }}>
+      <div className="file-row-actions">
         {!isTrashView && canEdit && (
           <button
             className="iconbtn"

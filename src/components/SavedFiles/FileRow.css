@@ -81,6 +81,8 @@
   .sf .file-row-name,
   .trash-view-page .file-row-name {
     font-size: 14px;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .sf .file-row-watermark,
