@@ -25,6 +25,8 @@ export interface BiginCompany {
   rawData: Record<string, unknown>;
   lastSyncedAt: string;
   syncSessionId: string | null;
+  isExistingLocation?: boolean;
+  locationTypeCheckedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +57,17 @@ export interface CompanyStats {
 }
 
 const BASE_PATH = '/api/bigin-companies';
+
+export interface LocationTypeStatus {
+  isRunning: boolean;
+  total: number;
+  processed: number;
+  markedExisting: number;
+  failed: number;
+  startedAt: string | null;
+  finishedAt: string | null;
+  message: string;
+}
 
 export const biginCompanyApi = {
   
@@ -171,6 +184,32 @@ export const biginCompanyApi = {
     } catch (error) {
       console.error('Error deleting company:', error);
       return false;
+    }
+  },
+
+  async refreshLocationTypes(): Promise<{ success: boolean; started?: boolean; alreadyRunning?: boolean; data?: LocationTypeStatus } | null> {
+    try {
+      const response = await apiClient.post<{ success: boolean; started?: boolean; alreadyRunning?: boolean; data?: LocationTypeStatus }>(
+        `${BASE_PATH}/location-types/refresh`,
+        {}
+      );
+      return response.data || null;
+    } catch (error) {
+      console.error('Error refreshing location types:', error);
+      return null;
+    }
+  },
+
+  async getLocationTypeStatus(): Promise<LocationTypeStatus | null> {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: LocationTypeStatus }>(
+        `${BASE_PATH}/location-types/status`
+      );
+      const result = response.data;
+      return result?.success ? result.data : null;
+    } catch (error) {
+      console.error('Error fetching location type status:', error);
+      return null;
     }
   },
 };

@@ -45,7 +45,7 @@ export function GlobalCommissionSummary({
   const [expanded, setExpanded] = useState(false);
   const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
 
-  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped, isNewLocation, setIsNewLocation } = useServicesContext();
+  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped, isNewLocation, setIsNewLocation, isLocationTypeAuto } = useServicesContext();
   const commissionRate = baseCommissionRate;
 
   const global = useGlobalCommission(commissionRate);
@@ -162,12 +162,15 @@ export function GlobalCommissionSummary({
         <input
           type="checkbox"
           checked={isNewLocation}
+          disabled={isLocationTypeAuto}
           onChange={(e) => setIsNewLocation(e.target.checked)}
         />
         <span className="commission-summary__newloc-text">
           <span className="commission-summary__newloc-title">{t("serviceComponents.commissionSummary.newLocationTitle")}</span>
           <span className="commission-summary__newloc-hint">
-            {t("serviceComponents.commissionSummary.newLocationHint")}
+            {isLocationTypeAuto
+              ? `Auto-detected from Bigin pipelines: ${isNewLocation ? "New location" : "Existing location"}`
+              : t("serviceComponents.commissionSummary.newLocationHint")}
           </span>
         </span>
       </label>

@@ -149,6 +149,7 @@ interface ServicesContextValue {
 
   isNewLocation: boolean;
   setIsNewLocation: (value: boolean) => void;
+  isLocationTypeAuto: boolean;
 }
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(
@@ -181,19 +182,28 @@ export const ServicesProvider: React.FC<{
   // Commission/quota only count once the Bigin company is mapped to a RouteStar
   // customer. Bigin-connected-but-unmapped agreements must NOT be calculated.
   const [isRouteStarMapped, setIsRouteStarMapped] = useState<boolean>(false);
+  const [isNewLocation, setIsNewLocation] = useState<boolean>(false);
+  const [isLocationTypeAuto, setIsLocationTypeAuto] = useState<boolean>(false);
   useEffect(() => {
     let cancelled = false;
     if (!biginCompanyId) {
       setIsRouteStarMapped(false);
+      setIsLocationTypeAuto(false);
       return;
     }
     companyMappingApi
       .getStatusByBigin(biginCompanyId)
-      .then(status => {
-        if (!cancelled) setIsRouteStarMapped(!!status?.isMapped);
+      .then((status: any) => {
+        if (cancelled) return;
+        setIsRouteStarMapped(!!status?.isMapped);
+        setIsNewLocation(!status?.isExistingLocation);
+        setIsLocationTypeAuto(true);
       })
       .catch(() => {
-        if (!cancelled) setIsRouteStarMapped(false);
+        if (!cancelled) {
+          setIsRouteStarMapped(false);
+          setIsLocationTypeAuto(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -237,7 +247,6 @@ export const ServicesProvider: React.FC<{
   // converting an existing small account (Pit) to a larger one (Anchor) pays
   // commission on the full value (no deduction). Persisted & frozen with the
   // agreement; only meaningful once Bigin-connected and RouteStar-mapped.
-  const [isNewLocation, setIsNewLocation] = useState<boolean>(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -779,8 +788,9 @@ export const ServicesProvider: React.FC<{
 
       isNewLocation,
       setIsNewLocation,
+      isLocationTypeAuto,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules, isNewLocation]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules, isNewLocation, isLocationTypeAuto]);
 
   return (
     <ServicesContext.Provider value={value}>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { biginCompanyApi, type BiginCompany, type FetchStatus, type CompanyStats } from '../../../backendservice/api/biginCompanyApi';
+import { biginCompanyApi, type BiginCompany, type FetchStatus, type CompanyStats, type LocationTypeStatus } from '../../../backendservice/api/biginCompanyApi';
 import './BiginCompaniesTab.css';
 
 export const BiginCompaniesTab: React.FC = () => {
@@ -11,6 +11,7 @@ export const BiginCompaniesTab: React.FC = () => {
   const [companies, setCompanies] = useState<BiginCompany[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchStatus, setFetchStatus] = useState<FetchStatus | null>(null);
+  const [ltStatus, setLtStatus] = useState<LocationTypeStatus | null>(null);
   const [stats, setStats] = useState<CompanyStats | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [cityFilter, setCityFilter] = useState('');
@@ -55,6 +56,7 @@ export const BiginCompaniesTab: React.FC = () => {
     loadCompanies();
     loadStats();
     loadFetchStatus();
+    biginCompanyApi.getLocationTypeStatus().then(setLtStatus);
   }, []);
 
   useEffect(() => {
@@ -74,10 +76,34 @@ export const BiginCompaniesTab: React.FC = () => {
     }
   }, [fetchStatus?.isRunning, fetchStatus?.lastFetchResult, loadFetchStatus, loadCompanies, loadStats]);
 
+  useEffect(() => {
+    if (!ltStatus?.isRunning) return;
+    const interval = setInterval(async () => {
+      const s = await biginCompanyApi.getLocationTypeStatus();
+      setLtStatus(s);
+      if (s && !s.isRunning) {
+        clearInterval(interval);
+        loadCompanies();
+        loadStats();
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [ltStatus?.isRunning, loadCompanies, loadStats]);
+
   const handleFetch = async () => {
     const result = await biginCompanyApi.startFetch();
     if (result) {
       loadFetchStatus();
+    }
+  };
+
+  const handleDetectLocationTypes = async () => {
+    const result = await biginCompanyApi.refreshLocationTypes();
+    if (result?.data) {
+      setLtStatus(result.data);
+    } else {
+      const s = await biginCompanyApi.getLocationTypeStatus();
+      setLtStatus(s);
     }
   };
 
@@ -121,8 +147,38 @@ export const BiginCompaniesTab: React.FC = () => {
               </>
             )}
           </button>
+          <button
+            className="bc-fetch-btn"
+            onClick={handleDetectLocationTypes}
+            disabled={!!ltStatus?.isRunning}
+            style={{ marginLeft: 8 }}
+          >
+            {ltStatus?.isRunning ? 'Detecting…' : 'Detect New/Existing'}
+          </button>
         </div>
       </div>
+
+      {ltStatus && (ltStatus.isRunning || ltStatus.finishedAt) && (
+        <div style={{ margin: '12px 0', padding: '12px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#f9fafb' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
+            <span>{ltStatus.message || 'Detecting new vs existing locations…'}</span>
+            <span>
+              {ltStatus.processed}/{ltStatus.total}
+              {ltStatus.total ? ` (${Math.round((ltStatus.processed / ltStatus.total) * 100)}%)` : ''}
+              {' · '}{ltStatus.markedExisting} existing
+              {ltStatus.failed ? ` · ${ltStatus.failed} failed` : ''}
+            </span>
+          </div>
+          <div style={{ background: '#e5e7eb', borderRadius: 4, height: 8, overflow: 'hidden' }}>
+            <div style={{
+              width: `${ltStatus.total ? Math.round((ltStatus.processed / ltStatus.total) * 100) : 0}%`,
+              background: ltStatus.isRunning ? '#2563eb' : '#059669',
+              height: '100%',
+              transition: 'width 0.4s ease',
+            }} />
+          </div>
+        </div>
+      )}
 
       {}
       <div className="bc-stats-grid">
@@ -259,6 +315,7 @@ export const BiginCompaniesTab: React.FC = () => {
                 <th>{t('adminTools.bigin.companies.colState')}</th>
                 <th>{t('adminTools.bigin.companies.colOwner')}</th>
                 <th>{t('adminTools.bigin.companies.colLastSynced')}</th>
+                <th>New Location</th>
                 <th>{t('adminTools.bigin.companies.colActions')}</th>
               </tr>
             </thead>
@@ -275,6 +332,7 @@ export const BiginCompaniesTab: React.FC = () => {
                   <td>{company.state || '-'}</td>
                   <td className="bc-owner">{company.owner || '-'}</td>
                   <td className="bc-synced">{formatDate(company.lastSyncedAt)}</td>
+                  <td>{company.isExistingLocation ? 'False' : 'True'}</td>
                   <td className="bc-actions">
                     <button
                       className="bc-view-btn"
