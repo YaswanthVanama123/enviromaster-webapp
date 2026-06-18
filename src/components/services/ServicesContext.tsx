@@ -150,6 +150,9 @@ interface ServicesContextValue {
   isNewLocation: boolean;
   setIsNewLocation: (value: boolean) => void;
   isLocationTypeAuto: boolean;
+  priorFarRedline: number;
+  priorFarGreenline: number;
+  setLoadedPriorFar: (redline: number | null, greenline: number | null) => void;
 }
 
 const ServicesContext = createContext<ServicesContextValue | undefined>(
@@ -210,6 +213,42 @@ export const ServicesProvider: React.FC<{
     };
   }, [biginCompanyId]);
   const [agreementId, setAgreementId] = useState<string | null>(null);
+
+  const [fetchedPriorFarRedline, setFetchedPriorFarRedline] = useState<number>(0);
+  const [fetchedPriorFarGreenline, setFetchedPriorFarGreenline] = useState<number>(0);
+  const [loadedPriorFarRedline, setLoadedPriorFarRedline] = useState<number | null>(null);
+  const [loadedPriorFarGreenline, setLoadedPriorFarGreenline] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!biginCompanyId) {
+      setFetchedPriorFarRedline(0);
+      setFetchedPriorFarGreenline(0);
+      return;
+    }
+    companyMappingApi
+      .getPriorFarByBigin(biginCompanyId, agreementId || undefined)
+      .then((prior: any) => {
+        if (cancelled) return;
+        setFetchedPriorFarRedline(Number(prior?.redline) || 0);
+        setFetchedPriorFarGreenline(Number(prior?.greenline) || 0);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setFetchedPriorFarRedline(0);
+          setFetchedPriorFarGreenline(0);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [biginCompanyId, agreementId]);
+  const setLoadedPriorFar = useCallback((redline: number | null, greenline: number | null) => {
+    setLoadedPriorFarRedline(redline);
+    setLoadedPriorFarGreenline(greenline);
+  }, []);
+  const priorFarRedline = loadedPriorFarRedline != null ? loadedPriorFarRedline : fetchedPriorFarRedline;
+  const priorFarGreenline = loadedPriorFarGreenline != null ? loadedPriorFarGreenline : fetchedPriorFarGreenline;
+
   const [accountTypeCache, setAccountTypeCache] = useState<AccountTypeCache>({});
   const [isDetectingAccountTypes, setIsDetectingAccountTypes] = useState(false);
   const [accountTypeDetectionError, setAccountTypeDetectionError] = useState<string | null>(null);
@@ -665,6 +704,8 @@ export const ServicesProvider: React.FC<{
       effectiveCommissionRules,
       effectivePriorQuotaCredit,
       isNewLocation,
+      priorFarRedline,
+      priorFarGreenline,
     );
 
     if (!global.services.length) {
@@ -692,7 +733,7 @@ export const ServicesProvider: React.FC<{
         annualCommission: s.annualCommission,
       })),
     };
-  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation]);
+  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation, priorFarRedline, priorFarGreenline]);
 
   const getQuotaCreditForSave = useCallback((rate: number = 6): number => {
     const global = computeGlobalCommission(
@@ -703,9 +744,11 @@ export const ServicesProvider: React.FC<{
       effectiveCommissionRules,
       effectivePriorQuotaCredit,
       isNewLocation,
+      priorFarRedline,
+      priorFarGreenline,
     );
     return Math.round((global.totalQuotaCredit || 0) * 100) / 100;
-  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation]);
+  }, [servicesState, accountTypeCache, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation, priorFarRedline, priorFarGreenline]);
 
   const value = useMemo<ServicesContextValue>(() => {
 
@@ -789,8 +832,11 @@ export const ServicesProvider: React.FC<{
       isNewLocation,
       setIsNewLocation,
       isLocationTypeAuto,
+      priorFarRedline,
+      priorFarGreenline,
+      setLoadedPriorFar,
     };
-  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules, isNewLocation, isLocationTypeAuto]);
+  }, [servicesState, updateSaniclean, updateService, backendPricingData, getBackendPricingForService, globalContractMonths, getTotalAgreementAmount, getTotalPerVisitAmount, getTotalMonthlyRecurringRevenue, getTotalOriginalContractTotal, globalTripCharge, globalParkingCharge, globalTripChargeFrequency, globalParkingChargeFrequency, biginCompanyId, agreementId, accountTypeCache, setAccountTypeForFrequency, getAccountTypeForFrequency, initializeAccountTypeCache, clearAccountTypeCache, isDetectingAccountTypes, accountTypeDetectionError, accountTypeCacheLoadedFromSaved, accountTypeCacheLoadedFromSavedRef, getCommissionDataForSave, getQuotaCreditForSave, quotaLevel, quotaLevelData, baseCommissionRate, effectivePriorQuotaCredit, isRouteStarMapped, effectiveCommissionRules, isNewLocation, isLocationTypeAuto, priorFarRedline, priorFarGreenline, setLoadedPriorFar]);
 
   return (
     <ServicesContext.Provider value={value}>

@@ -48,7 +48,7 @@
     "anchorExplanation": "Compte à forte valeur (200 $+/visite). Aucune déduction + 150% de bonus sur les revenus excédentaires.",
     "bread5Explanation": "À moins de 5 min de route de l'ancre. Déduction de revenus de 50 $ appliquée.",
     "bread15Explanation": "5-15 min de route de l'ancre. Déduction de revenus de 75 $ appliquée.",
-    "pitExplanation": "Plus de 15 min de route de l'ancre. Déduction de revenus de 100 $ appliquée.",
+    "pitExplanation": "Plus de 15 min de route de l'ancre (Pit). Les premiers 100 $/visite ne génèrent aucune commission, de 100 $ à 200 $ au taux normal, et les revenus au-dessus de 200 $ obtiennent un bonus d'ancre de 150 % (Greenline : 150 % au-dessus de 100 $).",
     "rate": "Taux : {{blended}}% × {{multiplier}}% = {{effective}}%",
     "quotaBadge": "{{label}} ({{rate}}%)",
     "quota": {

@@ -48,7 +48,7 @@
     "anchorExplanation": "Cuenta de alto valor ($200+/visita). Sin deducción + 150% de bono sobre ingresos excedentes.",
     "bread5Explanation": "A menos de 5 min en auto del ancla. Deducción de ingresos de $50 aplicada.",
     "bread15Explanation": "5-15 min en auto del ancla. Deducción de ingresos de $75 aplicada.",
-    "pitExplanation": "Más de 15 min en auto del ancla. Deducción de ingresos de $100 aplicada.",
+    "pitExplanation": "Más de 15 min en auto del ancla (Pit). Los primeros $100/visita no generan comisión, de $100 a $200 a tarifa normal, y los ingresos por encima de $200 obtienen un bono de ancla del 150 % (Greenline: 150 % por encima de $100).",
     "rate": "Tarifa: {{blended}}% × {{multiplier}}% = {{effective}}%",
     "quotaBadge": "{{label}} ({{rate}}%)",
     "quota": {

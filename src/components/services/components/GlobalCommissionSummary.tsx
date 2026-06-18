@@ -312,6 +312,83 @@ export function GlobalCommissionSummary({
                         {t("serviceComponents.commissionSummary.revenueCalculation")}
                       </div>
                       <div className="service-details__list">
+                        {service.farTiers ? (
+                          <>
+                            <div className="service-details__row">
+                              <span className="service-details__label">{t("serviceComponents.commissionSummary.originalPerVisit")}</span>
+                              <span className="service-details__value">{fmtMoney(service.farTiers.originalPerVisit)}</span>
+                            </div>
+                            <div className="service-details__row">
+                              <span className="service-details__label">{t("serviceComponents.commissionSummary.currentPerVisit")}</span>
+                              <span className="service-details__value">{fmtMoney(service.farTiers.currentPerVisit)}</span>
+                            </div>
+                            <div className="service-details__row">
+                              <span className="service-details__label">{t("serviceComponents.commissionSummary.priceRatio")}</span>
+                              <span className="service-details__value">{service.formatted.priceRatio}</span>
+                            </div>
+                            <div className="service-details__row">
+                              <span className="service-details__label">{t("serviceComponents.commissionSummary.pricingTier")}</span>
+                              <span className="service-details__value" style={{ fontWeight: 600 }}>{service.pricingTierLabel}</span>
+                            </div>
+                            {service.pricingMultiplier !== 1 && (
+                              <div className="service-details__row">
+                                <span className="service-details__label">
+                                  {t("serviceComponents.commissionSummary.adjustedPerVisit", { revenue: fmtMoney(service.farTiers.originalPerVisit * service.priceRatio), multiplier: service.formatted.pricingMultiplier })}
+                                </span>
+                                <span className="service-details__value">{fmtMoney(service.farTiers.currentPerVisit)}</span>
+                              </div>
+                            )}
+                            {service.farTiers.priorPerVisit >= 0 && (
+                              <div className="service-details__row">
+                                <span className="service-details__label">{t("serviceComponents.commissionSummary.priorSameLocationPerVisit")}</span>
+                                <span className="service-details__value">{fmtMoney(service.farTiers.priorPerVisit)}</span>
+                              </div>
+                            )}
+                            <div className="service-details__row">
+                              <span className="service-details__label">{t("serviceComponents.commissionSummary.combinedPerVisit")}</span>
+                              <span className="service-details__value" style={{ fontWeight: 600 }}>{fmtMoney(service.farTiers.combinedPerVisit)}</span>
+                            </div>
+
+                            <div className="service-details__row">
+                              <span className="service-details__label">
+                                {t("serviceComponents.commissionSummary.farTierNoComm", { from: fmtMoney(0), to: fmtMoney(service.farTiers.pitThreshold) })}
+                              </span>
+                              <span className="service-details__value service-details__value--red">
+                                {fmtMoney(0)}/visit
+                              </span>
+                            </div>
+                            {service.farTiers.anchorThreshold > service.farTiers.pitThreshold && (
+                              <div className="service-details__row">
+                                <span className="service-details__label">
+                                  {t("serviceComponents.commissionSummary.farTierNormal", { from: fmtMoney(service.farTiers.pitThreshold), to: fmtMoney(service.farTiers.anchorThreshold) })}
+                                </span>
+                                <span className="service-details__value">
+                                  {fmtMoney(service.farTiers.normalPerVisit)}/visit
+                                </span>
+                              </div>
+                            )}
+                            <div className="service-details__row">
+                              <span className="service-details__label">
+                                {t("serviceComponents.commissionSummary.farTierAnchor", { anchor: fmtMoney(service.farTiers.anchorThreshold) })}
+                              </span>
+                              <span className="service-details__value service-details__value--green">
+                                {fmtMoney(service.farTiers.anchorPerVisit)} × 1.5 = {fmtMoney(service.farTiers.anchorPerVisit * 1.5)}/visit
+                              </span>
+                            </div>
+
+                            <div className="service-details__row service-details__total-row">
+                              <span className="service-details__total-label">{t("serviceComponents.commissionSummary.commissionablePerVisit")}</span>
+                              <span className="service-details__total-value">{fmtMoney(service.farTiers.commissionablePerVisit)}</span>
+                            </div>
+                            <div className="service-details__row">
+                              <span className="service-details__label">
+                                {t("serviceComponents.commissionSummary.annualCommissionableFromPerVisit", { perVisit: fmtMoney(service.farTiers.commissionablePerVisit), visits: service.visitsPerYear })}
+                              </span>
+                              <span className="service-details__value">{service.formatted.commissionableRevenue}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
                         <div className="service-details__row">
                           <span className="service-details__label">{t("serviceComponents.commissionSummary.originalAnnualRedline")}</span>
                           <span className="service-details__value">{service.formatted.annualOriginalRevenue}</span>
@@ -388,6 +465,8 @@ export function GlobalCommissionSummary({
                           <span className="service-details__total-label">{t("serviceComponents.commissionSummary.commissionableRevenue")}</span>
                           <span className="service-details__total-value">{service.formatted.commissionableRevenue}</span>
                         </div>
+                          </>
+                        )}
                       </div>
                     </div>
 

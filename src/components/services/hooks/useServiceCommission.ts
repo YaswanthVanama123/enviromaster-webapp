@@ -214,7 +214,7 @@ export function useServiceCommission({
 }
 
 export function useGlobalCommission(commissionRate: number = 6) {
-  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit, effectiveCommissionRules, isNewLocation } = useServicesContext();
+  const { servicesState, accountTypeCache, globalContractMonths, effectivePriorQuotaCredit, effectiveCommissionRules, isNewLocation, priorFarRedline, priorFarGreenline } = useServicesContext();
 
   return useMemo(
     () =>
@@ -226,8 +226,10 @@ export function useGlobalCommission(commissionRate: number = 6) {
         effectiveCommissionRules,
         effectivePriorQuotaCredit,
         isNewLocation,
+        priorFarRedline,
+        priorFarGreenline,
       ),
-    [servicesState, accountTypeCache, commissionRate, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation],
+    [servicesState, accountTypeCache, commissionRate, globalContractMonths, effectiveCommissionRules, effectivePriorQuotaCredit, isNewLocation, priorFarRedline, priorFarGreenline],
   );
 }
 

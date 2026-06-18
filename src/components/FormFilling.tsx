@@ -1388,6 +1388,7 @@ function FormFillingContent({
     setLoadedCommissionRules,
     effectiveCommissionRules,
     setIsNewLocation,
+    setLoadedPriorFar,
     isRouteStarMapped,
 
   } = useServicesContext();
@@ -1483,6 +1484,13 @@ function FormFillingContent({
       setIsNewLocation(savedIsNewLocation);
     }
 
+    if (typeof savedCommission?.priorFarRedline === 'number' || typeof savedCommission?.priorFarGreenline === 'number') {
+      setLoadedPriorFar(
+        typeof savedCommission?.priorFarRedline === 'number' ? savedCommission.priorFarRedline : null,
+        typeof savedCommission?.priorFarGreenline === 'number' ? savedCommission.priorFarGreenline : null,
+      );
+    }
+
     if (contractMonths !== undefined && contractMonths !== null) {
       setGlobalContractMonths(contractMonths);
     }
@@ -1521,6 +1529,7 @@ function FormFillingContent({
     setLoadedPriorQuotaCredit,
     setLoadedCommissionRules,
     setIsNewLocation,
+    setLoadedPriorFar,
   ]);
 
   const getDocumentStatus = useCallback((): 'saved' | 'pending_approval' => {

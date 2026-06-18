@@ -116,6 +116,24 @@ export const companyMappingApi = {
     }
   },
 
+  async getPriorFarByBigin(
+    biginId: string,
+    excludeAgreementId?: string
+  ): Promise<{ redline: number; greenline: number } | null> {
+    try {
+      const qs = excludeAgreementId ? `?excludeAgreementId=${encodeURIComponent(excludeAgreementId)}` : '';
+      const response = await apiClient.get<{
+        success: boolean;
+        data: { redline: number; greenline: number };
+      }>(`${BASE_PATH}/prior-far/${encodeURIComponent(biginId)}${qs}`);
+      const result = response.data;
+      return result?.success ? result.data : null;
+    } catch (error) {
+      console.error('Error fetching prior far revenue:', error);
+      return null;
+    }
+  },
+
   async getAvailableRouteStarCustomers(
     search?: string,
     includeAll?: boolean

@@ -9,28 +9,28 @@
 
 @keyframes em-slide-in-up {
   from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to { transform: none; opacity: 1; }
 }
 
 @keyframes em-fade-up {
   from { transform: translateY(16px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to { transform: none; opacity: 1; }
 }
 
 @keyframes em-scale-in {
   from { transform: scale(0.96); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  to { transform: none; opacity: 1; }
 }
 
 @keyframes em-pop {
   0% { transform: scale(0.9); opacity: 0; }
   60% { transform: scale(1.03); opacity: 1; }
-  100% { transform: scale(1); }
+  100% { transform: none; }
 }
 
 @keyframes em-slide-in-right {
   from { transform: translateX(24px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  to { transform: none; opacity: 1; }
 }
 
 @keyframes em-shimmer {
