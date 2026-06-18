@@ -1963,6 +1963,10 @@ function FormFillingContent({
           rulesSnapshot: commissionData.rulesSnapshot,
           isNewLocation: commissionData.isNewLocation,
           priorQuotaCredit: commissionData.priorQuotaCredit,
+          farAnnualRedline: commissionData.farAnnualRedline,
+          farAnnualGreenline: commissionData.farAnnualGreenline,
+          priorFarRedline: commissionData.priorFarRedline,
+          priorFarGreenline: commissionData.priorFarGreenline,
           breakdown: {
             baseRate: commissionData.baseRate,
             agreementMultiplier: commissionData.agreementMultiplier,

@@ -116,6 +116,49 @@ export const companyMappingApi = {
     }
   },
 
+  async getConnectedCompanies(): Promise<Array<{ biginId: string; companyName: string; agreementCount: number }> | null> {
+    try {
+      const response = await apiClient.get<{
+        success: boolean;
+        data: Array<{ biginId: string; companyName: string; agreementCount: number }>;
+      }>(`${BASE_PATH}/connected-companies`);
+      const result = response.data;
+      return result?.success ? result.data : null;
+    } catch (error) {
+      console.error('Error fetching connected companies:', error);
+      return null;
+    }
+  },
+
+  async recalcCompanyFar(biginId: string): Promise<{ redline: number; greenline: number } | null> {
+    try {
+      const response = await apiClient.post<{
+        success: boolean;
+        prior: { redline: number; greenline: number };
+        agreementCount: number;
+      }>(`${BASE_PATH}/recalc-far/${encodeURIComponent(biginId)}`, {});
+      const result = response.data;
+      return result?.success ? result.prior : null;
+    } catch (error) {
+      console.error('Error recalculating company far:', error);
+      return null;
+    }
+  },
+
+  async getFarBreakdown(biginId: string): Promise<Array<{ agreementId: string; title: string; status: string; hasCommission: boolean; redline: number; greenline: number }> | null> {
+    try {
+      const response = await apiClient.get<{
+        success: boolean;
+        agreements: Array<{ agreementId: string; title: string; status: string; hasCommission: boolean; redline: number; greenline: number }>;
+      }>(`${BASE_PATH}/far-breakdown/${encodeURIComponent(biginId)}`);
+      const result = response.data;
+      return result?.success ? result.agreements : null;
+    } catch (error) {
+      console.error('Error fetching far breakdown:', error);
+      return null;
+    }
+  },
+
   async getPriorFarByBigin(
     biginId: string,
     excludeAgreementId?: string

@@ -57,6 +57,10 @@ export interface CommissionDataForSave {
   rulesSnapshot: ResolvedCommissionRules;
   isNewLocation: boolean;
   priorQuotaCredit: number;
+  farAnnualRedline: number;
+  farAnnualGreenline: number;
+  priorFarRedline: number;
+  priorFarGreenline: number;
   serviceBreakdown: Array<{
     serviceName: string;
     accountType: AccountType | null;
@@ -724,6 +728,10 @@ export const ServicesProvider: React.FC<{
       rulesSnapshot: effectiveCommissionRules,
       isNewLocation,
       priorQuotaCredit: effectivePriorQuotaCredit,
+      farAnnualRedline: global.totalFarAnnualRedline,
+      farAnnualGreenline: global.totalFarAnnualGreenline,
+      priorFarRedline,
+      priorFarGreenline,
       serviceBreakdown: global.services.map(s => ({
         serviceName: s.serviceName,
         accountType: s.accountType,

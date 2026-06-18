@@ -17,6 +17,7 @@ import { MapDistanceUpdateTab } from "./map-distance/MapDistanceUpdateTab";
 import { InsideSalesCheckTab } from "./inside-sales/InsideSalesCheckTab";
 import { AccountTypeDetectorTab } from "./account-type/AccountTypeDetectorTab";
 import { PayrollTab } from "./payroll/PayrollTab";
+import { LocationFarTotalsTab } from "./location-far/LocationFarTotalsTab";
 import { pdfApi } from "../../backendservice/api/pdfApi";
 import { MdAttachMoney, MdSettings, MdInventory, MdBackup, MdWorkspaces, MdCalculate, MdTrendingUp, MdPeople, MdHistory, MdBusiness, MdLink, MdRefresh, MdVerifiedUser, MdCategory, MdPayment } from "react-icons/md";
 import type { IconType } from "react-icons";
@@ -25,7 +26,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import "./AdminDashboard.css";
 
-type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll";
+type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll" | "location-far";
 
 const TABS: { key: TabType; Icon: IconType; labelKey: string }[] = [
   { key: "pricing", Icon: MdAttachMoney, labelKey: "adminDashboard.tabs.pricing" },
@@ -43,6 +44,7 @@ const TABS: { key: TabType; Icon: IconType; labelKey: string }[] = [
   { key: "inside-sales", Icon: MdVerifiedUser, labelKey: "adminDashboard.tabs.insideSales" },
   { key: "account-type-detector", Icon: MdCategory, labelKey: "adminDashboard.tabs.accountType" },
   { key: "payroll", Icon: MdPayment, labelKey: "adminDashboard.tabs.payroll" },
+  { key: "location-far", Icon: MdTrendingUp, labelKey: "adminDashboard.tabs.locationFar" },
 ];
 
 interface AdminDashboardProps {
@@ -116,9 +118,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (path.includes('/admin-panel/') && (path.includes('/payroll') || path.includes('/payroll/'))) {
         return "payroll";
       }
+      if (path.includes('/admin-panel/') && (path.includes('/location-far') || path.includes('/location-far/'))) {
+        return "location-far";
+      }
 
       if (!currentSubtab) return "pricing";
-      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "location-far"];
       return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
     }
 
@@ -164,9 +169,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (path.includes('/pricing-tables/payroll')) {
       return "payroll";
     }
+    if (path.includes('/pricing-tables/location-far')) {
+      return "location-far";
+    }
 
     if (!currentSubtab) return "pricing";
-    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll"];
+    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "location-far"];
     return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
   };
 
@@ -348,6 +356,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {activeTab === "inside-sales" && <InsideSalesCheckTab />}
         {activeTab === "account-type-detector" && <AccountTypeDetectorTab />}
         {activeTab === "payroll" && <PayrollTab />}
+        {activeTab === "location-far" && <LocationFarTotalsTab />}
       </div>
     </div>
   );

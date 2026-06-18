@@ -15,7 +15,8 @@
     "mapDistanceUpdate": "Update Distance",
     "insideSales": "Inside Sales",
     "accountType": "Account Type",
-    "payroll": "Payroll"
+    "payroll": "Payroll",
+    "locationFar": "Pit Far Totals"
   },
   "header": {
     "logo": "Enviro-Master Admin",

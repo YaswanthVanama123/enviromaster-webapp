@@ -468,15 +468,18 @@ export function computeGlobalCommission(
       switch (g.accountType) {
         case 'Anchor':
         case 'Pit': {
-          if (isGreenline) totalFarAnnualGreenline += adjusted;
-          else totalFarAnnualRedline += adjusted;
-          const prior = perFarGroupPrior;
+          const visitsF = visits > 0 ? visits : 1;
+          const round2 = (x: number) => Math.round(x * 100) / 100;
+          // Prior is stored PER-VISIT (by pricing line). Scale it to this group's
+          // annual using its own visit count before tiering.
+          const prior = perFarGroupPrior * visitsF;
+          // Accumulate this group's far contribution PER-VISIT (by pricing line).
+          if (isGreenline) totalFarAnnualGreenline += adjusted / visitsF;
+          else totalFarAnnualRedline += adjusted / visitsF;
           const comb = adjusted + prior;
           const tieredFar = (v: number) =>
             Math.min(Math.max(0, v - pitZoneAnnual), Math.max(0, anchorZoneAnnual - pitZoneAnnual)) +
             Math.max(0, v - anchorZoneAnnual) * rules.anchorBonusMultiplier;
-          const visitsF = visits > 0 ? visits : 1;
-          const round2 = (x: number) => Math.round(x * 100) / 100;
           const cpv = round2(Math.max(0, tieredFar(comb) - tieredFar(prior)) / visitsF);
           g.commissionableAnnual = cpv * visitsF;
           g.revenueDeduction = Math.max(0, Math.min(comb, pitZoneAnnual) - Math.min(prior, pitZoneAnnual));
