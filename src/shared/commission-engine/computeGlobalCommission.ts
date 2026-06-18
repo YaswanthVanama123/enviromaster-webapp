@@ -133,6 +133,8 @@ export interface ServiceCommissionDetail {
   farTiers: {
     originalPerVisit: number;
     currentPerVisit: number;
+    adjustedPerVisit: number;
+    priceRatio: number;
     priorPerVisit: number;
     combinedPerVisit: number;
     pitThreshold: number;
@@ -187,7 +189,8 @@ export interface GlobalCommissionResult {
   totalCommissionableRevenue: number;
   totalQuotaCredit: number;
   totalFarAnnual: number;
-  farIsGreenline: boolean;
+  totalFarAnnualRedline: number;
+  totalFarAnnualGreenline: number;
 
   agreementMultiplier: number;
   effectiveCommissionRate: number;
@@ -426,45 +429,29 @@ export function computeGlobalCommission(
 
     let totalCommissionableAnnual = 0;
     let totalQuotaCredit = 0;
-    let totalFarAnnual = 0;
-    let numFarGroups = 0;
+    let totalFarAnnualRedline = 0;
+    let totalFarAnnualGreenline = 0;
+    let numFarGroupsRedline = 0;
+    let numFarGroupsGreenline = 0;
     groups.forEach(g => {
-      if (g.accountType === 'Anchor' || g.accountType === 'Pit') numFarGroups++;
+      const tier = getPricingTierFromList(g.annualCurrent, g.annualOriginal, rules.pricingTiers);
+      g.pricingTier = tier;
+      g.pricingMultiplier = tier.quotaMultiplier;
+      g.priceRatio = g.annualOriginal > 0 ? g.annualCurrent / g.annualOriginal : 1;
+      if (g.accountType === 'Anchor' || g.accountType === 'Pit') {
+        if (tier.label === 'Greenline (130%+)') numFarGroupsGreenline++;
+        else numFarGroupsRedline++;
+      }
     });
-
-
-
-
-    let agreementCurrentAnnual = 0;
-    let agreementOriginalAnnual = 0;
-    rows.forEach(r => {
-      agreementCurrentAnnual += r.annualCurrent;
-      agreementOriginalAnnual += r.annualOriginal;
-    });
-    const agreementPriceRatio =
-      agreementOriginalAnnual > 0 ? agreementCurrentAnnual / agreementOriginalAnnual : 1;
-    const agreementPricingTier = getPricingTierFromList(
-      agreementCurrentAnnual,
-      agreementOriginalAnnual,
-      rules.pricingTiers,
-    );
-    const agreementPricingMultiplier = agreementPricingTier.quotaMultiplier;
-    const agreementIsGreenline = agreementPricingTier.label === 'Greenline (130%+)';
-
-    const priorLocationFarAnnual = agreementIsGreenline
-      ? priorLocationFarAnnualGreenline
-      : priorLocationFarAnnualRedline;
-    const perFarGroupPrior =
-      !isNewLocation && numFarGroups > 0 ? priorLocationFarAnnual / numFarGroups : 0;
 
     groups.forEach(g => {
 
-      g.pricingTier = agreementPricingTier;
-      g.pricingMultiplier = agreementPricingMultiplier;
-      g.priceRatio = agreementPriceRatio;
-      const isGreenline = agreementIsGreenline;
-
-
+      const isGreenline = g.pricingTier.label === 'Greenline (130%+)';
+      const perFarGroupPrior = !isNewLocation
+        ? (isGreenline
+            ? (numFarGroupsGreenline > 0 ? priorLocationFarAnnualGreenline / numFarGroupsGreenline : 0)
+            : (numFarGroupsRedline > 0 ? priorLocationFarAnnualRedline / numFarGroupsRedline : 0))
+        : 0;
 
       g.adjustedAnnual = g.annualCurrent * g.pricingMultiplier;
 
@@ -481,7 +468,8 @@ export function computeGlobalCommission(
       switch (g.accountType) {
         case 'Anchor':
         case 'Pit': {
-          totalFarAnnual += adjusted;
+          if (isGreenline) totalFarAnnualGreenline += adjusted;
+          else totalFarAnnualRedline += adjusted;
           const prior = perFarGroupPrior;
           const comb = adjusted + prior;
           const tieredFar = (v: number) =>
@@ -499,7 +487,9 @@ export function computeGlobalCommission(
           const bandNormal = Math.max(0, Math.min(comb, anchorZoneAnnual) - Math.max(prior, pitZoneAnnual));
           g.farTiers = {
             originalPerVisit: round2(g.annualOriginal / visitsF),
-            currentPerVisit: round2(adjusted / visitsF),
+            currentPerVisit: round2(g.annualCurrent / visitsF),
+            adjustedPerVisit: round2(adjusted / visitsF),
+            priceRatio: g.annualOriginal > 0 ? g.annualCurrent / g.annualOriginal : 1,
             priorPerVisit: round2(prior / visitsF),
             combinedPerVisit: round2(comb / visitsF),
             pitThreshold: rules.pitPerVisitThreshold,
@@ -661,8 +651,9 @@ export function computeGlobalCommission(
       totalPerVisitRevenue,
       totalCommissionableRevenue,
       totalQuotaCredit,
-      totalFarAnnual,
-      farIsGreenline: agreementIsGreenline,
+      totalFarAnnual: totalFarAnnualRedline + totalFarAnnualGreenline,
+      totalFarAnnualRedline,
+      totalFarAnnualGreenline,
 
       agreementMultiplier,
       effectiveCommissionRate,

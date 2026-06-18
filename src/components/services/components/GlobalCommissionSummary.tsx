@@ -360,7 +360,7 @@ export function GlobalCommissionSummary({
                             </div>
                             <div className="service-details__row">
                               <span className="service-details__label">{t("serviceComponents.commissionSummary.priceRatio")}</span>
-                              <span className="service-details__value">{service.formatted.priceRatio}</span>
+                              <span className="service-details__value">{`${(service.farTiers.priceRatio * 100).toFixed(1)}%`}</span>
                             </div>
                             <div className="service-details__row">
                               <span className="service-details__label">{t("serviceComponents.commissionSummary.pricingTier")}</span>
@@ -383,9 +383,9 @@ export function GlobalCommissionSummary({
                             {service.pricingMultiplier !== 1 && (
                               <div className="service-details__row">
                                 <span className="service-details__label">
-                                  {t("serviceComponents.commissionSummary.adjustedPerVisit", { revenue: fmtMoney2(service.farTiers.originalPerVisit * service.priceRatio), multiplier: service.formatted.pricingMultiplier })}
+                                  {t("serviceComponents.commissionSummary.adjustedPerVisit", { revenue: fmtMoney2(service.farTiers.currentPerVisit), multiplier: service.formatted.pricingMultiplier })}
                                 </span>
-                                <span className="service-details__value">{fmtMoney2(service.farTiers.currentPerVisit)}</span>
+                                <span className="service-details__value">{fmtMoney2(service.farTiers.adjustedPerVisit)}</span>
                               </div>
                             )}
                             {service.farTiers.priorPerVisit >= 0 && (
