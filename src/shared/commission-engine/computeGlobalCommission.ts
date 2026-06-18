@@ -158,6 +158,26 @@ export interface ServiceCommissionDetail {
   };
 }
 
+export interface GroupCommissionDetail {
+  groupKey: string;
+  serviceNames: string[];
+  accountType: AccountType | null;
+  frequencyLabel: string;
+  visitsPerYear: number;
+  perVisitRevenue: number;
+  revenueDeduction: number;
+  commissionableRevenue: number;
+  anchorBonus: number;
+  annualOriginalRevenue: number;
+  priceRatio: number;
+  pricingTierLabel: string;
+  pricingMultiplier: number;
+  perVisitCommission: number;
+  weeklyCommission: number;
+  annualCommission: number;
+  farTiers: ServiceCommissionDetail['farTiers'];
+}
+
 export interface GlobalCommissionResult {
 
   totalPerVisitCommission: number;
@@ -178,6 +198,7 @@ export interface GlobalCommissionResult {
   commissionTierBreakdown: CommissionTier[];
 
   services: ServiceCommissionDetail[];
+  groups: GroupCommissionDetail[];
 
   formatted: {
     totalPerVisitCommission: string;
@@ -466,28 +487,28 @@ export function computeGlobalCommission(
           const tieredFar = (v: number) =>
             Math.min(Math.max(0, v - pitZoneAnnual), Math.max(0, anchorZoneAnnual - pitZoneAnnual)) +
             Math.max(0, v - anchorZoneAnnual) * rules.anchorBonusMultiplier;
-          g.commissionableAnnual = Math.max(0, tieredFar(comb) - tieredFar(prior));
+          const visitsF = visits > 0 ? visits : 1;
+          const round2 = (x: number) => Math.round(x * 100) / 100;
+          const cpv = round2(Math.max(0, tieredFar(comb) - tieredFar(prior)) / visitsF);
+          g.commissionableAnnual = cpv * visitsF;
           g.revenueDeduction = Math.max(0, Math.min(comb, pitZoneAnnual) - Math.min(prior, pitZoneAnnual));
           const anchorOfThis =
             Math.max(0, comb - anchorZoneAnnual) - Math.max(0, prior - anchorZoneAnnual);
           g.anchorBonus = anchorOfThis * (rules.anchorBonusMultiplier - 1);
 
-          const visitsF = visits > 0 ? visits : 1;
-          const bandNoComm = Math.max(0, Math.min(comb, pitZoneAnnual) - Math.min(prior, pitZoneAnnual));
           const bandNormal = Math.max(0, Math.min(comb, anchorZoneAnnual) - Math.max(prior, pitZoneAnnual));
-          const bandAnchor = anchorOfThis;
           g.farTiers = {
-            originalPerVisit: g.annualOriginal / visitsF,
-            currentPerVisit: adjusted / visitsF,
-            priorPerVisit: prior / visitsF,
-            combinedPerVisit: comb / visitsF,
+            originalPerVisit: round2(g.annualOriginal / visitsF),
+            currentPerVisit: round2(adjusted / visitsF),
+            priorPerVisit: round2(prior / visitsF),
+            combinedPerVisit: round2(comb / visitsF),
             pitThreshold: rules.pitPerVisitThreshold,
             anchorThreshold: isGreenline ? rules.anchorMinGreenline : rules.anchorPerVisitThreshold,
             isGreenline,
-            noCommPerVisit: bandNoComm / visitsF,
-            normalPerVisit: bandNormal / visitsF,
-            anchorPerVisit: bandAnchor / visitsF,
-            commissionablePerVisit: g.commissionableAnnual / visitsF,
+            noCommPerVisit: round2(g.revenueDeduction / visitsF),
+            normalPerVisit: round2(bandNormal / visitsF),
+            anchorPerVisit: round2(anchorOfThis / visitsF),
+            commissionablePerVisit: cpv,
           };
           break;
         }
@@ -521,6 +542,7 @@ export function computeGlobalCommission(
     let totalCommissionableRevenue = 0;
 
     const services: ServiceCommissionDetail[] = [];
+    const groupsList: GroupCommissionDetail[] = [];
 
     const baseQuotaRate = progressiveQuotaCommissionRate(
       priorQuotaCredit,
@@ -555,6 +577,26 @@ export function computeGlobalCommission(
 
       g.annualCommission = g.commissionableAnnual * (effectiveCommissionRate / 100);
       const groupVisits = visitsPerYearOf(g.freqStr);
+
+      groupsList.push({
+        groupKey: `${g.accountType || 'none'}|${g.freqStr}`,
+        serviceNames: g.rows.map(r => r.serviceName),
+        accountType: g.accountType,
+        frequencyLabel: g.freqLabel,
+        visitsPerYear: groupVisits,
+        perVisitRevenue: g.annualCurrent,
+        revenueDeduction: g.revenueDeduction,
+        commissionableRevenue: g.commissionableAnnual,
+        anchorBonus: g.anchorBonus,
+        annualOriginalRevenue: g.annualOriginal,
+        priceRatio: g.priceRatio,
+        pricingTierLabel: g.pricingTier.label,
+        pricingMultiplier: g.pricingMultiplier,
+        perVisitCommission: groupVisits > 0 ? g.annualCommission / groupVisits : 0,
+        weeklyCommission: g.annualCommission / rules.weeksPerAnnualCommission,
+        annualCommission: g.annualCommission,
+        farTiers: g.farTiers,
+      });
 
       g.rows.forEach(row => {
         const share = g.annualCurrent > 0 ? row.annualCurrent / g.annualCurrent : 0;
@@ -631,6 +673,7 @@ export function computeGlobalCommission(
       commissionTierBreakdown,
 
       services,
+      groups: groupsList,
 
       formatted: {
         totalPerVisitCommission: formatCurrency(totalPerVisitCommission),
