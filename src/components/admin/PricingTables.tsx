@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
 
@@ -71,7 +72,7 @@ export const PricingTables: React.FC = () => {
             ))}
           </div>
 
-          {selectedServiceConfig && (
+          {selectedServiceConfig && createPortal(
             <div style={styles.detailPanel}>
               <div style={styles.detailHeader}>
                 <h2>{selectedServiceConfig.label}</h2>
@@ -110,7 +111,8 @@ export const PricingTables: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       )}
@@ -153,7 +155,7 @@ export const PricingTables: React.FC = () => {
                 ))}
               </div>
 
-              {selectedProductFamily && (
+              {selectedProductFamily && createPortal(
                 <div style={styles.detailPanel}>
                   <div style={styles.detailHeader}>
                     <h2>{selectedProductFamily.label}</h2>
@@ -204,7 +206,8 @@ export const PricingTables: React.FC = () => {
                       </table>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </>
           )}

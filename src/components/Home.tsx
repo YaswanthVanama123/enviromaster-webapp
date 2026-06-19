@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -496,7 +497,7 @@ export default function Home() {
               </select>
             </div>
 
-            {showDatePicker && (
+            {showDatePicker && createPortal(
               <div className="home__date-picker-overlay" onClick={handleDatePickerClose}>
                 <div className="home__date-picker-modal" onClick={(e) => e.stopPropagation()}>
                   <h3 className="home__date-picker-title">Select Date Range</h3>
@@ -550,7 +551,8 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
 
             {loading ? (

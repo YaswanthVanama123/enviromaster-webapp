@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaInfoCircle, FaTimes } from "react-icons/fa";
 import "./Toast.css";
 
@@ -72,7 +73,7 @@ export const Toast: React.FC<ToastProps> = ({
 
   const colors = getColors();
 
-  return (
+  return createPortal(
     <div style={styles.container}>
       <div
         style={{
@@ -87,7 +88,8 @@ export const Toast: React.FC<ToastProps> = ({
           <FaTimes />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

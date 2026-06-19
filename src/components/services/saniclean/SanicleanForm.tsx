@@ -530,6 +530,8 @@ export const SanicleanForm: React.FC<
         displayName: "SaniClean",
         isActive: true,
 
+        includedItems: form.includedItems ?? null,
+
         pricingMode: form.pricingMode,
         location: form.location,
         rateTier: form.rateTier,

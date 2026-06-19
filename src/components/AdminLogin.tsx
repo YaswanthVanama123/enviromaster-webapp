@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../backendservice/hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -85,7 +86,7 @@ export default function AdminLogin() {
         </form>
       </div>
 
-      {showForgotPasswordModal && (
+      {showForgotPasswordModal && createPortal(
         <div className="forgot-password-overlay" onClick={closeForgotPasswordModal}>
           <div className="forgot-password-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -107,7 +108,8 @@ export default function AdminLogin() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

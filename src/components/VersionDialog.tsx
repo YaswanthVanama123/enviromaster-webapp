@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -83,7 +84,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
     </div>
   );
 
-  return (
+  return createPortal(
     <div className="version-dialog">
       <div className="version-dialog__overlay" onClick={onClose} />
       <div className="version-dialog__modal">
@@ -203,6 +204,7 @@ export const VersionDialog: React.FC<VersionDialogProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

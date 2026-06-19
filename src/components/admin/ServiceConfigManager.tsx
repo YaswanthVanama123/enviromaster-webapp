@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -240,7 +241,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
         ))}
       </div>
 
-      {editingConfig && (
+      {editingConfig && createPortal(
         <div className="scm-modal" style={styles.modal}>
           <div className="scm-modal-content" style={styles.modalContent}>
             <div className="scm-modal-header" style={styles.modalHeader}>
@@ -445,7 +446,8 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {toastMessage && (

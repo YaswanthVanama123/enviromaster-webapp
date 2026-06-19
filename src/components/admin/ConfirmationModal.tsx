@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from "react-dom";
 import { useTranslation } from 'react-i18next';
 import {
   faExclamationTriangle,
@@ -189,7 +190,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div style={styles.overlay} onClick={onCancel}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
@@ -225,6 +226,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

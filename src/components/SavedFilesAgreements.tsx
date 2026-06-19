@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef, useCallback, ChangeEvent } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
@@ -16,7 +17,7 @@ import { Toast } from "./admin/Toast";
 import type { ToastType } from "./admin/Toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCheckSquare, faTrash, faFileAlt, faUpload
+  faCheckSquare, faTrash, faFileAlt, faUpload, faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import EmailComposer, { type EmailData, type EmailAttachment } from "./EmailComposer";
 import { ZohoUpload } from "./ZohoUpload";
@@ -1265,9 +1266,10 @@ export default function SavedFilesAgreements() {
         />
       )}
 
-      {fileUploadOpen && currentUploadAgreement && (
+      {fileUploadOpen && currentUploadAgreement && createPortal(
         <div className="file-upload-modal">
           <div className="file-upload-modal__overlay" onClick={() => {
+            if (isUploadingFiles) return;
             setFileUploadOpen(false);
             setCurrentUploadAgreement(null);
           }} />
@@ -1283,19 +1285,22 @@ export default function SavedFilesAgreements() {
                   type="file"
                   multiple
                   accept=".pdf"
+                  disabled={isUploadingFiles}
                   onChange={(e) => handleFileUpload(e.target.files)}
                   className="file-upload-modal__file-input"
                   id="file-upload-input"
                 />
                 <label
                   htmlFor="file-upload-input"
-                  className="file-upload-modal__file-label"
+                  className={`file-upload-modal__file-label${isUploadingFiles ? " file-upload-modal__file-label--uploading" : ""}`}
                   onDragOver={(e) => {
+                    if (isUploadingFiles) return;
                     e.preventDefault();
                     e.stopPropagation();
                     e.currentTarget.classList.add('file-upload-modal__file-label--dragging');
                   }}
                   onDragEnter={(e) => {
+                    if (isUploadingFiles) return;
                     e.preventDefault();
                     e.stopPropagation();
                     e.currentTarget.classList.add('file-upload-modal__file-label--dragging');
@@ -1309,6 +1314,7 @@ export default function SavedFilesAgreements() {
                     e.preventDefault();
                     e.stopPropagation();
                     e.currentTarget.classList.remove('file-upload-modal__file-label--dragging');
+                    if (isUploadingFiles) return;
 
                     const files = e.dataTransfer.files;
                     if (files && files.length > 0) {
@@ -1316,9 +1322,15 @@ export default function SavedFilesAgreements() {
                     }
                   }}
                 >
-                  <FontAwesomeIcon icon={faFileAlt} className="file-upload-modal__file-icon" />
+                  <FontAwesomeIcon
+                    icon={isUploadingFiles ? faSpinner : faFileAlt}
+                    spin={isUploadingFiles}
+                    className="file-upload-modal__file-icon"
+                  />
                   <span className="file-upload-modal__file-text">
-                    {t("savedFiles.uploadModal.chooseFiles")}
+                    {isUploadingFiles
+                      ? t("savedFiles.uploadModal.uploading")
+                      : t("savedFiles.uploadModal.chooseFiles")}
                   </span>
                 </label>
               </div>
@@ -1331,6 +1343,7 @@ export default function SavedFilesAgreements() {
               <button
                 type="button"
                 className="file-upload-modal__btn file-upload-modal__btn--cancel"
+                disabled={isUploadingFiles}
                 onClick={() => {
                   setFileUploadOpen(false);
                   setCurrentUploadAgreement(null);
@@ -1340,10 +1353,11 @@ export default function SavedFilesAgreements() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {deleteConfirmOpen && itemToDelete && (
+      {deleteConfirmOpen && itemToDelete && createPortal(
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1507,7 +1521,8 @@ export default function SavedFilesAgreements() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

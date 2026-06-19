@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -218,7 +219,7 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
   );
   const initials = (name: string) => name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase();
 
-  return (
+  return createPortal(
     <div style={overlay}>
       <div style={backdrop} onClick={step === "loading" || step === "submitting" ? undefined : onClose} />
       <div style={modal}>
@@ -475,7 +476,8 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -479,6 +479,13 @@ export function transformSanicleanData(structuredData: any): any {
     formState.rateTier = structuredData.rateTier;
   }
 
+  // Restore the customized "What's Included" list. null = use default list;
+  // an array = user-edited/added items. Without this the editor falls back to
+  // the default list on reload even though the saved data carries it.
+  if (structuredData.includedItems !== undefined) {
+    formState.includedItems = structuredData.includedItems;
+  }
+
   const pricingFields = [
     "allInclusiveWeeklyRatePerFixture",
     "luxuryUpgradePerDispenser",

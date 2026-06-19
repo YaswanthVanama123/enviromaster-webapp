@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { userManagementApi } from '../../backendservice/api/userManagementApi';
 import { Spinner } from '../atoms/Spinner';
@@ -351,7 +352,7 @@ export function UserManagement({}: UserManagementProps) {
       </div>
 
       {}
-      {showCreateModal && (
+      {showCreateModal && createPortal(
         <div style={styles.modalOverlay} onClick={() => setShowCreateModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>{t('userManagement.createNewUser')}</h3>
@@ -481,11 +482,12 @@ export function UserManagement({}: UserManagementProps) {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {}
-      {showEditModal && selectedUser && (
+      {showEditModal && selectedUser && createPortal(
         <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>{t('userManagement.editUser')}</h3>
@@ -548,11 +550,12 @@ export function UserManagement({}: UserManagementProps) {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {}
-      {showResetPasswordModal && selectedUser && (
+      {showResetPasswordModal && selectedUser && createPortal(
         <div style={styles.modalOverlay} onClick={() => setShowResetPasswordModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>{t('userManagement.resetPassword')}</h3>
@@ -639,7 +642,8 @@ export function UserManagement({}: UserManagementProps) {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

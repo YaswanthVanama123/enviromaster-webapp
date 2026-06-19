@@ -146,6 +146,7 @@
   "uploadModal": {
     "title": "Add Files to:",
     "chooseFiles": "Choose PDF Files or Drag & Drop",
+    "uploading": "Uploading…",
     "hint": "Select one or more PDF files to attach to this agreement"
   },
   "rows": {

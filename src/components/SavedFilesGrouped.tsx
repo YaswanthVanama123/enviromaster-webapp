@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
@@ -897,7 +898,7 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
         />
       )}
 
-      {logsModalOpen && currentLogsFile && (
+      {logsModalOpen && currentLogsFile && createPortal(
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1169,10 +1170,11 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               </div>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {bulkZohoUploadOpen && selectedFilesForBulkUpload.length > 0 && (
+      {bulkZohoUploadOpen && selectedFilesForBulkUpload.length > 0 && createPortal(
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1296,10 +1298,11 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {deleteConfirmOpen && itemToDelete && (
+      {deleteConfirmOpen && itemToDelete && createPortal(
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1463,7 +1466,8 @@ export default function SavedFilesGrouped({ onDataLoaded }: SavedFilesGroupedPro
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

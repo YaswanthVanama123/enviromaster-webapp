@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { pdfApi, emailApi, manualUploadApi } from "../backendservice/api";
@@ -651,7 +652,7 @@ export default function TrashView() {
         currentFile={currentEmailFile}
       />
 
-      {deleteConfirmOpen && itemToDelete && (
+      {deleteConfirmOpen && itemToDelete && createPortal(
         <div
           className="trash-view-modal-overlay"
           style={{
@@ -789,7 +790,8 @@ export default function TrashView() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

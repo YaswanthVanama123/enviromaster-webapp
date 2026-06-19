@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FaTimes, FaDownload } from "react-icons/fa";
 import { apiClient } from "../../../backendservice/utils/apiClient";
@@ -94,7 +95,7 @@ export const PayrollSlipModal: React.FC<PayrollSlipModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div className="payroll-modal-overlay" onClick={onClose}>
       <div className="payroll-modal" onClick={(e) => e.stopPropagation()}>
         <div className="payroll-modal-header">
@@ -248,6 +249,7 @@ export const PayrollSlipModal: React.FC<PayrollSlipModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

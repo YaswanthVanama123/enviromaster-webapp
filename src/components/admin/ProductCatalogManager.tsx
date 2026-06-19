@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useActiveProductCatalog } from "../../backendservice/hooks";
@@ -517,7 +518,7 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
         </div>
       )}
 
-      {editingProduct && (
+      {editingProduct && createPortal(
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-modal-content" style={styles.modalContent}>
             <div className="pcm-modal-header" style={styles.modalHeader}>
@@ -792,10 +793,11 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {creatingProduct && (
+      {creatingProduct && createPortal(
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-modal-content" style={styles.modalContent}>
             <div className="pcm-modal-header" style={styles.modalHeader}>
@@ -1024,10 +1026,11 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {deletingProduct && (
+      {deletingProduct && createPortal(
         <div className="pcm-modal" style={styles.modal}>
           <div className="pcm-confirmation-modal" style={styles.confirmationModal}>
             <div className="pcm-confirmation-header" style={styles.confirmationHeader}>
@@ -1073,7 +1076,8 @@ export const ProductCatalogManager: React.FC<ProductCatalogManagerProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {successMessage && (

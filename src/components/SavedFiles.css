@@ -1071,6 +1071,18 @@
   opacity: 1;
 }
 
+.file-upload-modal__file-label--uploading,
+.file-upload-modal__file-label--uploading:hover {
+  cursor: not-allowed;
+  pointer-events: none;
+  border-color: #d1d5db;
+  border-style: solid;
+  background: #f8fafc;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
 .file-upload-modal__file-label:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(192, 0, 0, 0.1);

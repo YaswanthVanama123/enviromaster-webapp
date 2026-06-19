@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -1413,7 +1414,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
     return null;
   };
 
-  return (
+  return createPortal(
     <div className="zoho-upload">
       <div className="zoho-upload__overlay" onClick={onClose} />
       <div className="zoho-upload__modal">
@@ -1445,6 +1446,7 @@ ${actualFileNames.map(fileName => `• ${fileName}`).join('\n')}`;
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

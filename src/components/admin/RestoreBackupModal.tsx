@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from "react-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { backupUtils } from '../../backendservice/api/pricingBackupApi';
@@ -241,7 +242,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
@@ -398,6 +399,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

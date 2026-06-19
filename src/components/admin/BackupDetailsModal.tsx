@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from "react-dom";
 import { useTranslation } from 'react-i18next';
 import {
   faMoneyBill,
@@ -1578,7 +1579,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
     </div>
   );
 
-  return (
+  return createPortal(
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
@@ -1629,6 +1630,7 @@ export const BackupDetailsModal: React.FC<BackupDetailsModalProps> = ({
           {activeTab === 'metadata' && renderMetadata()}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
