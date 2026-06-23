@@ -1892,7 +1892,6 @@ export const ServicePricingDetailedView: React.FC<ServicePricingDetailedViewProp
       <div className="spd__header">
         <div>
           <h2 className="spd__title">{t("servicePricing.detailedView.title", { label: service.label })}</h2>
-          <p className="spd__subtitle">{service.description}</p>
         </div>
         <button className="spd__close" onClick={onClose}>
           ✕ {t("servicePricing.detailedView.close")}
