@@ -15,6 +15,7 @@ import {
   Heading,
   Image,
   ImageCaption,
+  ImageResize,
   ImageStyle,
   ImageToolbar,
   ImageUpload,
@@ -281,7 +282,7 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                       Base64UploadAdapter, BlockQuote,
                       Bold, Italic, Underline,
                       Heading,
-                      Image, ImageCaption, ImageStyle, ImageToolbar, ImageUpload,
+                      Image, ImageCaption, ImageResize, ImageStyle, ImageToolbar, ImageUpload,
                       Indent, IndentBlock,
                       Link,
                       List, ListProperties,
@@ -311,8 +312,16 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
                       ],
                     },
                     image: {
+                      resizeUnit: "%" as const,
+                      resizeOptions: [
+                        { name: "resizeImage:original", value: null, label: "Original" },
+                        { name: "resizeImage:25", value: "25", label: "25%" },
+                        { name: "resizeImage:50", value: "50", label: "50%" },
+                        { name: "resizeImage:75", value: "75", label: "75%" },
+                      ],
                       toolbar: [
                         "imageStyle:inline", "imageStyle:block", "imageStyle:side", "|",
+                        "resizeImage", "|",
                         "toggleImageCaption", "imageTextAlternative",
                       ],
                     },
