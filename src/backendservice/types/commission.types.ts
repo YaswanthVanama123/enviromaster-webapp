@@ -185,10 +185,16 @@ export function resolveCommissionRules(
       'one-time': p.frequencyVisitsPerYear?.['one-time'] ?? FREQUENCY_VISITS_PER_YEAR['one-time'],
     },
     quotaTierCutoffs: {
-      aboveQuota: p.quotaTierCutoffs?.aboveQuota ?? DEFAULT_QUOTA_TIER_CUTOFFS.aboveQuota,
-      doubleQuota: p.quotaTierCutoffs?.doubleQuota ?? DEFAULT_QUOTA_TIER_CUTOFFS.doubleQuota,
+      aboveQuota:
+        p.quotaTierCutoffs?.aboveQuota && p.quotaTierCutoffs.aboveQuota > 0
+          ? p.quotaTierCutoffs.aboveQuota
+          : DEFAULT_QUOTA_TIER_CUTOFFS.aboveQuota,
+      doubleQuota:
+        p.quotaTierCutoffs?.doubleQuota && p.quotaTierCutoffs.doubleQuota > 0
+          ? p.quotaTierCutoffs.doubleQuota
+          : DEFAULT_QUOTA_TIER_CUTOFFS.doubleQuota,
     },
-    quotaTarget: p.quotaTarget ?? DEFAULT_QUOTA_TARGET,
+    quotaTarget: p.quotaTarget && p.quotaTarget > 0 ? p.quotaTarget : DEFAULT_QUOTA_TARGET,
     weeksPerAnnualCommission: p.weeksPerAnnualCommission ?? 52,
   };
 }

@@ -9,7 +9,7 @@ import {
   type ResolvedCommissionRules,
 } from '../../backendservice/types/commission.types';
 import type { ServiceFrequency, AgreementTerm } from '../../backendservice/types/commission.types.v2';
-import { getFrequencyNumber, BACKEND_TO_FREQUENCY } from './frequency';
+import { getFrequencyNumber, BACKEND_TO_FREQUENCY, expandServiceAreas } from './frequency';
 
 export type AccountType = 'Anchor' | 'Bread5' | 'Bread15' | 'Pit';
 
@@ -335,7 +335,7 @@ export function computeGlobalCommission(
 
     const rows: ServiceRow[] = [];
 
-    Object.entries(servicesState).forEach(([serviceName, serviceData]: [string, any]) => {
+    Object.entries(expandServiceAreas(servicesState)).forEach(([serviceName, serviceData]: [string, any]) => {
       if (!serviceData?.isActive) return;
 
       const freqNum = getFrequencyNumber(serviceData);
@@ -561,10 +561,7 @@ export function computeGlobalCommission(
           )
         : [];
     const tieredCommission = commissionTierBreakdown.reduce((sum, t) => sum + t.commission, 0);
-    const effectiveCommissionRate =
-      commissionTierBreakdown.length > 0 && totalCommissionableAnnual > 0
-        ? (tieredCommission / totalCommissionableAnnual) * 100
-        : baseQuotaRate * (agreementMultiplier / 100);
+    const effectiveCommissionRate = baseQuotaRate * (agreementMultiplier / 100);
 
     groups.forEach(g => {
 

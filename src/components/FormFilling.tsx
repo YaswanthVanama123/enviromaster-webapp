@@ -464,12 +464,13 @@ function ContractSummary({
 
     
 
-    const tierCutoffs = rules.quotaTierCutoffs;
+    const aboveBoundary = rules.quotaTarget;
+    const doubleBoundary = rules.quotaTarget * 2;
     const positionBefore = repActualSalesBefore;
     const positionAfter = positionBefore + annualQuotaCredit;
-    const belowQuotaPortion = Math.max(0, Math.min(positionAfter, tierCutoffs.aboveQuota) - positionBefore);
-    const aboveQuotaPortion = Math.max(0, Math.min(positionAfter, tierCutoffs.doubleQuota) - Math.max(positionBefore, tierCutoffs.aboveQuota));
-    const doubleQuotaPortion = Math.max(0, positionAfter - Math.max(positionBefore, tierCutoffs.doubleQuota));
+    const belowQuotaPortion = Math.max(0, Math.min(positionAfter, aboveBoundary) - positionBefore);
+    const aboveQuotaPortion = Math.max(0, Math.min(positionAfter, doubleBoundary) - Math.max(positionBefore, aboveBoundary));
+    const doubleQuotaPortion = Math.max(0, positionAfter - Math.max(positionBefore, doubleBoundary));
 
     const insideSalesDeduction = isInsideSales ? rules.insideSalesDeduction : 0;
     const belowRate = (rules.quotaRates.below + insideSalesDeduction) / 100;
@@ -1830,7 +1831,8 @@ function FormFillingContent({
         unitPrice: p.unitPrice || 0,
         frequency: p.frequency || "",
         total: p.total || 0,
-        customFields: p.customFields || {}, 
+        costType: p.costType || "productCost",
+        customFields: p.customFields || {},
       })),
 
       ...bigProducts.map((b: any) => ({
@@ -1839,7 +1841,8 @@ function FormFillingContent({
         amount: b.amount || 0,
         frequency: b.frequency || "",
         total: b.total || 0,
-        customFields: b.customFields || {}, 
+        costType: b.costType || "productCost",
+        customFields: b.customFields || {},
       }))
     ];
 
@@ -2551,18 +2554,20 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
             name,
             unitPrice: safeParseFloat(String(p.unitPrice || "")),
             qty: safeParseInt(String(p.qty || "")),
-            frequency: p.frequency || "", 
+            frequency: p.frequency || "",
             total: safeParseFloat(String(p.total || "")),
-            customFields: p.customFields || {}, 
+            costType: p.costType || "productCost",
+            customFields: p.customFields || {},
           };
         } else {
           return {
             name,
             qty: safeParseInt(String(p.qty || "")),
             amount: safeParseFloat(String(p.amount || "")),
-            frequency: p.frequency || "", 
+            frequency: p.frequency || "",
             total: safeParseFloat(String(p.total || "")),
-            customFields: p.customFields || {}, 
+            costType: p.costType || "productCost",
+            customFields: p.customFields || {},
           };
         }
       });

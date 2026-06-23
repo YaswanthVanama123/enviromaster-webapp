@@ -205,10 +205,25 @@ const getKitchenLarge = (): number => {
 
       const draftPayload = buildRefreshPowerScrubDraftPayload(form, customFields);
 
+      const areas = activeAreaKeys.map((key) => {
+        const target = form[key]?.frequencyLabel || form.frequency;
+        const oneTime = isOneTimeLabel(target);
+        const ct = oneTime ? (areaTotals[key] || 0) : (areaContractTotals[key] || 0);
+        return {
+          key,
+          isActive: true,
+          frequency: target,
+          perVisit: areaTotals[key] || 0,
+          contractTotal: ct,
+          originalContractTotal: ct,
+        };
+      });
+
       const data = isActive ? {
         serviceId: "refreshPowerScrub",
         displayName: "Refresh Power Scrub",
         isActive: true,
+        areas,
 
         perVisitBase: isActive ? totalPerVisitCost : 0,  
         perVisit: isActive

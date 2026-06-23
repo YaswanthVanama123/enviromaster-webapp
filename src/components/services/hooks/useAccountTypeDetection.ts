@@ -11,7 +11,7 @@ export {
   normalizeFrequencyKey,
   getFrequencyNumber,
 } from '../../../shared/commission-engine/frequency';
-import { getFrequencyNumber } from '../../../shared/commission-engine/frequency';
+import { getFrequencyNumber, expandServiceAreas } from '../../../shared/commission-engine/frequency';
 
 
 export interface UseAccountTypeDetectionOptions {
@@ -73,10 +73,10 @@ export function useAccountTypeDetection(
   const getUniqueFrequencies = useCallback((): number[] => {
     const frequencies = new Set<number>();
 
-    Object.values(servicesState).forEach((serviceData: any) => {
+    Object.values(expandServiceAreas(servicesState)).forEach((serviceData: any) => {
       if (serviceData?.isActive) {
         const freqNum = getFrequencyNumber(serviceData);
-        
+
         if (freqNum !== null && freqNum !== 0) {
           frequencies.add(freqNum);
         }
