@@ -10,6 +10,7 @@ import {
 import { DEFAULT_COMMISSION_RULES_V2 } from "../../backendservice/types/commission.types.v2";
 import type { AgreementTerm } from "../../backendservice/types/commission.types.v2";
 import { resolveCommissionRules, type ResolvedCommissionRules } from "../../backendservice/types/commission.types";
+import { buildFrozenRulesSnapshot } from "../../shared/commission-engine/freezeRules";
 import { commissionApi } from "../../backendservice/api/commissionApi";
 import { companyMappingApi } from "../../backendservice/api/companyMappingApi";
 import { computeGlobalCommission } from "./hooks/useServiceCommission";
@@ -150,6 +151,7 @@ interface ServicesContextValue {
 
   effectiveCommissionRules: ResolvedCommissionRules;
   setLoadedCommissionRules: (rules: ResolvedCommissionRules | null) => void;
+  setLoadedRawRulesSnapshot: (snapshot: Partial<ResolvedCommissionRules> | null) => void;
 
   isNewLocation: boolean;
   setIsNewLocation: (value: boolean) => void;
@@ -270,8 +272,12 @@ export const ServicesProvider: React.FC<{
   // stored at first calculation so the commission does not drift (the agreement's
   // own credit must never count as its own "prior").
   const [loadedPriorQuotaCredit, setLoadedPriorQuotaCredit] = useState<number | null>(null);
-  const effectivePriorQuotaCredit =
-    loadedPriorQuotaCredit != null ? loadedPriorQuotaCredit : quotaLevelData?.actualSales || 0;
+  let effectivePriorQuotaCredit = 0;
+  if (loadedPriorQuotaCredit !== null) {
+    effectivePriorQuotaCredit = loadedPriorQuotaCredit;
+  } else if (quotaLevelData && typeof quotaLevelData.actualSales === "number") {
+    effectivePriorQuotaCredit = quotaLevelData.actualSales;
+  }
 
   const [activeCommissionRules, setActiveCommissionRules] = useState<ResolvedCommissionRules>(
     () => resolveCommissionRules(null),
@@ -283,7 +289,22 @@ export const ServicesProvider: React.FC<{
   // admin rule changes never retroactively alter an already-created agreement.
   // A new agreement uses the live active rules.
   const [loadedCommissionRules, setLoadedCommissionRules] = useState<ResolvedCommissionRules | null>(null);
-  const effectiveCommissionRules = loadedCommissionRules ?? activeCommissionRules;
+  const [loadedRawRulesSnapshot, setLoadedRawRulesSnapshot] = useState<Partial<ResolvedCommissionRules> | null>(null);
+  const usedAccountTypes = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          Object.values(accountTypeCache || {})
+            .map((e: any) => e?.accountType)
+            .filter(Boolean),
+        ),
+      ) as string[],
+    [accountTypeCache],
+  );
+  const effectiveCommissionRules = useMemo(
+    () => buildFrozenRulesSnapshot(loadedRawRulesSnapshot, activeCommissionRules, usedAccountTypes),
+    [loadedRawRulesSnapshot, activeCommissionRules, usedAccountTypes],
+  );
 
   // Whether this agreement is a brand-new location vs. an upsell/conversion of an
   // existing location. New locations apply the Pit/Bread per-visit deductions;
@@ -836,6 +857,7 @@ export const ServicesProvider: React.FC<{
 
       effectiveCommissionRules,
       setLoadedCommissionRules,
+      setLoadedRawRulesSnapshot,
 
       isNewLocation,
       setIsNewLocation,

@@ -237,10 +237,13 @@ export const quotaApi = {
     }
   },
 
-  async getCurrentLevel(salesPersonId: string): Promise<QuotaLevelResponse | null> {
+  async getCurrentLevel(salesPersonId: string, excludeAgreementId?: string | null): Promise<QuotaLevelResponse | null> {
     try {
+      const query = excludeAgreementId
+        ? `?excludeAgreementId=${encodeURIComponent(excludeAgreementId)}`
+        : '';
       const response = await apiClient.get<{ success: boolean; data: QuotaLevelResponse }>(
-        `${BASE_PATH}/level/${salesPersonId}`
+        `${BASE_PATH}/level/${salesPersonId}${query}`
       );
 
       const result = response.data;

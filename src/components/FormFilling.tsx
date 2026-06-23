@@ -1253,7 +1253,7 @@ function FormFillingContent({
       }
 
       try {
-        const result = await quotaApi.getCurrentLevel(user.username);
+        const result = await quotaApi.getCurrentLevel(user.username, urlId);
         if (result) {
           const level = (result.quotaLevel as 'below' | 'above' | 'double') || 'above';
 
@@ -1387,6 +1387,7 @@ function FormFillingContent({
     effectivePriorQuotaCredit,
     setLoadedPriorQuotaCredit,
     setLoadedCommissionRules,
+    setLoadedRawRulesSnapshot,
     effectiveCommissionRules,
     setIsNewLocation,
     setLoadedPriorFar,
@@ -1478,6 +1479,7 @@ function FormFillingContent({
     const savedRulesSnapshot = savedCommission?.rulesSnapshot;
     if (savedRulesSnapshot && typeof savedRulesSnapshot === 'object') {
       setLoadedCommissionRules(resolveCommissionRules(savedRulesSnapshot));
+      setLoadedRawRulesSnapshot(savedRulesSnapshot);
     }
 
     const savedIsNewLocation = savedCommission?.isNewLocation;
