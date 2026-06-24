@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "../ServicesSection.css";
 import { useSanicleanCalc } from "./useSanicleanCalc";
 import { useEditableCurrency } from "../../../features/services/engine";
-import type { SanicleanFormState, SanicleanFrequency } from "./sanicleanTypes";
+import type { SanicleanFormState, SanicleanFrequency, SanicleanPricingMode } from "./sanicleanTypes";
 import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
@@ -346,6 +346,11 @@ export const SanicleanForm: React.FC<
       processedValue = value === "" ? undefined : parseFloat(value);
     } else if (type === "number") {
       processedValue = parseFloat(value) || 0;
+    }
+
+    if (name === "pricingMode") {
+      updateForm({ pricingMode: value as SanicleanPricingMode, includedItems: null });
+      return;
     }
 
     updateForm({ [name]: processedValue });
