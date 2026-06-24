@@ -113,6 +113,7 @@ export const RefreshPowerScrubForm: React.FC<
     areaMonthlyTotals,
     areaContractTotals,
     baselineAreaTotals,
+    baselineAreaContractTotals,
     quote,
     originalContractTotal,
     refreshConfig,
@@ -212,13 +213,14 @@ const getKitchenLarge = (): number => {
         const target = form[key]?.frequencyLabel || form.frequency;
         const oneTime = isOneTimeLabel(target);
         const ct = oneTime ? (areaTotals[key] || 0) : (areaContractTotals[key] || 0);
+        const oct = oneTime ? (baselineAreaTotals[key] || 0) : (baselineAreaContractTotals[key] || 0);
         return {
           key,
           isActive: true,
           frequency: target,
           perVisit: areaTotals[key] || 0,
           contractTotal: ct,
-          originalContractTotal: ct,
+          originalContractTotal: oct > 0 ? oct : ct,
         };
       });
 
