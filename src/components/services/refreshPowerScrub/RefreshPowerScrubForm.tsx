@@ -65,6 +65,8 @@ const PRICING_TYPES = [
   { value: "custom", label: "Custom Amount" },
 ];
 
+const GREENLINE_TARGET_MULTIPLIER = 1.3;
+
 export const RefreshPowerScrubForm: React.FC<
   ServiceInitialData<RefreshPowerScrubFormState>
 > = ({ initialData, onRemove }) => {
@@ -110,6 +112,7 @@ export const RefreshPowerScrubForm: React.FC<
     areaTotals,
     areaMonthlyTotals,
     areaContractTotals,
+    baselineAreaTotals,
     quote,
     originalContractTotal,
     refreshConfig,
@@ -1065,6 +1068,24 @@ const getKitchenLarge = (): number => {
                         )}
                       </>
                     )}
+
+                    {(() => {
+                      const baseline = baselineAreaTotals[areaKey] || 0;
+                      const current = areaTotals[areaKey] || 0;
+                      const isGreenline = baseline > 0 && current >= baseline * GREENLINE_TARGET_MULTIPLIER;
+                      return (
+                        <div className="rps-inline" style={{ marginTop: '8px' }}>
+                          <span
+                            className="rps-label"
+                            style={{ fontWeight: 'bold', color: isGreenline ? '#1a7f37' : '#c00000' }}
+                          >
+                            {isGreenline
+                              ? t("serviceForms.refreshPowerScrub.greenline")
+                              : t("serviceForms.refreshPowerScrub.redline")}
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     {}
                     {form[areaKey].frequencyLabel?.toLowerCase() !== "one time" && (

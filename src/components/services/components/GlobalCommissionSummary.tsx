@@ -62,6 +62,8 @@ export function GlobalCommissionSummary({
 
   const quotaDisplay = QUOTA_LEVEL_DISPLAY[quotaLevel];
   const quotaLabel = t(`serviceComponents.commissionSummary.quota.${quotaLevel}`);
+  const quotaLevelRate =
+    global.commissionTierBreakdown.find(t => t.level === quotaLevel)?.rate ?? commissionRate;
 
   const blendedQuotaRate =
     global.agreementMultiplier > 0
@@ -75,6 +77,7 @@ export function GlobalCommissionSummary({
     accountType: g.accountType,
     reason: null as string | null,
     farTiers: g.farTiers,
+    commissionTiers: g.commissionTiers,
     priceRatio: g.priceRatio,
     pricingMultiplier: g.pricingMultiplier,
     pricingTierLabel: g.pricingTierLabel,
@@ -165,7 +168,7 @@ export function GlobalCommissionSummary({
             className="commission-summary__quota-badge"
             style={{ backgroundColor: quotaDisplay.bgColor, color: quotaDisplay.color }}
           >
-            {t("serviceComponents.commissionSummary.quotaBadge", { label: quotaLabel, rate: commissionRate })}
+            {t("serviceComponents.commissionSummary.quotaBadge", { label: quotaLabel, rate: quotaLevelRate })}
           </span>
           {isDetecting && (
             <span className="commission-summary__detecting">
@@ -291,10 +294,8 @@ export function GlobalCommissionSummary({
 
           {displayItems.map((service, index) => {
             const colors = service.accountType ? ACCOUNT_TYPE_COLORS[service.accountType] : { bg: '#f3f4f6', text: '#6b7280' };
-            const serviceShare =
-              global.totalCommissionableRevenue > 0
-                ? service.commissionableRevenue / global.totalCommissionableRevenue
-                : 0;
+            const serviceTiers = (service.commissionTiers || []).filter(tier => tier.base > 0);
+            const hasServiceTiers = serviceTiers.length > 0;
             const isServiceExpanded = expandedServices[index] || false;
 
             return (
@@ -526,9 +527,8 @@ export function GlobalCommissionSummary({
                         {t("serviceComponents.commissionSummary.commissionRateCalculation")}
                       </div>
                       <div className="service-details__list">
-                        {hasCommissionTiers ? (
-                          global.commissionTierBreakdown
-                            .filter(tier => tier.base > 0)
+                        {hasServiceTiers ? (
+                          serviceTiers
                             .map(tier => (
                               <div className="service-details__row" key={tier.level}>
                                 <span className="service-details__label">{t("serviceComponents.commissionSummary.tierRate", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`) })}</span>
@@ -572,12 +572,11 @@ export function GlobalCommissionSummary({
                         {t("serviceComponents.commissionSummary.commissionCalculation")}
                       </div>
                       <div className="service-details__list service-details__list--green">
-                        {hasCommissionTiers ? (
-                          global.commissionTierBreakdown
-                            .filter(tier => tier.base > 0)
+                        {hasServiceTiers ? (
+                          serviceTiers
                             .map(tier => {
-                              const tierBase = tier.base * serviceShare;
-                              const tierCommission = tier.commission * serviceShare;
+                              const tierBase = tier.base;
+                              const tierCommission = tier.commission;
                               return (
                                 <div className="service-details__row" key={tier.level}>
                                   <span className="service-details__label">

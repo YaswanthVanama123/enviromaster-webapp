@@ -374,6 +374,7 @@ export function useRefreshPowerScrubCalc(
     areaTotals: computed.areaTotals,
     areaMonthlyTotals: computed.areaMonthlyTotals,
     areaContractTotals: computed.areaContractTotals,
+    baselineAreaTotals: computed.baselineAreaTotals,
     quote,
     originalContractTotal: computed.originalContractTotal,
     refreshConfig,

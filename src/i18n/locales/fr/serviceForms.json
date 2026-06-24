@@ -633,6 +633,8 @@
     "selectPlaceholder": "Sélectionner...",
     "totalVisit": "Total de Visite : ${{amount}}",
     "totalLabel": "Total : ${{amount}}",
+    "redline": "Tarification : Redline",
+    "greenline": "Tarification : Greenline",
     "monthly": "Mensuel : ${{amount}}",
     "contract": "Contrat :",
     "applyMinimum": "Appliquer le Minimum",
