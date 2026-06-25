@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import { routestarCustomersApi, type RouteStarCustomer, type CustomerSyncStatus, type CustomerStats } from '../../../backendservice/api/routestarCustomersApi';
@@ -311,7 +312,7 @@ export const RouteStarCustomersTab: React.FC = () => {
       )}
 
       {}
-      {selectedCustomer && (
+      {selectedCustomer && createPortal(
         <div className="rs-modal-overlay" onClick={() => setSelectedCustomer(null)}>
           <div className="rs-modal" onClick={(e) => e.stopPropagation()}>
             <div className="rs-modal-header">
@@ -393,7 +394,8 @@ export const RouteStarCustomersTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

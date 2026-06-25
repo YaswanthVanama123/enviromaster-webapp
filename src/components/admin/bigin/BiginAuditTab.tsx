@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginAuditApi, type BiginAuditLog, type ScrapeStatus, type AuditStats } from '../../../backendservice/api/biginAuditApi';
@@ -495,7 +496,7 @@ export const BiginAuditTab: React.FC = () => {
       )}
 
       {}
-      {selectedLog && (
+      {selectedLog && createPortal(
         <div className="ba-modal-overlay" onClick={() => setSelectedLog(null)}>
           <div className="ba-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header">
@@ -561,11 +562,12 @@ export const BiginAuditTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {}
-      {showUploadModal && (
+      {showUploadModal && createPortal(
         <div className="ba-modal-overlay" onClick={closeUploadModal}>
           <div className="ba-modal ba-upload-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header">
@@ -639,11 +641,12 @@ export const BiginAuditTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {}
-      {showDeleteAllModal && (
+      {showDeleteAllModal && createPortal(
         <div className="ba-modal-overlay" onClick={closeDeleteModal}>
           <div className="ba-modal ba-delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header ba-modal-header-danger">
@@ -692,11 +695,12 @@ export const BiginAuditTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {}
-      {showDeleteUnnecessaryModal && (
+      {showDeleteUnnecessaryModal && createPortal(
         <div className="ba-modal-overlay" onClick={closeDeleteModal}>
           <div className="ba-modal ba-delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="ba-modal-header ba-modal-header-warning">
@@ -744,7 +748,8 @@ export const BiginAuditTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

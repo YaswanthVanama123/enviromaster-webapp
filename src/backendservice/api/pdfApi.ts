@@ -135,6 +135,9 @@ export interface SavedFileGroup {
   contractMonths?: number | null;
   addedToPayroll?: boolean;
   payrollPeriodLabel?: string | null;
+  annualCommission?: number;
+  weeklyCommission?: number;
+  monthlyValue?: number;
 }
 
 export interface AddFileToAgreementRequest {
@@ -727,6 +730,7 @@ export const pdfApi = {
       includeLogs?: boolean;
       includeDrafts?: boolean;
       isTrashView?: boolean;
+      commissionOnly?: boolean;
     } = {}
   ): Promise<SavedFilesGroupedResponse> {
     const params = new URLSearchParams();
@@ -748,6 +752,9 @@ export const pdfApi = {
     }
     if (filters.isTrashView !== undefined) {
       params.set('isTrashView', filters.isTrashView.toString());
+    }
+    if (filters.commissionOnly) {
+      params.set('commissionOnly', 'true');
     }
 
     console.log('📡 [pdfApi] getSavedFilesGrouped called with params:', params.toString());

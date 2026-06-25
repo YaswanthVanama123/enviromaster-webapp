@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { biginCompanyApi, type BiginCompany, type FetchStatus, type CompanyStats, type LocationTypeStatus } from '../../../backendservice/api/biginCompanyApi';
@@ -372,7 +373,7 @@ export const BiginCompaniesTab: React.FC = () => {
       )}
 
       {}
-      {selectedCompany && (
+      {selectedCompany && createPortal(
         <div className="bc-modal-overlay" onClick={() => setSelectedCompany(null)}>
           <div className="bc-modal" onClick={(e) => e.stopPropagation()}>
             <div className="bc-modal-header">
@@ -458,7 +459,8 @@ export const BiginCompaniesTab: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

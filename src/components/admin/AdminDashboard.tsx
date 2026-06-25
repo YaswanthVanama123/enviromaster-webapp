@@ -26,7 +26,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import "./AdminDashboard.css";
 
-type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll" | "location-far";
+type TabType = "pricing" | "services" | "products" | "backup" | "workflow" | "commissions" | "quota" | "customers" | "audit" | "bigin-companies" | "company-mapping" | "map-distance-update" | "inside-sales" | "account-type-detector" | "payroll" | "payroll-agreements" | "location-far";
 
 const TABS: { key: TabType; Icon: IconType; labelKey: string }[] = [
   { key: "pricing", Icon: MdAttachMoney, labelKey: "adminDashboard.tabs.pricing" },
@@ -43,7 +43,6 @@ const TABS: { key: TabType; Icon: IconType; labelKey: string }[] = [
   { key: "map-distance-update", Icon: MdRefresh, labelKey: "adminDashboard.tabs.mapDistanceUpdate" },
   { key: "inside-sales", Icon: MdVerifiedUser, labelKey: "adminDashboard.tabs.insideSales" },
   { key: "account-type-detector", Icon: MdCategory, labelKey: "adminDashboard.tabs.accountType" },
-  { key: "payroll", Icon: MdPayment, labelKey: "adminDashboard.tabs.payroll" },
   { key: "location-far", Icon: MdTrendingUp, labelKey: "adminDashboard.tabs.locationFar" },
 ];
 
@@ -115,6 +114,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (path.includes('/admin-panel/') && (path.includes('/account-type-detector') || path.includes('/account-type-detector/'))) {
         return "account-type-detector";
       }
+      if (path.includes('/admin-panel/') && (path.includes('/payroll-agreements') || path.includes('/payroll-agreements/'))) {
+        return "payroll-agreements";
+      }
       if (path.includes('/admin-panel/') && (path.includes('/payroll') || path.includes('/payroll/'))) {
         return "payroll";
       }
@@ -123,7 +125,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       }
 
       if (!currentSubtab) return "pricing";
-      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "location-far"];
+      const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "payroll-agreements", "location-far"];
       return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
     }
 
@@ -166,6 +168,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (path.includes('/pricing-tables/account-type-detector')) {
       return "account-type-detector";
     }
+    if (path.includes('/pricing-tables/payroll-agreements')) {
+      return "payroll-agreements";
+    }
     if (path.includes('/pricing-tables/payroll')) {
       return "payroll";
     }
@@ -174,7 +179,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
 
     if (!currentSubtab) return "pricing";
-    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "location-far"];
+    const validTabs: TabType[] = ["pricing", "services", "products", "backup", "workflow", "commissions", "quota", "customers", "audit", "bigin-companies", "company-mapping", "map-distance-update", "inside-sales", "account-type-detector", "payroll", "payroll-agreements", "location-far"];
     return validTabs.includes(currentSubtab as TabType) ? (currentSubtab as TabType) : "pricing";
   };
 
