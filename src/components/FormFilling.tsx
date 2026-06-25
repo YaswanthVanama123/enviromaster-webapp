@@ -1197,6 +1197,7 @@ function FormFillingContent({
   ]);
 
   const [payload, setPayload] = useState<FormPayload | null>(null);
+  const [payrollLock, setPayrollLock] = useState<{ addedToPayroll?: boolean; periodLabel?: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
 
@@ -1703,6 +1704,7 @@ function FormFillingContent({
         }
 
         const fromBackend = json.payload ?? json;
+        setPayrollLock((json as any).payrollLock || null);
 
         console.log("📋 [FormFilling] Loaded from backend:", {
           isEditMode: useCustomerDoc,
@@ -2971,7 +2973,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
 
             {}
             {}
-            <GlobalCommissionSummary showDetectButton={true} />
+            <GlobalCommissionSummary showDetectButton={true} addedToPayroll={!!payrollLock?.addedToPayroll} payrollPeriodLabel={payrollLock?.periodLabel} />
 
             {}
             <ContractSummary

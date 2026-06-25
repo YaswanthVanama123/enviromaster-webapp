@@ -45,10 +45,14 @@ function fmtMoney2(n: number): string {
 
 interface GlobalCommissionSummaryProps {
   showDetectButton?: boolean;
+  addedToPayroll?: boolean;
+  payrollPeriodLabel?: string;
 }
 
 export function GlobalCommissionSummary({
   showDetectButton = true,
+  addedToPayroll = false,
+  payrollPeriodLabel,
 }: GlobalCommissionSummaryProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -156,6 +160,22 @@ export function GlobalCommissionSummary({
 
   return (
     <div className="commission-summary">
+      {addedToPayroll && (
+        <div
+          style={{
+            background: "#ede9fe",
+            color: "#5b21b6",
+            border: "1px solid #c4b5fd",
+            borderRadius: 8,
+            padding: "10px 14px",
+            marginBottom: 12,
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          🔒 This agreement is already in payroll{payrollPeriodLabel ? ` (${payrollPeriodLabel})` : ""}. Changing it now will not change the payroll amount.
+        </div>
+      )}
       {}
       <div className="commission-summary__header">
         <div className="commission-summary__title">

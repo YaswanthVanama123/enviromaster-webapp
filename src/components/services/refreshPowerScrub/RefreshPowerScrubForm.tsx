@@ -284,19 +284,19 @@ const getKitchenLarge = (): number => {
 
             if (freqLower === "quarterly") {
 
-              const quarterlyVisits = (area.contractMonths || 12) / 3;
+              const quarterlyVisits = (form.contractMonths || 12) / 3;
               contractAmount = areaTotals[key] * quarterlyVisits;
             } else if (freqLower === "bi-annual" || freqLower === "biannual") {
 
-              const biannualVisits = (area.contractMonths || 12) / 6;
+              const biannualVisits = (form.contractMonths || 12) / 6;
               contractAmount = areaTotals[key] * biannualVisits;
             } else if (freqLower === "annual") {
 
-              const annualVisits = (area.contractMonths || 12) / 12;
+              const annualVisits = (form.contractMonths || 12) / 12;
               contractAmount = areaTotals[key] * annualVisits;
             } else {
 
-              contractAmount = monthlyAmount * (area.contractMonths || 12);
+              contractAmount = monthlyAmount * (form.contractMonths || 12);
             }
 
             const serviceData: any = {
@@ -423,7 +423,7 @@ const getKitchenLarge = (): number => {
             };
             serviceData.contract = {
               isDisplay: true,
-              quantity: area.contractMonths || 12,
+              quantity: form.contractMonths || 12,
               priceRate: monthlyAmount,
               total: contractAmount,
               type: "calc"

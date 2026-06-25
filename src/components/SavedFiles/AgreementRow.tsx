@@ -206,6 +206,20 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
           }}>
             {agreement.agreementTitle}
           </span>
+          {agreement.addedToPayroll && (
+            <span style={{
+              marginLeft: '8px',
+              background: '#ede9fe',
+              color: '#6d28d9',
+              borderRadius: '999px',
+              padding: '2px 10px',
+              fontSize: '11px',
+              fontWeight: 600,
+              whiteSpace: 'nowrap'
+            }}>
+              🔒 Added in payroll{agreement.payrollPeriodLabel ? ` · ${agreement.payrollPeriodLabel}` : ''}
+            </span>
+          )}
         <div style={{
           display: 'flex',
           alignItems: 'center',

@@ -39,8 +39,9 @@ import "./AdminPanel.css";
 import { UserManagement } from "./admin/UserManagement";
 import { EditHistory } from "./admin/EditHistory";
 import { EmployeeAgreements } from "./admin/EmployeeAgreements";
+import { PayrollAgreementsAdmin } from "./admin/payroll/PayrollAgreementsAdmin";
 
-type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "email-template" | "service-agreement-template" | "trash";
+type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "email-template" | "service-agreement-template" | "trash" | "payroll-agreements";
 
 type FileStatus = "draft" | "pending_approval" | "approved_salesman" | "approved_admin";
 
@@ -100,7 +101,7 @@ export default function AdminPanel() {
   const getActiveTabFromUrl = (): TabType => {
     if (!tab) return "dashboard";
 
-    const validTabs: TabType[] = ["dashboard", "saved-pdfs", "approval-documents", "pricing-details", "user-management", "edit-history", "employee-agreements", "email-template", "service-agreement-template", "trash"];
+    const validTabs: TabType[] = ["dashboard", "saved-pdfs", "approval-documents", "pricing-details", "user-management", "edit-history", "employee-agreements", "email-template", "service-agreement-template", "trash", "payroll-agreements"];
     return validTabs.includes(tab as TabType) ? (tab as TabType) : "dashboard";
   };
 
@@ -613,6 +614,13 @@ export default function AdminPanel() {
           <FontAwesomeIcon icon={faFileContract} size="lg" />
           {t("adminPanel.tabs.serviceAgreement")}
         </button>
+        <button
+          className={`secondary-nav-item ${activeTab === "payroll-agreements" ? "active" : ""}`}
+          onClick={() => handleTabChange("payroll-agreements")}
+        >
+          <FontAwesomeIcon icon={faDollarSign} size="lg" />
+          Payroll Agreements
+        </button>
         </nav>
         <button
           type="button"
@@ -1094,6 +1102,12 @@ export default function AdminPanel() {
         {activeTab === "employee-agreements" && (
           <div className="tab-content-full">
             <EmployeeAgreements />
+          </div>
+        )}
+
+        {activeTab === "payroll-agreements" && (
+          <div className="tab-content-full">
+            <PayrollAgreementsAdmin />
           </div>
         )}
       </main>
