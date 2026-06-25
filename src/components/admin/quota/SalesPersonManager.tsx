@@ -154,7 +154,7 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
       </div>
 
       {}
-      {editingPerson && (
+      {editingPerson && createPortal(
         <div className="edit-modal-overlay">
           <div className="edit-modal">
             <h3>{t("adminQuota.salesPersonManager.editTitle", { name: editingPerson.name })}</h3>
@@ -230,7 +230,8 @@ export const SalesPersonManager: React.FC<SalesPersonManagerProps> = ({ onRefres
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {loading ? (
