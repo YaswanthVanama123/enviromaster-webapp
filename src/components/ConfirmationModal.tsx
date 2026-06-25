@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import "./ConfirmationModal.css";
 
@@ -37,7 +38,7 @@ export default function ConfirmationModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{resolvedTitle}</h2>
@@ -59,6 +60,7 @@ export default function ConfirmationModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

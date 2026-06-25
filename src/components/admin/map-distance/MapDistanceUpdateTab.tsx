@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { mapDistanceApi, MapDistanceSyncJob, MapDistanceStats, MapDistanceRecord, RouteStarCustomerOption } from '../../../backendservice/api/mapDistanceApi';
 import { MdRefresh, MdCancel, MdStorage, MdHistory, MdPerson, MdCalendarToday, MdLocationOn, MdStraighten, MdCheckCircle, MdError, MdSchedule, MdSync, MdPlayArrow, MdPause, MdFilterList, MdClose, MdExpandMore, MdDeleteForever } from 'react-icons/md';
@@ -287,7 +288,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
         </div>
 
         {}
-        {showDeleteConfirm && (
+        {showDeleteConfirm && createPortal(
           <div className="mdu-modal-overlay">
             <div className="mdu-modal">
               <div className="mdu-modal-header">
@@ -314,7 +315,8 @@ export const MapDistanceUpdateTab: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Stats Bar */}
