@@ -111,6 +111,16 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
   const handleSave = async () => {
     if (!editingConfig?._id) return;
 
+    // The CKEditor embeds pasted/uploaded images inline (base64) in the
+    // description, so the request body can exceed the server's 5 MB limit and
+    // fail with a 413. Catch that here and tell the user clearly.
+    const MAX_BODY_BYTES = 5 * 1024 * 1024;
+    const payloadBytes = new Blob([JSON.stringify(formData)]).size;
+    if (payloadBytes > MAX_BODY_BYTES) {
+      setToastMessage({ message: t("adminPricing.serviceConfig.imageTooLarge"), type: "error" });
+      return;
+    }
+
     setSaving(true);
 
     const result = await updateConfig(editingConfig._id, formData);
@@ -119,7 +129,14 @@ export const ServiceConfigManager: React.FC<ServiceConfigManagerProps> = ({
       setToastMessage({ message: t("adminPricing.serviceConfig.configUpdated"), type: "success" });
       closeModal();
     } else {
-      setToastMessage({ message: t("adminPricing.serviceConfig.configUpdateFailed"), type: "error" });
+      const msg = (result as any)?.error || "";
+      const tooLarge = /413|too large|payload/i.test(String(msg));
+      setToastMessage({
+        message: tooLarge
+          ? t("adminPricing.serviceConfig.imageTooLarge")
+          : t("adminPricing.serviceConfig.configUpdateFailed"),
+        type: "error",
+      });
     }
 
     setSaving(false);

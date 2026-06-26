@@ -225,6 +225,7 @@
     "saveChanges": "Save Changes",
     "configUpdated": "Service config updated successfully!",
     "configUpdateFailed": "Failed to update service config. Please try again.",
-    "imageUploadFailed": "Image upload failed."
+    "imageUploadFailed": "Image upload failed.",
+    "imageTooLarge": "The image you added is too large to save. Please use an image under 5 MB and try again."
   }
 }

@@ -225,6 +225,7 @@
     "saveChanges": "Guardar cambios",
     "configUpdated": "¡Configuración del servicio actualizada correctamente!",
     "configUpdateFailed": "No se pudo actualizar la configuración del servicio. Inténtelo de nuevo.",
-    "imageUploadFailed": "Error al subir la imagen."
+    "imageUploadFailed": "Error al subir la imagen.",
+    "imageTooLarge": "La imagen que agregó es demasiado grande para guardarla. Use una imagen de menos de 5 MB e inténtelo de nuevo."
   }
 }

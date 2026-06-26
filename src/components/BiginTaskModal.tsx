@@ -13,6 +13,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { zohoApi } from "../backendservice/api";
+import { adminSettingsApi } from "../backendservice/api/adminSettingsApi";
 import type { ZohoCompany, ZohoUploadStatus, ZohoUser } from "../backendservice/api";
 
 interface BiginTaskModalProps {
@@ -104,9 +105,20 @@ export const BiginTaskModal: React.FC<BiginTaskModalProps> = ({
     Promise.allSettled([
       zohoApi.getUploadStatus(agreementId),
       zohoApi.getUsers(),
-    ]).then(([statusResult, usersResult]) => {
+      adminSettingsApi.get(),
+    ]).then(([statusResult, usersResult, settingsResult]) => {
+      let loadedUsers: ZohoUser[] = [];
       if (usersResult.status === "fulfilled") {
-        setUsers(usersResult.value.users || []);
+        loadedUsers = usersResult.value.users || [];
+        setUsers(loadedUsers);
+      }
+      // Default the Owner to the workflow's configured approval-task owner.
+      if (settingsResult.status === "fulfilled") {
+        const defOwner = settingsResult.value?.defaultApprovalTaskOwner;
+        if (defOwner?.id) {
+          const match = loadedUsers.find(u => u.id === defOwner.id);
+          setSelectedOwner(match || { id: defOwner.id, name: defOwner.name || "", email: "" });
+        }
       }
       if (statusResult.status === "fulfilled") {
         const status = statusResult.value as ZohoUploadStatus;

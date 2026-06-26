@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -287,7 +288,7 @@ export const PayrollAgreementsAdmin: React.FC = () => {
         )}
       </div>
 
-      {confirmTarget && (
+      {confirmTarget && createPortal(
         <div style={styles.modalOverlay} onClick={() => !submitting && setConfirmTarget(null)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>Add to payroll?</h3>
@@ -308,7 +309,8 @@ export const PayrollAgreementsAdmin: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

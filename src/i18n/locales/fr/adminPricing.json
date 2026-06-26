@@ -225,6 +225,7 @@
     "saveChanges": "Enregistrer les modifications",
     "configUpdated": "Configuration du service mise à jour avec succès !",
     "configUpdateFailed": "Échec de la mise à jour de la configuration du service. Veuillez réessayer.",
-    "imageUploadFailed": "Échec du téléversement de l'image."
+    "imageUploadFailed": "Échec du téléversement de l'image.",
+    "imageTooLarge": "L'image ajoutée est trop volumineuse pour être enregistrée. Veuillez utiliser une image de moins de 5 Mo et réessayer."
   }
 }
