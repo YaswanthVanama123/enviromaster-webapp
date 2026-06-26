@@ -1,0 +1,25 @@
+{
+  "refresh": "Actualiser",
+  "from": "Du",
+  "to": "Au",
+  "filters": {
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois-ci",
+    "specificDate": "Date précise"
+  },
+  "summary": {
+    "totalAgreements": "Contrats créés",
+    "employees": "Employés"
+  },
+  "loading": "Chargement de l'activité…",
+  "empty": "Aucun contrat n'a été créé durant cette période.",
+  "statuses": {
+    "draft": "Brouillon",
+    "saved": "Enregistré",
+    "pending_approval": "En attente d'approbation",
+    "approved_salesman": "Approuvé par le vendeur",
+    "approved_admin": "Approuvé par l'administrateur",
+    "finalized": "Finalisé"
+  }
+}

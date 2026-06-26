@@ -8,6 +8,7 @@
     "userManagement": "Gestion des utilisateurs",
     "editHistory": "Historique des modifications",
     "employeeFiles": "Fichiers des employés",
+    "agreementActivity": "Activité des contrats",
     "emailTemplate": "Modèle d'e-mail",
     "serviceAgreement": "Contrat de service"
   },
@@ -19,6 +20,7 @@
     "userManagement": "Gestion des utilisateurs",
     "editHistory": "Historique des modifications",
     "employeeAgreements": "Contrats des employés",
+    "agreementActivity": "Activité des contrats",
     "emailTemplate": "Modèle d'e-mail",
     "serviceAgreementTemplate": "Modèle de contrat de service",
     "trash": "Corbeille"
@@ -26,6 +28,7 @@
   "headers": {
     "recentDocuments": "Documents récents",
     "documentStatus": "Statut du document",
-    "selectDateRange": "Sélectionner une plage de dates"
+    "selectDateRange": "Sélectionner une plage de dates",
+    "back": "Retour"
   }
 }

@@ -1,0 +1,25 @@
+{
+  "refresh": "Actualizar",
+  "from": "Desde",
+  "to": "Hasta",
+  "filters": {
+    "today": "Hoy",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "specificDate": "Fecha específica"
+  },
+  "summary": {
+    "totalAgreements": "Acuerdos creados",
+    "employees": "Empleados"
+  },
+  "loading": "Cargando actividad…",
+  "empty": "No se crearon acuerdos en este período.",
+  "statuses": {
+    "draft": "Borrador",
+    "saved": "Guardado",
+    "pending_approval": "Pendiente de aprobación",
+    "approved_salesman": "Aprobado por vendedor",
+    "approved_admin": "Aprobado por administrador",
+    "finalized": "Finalizado"
+  }
+}

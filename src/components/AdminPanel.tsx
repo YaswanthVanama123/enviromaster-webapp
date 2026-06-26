@@ -12,13 +12,15 @@ import EmailTemplateManager from "./admin/EmailTemplateManager";
 import ServiceAgreementTemplateManager from "./admin/ServiceAgreementTemplateManager";
 import AgreementTimelineBadge from "./AgreementTimelineBadge";
 import TrashView from "./TrashView";
+import { LanguageSwitcher } from "./molecules";
+import { AgreementActivity } from "./admin/AgreementActivity";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileAlt,
   faSearch,
   faUpload,
   faDownload,
-  faSignOutAlt,
+  faArrowLeft,
   faChevronDown,
   faBriefcase,
   faEye,
@@ -32,7 +34,8 @@ import {
   faFileContract,
   faUsers,
   faHistory,
-  faUserFriends
+  faUserFriends,
+  faCalendarDay
 } from "@fortawesome/free-solid-svg-icons";
 import { FaSort } from "react-icons/fa";
 import "./AdminPanel.css";
@@ -42,7 +45,7 @@ import { EmployeeAgreements } from "./admin/EmployeeAgreements";
 import { PayrollTab } from "./admin/payroll/PayrollTab";
 import { PayrollAgreementsAdmin } from "./admin/payroll/PayrollAgreementsAdmin";
 
-type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "email-template" | "service-agreement-template" | "trash" | "payroll" | "payroll-agreements";
+type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "agreement-activity" | "email-template" | "service-agreement-template" | "trash" | "payroll" | "payroll-agreements";
 
 type FileStatus = "draft" | "pending_approval" | "approved_salesman" | "approved_admin";
 
@@ -64,7 +67,7 @@ export default function AdminPanel() {
     modalType: string;
     itemId: string;
   }>();
-  const { isAuthenticated, user, logout } = useAdminAuth();
+  const { isAuthenticated, user } = useAdminAuth();
   const isNavigatingRef = useRef(false);
 
   const secondaryNavRef = useRef<HTMLElement>(null);
@@ -102,7 +105,7 @@ export default function AdminPanel() {
   const getActiveTabFromUrl = (): TabType => {
     if (!tab) return "dashboard";
 
-    const validTabs: TabType[] = ["dashboard", "saved-pdfs", "approval-documents", "pricing-details", "user-management", "edit-history", "employee-agreements", "email-template", "service-agreement-template", "trash", "payroll", "payroll-agreements"];
+    const validTabs: TabType[] = ["dashboard", "saved-pdfs", "approval-documents", "pricing-details", "user-management", "edit-history", "employee-agreements", "agreement-activity", "email-template", "service-agreement-template", "trash", "payroll", "payroll-agreements"];
     return validTabs.includes(tab as TabType) ? (tab as TabType) : "dashboard";
   };
 
@@ -400,11 +403,9 @@ export default function AdminPanel() {
     console.log("📍 Admin Panel: Navigating to PDF viewer with return path:", adminReturnPath);
   };
 
-  const handleLogout = () => {
-    if (logout) {
-      logout();
-      navigate("/admin-login", { replace: true });
-    }
+  const handleBack = () => {
+    setShowUserMenu(false);
+    navigate("/home");
   };
 
   const toggleAgreement = (agreementId: string) => {
@@ -457,6 +458,8 @@ export default function AdminPanel() {
         return t("adminPanel.titles.editHistory");
       case "employee-agreements":
         return t("adminPanel.titles.employeeAgreements");
+      case "agreement-activity":
+        return t("adminPanel.titles.agreementActivity");
       case "email-template":
         return t("adminPanel.titles.emailTemplate");
       case "service-agreement-template":
@@ -518,6 +521,7 @@ export default function AdminPanel() {
         </div>
 
         <div className="nav-right">
+          <LanguageSwitcher />
           <div className="user-section" onClick={() => setShowUserMenu(!showUserMenu)}>
             <div className="user-avatar-modern">
               {user?.username?.charAt(0).toUpperCase() || "A"}
@@ -528,9 +532,9 @@ export default function AdminPanel() {
 
           {showUserMenu && (
             <div className="user-dropdown-menu">
-              <button className="dropdown-logout" onClick={handleLogout}>
-                <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
-                <span>Log Out</span>
+              <button className="dropdown-back" onClick={handleBack}>
+                <FontAwesomeIcon icon={faArrowLeft} size="lg" />
+                <span>{t("adminPanel.headers.back")}</span>
               </button>
             </div>
           )}
@@ -600,6 +604,13 @@ export default function AdminPanel() {
         >
           <FontAwesomeIcon icon={faUserFriends} size="lg" />
           {t("adminPanel.tabs.employeeFiles")}
+        </button>
+        <button
+          className={`secondary-nav-item ${activeTab === "agreement-activity" ? "active" : ""}`}
+          onClick={() => handleTabChange("agreement-activity")}
+        >
+          <FontAwesomeIcon icon={faCalendarDay} size="lg" />
+          {t("adminPanel.tabs.agreementActivity")}
         </button>
         <button
           className={`secondary-nav-item ${activeTab === "email-template" ? "active" : ""}`}
@@ -1110,6 +1121,12 @@ export default function AdminPanel() {
         {activeTab === "employee-agreements" && (
           <div className="tab-content-full">
             <EmployeeAgreements />
+          </div>
+        )}
+
+        {activeTab === "agreement-activity" && (
+          <div className="tab-content-full">
+            <AgreementActivity />
           </div>
         )}
 

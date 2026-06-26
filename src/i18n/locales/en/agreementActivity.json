@@ -1,0 +1,25 @@
+{
+  "refresh": "Refresh",
+  "from": "From",
+  "to": "To",
+  "filters": {
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "specificDate": "Specific Date"
+  },
+  "summary": {
+    "totalAgreements": "Agreements Created",
+    "employees": "Employees"
+  },
+  "loading": "Loading activity…",
+  "empty": "No agreements were created in this period.",
+  "statuses": {
+    "draft": "Draft",
+    "saved": "Saved",
+    "pending_approval": "Pending Approval",
+    "approved_salesman": "Approved by Salesman",
+    "approved_admin": "Approved by Admin",
+    "finalized": "Finalized"
+  }
+}

@@ -8,6 +8,7 @@
     "userManagement": "User Management",
     "editHistory": "Edit History",
     "employeeFiles": "Employee Files",
+    "agreementActivity": "Agreement Activity",
     "emailTemplate": "Email Template",
     "serviceAgreement": "Service Agreement"
   },
@@ -19,6 +20,7 @@
     "userManagement": "User Management",
     "editHistory": "Edit History",
     "employeeAgreements": "Employee Agreements",
+    "agreementActivity": "Agreement Activity",
     "emailTemplate": "Email Template",
     "serviceAgreementTemplate": "Service Agreement Template",
     "trash": "Trash"
@@ -26,6 +28,7 @@
   "headers": {
     "recentDocuments": "Recent Documents",
     "documentStatus": "Document Status",
-    "selectDateRange": "Select Date Range"
+    "selectDateRange": "Select Date Range",
+    "back": "Back"
   }
 }
