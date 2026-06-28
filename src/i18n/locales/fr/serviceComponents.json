@@ -35,6 +35,9 @@
     "tierRateCalc": "{{rate}}% × {{multiplier}}% = {{effective}}%",
     "baseCommissionRate": "Taux de Commission de Base ({{label}}) :",
     "effectiveRate": "Taux Effectif ({{rate}}% × {{multiplier}}%) :",
+    "fullContractRevenue": "Revenu total du contrat ({{months}} mois) :",
+    "annualRevenueDivide": "Revenu annuel (Contrat ÷ {{years}} ans) :",
+    "annualizationNote": "La commission est calculée sur une base d'un an ; le revenu total du contrat de {{months}} mois est donc divisé par {{years}} pour obtenir le montant annuel utilisé ci-dessous.",
     "multiplierNote": "Le multiplicateur de {{multiplier}} % est appliqué car il s'agit d'un contrat {{term}}.",
     "term": {
       "3-year": "de 3 ans",

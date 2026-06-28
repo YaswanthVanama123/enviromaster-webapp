@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBox, FaHourglassHalf, FaDownload } from "react-icons/fa";
 import { useServiceConfigs, useActiveProductCatalog } from "../../backendservice/hooks";
+import { useAdminAuth } from "../../backendservice/hooks/useAdminAuth";
 import type { ServiceConfig } from "../../backendservice/types/serviceConfig.types";
 import { ServicePricingEditor } from "./ServicePricingEditor";
 import { pdfApi } from "../../backendservice/api/pdfApi";
@@ -25,6 +26,8 @@ type ViewMode = "list" | "service" | "products" | "editConfig";
 export const AdminPricingManager: React.FC = () => {
   const { t } = useTranslation();
   const { configs, loading, error, updateConfig } = useServiceConfigs();
+  const { user: adminUser } = useAdminAuth();
+  const canManagePriceChanges = adminUser?.canManagePriceChanges !== false;
   const { catalog, loading: catalogLoading } = useActiveProductCatalog();
 
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -169,13 +172,15 @@ export const AdminPricingManager: React.FC = () => {
                 >
                   {t('adminPricing.manager.viewPricingForm')}
                 </button>
-                <button
-                  className="apm-edit-config-button"
-                  style={styles.editConfigButton}
-                  onClick={() => handleEditConfig(config)}
-                >
-                  {t('adminPricing.manager.editConfig')}
-                </button>
+                {canManagePriceChanges && (
+                  <button
+                    className="apm-edit-config-button"
+                    style={styles.editConfigButton}
+                    onClick={() => handleEditConfig(config)}
+                  >
+                    {t('adminPricing.manager.editConfig')}
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -195,13 +200,15 @@ export const AdminPricingManager: React.FC = () => {
             <h2 className="apm-title" style={styles.title}>{selectedService.label}</h2>
             <p className="apm-subtitle" style={styles.subtitle}>{selectedService.description}</p>
           </div>
-          <button
-            className="apm-edit-config-button"
-            style={styles.editConfigButton}
-            onClick={() => handleEditConfig(selectedService)}
-          >
-            {t('adminPricing.manager.editConfiguration')}
-          </button>
+          {canManagePriceChanges && (
+            <button
+              className="apm-edit-config-button"
+              style={styles.editConfigButton}
+              onClick={() => handleEditConfig(selectedService)}
+            >
+              {t('adminPricing.manager.editConfiguration')}
+            </button>
+          )}
         </div>
 
         <div className="apm-form-container" style={styles.formContainer}>

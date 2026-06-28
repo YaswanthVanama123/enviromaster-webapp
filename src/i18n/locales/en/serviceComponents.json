@@ -45,6 +45,9 @@
     "tierRateCalc": "{{rate}}% × {{multiplier}}% = {{effective}}%",
     "baseCommissionRate": "Base Commission Rate ({{label}}):",
     "effectiveRate": "Effective Rate ({{rate}}% × {{multiplier}}%):",
+    "fullContractRevenue": "Full Contract Revenue ({{months}} mo):",
+    "annualRevenueDivide": "Annual Revenue (Contract ÷ {{years}} yr):",
+    "annualizationNote": "Commission is calculated on a 1-year basis, so the full {{months}}-month contract revenue is divided by {{years}} to get the annual amount used below.",
     "multiplierNote": "The {{multiplier}}% multiplier is applied because this is a {{term}} agreement.",
     "term": {
       "3-year": "3-year",

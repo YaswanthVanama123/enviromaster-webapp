@@ -28,6 +28,8 @@ export function UserManagement({}: UserManagementProps) {
     email: '',
     role: 'employee' as UserRole,
     isActive: true,
+    backupManagement: false,
+    priceChanges: false,
   });
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -111,6 +113,9 @@ export function UserManagement({}: UserManagementProps) {
         fullName: formData.fullName,
         email: formData.email || undefined,
         isActive: formData.isActive,
+        ...(selectedUser.role === 'admin'
+          ? { permissions: { backupManagement: formData.backupManagement, priceChanges: formData.priceChanges } }
+          : {}),
       });
 
       setShowEditModal(false);
@@ -130,17 +135,6 @@ export function UserManagement({}: UserManagementProps) {
       fetchUsers();
     } catch (err: any) {
       setError(err?.detail || err?.message || t('userManagement.failedToToggleStatus'));
-    }
-  };
-
-  const handleToggleBackupPermission = async (user: UserListItem) => {
-    try {
-      await userManagementApi.updateUser(user.role, user.id, {
-        permissions: { backupManagement: !user.permissions?.backupManagement },
-      });
-      fetchUsers();
-    } catch (err: any) {
-      setError(err?.detail || err?.message || t('userManagement.failedToUpdateUser'));
     }
   };
 
@@ -183,6 +177,8 @@ export function UserManagement({}: UserManagementProps) {
       email: user.email || '',
       role: user.role,
       isActive: user.isActive,
+      backupManagement: user.permissions?.backupManagement ?? false,
+      priceChanges: user.permissions?.priceChanges ?? false,
     });
     setFormError(null);
     setShowEditModal(true);
@@ -207,6 +203,8 @@ export function UserManagement({}: UserManagementProps) {
       email: '',
       role: 'employee',
       isActive: true,
+      backupManagement: false,
+      priceChanges: false,
     });
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -353,20 +351,6 @@ export function UserManagement({}: UserManagementProps) {
                       >
                         {user.isActive ? t('userManagement.deactivate') : t('userManagement.activate')}
                       </button>
-                      {user.role === 'admin' && (
-                        <button
-                          style={{
-                            ...styles.actionButton,
-                            ...(user.permissions?.backupManagement ? styles.deactivateButton : styles.activateButton),
-                          }}
-                          onClick={() => handleToggleBackupPermission(user)}
-                          title={t('userManagement.backupAccessTitle')}
-                        >
-                          {user.permissions?.backupManagement
-                            ? t('userManagement.revokeBackupAccess')
-                            : t('userManagement.grantBackupAccess')}
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -560,6 +544,29 @@ export function UserManagement({}: UserManagementProps) {
                   <span style={{ marginLeft: '8px' }}>{t('userManagement.active')}</span>
                 </label>
               </div>
+              {selectedUser?.role === 'admin' && (
+                <div style={styles.formGroup}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                    {t('userManagement.permissions')}
+                  </div>
+                  <label style={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={formData.backupManagement}
+                      onChange={(e) => setFormData({ ...formData, backupManagement: e.target.checked })}
+                    />
+                    <span style={{ marginLeft: '8px' }}>{t('userManagement.permBackup')}</span>
+                  </label>
+                  <label style={{ ...styles.checkboxLabel, marginTop: '8px' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.priceChanges}
+                      onChange={(e) => setFormData({ ...formData, priceChanges: e.target.checked })}
+                    />
+                    <span style={{ marginLeft: '8px' }}>{t('userManagement.permPriceChanges')}</span>
+                  </label>
+                </div>
+              )}
               {formError && <div style={styles.formError}>{formError}</div>}
               <div style={styles.modalActions}>
                 <button

@@ -58,11 +58,15 @@ export function GlobalCommissionSummary({
   const [expanded, setExpanded] = useState(false);
   const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
 
-  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped, isNewLocation, setIsNewLocation, isLocationTypeAuto } = useServicesContext();
+  const { quotaLevel, quotaLevelData, baseCommissionRate, isRouteStarMapped, isNewLocation, setIsNewLocation, isLocationTypeAuto, globalContractMonths } = useServicesContext();
   const commissionRate = baseCommissionRate;
 
   const global = useGlobalCommission(commissionRate);
   const { detectAccountTypes, isDetecting, error, isCompanyMapped } = useAccountTypeDetection();
+
+  const contractMonths = globalContractMonths > 0 ? globalContractMonths : 12;
+  const contractYears = contractMonths / 12;
+  const contractYearsLabel = Number.isInteger(contractYears) ? String(contractYears) : contractYears.toFixed(1);
 
   const quotaDisplay = QUOTA_LEVEL_DISPLAY[quotaLevel];
   const quotaLabel = t(`serviceComponents.commissionSummary.quota.${quotaLevel}`);
@@ -98,6 +102,8 @@ export function GlobalCommissionSummary({
       commissionableRevenue: fmtMoney2(g.commissionableRevenue),
       annualOriginalRevenue: fmtMoney2(g.annualOriginalRevenue),
       perVisitRevenue: fmtMoney2(g.perVisitRevenue),
+      annualRevenue: fmtMoney2(g.perVisitRevenue),
+      fullContractRevenue: fmtMoney2(g.perVisitRevenue * contractYears),
       adjustedAnnualRevenue: fmtMoney2(g.perVisitRevenue * g.pricingMultiplier),
       revenueDeduction: fmtMoney2(g.revenueDeduction),
       perVisitCommission: fmtMoney2(g.perVisitCommission),
@@ -369,6 +375,20 @@ export function GlobalCommissionSummary({
                         {t("serviceComponents.commissionSummary.revenueCalculation")}
                       </div>
                       <div className="service-details__list">
+                        <div className="service-details__row">
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.fullContractRevenue", { months: contractMonths })}</span>
+                          <span className="service-details__value" style={{ fontWeight: 600 }}>{service.formatted.fullContractRevenue}</span>
+                        </div>
+                        <div className="service-details__row">
+                          <span className="service-details__label">{t("serviceComponents.commissionSummary.annualRevenueDivide", { years: contractYearsLabel })}</span>
+                          <span className="service-details__value service-details__value--green">{service.formatted.annualRevenue}</span>
+                        </div>
+                        <div
+                          className="service-details__annualization-note"
+                          style={{ margin: '4px 0 10px', fontSize: 12, color: '#6b7280', lineHeight: 1.4 }}
+                        >
+                          {t("serviceComponents.commissionSummary.annualizationNote", { months: contractMonths, years: contractYearsLabel })}
+                        </div>
                         {service.farTiers ? (
                           <>
                             <div className="service-details__row">
