@@ -35,6 +35,12 @@
     "tierRateCalc": "{{rate}}% × {{multiplier}}% = {{effective}}%",
     "baseCommissionRate": "Tarifa de Comisión Base ({{label}}):",
     "effectiveRate": "Tarifa Efectiva ({{rate}}% × {{multiplier}}%):",
+    "multiplierNote": "El multiplicador del {{multiplier}}% se aplica porque es un acuerdo {{term}}.",
+    "term": {
+      "3-year": "de 3 años",
+      "1-year": "de 1 año",
+      "MTM-with-install": "mes a mes"
+    },
     "commissionCalculation": "Cálculo de Comisión",
     "tierCommissionLabel": "{{label}} ({{base}} × {{rate}}%):",
     "perVisitCommissionLabel": "Comisión por Visita ({{revenue}} × {{rate}}%):",

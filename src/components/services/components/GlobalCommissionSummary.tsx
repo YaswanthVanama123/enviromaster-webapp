@@ -584,6 +584,26 @@ export function GlobalCommissionSummary({
                           </>
                         )}
                       </div>
+                      <div
+                        className="service-details__multiplier-note"
+                        style={{
+                          display: 'inline-block',
+                          marginTop: 8,
+                          padding: '6px 12px',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          lineHeight: 1.4,
+                          color: '#1d4ed8',
+                          background: '#eff6ff',
+                          border: '1px solid #bfdbfe',
+                          borderRadius: 9999,
+                        }}
+                      >
+                        {t("serviceComponents.commissionSummary.multiplierNote", {
+                          multiplier: global.agreementMultiplier,
+                          term: t(`serviceComponents.commissionSummary.term.${global.agreementTerm}`),
+                        })}
+                      </div>
                     </div>
 
                     {}
@@ -628,31 +648,6 @@ export function GlobalCommissionSummary({
                           </span>
                           <span className="service-details__total-value service-details__value--green">
                             {service.formatted.annualCommission}
-                          </span>
-                        </div>
-
-                        <div className="service-details__row">
-                          <span className="service-details__label">{t("serviceComponents.commissionSummary.frequency")}</span>
-                          <span className="service-details__value">
-                            {t("serviceComponents.commissionSummary.frequencyVisits", { label: service.frequencyLabel, visits: service.visitsPerYear })}
-                          </span>
-                        </div>
-
-                        <div className="service-details__row">
-                          <span className="service-details__label">
-                            {t("serviceComponents.commissionSummary.perVisitCommissionDivide", { commission: service.formatted.annualCommission, visits: service.visitsPerYear })}
-                          </span>
-                          <span className="service-details__value service-details__value--green">
-                            {service.formatted.perVisitCommission}
-                          </span>
-                        </div>
-
-                        <div className="service-details__row">
-                          <span className="service-details__label">
-                            {t("serviceComponents.commissionSummary.weeklyCommissionDivide", { commission: service.formatted.annualCommission })}
-                          </span>
-                          <span className="service-details__total-value service-details__value--green">
-                            {service.formatted.weeklyCommission}
                           </span>
                         </div>
                       </div>

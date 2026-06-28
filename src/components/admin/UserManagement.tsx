@@ -133,6 +133,17 @@ export function UserManagement({}: UserManagementProps) {
     }
   };
 
+  const handleToggleBackupPermission = async (user: UserListItem) => {
+    try {
+      await userManagementApi.updateUser(user.role, user.id, {
+        permissions: { backupManagement: !user.permissions?.backupManagement },
+      });
+      fetchUsers();
+    } catch (err: any) {
+      setError(err?.detail || err?.message || t('userManagement.failedToUpdateUser'));
+    }
+  };
+
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser) return;
@@ -342,6 +353,20 @@ export function UserManagement({}: UserManagementProps) {
                       >
                         {user.isActive ? t('userManagement.deactivate') : t('userManagement.activate')}
                       </button>
+                      {user.role === 'admin' && (
+                        <button
+                          style={{
+                            ...styles.actionButton,
+                            ...(user.permissions?.backupManagement ? styles.deactivateButton : styles.activateButton),
+                          }}
+                          onClick={() => handleToggleBackupPermission(user)}
+                          title={t('userManagement.backupAccessTitle')}
+                        >
+                          {user.permissions?.backupManagement
+                            ? t('userManagement.revokeBackupAccess')
+                            : t('userManagement.grantBackupAccess')}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

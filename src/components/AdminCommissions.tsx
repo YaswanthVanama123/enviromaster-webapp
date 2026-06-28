@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { pdfApi } from '../backendservice/api/pdfApi';
+import { apiClient } from '../backendservice/utils/apiClient';
 import './AdminCommissions.css';
 
 interface StatusCounts {
@@ -103,7 +104,7 @@ const STATUS_I18N_KEYS: Record<string, string> = {
   active: 'active',
 };
 
-type TimeFilterType = 'all' | 'thisWeek' | 'last14Days' | 'thisMonth' | 'thisQuarter' | 'thisYear' | 'dateRange';
+type TimeFilterType = 'all' | 'thisWeek' | 'last14Days' | 'thisMonth' | 'thisQuarter' | 'thisYear' | 'thisPayroll' | 'previousPayroll' | 'dateRange';
 
 const TIME_FILTER_LABELS: Record<TimeFilterType, string> = {
   all: 'All Time',
@@ -112,10 +113,20 @@ const TIME_FILTER_LABELS: Record<TimeFilterType, string> = {
   thisMonth: 'This Month',
   thisQuarter: 'This Quarter',
   thisYear: 'This Year',
+  thisPayroll: 'This Payroll',
+  previousPayroll: 'Previous Payroll',
   dateRange: 'Date Range',
 };
 
-function getDateRange(filter: TimeFilterType, customStart?: string, customEnd?: string): { startDate?: string; endDate?: string } {
+interface PayrollPeriod { start: string; end: string; label: string; }
+interface PayrollPeriods { current?: PayrollPeriod; previous?: PayrollPeriod; }
+
+function getDateRange(
+  filter: TimeFilterType,
+  customStart?: string,
+  customEnd?: string,
+  payrollPeriods?: PayrollPeriods
+): { startDate?: string; endDate?: string } {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -176,6 +187,16 @@ function getDateRange(filter: TimeFilterType, customStart?: string, customEnd?: 
       }
       return {};
 
+    case 'thisPayroll':
+      return payrollPeriods?.current
+        ? { startDate: payrollPeriods.current.start, endDate: payrollPeriods.current.end }
+        : {};
+
+    case 'previousPayroll':
+      return payrollPeriods?.previous
+        ? { startDate: payrollPeriods.previous.start, endDate: payrollPeriods.previous.end }
+        : {};
+
     default:
       return {};
   }
@@ -215,16 +236,26 @@ export default function AdminCommissions() {
   const [customDateStart, setCustomDateStart] = useState<string>('');
   const [customDateEnd, setCustomDateEnd] = useState<string>('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [payrollPeriods, setPayrollPeriods] = useState<PayrollPeriods>({});
+
+  useEffect(() => {
+    apiClient
+      .get<{ success: boolean; periods: PayrollPeriods }>('/api/payroll/periods')
+      .then((res) => {
+        if (res.data?.periods) setPayrollPeriods(res.data.periods);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchEmployees();
-  }, [timeFilter, customDateStart, customDateEnd]);
+  }, [timeFilter, customDateStart, customDateEnd, payrollPeriods]);
 
   async function fetchEmployees() {
     try {
       setLoading(true);
       setError(null);
-      const dateRange = getDateRange(timeFilter, customDateStart, customDateEnd);
+      const dateRange = getDateRange(timeFilter, customDateStart, customDateEnd, payrollPeriods);
       const response = await pdfApi.getAllEmployeesCommissions(dateRange);
       setEmployeesData(response);
     } catch (err: any) {
@@ -239,7 +270,7 @@ export default function AdminCommissions() {
       setEmployeeLoading(true);
       setError(null);
       setSelectedEmployee(username);
-      const dateRange = getDateRange(timeFilter, customDateStart, customDateEnd);
+      const dateRange = getDateRange(timeFilter, customDateStart, customDateEnd, payrollPeriods);
       const response = await pdfApi.getEmployeeCommissions(username, dateRange);
       setEmployeeCommissions(response);
       setStatusFilter('all');

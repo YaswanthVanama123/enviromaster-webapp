@@ -13,6 +13,8 @@ export interface RouteStarCustomer {
   phone: string;
   email: string;
   company: string;
+  accountNumber: string | null;
+  accountNumberFetchedAt: string | null;
   isActive: boolean;
   isPaperless: boolean;
   grouping: string;
@@ -45,6 +47,17 @@ export interface CustomerStats {
   uniqueStates: number;
   recentlyAdded: number;
   states: string[];
+}
+
+export interface AccountSyncStatus {
+  isRunning: boolean;
+  lastSyncAt: string | null;
+  lastSyncResult: 'success' | 'failed' | null;
+  progress: number;
+  message: string;
+  total: number;
+  fetched: number;
+  remaining: number;
 }
 
 const BASE_PATH = '/api/routestar-customers';
@@ -134,6 +147,49 @@ export const routestarCustomersApi = {
       return result?.success ? result.data : null;
     } catch (error) {
       console.error('Error fetching stats:', error);
+      return null;
+    }
+  },
+
+  async fetchAccountNumber(
+    id: string
+  ): Promise<{ _id: string; routeStarId: string; accountNumber: string | null } | null> {
+    try {
+      const response = await apiClient.post<{
+        success: boolean;
+        data: { _id: string; routeStarId: string; accountNumber: string | null };
+      }>(`${BASE_PATH}/${id}/account-number`, {});
+      const result = response.data;
+      return result?.success ? result.data : null;
+    } catch (error) {
+      console.error('Error fetching account number:', error);
+      return null;
+    }
+  },
+
+  async getAccountSyncStatus(): Promise<AccountSyncStatus | null> {
+    try {
+      const response = await apiClient.get<{ success: boolean; data: AccountSyncStatus }>(
+        `${BASE_PATH}/sync/account-numbers/status`
+      );
+      const result = response.data;
+      return result?.success ? result.data : null;
+    } catch (error) {
+      console.error('Error fetching account sync status:', error);
+      return null;
+    }
+  },
+
+  async startAccountSync(): Promise<{ success: boolean; message: string; total?: number; remaining?: number } | null> {
+    try {
+      const response = await apiClient.post<{ success: boolean; message: string; total?: number; remaining?: number }>(
+        `${BASE_PATH}/sync/account-numbers/start`,
+        {}
+      );
+      const result = response.data;
+      return result?.success ? result : null;
+    } catch (error) {
+      console.error('Error starting account sync:', error);
       return null;
     }
   },

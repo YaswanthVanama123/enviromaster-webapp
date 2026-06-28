@@ -196,6 +196,7 @@ export interface GlobalCommissionResult {
   totalFarAnnualGreenline: number;
 
   agreementMultiplier: number;
+  agreementTerm: AgreementTerm;
   effectiveCommissionRate: number;
 
   priorQuotaCredit: number;
@@ -508,6 +509,10 @@ export function computeGlobalCommission(
             anchorPerVisit: round2(anchorOfThis / visitsF),
             commissionablePerVisit: cpv,
           };
+
+          if (g.accountType === 'Pit' && perFarGroupPrior > rules.anchorPerVisitThreshold) {
+            g.accountType = 'Anchor';
+          }
           break;
         }
         case 'Bread5': {
@@ -614,7 +619,7 @@ export function computeGlobalCommission(
 
         services.push({
           serviceName: row.serviceName,
-          accountType: row.accountType,
+          accountType: g.accountType,
           confidence: row.cacheEntry?.confidence || null,
           reason: row.cacheEntry?.reason || null,
           perVisitRevenue: row.annualCurrent,
@@ -686,6 +691,7 @@ export function computeGlobalCommission(
       totalFarAnnualGreenline,
 
       agreementMultiplier,
+      agreementTerm,
       effectiveCommissionRate,
 
       priorQuotaCredit,

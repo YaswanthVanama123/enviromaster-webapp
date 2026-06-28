@@ -22,6 +22,8 @@
     "monthly": "Este mes",
     "quarterly": "Este trimestre",
     "annually": "Este año",
+    "thisPayroll": "Esta nómina",
+    "previousPayroll": "Nómina anterior",
     "custom": "Rango de fechas"
   },
   "dateRange": {

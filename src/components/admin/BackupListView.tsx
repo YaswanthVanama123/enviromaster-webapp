@@ -15,6 +15,7 @@ interface BackupListViewProps {
   backups: PricingBackup[];
   loading: boolean;
   error: string | null;
+  canManage?: boolean;
   selectedBackups: string[];
   onSelectionChange: (selected: string[]) => void;
   onRestoreClick: (backup: PricingBackup) => void;
@@ -30,6 +31,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
   backups,
   loading,
   error,
+  canManage = true,
   selectedBackups,
   onSelectionChange,
   onRestoreClick,
@@ -533,6 +535,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                       >
                         {t("adminTools.backup.list.viewDetails")}
                       </button>
+                      {canManage && (
                       <button
                         className="blv-action-button blv-restore-button"
                         style={{
@@ -552,6 +555,7 @@ export const BackupListView: React.FC<BackupListViewProps> = ({
                       >
                         {backup.restorationInfo?.hasBeenRestored ? t("adminTools.backup.list.restoreAgain") : t("adminTools.backup.list.restore")}
                       </button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -3,6 +3,7 @@ export interface AdminUser {
   id: string;
   username: string;
   isActive: boolean;
+  canManageBackups?: boolean;
   lastLoginAt?: string;
 }
 
@@ -53,6 +54,7 @@ export interface UserListItem {
   fullName: string;
   email?: string;
   isActive: boolean;
+  permissions?: { backupManagement: boolean };
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -78,6 +80,7 @@ export interface UpdateUserPayload {
   fullName?: string;
   email?: string;
   isActive?: boolean;
+  permissions?: { backupManagement?: boolean };
 }
 
 export interface ResetPasswordPayload {

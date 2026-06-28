@@ -22,6 +22,8 @@
     "monthly": "Ce mois-ci",
     "quarterly": "Ce trimestre",
     "annually": "Cette année",
+    "thisPayroll": "Cette paie",
+    "previousPayroll": "Paie précédente",
     "custom": "Plage de dates"
   },
   "dateRange": {

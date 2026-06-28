@@ -732,3 +732,39 @@
     grid-column: span 1;
   }
 }
+
+.rs-account-num {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.rs-fetch-account-btn {
+  padding: 5px 12px;
+  border: 1px solid #c00000;
+  background: #fff;
+  color: #c00000;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.rs-fetch-account-btn:hover:not(:disabled) {
+  background: #c00000;
+  color: #fff;
+}
+.rs-fetch-account-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.rs-account-sync-btn {
+  background: #fff;
+  color: #c00000;
+  border: 1px solid #c00000;
+}
+.rs-account-sync-btn:hover:not(:disabled) {
+  background: #fdeaea;
+}

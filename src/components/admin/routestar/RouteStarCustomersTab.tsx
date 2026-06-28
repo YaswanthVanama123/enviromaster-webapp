@@ -1,10 +1,10 @@
 
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { FaExternalLinkAlt } from 'react-icons/fa';
-import { routestarCustomersApi, type RouteStarCustomer, type CustomerSyncStatus, type CustomerStats } from '../../../backendservice/api/routestarCustomersApi';
+import { routestarCustomersApi, type RouteStarCustomer, type CustomerSyncStatus, type CustomerStats, type AccountSyncStatus } from '../../../backendservice/api/routestarCustomersApi';
 import './RouteStarCustomersTab.css';
 
 export const RouteStarCustomersTab: React.FC = () => {
@@ -18,6 +18,9 @@ export const RouteStarCustomersTab: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [pagination, setPagination] = useState({ total: 0, skip: 0, limit: 50 });
   const [selectedCustomer, setSelectedCustomer] = useState<RouteStarCustomer | null>(null);
+  const [fetchingId, setFetchingId] = useState<string | null>(null);
+  const [accountSync, setAccountSync] = useState<AccountSyncStatus | null>(null);
+  const prevAccountRunning = useRef(false);
 
   const loadCustomers = useCallback(async () => {
     setLoading(true);
@@ -50,10 +53,18 @@ export const RouteStarCustomersTab: React.FC = () => {
     }
   }, []);
 
+  const loadAccountSyncStatus = useCallback(async () => {
+    const result = await routestarCustomersApi.getAccountSyncStatus();
+    if (result) {
+      setAccountSync(result);
+    }
+  }, []);
+
   useEffect(() => {
     loadCustomers();
     loadStats();
     loadSyncStatus();
+    loadAccountSyncStatus();
   }, []);
 
   useEffect(() => {
@@ -69,11 +80,47 @@ export const RouteStarCustomersTab: React.FC = () => {
     }
   }, [syncStatus?.isRunning, loadSyncStatus]);
 
+  useEffect(() => {
+    if (accountSync?.isRunning) {
+      const interval = setInterval(() => {
+        loadAccountSyncStatus();
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [accountSync?.isRunning, loadAccountSyncStatus]);
+
+  useEffect(() => {
+    if (prevAccountRunning.current && !accountSync?.isRunning) {
+      loadCustomers();
+      loadStats();
+    }
+    prevAccountRunning.current = !!accountSync?.isRunning;
+  }, [accountSync?.isRunning, loadCustomers, loadStats]);
+
   const handleSync = async () => {
     const result = await routestarCustomersApi.startSync();
     if (result) {
       loadSyncStatus();
     }
+  };
+
+  const handleFetchAccounts = async () => {
+    const result = await routestarCustomersApi.startAccountSync();
+    if (result) {
+      loadAccountSyncStatus();
+    }
+  };
+
+  const handleFetchAccount = async (customer: RouteStarCustomer) => {
+    if (fetchingId) return;
+    setFetchingId(customer._id);
+    const result = await routestarCustomersApi.fetchAccountNumber(customer._id);
+    if (result) {
+      setCustomers(prev =>
+        prev.map(c => (c._id === customer._id ? { ...c, accountNumber: result.accountNumber } : c))
+      );
+    }
+    setFetchingId(null);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -112,6 +159,28 @@ export const RouteStarCustomersTab: React.FC = () => {
                 <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
               </svg>
               {t('adminTools.routestar.syncFromRouteStar')}
+            </>
+          )}
+        </button>
+        <button
+          className={`rs-sync-btn rs-account-sync-btn ${accountSync?.isRunning ? 'syncing' : ''}`}
+          onClick={handleFetchAccounts}
+          disabled={accountSync?.isRunning}
+          title={t('adminTools.routestar.fetchAccountsTitle')}
+        >
+          {accountSync?.isRunning ? (
+            <>
+              <span className="sync-spinner"></span>
+              {t('adminTools.routestar.fetchingAccounts', { progress: accountSync.progress })}
+            </>
+          ) : (
+            <>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M3 10h18M7 15h4" />
+              </svg>
+              {t('adminTools.routestar.fetchAccounts')}
+              {accountSync && accountSync.remaining > 0 ? ` (${accountSync.remaining})` : ''}
             </>
           )}
         </button>
@@ -232,6 +301,7 @@ export const RouteStarCustomersTab: React.FC = () => {
               <tr>
                 <th>{t('adminTools.routestar.colCustomer')}</th>
                 <th>{t('adminTools.routestar.colCompany')}</th>
+                <th>{t('adminTools.routestar.colAccount')}</th>
                 <th>{t('adminTools.routestar.colAddress')}</th>
                 <th>{t('adminTools.routestar.colCity')}</th>
                 <th>{t('adminTools.routestar.colState')}</th>
@@ -248,6 +318,22 @@ export const RouteStarCustomersTab: React.FC = () => {
                     <strong>{customer.name}</strong>
                   </td>
                   <td>{customer.company || '-'}</td>
+                  <td className="rs-account">
+                    {customer.accountNumber ? (
+                      <span className="rs-account-num">{customer.accountNumber}</span>
+                    ) : (
+                      <button
+                        className="rs-fetch-account-btn"
+                        onClick={() => handleFetchAccount(customer)}
+                        disabled={fetchingId === customer._id}
+                        title={t('adminTools.routestar.fetchAccountTitle')}
+                      >
+                        {fetchingId === customer._id
+                          ? t('adminTools.routestar.fetching')
+                          : t('adminTools.routestar.fetchAccount')}
+                      </button>
+                    )}
+                  </td>
                   <td className="rs-address">{customer.address || '-'}</td>
                   <td>{customer.city || '-'}</td>
                   <td>{customer.state || '-'}</td>

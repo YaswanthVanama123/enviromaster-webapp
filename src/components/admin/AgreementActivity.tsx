@@ -10,16 +10,24 @@ import {
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { agreementActivityApi } from "../../backendservice/api/agreementActivityApi";
+import { apiClient } from "../../backendservice/utils/apiClient";
 import type {
   ActivityRange,
   ActivityAgreement,
   AgreementActivityResponse,
 } from "../../backendservice/api/agreementActivityApi";
 
-const RANGES: { key: ActivityRange; labelKey: string }[] = [
+type UIRange = ActivityRange | "thisPayroll" | "previousPayroll";
+
+interface PayrollPeriod { start: string; end: string; label: string; }
+interface PayrollPeriods { current?: PayrollPeriod; previous?: PayrollPeriod; }
+
+const RANGES: { key: UIRange; labelKey: string }[] = [
   { key: "today", labelKey: "agreementActivity.filters.today" },
   { key: "week", labelKey: "agreementActivity.filters.thisWeek" },
   { key: "month", labelKey: "agreementActivity.filters.thisMonth" },
+  { key: "thisPayroll", labelKey: "agreementActivity.filters.thisPayroll" },
+  { key: "previousPayroll", labelKey: "agreementActivity.filters.previousPayroll" },
   { key: "date", labelKey: "agreementActivity.filters.specificDate" },
 ];
 
@@ -30,26 +38,58 @@ function todayStr() {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 
+function localDateStr(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
 export function AgreementActivity() {
   const { t } = useTranslation();
-  const [range, setRange] = useState<ActivityRange>("today");
+  const [range, setRange] = useState<UIRange>("today");
   const [fromDate, setFromDate] = useState<string>(todayStr());
   const [toDate, setToDate] = useState<string>(todayStr());
+  const [payrollPeriods, setPayrollPeriods] = useState<PayrollPeriods>({});
   const [data, setData] = useState<AgreementActivityResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [agreementsByUser, setAgreementsByUser] = useState<Record<string, ActivityAgreement[]>>({});
   const [loadingByUser, setLoadingByUser] = useState<Record<string, boolean>>({});
 
+  useEffect(() => {
+    apiClient
+      .get<{ success: boolean; periods: PayrollPeriods }>("/api/payroll/periods")
+      .then((res) => {
+        if (res.data?.periods) setPayrollPeriods(res.data.periods);
+      })
+      .catch(() => {});
+  }, []);
+
+  const resolveApiArgs = useCallback((): {
+    apiRange: ActivityRange;
+    dates: { from?: string; to?: string };
+  } => {
+    if (range === "thisPayroll" || range === "previousPayroll") {
+      const p = range === "thisPayroll" ? payrollPeriods.current : payrollPeriods.previous;
+      if (p) return { apiRange: "date", dates: { from: localDateStr(p.start), to: localDateStr(p.end) } };
+      return { apiRange: "date", dates: {} };
+    }
+    if (range === "date") return { apiRange: "date", dates: { from: fromDate, to: toDate } };
+    return { apiRange: range, dates: {} };
+  }, [range, fromDate, toDate, payrollPeriods]);
+
   const load = useCallback(async () => {
     setLoading(true);
     setExpanded({});
     setAgreementsByUser({});
     setLoadingByUser({});
-    const res = await agreementActivityApi.getActivity(range, { from: fromDate, to: toDate });
+    const { apiRange, dates } = resolveApiArgs();
+    const res = await agreementActivityApi.getActivity(apiRange, dates);
     setData(res);
     setLoading(false);
-  }, [range, fromDate, toDate]);
+  }, [resolveApiArgs]);
 
   useEffect(() => {
     load();
@@ -58,14 +98,12 @@ export function AgreementActivity() {
   const loadEmployee = useCallback(
     async (username: string) => {
       setLoadingByUser((prev) => ({ ...prev, [username]: true }));
-      const rows = await agreementActivityApi.getEmployeeAgreements(username, range, {
-        from: fromDate,
-        to: toDate,
-      });
+      const { apiRange, dates } = resolveApiArgs();
+      const rows = await agreementActivityApi.getEmployeeAgreements(username, apiRange, dates);
       setAgreementsByUser((prev) => ({ ...prev, [username]: rows || [] }));
       setLoadingByUser((prev) => ({ ...prev, [username]: false }));
     },
-    [range, fromDate, toDate]
+    [resolveApiArgs]
   );
 
   const toggle = (username: string) => {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthContext } from './auth';
 import { pdfApi } from '../backendservice/api/pdfApi';
 import { quotaApi } from '../backendservice/api/quotaApi';
+import { apiClient } from '../backendservice/utils/apiClient';
 import './MyCommissions.css';
 
 type QuotaLevel = 'below' | 'above' | 'double';
@@ -125,7 +126,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-type TimePeriod = 'all' | 'weekly' | '14days' | 'monthly' | 'quarterly' | 'annually' | 'custom';
+type TimePeriod = 'all' | 'weekly' | '14days' | 'monthly' | 'quarterly' | 'annually' | 'thisPayroll' | 'previousPayroll' | 'custom';
 
 const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
   all: 'All Time',
@@ -134,14 +135,20 @@ const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
   monthly: 'This Month',
   quarterly: 'This Quarter',
   annually: 'This Year',
+  thisPayroll: 'This Payroll',
+  previousPayroll: 'Previous Payroll',
   custom: 'Date Range',
 };
+
+interface PayrollPeriod { start: string; end: string; label: string; }
+interface PayrollPeriods { current?: PayrollPeriod; previous?: PayrollPeriod; }
 
 function isWithinTimePeriod(
   dateStr: string | null,
   period: TimePeriod,
   customStartDate?: string | null,
-  customEndDate?: string | null
+  customEndDate?: string | null,
+  payrollPeriods?: PayrollPeriods
 ): boolean {
   if (period === 'all') return true;
   if (!dateStr) return false;
@@ -176,6 +183,14 @@ function isWithinTimePeriod(
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       return date >= startOfYear;
     }
+    case 'thisPayroll': {
+      if (!payrollPeriods?.current) return true;
+      return date >= new Date(payrollPeriods.current.start) && date <= new Date(payrollPeriods.current.end);
+    }
+    case 'previousPayroll': {
+      if (!payrollPeriods?.previous) return false;
+      return date >= new Date(payrollPeriods.previous.start) && date <= new Date(payrollPeriods.previous.end);
+    }
     case 'custom': {
       if (!customStartDate && !customEndDate) return true;
       const startDate = customStartDate ? new Date(customStartDate) : null;
@@ -203,6 +218,7 @@ export default function MyCommissions() {
   const [data, setData] = useState<CommissionsResponse | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
+  const [payrollPeriods, setPayrollPeriods] = useState<PayrollPeriods>({});
   const [customStartDate, setCustomStartDate] = useState<string>('');
   const [customEndDate, setCustomEndDate] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -212,6 +228,15 @@ export default function MyCommissions() {
   const [quotaTarget, setQuotaTarget] = useState<number | null>(null);
   const [actualSales, setActualSales] = useState<number | null>(null);
   const [quotaLoading, setQuotaLoading] = useState(true);
+
+  useEffect(() => {
+    apiClient
+      .get<{ success: boolean; periods: PayrollPeriods }>('/api/payroll/periods')
+      .then((res) => {
+        if (res.data?.periods) setPayrollPeriods(res.data.periods);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function fetchQuotaLevel() {
@@ -269,7 +294,7 @@ export default function MyCommissions() {
       }
 
       const dateToCheck = c.startDate || c.createdAt;
-      const timeMatch = isWithinTimePeriod(dateToCheck, timePeriod, customStartDate, customEndDate);
+      const timeMatch = isWithinTimePeriod(dateToCheck, timePeriod, customStartDate, customEndDate, payrollPeriods);
 
       return statusMatch && timeMatch;
     });
@@ -280,7 +305,7 @@ export default function MyCommissions() {
 
     return data.commissions.filter(c => {
       const dateToCheck = c.startDate || c.createdAt;
-      return isWithinTimePeriod(dateToCheck, timePeriod, customStartDate, customEndDate);
+      return isWithinTimePeriod(dateToCheck, timePeriod, customStartDate, customEndDate, payrollPeriods);
     });
   }, [data?.commissions, timePeriod, customStartDate, customEndDate]);
 

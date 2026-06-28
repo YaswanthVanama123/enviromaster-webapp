@@ -22,6 +22,8 @@
     "monthly": "This Month",
     "quarterly": "This Quarter",
     "annually": "This Year",
+    "thisPayroll": "This Payroll",
+    "previousPayroll": "Previous Payroll",
     "custom": "Date Range"
   },
   "dateRange": {

@@ -6,6 +6,8 @@
     "today": "Today",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
+    "thisPayroll": "This Payroll",
+    "previousPayroll": "Previous Payroll",
     "specificDate": "Specific Date"
   },
   "summary": {

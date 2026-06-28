@@ -18,6 +18,8 @@
     "thisMonth": "Ce mois-ci",
     "thisQuarter": "Ce trimestre",
     "thisYear": "Cette année",
+    "thisPayroll": "Cette paie",
+    "previousPayroll": "Paie précédente",
     "dateRange": "Plage de dates"
   },
   "datePicker": {

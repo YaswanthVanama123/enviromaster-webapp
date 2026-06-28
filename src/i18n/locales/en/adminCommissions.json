@@ -18,6 +18,8 @@
     "thisMonth": "This Month",
     "thisQuarter": "This Quarter",
     "thisYear": "This Year",
+    "thisPayroll": "This Payroll",
+    "previousPayroll": "Previous Payroll",
     "dateRange": "Date Range"
   },
   "datePicker": {

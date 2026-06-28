@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { usePricingBackups } from '../../backendservice/hooks/usePricingBackups';
+import { useAdminAuth } from '../../backendservice/hooks/useAdminAuth';
 import { backupUtils } from '../../backendservice/api/pricingBackupApi';
 import type { PricingBackup, BackupViewMode } from '../../backendservice/types/pricingBackup.types';
 import { Toast } from './Toast';
@@ -61,6 +62,9 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
   const [restoreCandidate, setRestoreCandidate] = useState<PricingBackup | null>(null);
   const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  const { user: adminUser } = useAdminAuth();
+  const canManage = adminUser?.canManageBackups !== false;
 
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -532,14 +536,16 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
       <div style={styles.content}>
         <div style={styles.actionBar}>
           <div style={styles.actionButtons}>
-            <button
-              className="backup-button backup-primary"
-              style={{ ...styles.button, ...styles.primaryButton }}
-              onClick={() => setShowCreateModal(true)}
-              disabled={actionLoading}
-            >
-              {t("adminTools.backup.manager.createManualBackup")}
-            </button>
+            {canManage && (
+              <button
+                className="backup-button backup-primary"
+                style={{ ...styles.button, ...styles.primaryButton }}
+                onClick={() => setShowCreateModal(true)}
+                disabled={actionLoading}
+              >
+                {t("adminTools.backup.manager.createManualBackup")}
+              </button>
+            )}
 
             <button
               className="backup-button backup-refresh"
@@ -550,7 +556,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
               {loading || healthLoading || statisticsLoading ? t("adminTools.backup.manager.refreshing") : t("adminTools.backup.manager.refreshAll")}
             </button>
 
-            {selectedBackups.length > 0 && (
+            {canManage && selectedBackups.length > 0 && (
               <button
                 className="backup-button backup-danger"
                 style={{ ...styles.button, ...styles.dangerButton }}
@@ -563,14 +569,16 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
           </div>
 
           <div style={styles.actionButtons}>
-            <button
-              className="backup-button backup-secondary"
-              style={{ ...styles.button, ...styles.secondaryButton }}
-              onClick={handleEnforceRetention}
-              disabled={actionLoading}
-            >
-              {t("adminTools.backup.manager.enforceRetentionPolicy")}
-            </button>
+            {canManage && (
+              <button
+                className="backup-button backup-secondary"
+                style={{ ...styles.button, ...styles.secondaryButton }}
+                onClick={handleEnforceRetention}
+                disabled={actionLoading}
+              >
+                {t("adminTools.backup.manager.enforceRetentionPolicy")}
+              </button>
+            )}
           </div>
         </div>
 
@@ -579,6 +587,7 @@ export const PricingBackupManager: React.FC<PricingBackupManagerProps> = ({
             backups={backups}
             loading={loading}
             error={error}
+            canManage={canManage}
             selectedBackups={selectedBackups}
             onSelectionChange={setSelectedBackups}
             onRestoreClick={(backup) => {
