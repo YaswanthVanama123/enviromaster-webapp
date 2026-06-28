@@ -1,5 +1,7 @@
 {
   "refresh": "Refresh",
+  "modeCreated": "Created",
+  "modePayroll": "Payroll",
   "from": "From",
   "to": "To",
   "filters": {

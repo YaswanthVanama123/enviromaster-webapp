@@ -1,6 +1,8 @@
 {
   "title": "Mes Commissions",
   "subtitle": "Suivez vos gains de commission sur tous les contrats",
+  "modeCreated": "Créé",
+  "modePayroll": "Paie",
   "loading": "Chargement de vos commissions...",
   "error": "Erreur",
   "noData": "Aucune donnée",

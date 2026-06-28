@@ -1,5 +1,7 @@
 {
   "refresh": "Actualiser",
+  "modeCreated": "Créé",
+  "modePayroll": "Paie",
   "from": "Du",
   "to": "Au",
   "filters": {

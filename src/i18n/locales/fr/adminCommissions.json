@@ -11,6 +11,8 @@
   "title": "Commissions des Employés",
   "adminBadge": "Vue administrateur",
   "subtitle": "Consultez les commissions de tous les employés",
+  "modeCreated": "Créé",
+  "modePayroll": "Paie",
   "timeFilter": {
     "all": "Tout le temps",
     "thisWeek": "Cette semaine",

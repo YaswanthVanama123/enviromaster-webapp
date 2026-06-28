@@ -11,6 +11,8 @@
   "title": "Employee Commissions",
   "adminBadge": "Admin View",
   "subtitle": "View commission earnings for all employees",
+  "modeCreated": "Created",
+  "modePayroll": "Payroll",
   "timeFilter": {
     "all": "All Time",
     "thisWeek": "This Week",

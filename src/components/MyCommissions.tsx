@@ -143,6 +143,10 @@ const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
 interface PayrollPeriod { start: string; end: string; label: string; }
 interface PayrollPeriods { current?: PayrollPeriod; previous?: PayrollPeriod; }
 
+type FilterMode = 'created' | 'payroll';
+const CREATED_PERIODS: TimePeriod[] = ['all', 'weekly', '14days', 'monthly', 'quarterly', 'annually', 'custom'];
+const PAYROLL_PERIODS: TimePeriod[] = ['thisPayroll', 'previousPayroll'];
+
 function isWithinTimePeriod(
   dateStr: string | null,
   period: TimePeriod,
@@ -218,6 +222,7 @@ export default function MyCommissions() {
   const [data, setData] = useState<CommissionsResponse | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
+  const [filterMode, setFilterMode] = useState<FilterMode>('created');
   const [payrollPeriods, setPayrollPeriods] = useState<PayrollPeriods>({});
   const [customStartDate, setCustomStartDate] = useState<string>('');
   const [customEndDate, setCustomEndDate] = useState<string>('');
@@ -462,8 +467,32 @@ export default function MyCommissions() {
 
       {/* Time Period Filter Tabs */}
       <div className="my-commissions__time-filter">
+        <div className="my-commissions__filter-mode" style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          {(['created', 'payroll'] as FilterMode[]).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                setFilterMode(mode);
+                setTimePeriod(mode === 'created' ? 'all' : 'thisPayroll');
+              }}
+              style={{
+                padding: '6px 18px',
+                borderRadius: 9999,
+                border: `1px solid ${filterMode === mode ? '#c00000' : '#e2e8f0'}`,
+                background: filterMode === mode ? '#c00000' : '#fff',
+                color: filterMode === mode ? '#fff' : '#475569',
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: 'pointer',
+              }}
+            >
+              {t(mode === 'created' ? 'commissions.modeCreated' : 'commissions.modePayroll')}
+            </button>
+          ))}
+        </div>
         <div className="my-commissions__time-tabs">
-          {(Object.keys(TIME_PERIOD_LABELS) as TimePeriod[]).map((period) => (
+          {(filterMode === 'created' ? CREATED_PERIODS : PAYROLL_PERIODS).map((period) => (
             <button
               key={period}
               className={`my-commissions__time-tab ${timePeriod === period ? 'active' : ''}`}

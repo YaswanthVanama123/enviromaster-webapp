@@ -31,6 +31,10 @@ const RANGES: { key: UIRange; labelKey: string }[] = [
   { key: "date", labelKey: "agreementActivity.filters.specificDate" },
 ];
 
+type FilterMode = "created" | "payroll";
+const CREATED_KEYS: UIRange[] = ["today", "week", "month", "date"];
+const PAYROLL_KEYS: UIRange[] = ["thisPayroll", "previousPayroll"];
+
 function todayStr() {
   const d = new Date();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -49,6 +53,7 @@ function localDateStr(iso: string) {
 export function AgreementActivity() {
   const { t } = useTranslation();
   const [range, setRange] = useState<UIRange>("today");
+  const [filterMode, setFilterMode] = useState<FilterMode>("created");
   const [fromDate, setFromDate] = useState<string>(todayStr());
   const [toDate, setToDate] = useState<string>(todayStr());
   const [payrollPeriods, setPayrollPeriods] = useState<PayrollPeriods>({});
@@ -128,7 +133,31 @@ export function AgreementActivity() {
     <div className="aa">
       <div className="aa-toolbar">
         <div className="aa-filters">
-          {RANGES.map((r) => (
+          <div className="aa-filter-mode" style={{ display: "flex", gap: 8, marginRight: 12 }}>
+            {(["created", "payroll"] as FilterMode[]).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => {
+                  setFilterMode(mode);
+                  setRange(mode === "created" ? "today" : "thisPayroll");
+                }}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: 9999,
+                  border: `1px solid ${filterMode === mode ? "#c00000" : "#e2e8f0"}`,
+                  background: filterMode === mode ? "#c00000" : "#fff",
+                  color: filterMode === mode ? "#fff" : "#475569",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                {t(mode === "created" ? "agreementActivity.modeCreated" : "agreementActivity.modePayroll")}
+              </button>
+            ))}
+          </div>
+          {RANGES.filter((r) => (filterMode === "created" ? CREATED_KEYS : PAYROLL_KEYS).includes(r.key)).map((r) => (
             <button
               key={r.key}
               type="button"

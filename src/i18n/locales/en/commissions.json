@@ -1,6 +1,8 @@
 {
   "title": "My Commissions",
   "subtitle": "Track your commission earnings across all agreements",
+  "modeCreated": "Created",
+  "modePayroll": "Payroll",
   "loading": "Loading your commissions...",
   "error": "Error",
   "noData": "No Data",

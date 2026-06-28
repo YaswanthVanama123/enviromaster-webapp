@@ -1,5 +1,7 @@
 {
   "refresh": "Actualizar",
+  "modeCreated": "Creado",
+  "modePayroll": "Nómina",
   "from": "Desde",
   "to": "Hasta",
   "filters": {
