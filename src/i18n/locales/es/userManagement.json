@@ -23,6 +23,7 @@
   "deactivate": "Desactivar",
   "activate": "Activar",
   "permissions": "Permisos",
+  "superAdminNote": "Súper administrador: todos los permisos están siempre concedidos.",
   "permBackup": "Gestión de copias (crear y restaurar)",
   "permPriceChanges": "Cambios de precios (editar precios)",
   "grantBackupAccess": "Conceder acceso a copias",

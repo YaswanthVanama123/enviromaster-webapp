@@ -549,10 +549,16 @@ export function UserManagement({}: UserManagementProps) {
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                     {t('userManagement.permissions')}
                   </div>
+                  {selectedUser?.username === 'envimaster' && (
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+                      {t('userManagement.superAdminNote')}
+                    </div>
+                  )}
                   <label style={styles.checkboxLabel}>
                     <input
                       type="checkbox"
-                      checked={formData.backupManagement}
+                      checked={selectedUser?.username === 'envimaster' ? true : formData.backupManagement}
+                      disabled={selectedUser?.username === 'envimaster'}
                       onChange={(e) => setFormData({ ...formData, backupManagement: e.target.checked })}
                     />
                     <span style={{ marginLeft: '8px' }}>{t('userManagement.permBackup')}</span>
@@ -560,7 +566,8 @@ export function UserManagement({}: UserManagementProps) {
                   <label style={{ ...styles.checkboxLabel, marginTop: '8px' }}>
                     <input
                       type="checkbox"
-                      checked={formData.priceChanges}
+                      checked={selectedUser?.username === 'envimaster' ? true : formData.priceChanges}
+                      disabled={selectedUser?.username === 'envimaster'}
                       onChange={(e) => setFormData({ ...formData, priceChanges: e.target.checked })}
                     />
                     <span style={{ marginLeft: '8px' }}>{t('userManagement.permPriceChanges')}</span>
