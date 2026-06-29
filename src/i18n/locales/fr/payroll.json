@@ -85,6 +85,9 @@
     "cycleTypeHint": "À quelle fréquence la paie est calculée.",
     "cycleDayTitle": "Jour du Cycle de la Semaine",
     "cycleDayHint": "Le jour où le cycle de paie commence/se termine.",
+    "cutoffTitle": "Date limite d'approbation hebdomadaire",
+    "cutoffHint": "Après cette date limite hebdomadaire, finaliser un contrat compte pour la période de paie suivante. Par défaut : minuit le dimanche.",
+    "cutoffEnabled": "Reporter les finalisations à la période suivante après la date limite",
     "saving": "Enregistrement...",
     "saveSettings": "Enregistrer les Paramètres",
     "noChanges": "Aucune modification non enregistrée"

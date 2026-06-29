@@ -85,6 +85,9 @@
     "cycleTypeHint": "How often payroll is calculated.",
     "cycleDayTitle": "Cycle Day of Week",
     "cycleDayHint": "The day when the payroll cycle starts/ends.",
+    "cutoffTitle": "Weekly Approval Cutoff",
+    "cutoffHint": "After this weekly cutoff, completing an agreement counts toward the next payroll period. Default is midnight Sunday.",
+    "cutoffEnabled": "Roll completions to the next period after the cutoff",
     "saving": "Saving...",
     "saveSettings": "Save Settings",
     "noChanges": "No unsaved changes"

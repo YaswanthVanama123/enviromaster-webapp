@@ -84,6 +84,14 @@ export const PayrollTab: React.FC = () => {
   });
   const [originalSettings, setOriginalSettings] = useState<PayrollSettings | null>(null);
 
+  const [approvalCutoff, setApprovalCutoff] = useState<{ enabled: boolean; dayOfWeek: number; hour: number; minute: number }>({
+    enabled: true,
+    dayOfWeek: 0,
+    hour: 0,
+    minute: 0,
+  });
+  const [originalCutoff, setOriginalCutoff] = useState<typeof approvalCutoff | null>(null);
+
   const [currentPeriod, setCurrentPeriod] = useState<PayrollPeriod | null>(null);
   const [previousPeriod, setPreviousPeriod] = useState<PayrollPeriod | null>(null);
 
@@ -117,6 +125,10 @@ export const PayrollTab: React.FC = () => {
         setOriginalSettings(periodsRes.data.settings);
         setCurrentPeriod(periodsRes.data.periods.current);
         setPreviousPeriod(periodsRes.data.periods.previous);
+        if (periodsRes.data.approvalCutoff) {
+          setApprovalCutoff(periodsRes.data.approvalCutoff);
+          setOriginalCutoff(periodsRes.data.approvalCutoff);
+        }
       }
 
       if (employeesRes.data?.success) {
@@ -189,11 +201,18 @@ export const PayrollTab: React.FC = () => {
     }
   }, [activeSubTab, loadHistory]);
 
-  const hasChanges = originalSettings
+  const cutoffChanged = originalCutoff
+    ? approvalCutoff.enabled !== originalCutoff.enabled ||
+      approvalCutoff.dayOfWeek !== originalCutoff.dayOfWeek ||
+      approvalCutoff.hour !== originalCutoff.hour ||
+      approvalCutoff.minute !== originalCutoff.minute
+    : false;
+
+  const hasChanges = (originalSettings
     ? settings.startDate !== originalSettings.startDate ||
       settings.cycleType !== originalSettings.cycleType ||
       settings.cycleDayOfWeek !== originalSettings.cycleDayOfWeek
-    : false;
+    : false) || cutoffChanged;
 
   const handleSaveSettings = async () => {
     try {
@@ -203,10 +222,12 @@ export const PayrollTab: React.FC = () => {
 
       const res = await apiClient.patch<any>("/api/admin-settings", {
         payrollSettings: settings,
+        approvalCutoff,
       });
 
       if (res.data?.success) {
         setOriginalSettings(settings);
+        setOriginalCutoff(approvalCutoff);
         setSuccessMessage(t("payroll.saveSuccess"));
         setTimeout(() => setSuccessMessage(null), 3000);
         loadPayrollData();
@@ -653,6 +674,46 @@ export const PayrollTab: React.FC = () => {
                 </select>
               </div>
             )}
+
+            <div className="settings-section">
+              <h3>
+                <FaCalendarAlt /> {t("payroll.settings.cutoffTitle")}
+              </h3>
+              <p className="settings-hint">{t("payroll.settings.cutoffHint")}</p>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <input
+                  type="checkbox"
+                  checked={approvalCutoff.enabled}
+                  onChange={(e) => setApprovalCutoff({ ...approvalCutoff, enabled: e.target.checked })}
+                />
+                <span>{t("payroll.settings.cutoffEnabled")}</span>
+              </label>
+              {approvalCutoff.enabled && (
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                  <select
+                    className="settings-select"
+                    value={approvalCutoff.dayOfWeek}
+                    onChange={(e) => setApprovalCutoff({ ...approvalCutoff, dayOfWeek: Number(e.target.value) })}
+                  >
+                    {DAYS_OF_WEEK.map((day) => (
+                      <option key={day.value} value={day.value}>
+                        {t(`payroll.daysOfWeek.${day.labelKey}`)}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="time"
+                    className="settings-input"
+                    style={{ width: "auto" }}
+                    value={`${String(approvalCutoff.hour).padStart(2, "0")}:${String(approvalCutoff.minute).padStart(2, "0")}`}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      setApprovalCutoff({ ...approvalCutoff, hour: h || 0, minute: m || 0 });
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="settings-footer">
               <button

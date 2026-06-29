@@ -85,6 +85,9 @@
     "cycleTypeHint": "Con qué frecuencia se calcula la nómina.",
     "cycleDayTitle": "Día del Ciclo de la Semana",
     "cycleDayHint": "El día en que comienza/termina el ciclo de nómina.",
+    "cutoffTitle": "Corte de aprobación semanal",
+    "cutoffHint": "Después de este corte semanal, completar un acuerdo cuenta para el siguiente período de nómina. El valor predeterminado es la medianoche del domingo.",
+    "cutoffEnabled": "Pasar las finalizaciones al siguiente período después del corte",
     "saving": "Guardando...",
     "saveSettings": "Guardar Configuración",
     "noChanges": "No hay cambios sin guardar"
