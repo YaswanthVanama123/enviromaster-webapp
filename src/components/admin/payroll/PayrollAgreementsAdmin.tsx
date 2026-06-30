@@ -212,7 +212,12 @@ export const PayrollAgreementsAdmin: React.FC = () => {
                     </div>
 
                     <div className="agreement-actions">
-                      <span style={styles.commission}>{money(g.annualCommission)} <span style={styles.unit}>/ yr</span></span>
+                      <span style={styles.commission} title={g.payrollFrozen ? "Frozen at completion" : undefined}>
+                        {g.payrollFrozen && (
+                          <FontAwesomeIcon icon={faLock} style={{ fontSize: "10px", marginRight: "5px", color: "#6d28d9" }} />
+                        )}
+                        {money(g.annualCommission)} <span style={styles.unit}>/ yr</span>
+                      </span>
                       <span style={styles.commissionWk}>{money(g.weeklyCommission)} <span style={styles.unit}>/ wk</span></span>
                       {g.addedToPayroll ? (
                         <span style={styles.badge}>

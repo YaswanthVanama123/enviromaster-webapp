@@ -65,6 +65,8 @@ export interface UserListItem {
 export interface CreateAdminPayload {
   username: string;
   password: string;
+  email?: string;
+  permissions?: { backupManagement: boolean; priceChanges: boolean };
   isActive?: boolean;
 }
 

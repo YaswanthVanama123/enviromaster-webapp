@@ -135,6 +135,7 @@ export interface SavedFileGroup {
   contractMonths?: number | null;
   addedToPayroll?: boolean;
   payrollPeriodLabel?: string | null;
+  payrollFrozen?: boolean;
   annualCommission?: number;
   weeklyCommission?: number;
   monthlyValue?: number;

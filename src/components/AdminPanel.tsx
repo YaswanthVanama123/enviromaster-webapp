@@ -117,6 +117,18 @@ export default function AdminPanel() {
     return () => window.removeEventListener('resize', updateNavScroll);
   }, [updateNavScroll, activeTab]);
 
+  useEffect(() => {
+    const el = secondaryNavRef.current;
+    if (!el) return;
+    const active = el.querySelector<HTMLElement>('.secondary-nav-item.active');
+    if (!active) return;
+    const elRect = el.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    const targetLeft = el.scrollLeft + (activeRect.left - elRect.left) - (el.clientWidth - activeRect.width) / 2;
+    el.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+    updateNavScroll();
+  }, [activeTab, updateNavScroll]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [recentAgreements, setRecentAgreements] = useState<SavedFileGroup[]>([]);

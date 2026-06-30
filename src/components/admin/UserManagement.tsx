@@ -76,6 +76,11 @@ export function UserManagement({}: UserManagementProps) {
         const payload: CreateAdminPayload = {
           username: formData.username,
           password: formData.password,
+          email: formData.email || undefined,
+          permissions: {
+            backupManagement: formData.backupManagement,
+            priceChanges: formData.priceChanges,
+          },
           isActive: formData.isActive,
         };
         await userManagementApi.createAdmin(payload);
@@ -454,27 +459,48 @@ export function UserManagement({}: UserManagementProps) {
                 </div>
               </div>
               {formData.role === 'employee' && (
-                <>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>{t('userManagement.fullNameRequired')}</label>
-                    <input
-                      type="text"
-                      style={styles.input}
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      required
-                    />
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>{t('userManagement.fullNameRequired')}</label>
+                  <input
+                    type="text"
+                    style={styles.input}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+              )}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>{t('userManagement.email')}</label>
+                <input
+                  type="email"
+                  style={styles.input}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              {formData.role === 'admin' && (
+                <div style={styles.formGroup}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                    {t('userManagement.permissions')}
                   </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>{t('userManagement.email')}</label>
+                  <label style={styles.checkboxLabel}>
                     <input
-                      type="email"
-                      style={styles.input}
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      type="checkbox"
+                      checked={formData.backupManagement}
+                      onChange={(e) => setFormData({ ...formData, backupManagement: e.target.checked })}
                     />
-                  </div>
-                </>
+                    <span style={{ marginLeft: '8px' }}>{t('userManagement.permBackup')}</span>
+                  </label>
+                  <label style={{ ...styles.checkboxLabel, marginTop: '8px' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.priceChanges}
+                      onChange={(e) => setFormData({ ...formData, priceChanges: e.target.checked })}
+                    />
+                    <span style={{ marginLeft: '8px' }}>{t('userManagement.permPriceChanges')}</span>
+                  </label>
+                </div>
               )}
               {formError && <div style={styles.formError}>{formError}</div>}
               <div style={styles.modalActions}>
@@ -512,28 +538,26 @@ export function UserManagement({}: UserManagementProps) {
                 />
               </div>
               {selectedUser.role === 'employee' && (
-                <>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>{t('userManagement.fullName')}</label>
-                    <input
-                      type="text"
-                      style={styles.input}
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>{t('userManagement.email')}</label>
-                    <input
-                      type="email"
-                      style={styles.input}
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
-                  </div>
-                </>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>{t('userManagement.fullName')}</label>
+                  <input
+                    type="text"
+                    style={styles.input}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                </div>
               )}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>{t('userManagement.email')}</label>
+                <input
+                  type="email"
+                  style={styles.input}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
               <div style={styles.formGroup}>
                 <label style={styles.checkboxLabel}>
                   <input
