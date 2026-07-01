@@ -243,12 +243,6 @@ export function GlobalCommissionSummary({
       {}
       <div className="commission-summary__totals">
         <div className="commission-summary__total-item">
-          <div className="commission-summary__total-label">{t("serviceComponents.commissionSummary.weekly")}</div>
-          <div className="commission-summary__total-value">
-            {global.formatted.totalWeeklyCommission}
-          </div>
-        </div>
-        <div className="commission-summary__total-item">
           <div className="commission-summary__total-label">{t("serviceComponents.commissionSummary.annual")}</div>
           <div className="commission-summary__total-value">
             {global.formatted.totalAnnualCommission}
@@ -351,12 +345,6 @@ export function GlobalCommissionSummary({
                     </span>
                   </div>
                   <div className="service-row__commissions">
-                    <div className="service-row__commission-item">
-                      <div className="service-row__commission-label">{t("serviceComponents.commissionSummary.weekly")}</div>
-                      <div className="service-row__commission-value">
-                        {service.formatted.weeklyCommission}
-                      </div>
-                    </div>
                     <div className="service-row__commission-item">
                       <div className="service-row__commission-label">{t("serviceComponents.commissionSummary.annual")}</div>
                       <div className="service-row__commission-value">
@@ -635,12 +623,12 @@ export function GlobalCommissionSummary({
                         {hasServiceTiers ? (
                           serviceTiers
                             .map(tier => {
-                              const tierBase = tier.base;
+                              const tierCredit = tier.quotaCredit ?? 0;
                               const tierCommission = tier.commission;
                               return (
                                 <div className="service-details__row" key={tier.level}>
                                   <span className="service-details__label">
-                                    {t("serviceComponents.commissionSummary.tierCommissionLabel", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`), base: fmtMoney(tierBase), rate: tier.effectiveRate.toFixed(2) })}
+                                    {t("serviceComponents.commissionSummary.tierCommissionLabel", { label: t(`serviceComponents.commissionSummary.quota.${tier.level}`), credit: fmtMoney(tierCredit), rate: tier.effectiveRate.toFixed(2) })}
                                   </span>
                                   <span
                                     className="service-details__value"

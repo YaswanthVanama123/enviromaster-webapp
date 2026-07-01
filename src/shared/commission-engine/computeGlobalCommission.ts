@@ -269,6 +269,7 @@ export interface CommissionTier {
   effectiveRate: number;
   base: number;
   commission: number;
+  quotaCredit?: number;
 }
 
 export function computeCommissionTiers(
@@ -582,6 +583,7 @@ export function computeGlobalCommission(
             effectiveRate: p.rate * mult,
             base: g.commissionableAnnual * share,
             commission: g.annualCommission * share,
+            quotaCredit: p.quotaCredit,
           };
         });
       g.commissionTiers = groupCommissionTiers;
@@ -626,6 +628,7 @@ export function computeGlobalCommission(
           ...t,
           base: t.base * share,
           commission: t.commission * share,
+          quotaCredit: (t.quotaCredit ?? 0) * share,
         }));
 
         totalAnnualCommission += rowAnnualCommission;

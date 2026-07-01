@@ -45,7 +45,7 @@
       "MTM-with-install": "au mois"
     },
     "commissionCalculation": "Calcul de la Commission",
-    "tierCommissionLabel": "{{label}} ({{base}} × {{rate}}%) :",
+    "tierCommissionLabel": "{{label}} ({{credit}} quota credit @ {{rate}}%) :",
     "perVisitCommissionLabel": "Commission par Visite ({{revenue}} × {{rate}}%) :",
     "annualCommission": "Commission Annuelle :",
     "annualCommissionSumOfTiers": "Commission Annuelle (somme des paliers) :",
