@@ -662,6 +662,7 @@
     "yesDeleteAll": "Yes, Delete All",
     "totalRecords": "Total Records",
     "customersWithData": "Customers with Data",
+    "customersMissingData": "Never Synced",
     "lastSync": "Last Sync",
     "never": "Never",
     "error": "Error:",

@@ -34,6 +34,14 @@ export const MapDistanceUpdateTab: React.FC = () => {
 
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // "Update All Data" refreshes every active customer, including those that have
+  // never been fetched, so the target is the active count when the server reports
+  // it (older builds only return customersWithData).
+  const updateTargetCount = stats
+    ? stats.activeCustomers ?? stats.customersWithData
+    : 0;
+  const missingCount = stats?.customersMissingData ?? 0;
+
   useEffect(() => {
     loadStats();
     checkSyncStatus();
@@ -265,11 +273,11 @@ export const MapDistanceUpdateTab: React.FC = () => {
                 <button
                   className="mdu-update-btn"
                   onClick={handleStartUpdateSync}
-                  disabled={!stats || stats.customersWithData === 0 || isJobRunning || isJobInterrupted || isJobPaused}
+                  disabled={!stats || updateTargetCount === 0 || isJobRunning || isJobInterrupted || isJobPaused}
                 >
                   <MdRefresh size={18} />
-                  {stats && stats.customersWithData > 0
-                    ? t('adminTools.mapDistanceUpdate.updateAllData', { count: stats.customersWithData })
+                  {stats && updateTargetCount > 0
+                    ? t('adminTools.mapDistanceUpdate.updateAllData', { count: updateTargetCount })
                     : t('adminTools.mapDistanceUpdate.noDataToUpdate')
                   }
                 </button>
@@ -330,6 +338,16 @@ export const MapDistanceUpdateTab: React.FC = () => {
               <span className="mdu-stat-value">{stats.customersWithData.toLocaleString()}</span>
               <span className="mdu-stat-label">{t('adminTools.mapDistanceUpdate.customersWithData')}</span>
             </div>
+            {missingCount > 0 && (
+              <div className="mdu-stat">
+                <span className="mdu-stat-value" style={{ color: '#d97706' }}>
+                  {missingCount.toLocaleString()}
+                </span>
+                <span className="mdu-stat-label">
+                  {t('adminTools.mapDistanceUpdate.customersMissingData')}
+                </span>
+              </div>
+            )}
             <div className="mdu-stat">
               <span className="mdu-stat-value">{stats.lastSyncAt ? formatDate(stats.lastSyncAt) : t('adminTools.mapDistanceUpdate.never')}</span>
               <span className="mdu-stat-label">{t('adminTools.mapDistanceUpdate.lastSync')}</span>

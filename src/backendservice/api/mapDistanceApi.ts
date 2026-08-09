@@ -77,6 +77,8 @@ export interface MapDistanceRecord {
 export interface MapDistanceStats {
   totalRecords: number;
   customersWithData: number;
+  activeCustomers?: number;
+  customersMissingData?: number;
   lastSyncAt: string | null;
   lastSyncRecords: number;
   storageSizeBytes: number;
