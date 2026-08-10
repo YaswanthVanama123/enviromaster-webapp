@@ -165,6 +165,16 @@ export const MapDistanceUpdateTab: React.FC = () => {
     }
   };
 
+  const handleStartMissingSync = async () => {
+    setError(null);
+    const result = await mapDistanceApi.startMissingSync();
+    if (result.success) {
+      checkSyncStatus();
+    } else {
+      setError(result.error || t('adminTools.mapDistanceUpdate.failedToStartUpdate'));
+    }
+  };
+
   const handleCancelSync = async () => {
     const result = await mapDistanceApi.cancelSync();
     if (result.success) {
@@ -279,6 +289,18 @@ export const MapDistanceUpdateTab: React.FC = () => {
                   {stats && updateTargetCount > 0
                     ? t('adminTools.mapDistanceUpdate.updateAllData', { count: updateTargetCount })
                     : t('adminTools.mapDistanceUpdate.noDataToUpdate')
+                  }
+                </button>
+                <button
+                  className="mdu-update-btn"
+                  onClick={handleStartMissingSync}
+                  disabled={!stats || missingCount === 0 || isJobRunning || isJobInterrupted || isJobPaused}
+                  title={t('adminTools.mapDistanceUpdate.fetchNewOnlyTitle')}
+                >
+                  <MdRefresh size={18} />
+                  {missingCount > 0
+                    ? t('adminTools.mapDistanceUpdate.fetchNewOnly', { count: missingCount })
+                    : t('adminTools.mapDistanceUpdate.noNewCustomers')
                   }
                 </button>
                 <button
