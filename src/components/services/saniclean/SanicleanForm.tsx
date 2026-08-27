@@ -7,6 +7,7 @@ import type { ServiceInitialData } from "../common/serviceTypes";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
+import { Select } from "../../atoms";
 import { FaCircle, FaPen } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
@@ -1081,16 +1082,18 @@ export const SanicleanForm: React.FC<
                 </small>
               </label>
               <div className="svc-row-right">
-          <select
+          <Select
             className="svc-in"
+            selectSize="sm"
             name="facilityComponentsFrequency"
             value={form.facilityComponentsFrequency}
-            onChange={(e) => setFacilityComponentsFrequency(e.target.value as SanicleanFrequency)}
-          >
-            <option value="weekly">{t("serviceForms.common.weekly")}</option>
-            <option value="biweekly">{t("serviceForms.common.biweeklyAlt")}</option>
-            <option value="monthly">{t("serviceForms.common.monthly")}</option>
-          </select>
+            onValueChange={(v) => setFacilityComponentsFrequency(v as SanicleanFrequency)}
+            options={[
+              { value: "weekly", label: t("serviceForms.common.weekly") },
+              { value: "biweekly", label: t("serviceForms.common.biweeklyAlt") },
+              { value: "monthly", label: t("serviceForms.common.monthly") },
+            ]}
+          />
         </div>
       </div>
     )}

@@ -1541,7 +1541,9 @@ export function transformMicrofiberMoppingData(structuredData: any): any {
 
   if (structuredData.serviceBreakdown && Array.isArray(structuredData.serviceBreakdown)) {
     structuredData.serviceBreakdown.forEach((item: any) => {
-      if (item.label === "Bathrooms") {
+      // "Bathrooms"/"Huge Bathrooms" are the pre-rename labels — still matched so
+      // agreements saved before the rename load correctly.
+      if (item.label === "Small Bathrooms" || item.label === "Bathrooms") {
         if (formState.bathroomCount === undefined) {
           formState.bathroomCount = item.qty || 0;
         }
@@ -1549,7 +1551,7 @@ export function transformMicrofiberMoppingData(structuredData: any): any {
           formState.includedBathroomRate = item.rate;
           console.log('🔄 [Microfiber] Using fallback includedBathroomRate from serviceBreakdown:', item.rate);
         }
-      } else if (item.label === "Huge Bathrooms") {
+      } else if (item.label === "Large Bathrooms" || item.label === "Huge Bathrooms") {
         if (formState.hugeBathroomSqFt === undefined) {
           formState.hugeBathroomSqFt = item.qty || 0;
         }
@@ -1557,7 +1559,7 @@ export function transformMicrofiberMoppingData(structuredData: any): any {
           formState.hugeBathroomRatePerSqFt = item.rate;
           console.log('🔄 [Microfiber] Using fallback hugeBathroomRatePerSqFt from serviceBreakdown:', item.rate);
         }
-      } else if (item.label === "Extra Area") {
+      } else if (item.label === "Mopping with Sani" || item.label === "Extra Area") {
         if (formState.extraAreaSqFt === undefined) {
           formState.extraAreaSqFt = item.qty || 0;
         }
@@ -1565,7 +1567,7 @@ export function transformMicrofiberMoppingData(structuredData: any): any {
           formState.extraAreaRatePerUnit = item.rate;
           console.log('🔄 [Microfiber] Using fallback extraAreaRatePerUnit from serviceBreakdown:', item.rate);
         }
-      } else if (item.label === "Standalone Service") {
+      } else if (item.label === "Mopping Non-Bathroom" || item.label === "Standalone Service") {
         if (formState.standaloneSqFt === undefined) {
           formState.standaloneSqFt = item.qty || 0;
         }

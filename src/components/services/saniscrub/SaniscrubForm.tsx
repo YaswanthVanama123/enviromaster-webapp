@@ -69,9 +69,29 @@ export const SaniscrubForm: React.FC<
   const isSanicleanAllInclusive =
     servicesContext?.isSanicleanAllInclusive ?? false;
 
+  // SaniClean drives the restroom-fixture count: whatever is entered there (sinks +
+  // urinals + male/female toilets) mirrors into SaniScrub automatically. On the
+  // All-Inclusive package those fixtures are bundled, so they bill at $0 here while
+  // the non-bathroom area still charges normally.
+  const sanicleanFixtureCount = servicesContext?.sanicleanFixtureCount ?? 0;
+
+  useEffect(() => {
+    if (sanicleanFixtureCount > 0 && sanicleanFixtureCount !== form.fixtureCount) {
+      setForm((prev) => ({ ...prev, fixtureCount: sanicleanFixtureCount }));
+    }
+  }, [sanicleanFixtureCount]);
+
+  useEffect(() => {
+    if (isSanicleanAllInclusive !== (form.fixturesIncludedInSaniclean ?? false)) {
+      setForm((prev) => ({ ...prev, fixturesIncludedInSaniclean: isSanicleanAllInclusive }));
+    }
+  }, [isSanicleanAllInclusive]);
+
   const prevDataRef = React.useRef<string>("");
 
   const displayFixtureRate = (() => {
+    // Bundled into SaniClean All-Inclusive — show the $0 the customer is charged.
+    if (isSanicleanAllInclusive) return 0;
 
     if (form.frequency === "oneTime" || form.frequency === "weekly" ||
         form.frequency === "biweekly" || form.frequency === "twicePerMonth" ||

@@ -98,6 +98,8 @@ interface ServicesContextValue {
 
   isSanicleanAllInclusive: boolean;
   sanicleanPaperCreditPerWeek: number;
+  /** Total SaniClean restroom fixtures (sinks + urinals + male/female toilets). */
+  sanicleanFixtureCount: number;
 
   globalContractMonths: number;
   setGlobalContractMonths: (months: number) => void;
@@ -788,9 +790,9 @@ export const ServicesProvider: React.FC<{
        sanicleanData?.pricingMode === "all_inclusive")
     );
 
-    const fixtureCount = sanicleanData?.fixtureBreakdown?.reduce((sum: number, item: any) => sum + (item.qty || 0), 0) || 0;
+    const sanicleanFixtureCount = sanicleanData?.fixtureBreakdown?.reduce((sum: number, item: any) => sum + (item.qty || 0), 0) || 0;
     const sanicleanPaperCreditPerWeek = isSanicleanAllInclusive
-      ? fixtureCount * 5 
+      ? sanicleanFixtureCount * 5 
       : 0;
 
     const activeServices = Object.values(servicesState).filter((sd: any) => sd?.isActive);
@@ -806,6 +808,7 @@ export const ServicesProvider: React.FC<{
       getBackendPricingForService,
       isSanicleanAllInclusive,
       sanicleanPaperCreditPerWeek,
+      sanicleanFixtureCount,
 
       globalContractMonths,
       setGlobalContractMonths,

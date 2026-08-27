@@ -246,17 +246,11 @@ export function useMicrofiberMoppingCalc(
         [name]: nextValue as any,
       };
 
+      // Standard bathrooms and huge bathroom sq ft can both be charged on the same
+      // agreement — the engine sums them — so entering one must not clear the other.
       if (name === "hugeBathroomSqFt") {
         const sq = Number(nextValue) || 0;
-        if (sq > 0) {
-          next.bathroomCount = 0;
-          next.isHugeBathroom = true;
-        } else if (sq === 0) {
-          next.isHugeBathroom = false;
-        }
-      }
-      if (name === "isHugeBathroom" && nextValue === true) {
-        next.bathroomCount = 0;
+        next.isHugeBathroom = sq > 0;
       }
 
       if (ALL_PRICING_FIELDS.has(name)) {

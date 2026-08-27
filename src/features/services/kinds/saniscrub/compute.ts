@@ -226,6 +226,15 @@ export function computeSaniscrubCalc(
       minimumAmount = activeConfig.minimums.quarterly;
     }
 
+    // SaniClean's All-Inclusive package bundles the restroom-fixture portion of
+    // SaniScrub, so the fixtures still show (mirroring SaniClean's count) but are
+    // charged at $0. The minimum is waived too, otherwise it would reintroduce a
+    // charge. Non-bathroom area is unaffected and continues to bill normally.
+    if (form.fixturesIncludedInSaniclean) {
+      baseRate = 0;
+      minimumAmount = 0;
+    }
+
     const rawAmount = fixtureCount * baseRate;
     fixtureBaseAmount =
       fixtureCount > 0

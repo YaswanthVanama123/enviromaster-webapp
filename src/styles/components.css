@@ -92,6 +92,61 @@
 .em-input--md { padding: 10px 14px; font-size: var(--em-font-size-md); }
 .em-input--lg { padding: 12px 16px; font-size: var(--em-font-size-lg); }
 
+/* Select (react-select) — visuals driven by tokens so it matches .em-input */
+.em-select .em-select__control {
+  border: 1px solid var(--em-color-border);
+  border-radius: var(--em-radius-lg);
+  background-color: var(--em-color-bg);
+  min-height: unset;
+  box-shadow: none;
+  transition: border-color var(--em-transition-base),
+              box-shadow var(--em-transition-base);
+}
+.em-select .em-select__control:hover { border-color: var(--em-color-border-strong); }
+.em-select .em-select__control--is-focused {
+  border-color: var(--em-color-primary);
+  box-shadow: var(--em-shadow-focus-primary);
+}
+.em-select .em-select__control--is-disabled {
+  background-color: var(--em-color-bg-muted);
+  cursor: not-allowed;
+}
+.em-select .em-select__single-value { color: var(--em-color-text); }
+.em-select .em-select__placeholder { color: var(--em-color-text-subtle); }
+.em-select .em-select__dropdown-indicator { color: var(--em-color-text-muted); padding: 0 8px; }
+.em-select .em-select__value-container { padding: 0; }
+
+.em-select--invalid .em-select__control { border-color: var(--em-color-danger); }
+.em-select--invalid .em-select__control--is-focused {
+  border-color: var(--em-color-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.em-select--sm .em-select__control { padding: 8px 12px; font-size: var(--em-font-size-sm); }
+.em-select--md .em-select__control { padding: 10px 14px; font-size: var(--em-font-size-md); }
+.em-select--lg .em-select__control { padding: 12px 16px; font-size: var(--em-font-size-lg); }
+
+/* Menu is portalled to <body>, so target the prefix globally rather than nested. */
+.em-select__menu {
+  border: 1px solid var(--em-color-border);
+  border-radius: var(--em-radius-lg);
+  background-color: var(--em-color-bg);
+  box-shadow: var(--em-shadow-lg);
+  overflow: hidden;
+}
+.em-select__option {
+  font-size: var(--em-font-size-md);
+  color: var(--em-color-text);
+  cursor: pointer;
+}
+.em-select__option--is-focused { background-color: var(--em-color-bg-muted); }
+.em-select__option--is-selected {
+  background-color: var(--em-color-primary);
+  color: var(--em-color-text-inverse);
+}
+.em-select__option--is-disabled { color: var(--em-color-text-subtle); cursor: not-allowed; }
+.em-select__menu-notice { font-size: var(--em-font-size-md); color: var(--em-color-text-muted); }
+
 .em-label {
   display: block;
   font-size: var(--em-font-size-md);

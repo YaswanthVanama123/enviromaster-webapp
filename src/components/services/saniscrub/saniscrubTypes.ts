@@ -64,6 +64,12 @@ export interface SaniscrubFormState extends BaseServiceFormState {
   frequency: SaniscrubFrequency;
 
   hasSaniClean: boolean;
+  /**
+   * True when SaniClean is on its All-Inclusive package, which bundles the
+   * restroom-fixture portion of SaniScrub. The fixture count is still shown (and
+   * mirrors SaniClean) but is charged at $0; non-bathroom area still bills.
+   */
+  fixturesIncludedInSaniclean?: boolean;
 
   location: "insideBeltway" | "outsideBeltway";
   needsParking: boolean;

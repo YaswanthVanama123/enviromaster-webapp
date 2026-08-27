@@ -134,7 +134,7 @@ export const MicrofiberMoppingForm: React.FC<
             breakdown.push({
               isDisplay: true,
               orderNo: FIELD_ORDER.serviceBreakdown.bathrooms,
-              label: "Bathrooms",
+              label: "Small Bathrooms",
               type: "calc" as const,
               qty: form.bathroomCount,
               rate: bathroomRate,
@@ -145,7 +145,7 @@ export const MicrofiberMoppingForm: React.FC<
             breakdown.push({
               isDisplay: true,
               orderNo: FIELD_ORDER.serviceBreakdown.hugeBathrooms,
-              label: "Huge Bathrooms",
+              label: "Large Bathrooms",
               type: "calc" as const,
               qty: form.hugeBathroomSqFt,
               rate: hugeBathroomRate,
@@ -157,7 +157,7 @@ export const MicrofiberMoppingForm: React.FC<
             breakdown.push({
               isDisplay: true,
               orderNo: FIELD_ORDER.serviceBreakdown.extraArea,
-              label: "Extra Area",
+              label: "Mopping with Sani",
               type: "calc" as const,
               qty: form.extraAreaSqFt,
               rate: extraAreaRate,
@@ -169,7 +169,7 @@ export const MicrofiberMoppingForm: React.FC<
             breakdown.push({
               isDisplay: true,
               orderNo: FIELD_ORDER.serviceBreakdown.standalone,
-              label: "Standalone Service",
+              label: "Mopping Non-Bathroom",
               type: "calc" as const,
               qty: form.standaloneSqFt,
               rate: form.customStandaloneRatePerUnit ?? form.standaloneRatePerUnit,
@@ -372,8 +372,6 @@ export const MicrofiberMoppingForm: React.FC<
     (Number(form.extraAreaRatePerUnit) || 0) /
     cfg.extraAreaPricing.extraAreaSqFtUnit;
 
-  const isBathroomDisabled =
-    form.isHugeBathroom || (form.hugeBathroomSqFt ?? 0) > 0;
 
   return (
     <ServiceCardShell
@@ -472,7 +470,7 @@ export const MicrofiberMoppingForm: React.FC<
 
       {}
       <div className="svc-row">
-        <label>{t("serviceForms.microfiberMopping.standardBathrooms")}</label>
+        <label>{t("serviceForms.microfiberMopping.standardBathrooms", { sqFt: cfg.hugeBathroomPricing.sqFtUnit })}</label>
         <div className="svc-row-right">
           <input
             className="svc-in field-qty"
@@ -481,9 +479,7 @@ export const MicrofiberMoppingForm: React.FC<
             name="bathroomCount"
             value={form.bathroomCount || ""}
             onChange={onChange}
-            disabled={
-              isBathroomDisabled || !form.hasExistingSaniService || form.isAllInclusive
-            }
+            disabled={!form.hasExistingSaniService || form.isAllInclusive}
           />
           <span>@</span>
           <div className="svc-dollar">
