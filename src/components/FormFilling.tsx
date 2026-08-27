@@ -173,20 +173,25 @@ type LocationState = {
 
   editingVersionId?: string;
   editingVersionFile?: string;
+  isExtension?: boolean;
 };
 
 const CUSTOMER_FALLBACK_ID = "6918cecbf0b2846a9c562fd6";
 
-// Title shown when no customer name has been entered yet. The previous wording
-// ("Customer Update Addendum") is still treated as a placeholder so agreements
-// saved before the rename don't display the old heading.
+// Title shown when no customer name has been entered yet. Extensions (renewals of
+// an existing agreement) keep the legacy addendum wording; new agreements use the
+// service-agreement wording. Both are treated as placeholders so a title saved
+// under either scheme is replaced rather than displayed verbatim.
+const EXTENSION_DOCUMENT_TITLE = "Customer Update Addendum";
 const DEFAULT_DOCUMENT_TITLE = "Customer Service Agreement";
 const PLACEHOLDER_TITLES = new Set([
   DEFAULT_DOCUMENT_TITLE,
-  "Customer Update Addendum",
+  EXTENSION_DOCUMENT_TITLE,
 ]);
 const isPlaceholderTitle = (title?: string | null): boolean =>
   !title?.trim() || PLACEHOLDER_TITLES.has(title.trim());
+const defaultTitleFor = (isExtension?: boolean): string =>
+  isExtension ? EXTENSION_DOCUMENT_TITLE : DEFAULT_DOCUMENT_TITLE;
 
 const ADMIN_TEMPLATE_ID = "692dc43b3811afcdae0d5547";
 
@@ -1204,8 +1209,13 @@ function FormFillingContent({
     location.state?.returnPath,
     location.state?.fromPdfViewer,
     location.state?.editingVersionId,
-    location.state?.editingVersionFile
+    location.state?.editingVersionFile,
+    location.state?.isExtension
   ]);
+
+  // Set when arriving via "Extend Agreement", or restored from a saved document in
+  // edit mode. Drives the heading in the form, on save and in the PDF.
+  const [isExtension, setIsExtension] = useState<boolean>(locationState.isExtension === true);
 
   const [payload, setPayload] = useState<FormPayload | null>(null);
   const [payrollLock, setPayrollLock] = useState<{ addedToPayroll?: boolean; periodLabel?: string } | null>(null);
@@ -1759,8 +1769,12 @@ function FormFillingContent({
 
           console.log("⚠️ [TITLE DEBUG] No customer name found in headerRows, using fallback");
 
-          return DEFAULT_DOCUMENT_TITLE;
+          return defaultTitleFor(loadedIsExtension);
         };
+
+        const loadedIsExtension =
+          (fromBackend as any).isExtension === true || locationState.isExtension === true;
+        setIsExtension(loadedIsExtension);
 
         const dynamicTitle = generateTitleFromCustomerName(fromBackend.headerRows || []);
         const shouldUseBackendTitle = isPlaceholderTitle(dynamicTitle) && !isPlaceholderTitle(fromBackend.headerTitle);
@@ -1912,7 +1926,7 @@ function FormFillingContent({
 
     const titleForSave = customerName !== "Unnamed_Customer"
       ? customerName
-      : (isPlaceholderTitle(payload?.headerTitle) ? DEFAULT_DOCUMENT_TITLE : payload!.headerTitle);
+      : (isPlaceholderTitle(payload?.headerTitle) ? defaultTitleFor(isExtension) : payload!.headerTitle);
 
     console.log("💾 [SAVE DEBUG] Title selection for save:", {
       extractedCustomerName: customerName,
@@ -1954,6 +1968,7 @@ function FormFillingContent({
     return {
       headerTitle: titleForSave,
       headerRows: payload?.headerRows || [],
+      isExtension,
       products: {
         ...productsForBackend,
         smallProducts: productsData.smallProducts,
@@ -2936,7 +2951,7 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
             padding: '20px'
           }}>
             <CustomerSection
-              headerTitle={payload.headerTitle}
+              headerTitle={defaultTitleFor(isExtension)}
               headerRows={payload.headerRows}
               onHeaderRowsChange={handleHeaderRowsChange}
             />

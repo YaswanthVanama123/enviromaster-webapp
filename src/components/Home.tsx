@@ -355,7 +355,7 @@ export default function Home() {
       title: t("home.cards.extend.title"),
       description: t("home.cards.extend.description"),
       icon: faCalendarPlus,
-      action: () => navigate("/form-filling"),
+      action: () => navigate("/form-filling", { state: { isExtension: true } }),
       buttonText: t("home.cards.extend.button"),
       buttonClass: "home__button-green",
       available: true,

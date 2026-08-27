@@ -10,6 +10,7 @@ import "./refreshPowerScrub.css";
 import { useServicesContextOptional } from "../ServicesContext";
 import { CustomFieldManager, type CustomField } from "../CustomFieldManager";
 import { buildRefreshPowerScrubDraftPayload } from "./refreshPowerScrubDraftPayload";
+import { areaHasQuantity } from "../../../features/services/kinds/refreshPowerScrub";
 import { ServiceCardShell, RefreshButton } from "../../molecules";
 
 const formatNumber = (num: number | undefined): string => {
@@ -193,7 +194,9 @@ const getKitchenLarge = (): number => {
       const activeAreaKeys = AREA_ORDER.filter((key) => {
         const area = form[key];
         const areaTotal = areaTotals[key] || 0;
-        return area?.enabled && areaTotal > 0;
+        // Quantity is what makes an area real; a $0 total means it was comped, not
+        // that it is empty, so it must still reach the agreement.
+        return area?.enabled && (areaTotal > 0 || areaHasQuantity(key, form));
       });
 
       const totalPerVisitCost = activeAreaKeys.reduce(

@@ -62,6 +62,7 @@ export interface GlobalSummary {
 export interface FormPayload {
   headerTitle: string;
   headerRows: any[];
+  isExtension?: boolean;
   products: ProductsPayload;
   services: any;
   agreement: any;

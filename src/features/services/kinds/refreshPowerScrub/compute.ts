@@ -566,6 +566,35 @@ export function calcAreaCost(
   }
 }
 
+/**
+ * Whether an enabled area has any quantity entered, regardless of price. A rep can
+ * comp an area (rates set to $0) and it must still appear on the agreement, so
+ * quantity — not cost — decides whether the area is printed.
+ */
+export function areaHasQuantity(
+  area: RefreshAreaKey,
+  form: RefreshPowerScrubFormState
+): boolean {
+  const state = form[area];
+  if (!state?.enabled) return false;
+  const positive = (v: unknown) => typeof v === "number" && Number.isFinite(v) && v > 0;
+
+  switch (state.pricingType) {
+    case "preset":
+      return positive(state.presetQuantity);
+    case "perWorker":
+      return positive(state.workers) || positive(state.hours);
+    case "perHour":
+      return positive(state.hours);
+    case "squareFeet":
+      return positive(state.smallMediumQuantity) || positive(state.largeQuantity);
+    case "custom":
+      return positive(state.customAmount);
+    default:
+      return false;
+  }
+}
+
 export function calcBaselineAreaCost(
   area: RefreshAreaKey,
   form: RefreshPowerScrubFormState,

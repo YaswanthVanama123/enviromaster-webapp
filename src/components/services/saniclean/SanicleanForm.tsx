@@ -428,13 +428,15 @@ export const SanicleanForm: React.FC<
         total: number,
         orderNo?: number
       ) => {
+        // Quantity decides whether the line prints. A $0 rate is legitimate — reps
+        // comp items for existing customers — so it must not suppress the row.
         if (!qty || qty <= 0) return;
-        if (!rate || rate === 0) return;
+        const safeRate = typeof rate === "number" && Number.isFinite(rate) ? rate : 0;
         extras.push({
           label,
           type: "atCharge",
           v1: qty,
-          v2: `${formatDollars(rate)}/mo`,
+          v2: `${formatDollars(safeRate)}/mo`,
           v3: formatDollars(total),
           isDisplay: true,
           orderNo,

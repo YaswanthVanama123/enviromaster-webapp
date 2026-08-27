@@ -3,6 +3,7 @@ export {
   computeRefreshPowerScrub,
   calcAreaCost,
   calcBaselineAreaCost,
+  areaHasQuantity,
   getBillingMultiplier,
   transformBackendFrequencyMeta,
   createDefaultArea,
