@@ -177,6 +177,17 @@ type LocationState = {
 
 const CUSTOMER_FALLBACK_ID = "6918cecbf0b2846a9c562fd6";
 
+// Title shown when no customer name has been entered yet. The previous wording
+// ("Customer Update Addendum") is still treated as a placeholder so agreements
+// saved before the rename don't display the old heading.
+const DEFAULT_DOCUMENT_TITLE = "Customer Service Agreement";
+const PLACEHOLDER_TITLES = new Set([
+  DEFAULT_DOCUMENT_TITLE,
+  "Customer Update Addendum",
+]);
+const isPlaceholderTitle = (title?: string | null): boolean =>
+  !title?.trim() || PLACEHOLDER_TITLES.has(title.trim());
+
 const ADMIN_TEMPLATE_ID = "692dc43b3811afcdae0d5547";
 
 type CommissionState = {
@@ -1748,11 +1759,11 @@ function FormFillingContent({
 
           console.log("⚠️ [TITLE DEBUG] No customer name found in headerRows, using fallback");
 
-          return "Customer Update Addendum";
+          return DEFAULT_DOCUMENT_TITLE;
         };
 
         const dynamicTitle = generateTitleFromCustomerName(fromBackend.headerRows || []);
-        const shouldUseBackendTitle = dynamicTitle === "Customer Update Addendum" && fromBackend.headerTitle && fromBackend.headerTitle !== "Customer Update Addendum";
+        const shouldUseBackendTitle = isPlaceholderTitle(dynamicTitle) && !isPlaceholderTitle(fromBackend.headerTitle);
         const finalTitle = shouldUseBackendTitle ? fromBackend.headerTitle : dynamicTitle;
 
         console.log("🎯 [TITLE DEBUG] Title selection logic:", {
@@ -1899,7 +1910,9 @@ function FormFillingContent({
 
     const customerName = extractCustomerName(payload?.headerRows || []);
 
-    const titleForSave = customerName !== "Unnamed_Customer" ? customerName : (payload?.headerTitle || "Customer Update Addendum");
+    const titleForSave = customerName !== "Unnamed_Customer"
+      ? customerName
+      : (isPlaceholderTitle(payload?.headerTitle) ? DEFAULT_DOCUMENT_TITLE : payload!.headerTitle);
 
     console.log("💾 [SAVE DEBUG] Title selection for save:", {
       extractedCustomerName: customerName,
