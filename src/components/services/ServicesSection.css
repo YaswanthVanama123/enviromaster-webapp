@@ -342,6 +342,10 @@
 }
 .svc-in:focus{ border-bottom-color:#c20000; }
 
+.svc-in--bare, .svc-in--bare:focus{ border-bottom:none; }
+.svc-in--bare::-webkit-outer-spin-button, .svc-in--bare::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.svc-in--bare[type=number]{ -moz-appearance:textfield; appearance:textfield; }
+
 .svc-in-box, .svc-dollar input{
   border:none; border-bottom:2px solid #000; background:transparent; outline:none; font-size:14px; height:28px; width:auto; max-width:150px; box-sizing:border-box; min-width:60px;
 }

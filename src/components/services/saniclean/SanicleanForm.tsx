@@ -769,7 +769,7 @@ export const SanicleanForm: React.FC<
         <label>{t("serviceForms.common.restroomFixtures")}</label>
         <div className="svc-row-right">
           <input
-            className="svc-in"
+            className="svc-in svc-in--bare"
             type="number"
             min="0"
             name="fixtureCount"
