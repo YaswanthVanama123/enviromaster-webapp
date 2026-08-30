@@ -405,6 +405,34 @@
   margin-top: var(--em-space-6);
 }
 
+.em-push-prod__btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #0d9488;
+  border-radius: var(--em-radius-md);
+  background: #0f766e;
+  color: #fff;
+  font-size: var(--em-font-size-xs);
+  font-weight: var(--em-font-weight-medium);
+  cursor: pointer;
+}
+.em-push-prod__btn:hover { background: #0d9488; }
+.em-push-prod__btn-icon { font-size: 10px; }
+.em-push-prod__summary { line-height: 1.7; }
+.em-push-prod__summary > p:first-child { margin-top: 0; }
+.em-push-prod__list {
+  margin: var(--em-space-2) 0 var(--em-space-3);
+  padding-left: var(--em-space-5);
+}
+.em-push-prod__note {
+  margin-bottom: 0;
+  color: var(--em-color-text-muted);
+  font-size: var(--em-font-size-sm);
+}
+.em-push-prod__alert { margin-top: var(--em-space-3); }
+
 .em-toast {
   position: fixed;
   bottom: 24px;

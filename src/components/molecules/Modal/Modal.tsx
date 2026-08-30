@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export type ModalSize = "sm" | "md" | "lg";
 
@@ -34,7 +35,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="em-modal__overlay"
       onClick={closeOnOverlayClick ? onClose : undefined}
@@ -55,6 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="em-modal__body">{children}</div>
         {footer && <div className="em-modal__footer">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

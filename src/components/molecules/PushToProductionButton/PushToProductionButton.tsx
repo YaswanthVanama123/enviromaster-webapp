@@ -78,27 +78,14 @@ export const PushToProductionButton: React.FC<PushToProductionButtonProps> = ({
     <>
       <button
         type="button"
-        className={className}
-        style={{
-          background: "#0f766e",
-          border: "1px solid #0d9488",
-          borderRadius: "6px",
-          padding: "6px 8px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          fontSize: "12px",
-          color: "#fff",
-          fontWeight: 500,
-        }}
+        className={`em-push-prod__btn ${className}`.trim()}
         onClick={(e) => {
           e.stopPropagation();
           openDialog();
         }}
         title={`Send this agreement folder to production${target ? ` (${target})` : ""}`}
       >
-        <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: "10px" }} />
+        <FontAwesomeIcon icon={faCloudArrowUp} className="em-push-prod__btn-icon" />
         <span className="ag-act-label">Push to Production</span>
       </button>
 
@@ -127,51 +114,31 @@ export const PushToProductionButton: React.FC<PushToProductionButtonProps> = ({
         {loadingPreview && <p>Reading agreement…</p>}
 
         {preview && (
-          <div style={{ fontSize: "14px", lineHeight: 1.7 }}>
-            <p style={{ marginTop: 0 }}>
+          <div className="em-push-prod__summary">
+            <p>
               This sends the agreement and everything in its folder to the production
               API{target ? ` (${target})` : ""}, which stores it in the production database.
             </p>
-            <ul style={{ margin: "8px 0 12px", paddingLeft: "20px" }}>
+            <ul className="em-push-prod__list">
               <li>{preview.counts.versions} version PDF(s)</li>
               <li>{preview.counts.attachedFiles} attached file(s)</li>
               <li>{preview.counts.changeLogs} change log(s)</li>
               <li>{formatBytes(preview.totalPdfBytes)} of PDF data</li>
             </ul>
 
-            <div
-              style={{
-                background: "#fffbeb",
-                border: "1px solid #fde68a",
-                borderRadius: "8px",
-                padding: "10px 12px",
-                color: "#92400e",
-              }}
-            >
+            <div className="em-banner em-banner--warning">
               If this agreement already exists in production it will be{" "}
               <strong>overwritten</strong> with this copy. Nothing is deleted.
             </div>
 
-            <p style={{ color: "#64748b", fontSize: "13px", marginBottom: 0 }}>
+            <p className="em-push-prod__note">
               Bigin/CRM links are not copied — production keeps its own upload state.
             </p>
           </div>
         )}
 
         {error && (
-          <div
-            style={{
-              marginTop: "12px",
-              background: "#fef2f2",
-              border: "1px solid #fecaca",
-              borderRadius: "8px",
-              padding: "10px 12px",
-              color: "#b91c1c",
-              fontSize: "13px",
-            }}
-          >
-            {error}
-          </div>
+          <div className="em-banner em-banner--danger em-push-prod__alert">{error}</div>
         )}
       </Modal>
     </>
