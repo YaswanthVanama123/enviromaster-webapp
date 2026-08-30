@@ -10,6 +10,7 @@ import {
 import type { SavedFileGroup, SavedFileListItem } from "../../backendservice/api/pdfApi";
 import { FileRow } from "./FileRow";
 import AgreementTimelineBadge from "../AgreementTimelineBadge";
+import { PushToProductionButton } from "../molecules";
 import "./AgreementRow.css";
 
 function timeAgo(iso: string) {
@@ -473,6 +474,11 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
                 <FontAwesomeIcon icon={faPlus} style={{ fontSize: '10px' }} />
                 <span className="ag-act-label">{t("savedFiles.rows.add")}</span>
               </button>
+
+              <PushToProductionButton
+                agreementId={agreement.id}
+                agreementTitle={agreement.agreementTitle}
+              />
 
               {showAgreementLevelEdit && (
                 <button
