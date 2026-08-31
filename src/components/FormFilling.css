@@ -300,6 +300,29 @@ body::-webkit-scrollbar,
 .contract-summary-header {
   margin-bottom: 24px;
   padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.contract-summary-print-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+}
+
+.contract-summary-print-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #c00000;
+  cursor: pointer;
 }
 
 .contract-summary-header h2 {

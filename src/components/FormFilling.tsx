@@ -269,9 +269,11 @@ type ContractSummaryProps = {
   isConnectedToBigin?: boolean;
   accountTypeDetection?: AccountTypeDetectionResult | null;
 
-  
-  
+
+
   repActualSalesBefore?: number;
+  includeInPdf?: boolean;
+  onIncludeInPdfChange?: (include: boolean) => void;
 };
 
 function ContractSummary({
@@ -285,7 +287,9 @@ function ContractSummary({
   userName,
   isConnectedToBigin = false,
   accountTypeDetection = null,
-  repActualSalesBefore = 0
+  repActualSalesBefore = 0,
+  includeInPdf = true,
+  onIncludeInPdfChange
 }: ContractSummaryProps) {
   const { t } = useTranslation();
   const getFreqLabel = (freq: number) =>
@@ -707,6 +711,14 @@ function ContractSummary({
     <div className="contract-summary-section">
       <div className="contract-summary-header">
         <h2>{t("formFilling.contractSummary.title")}</h2>
+        <label className="contract-summary-print-toggle">
+          <input
+            type="checkbox"
+            checked={includeInPdf}
+            onChange={(e) => onIncludeInPdfChange?.(e.target.checked)}
+          />
+          <span>{t("formFilling.includeContractSummary")}</span>
+        </label>
       </div>
 
       {}
@@ -1234,6 +1246,7 @@ function FormFillingContent({
   const [paymentOption, setPaymentOption] = useState<PaymentOption>("online");
   const [paymentNote, setPaymentNote] = useState<string>("");
   const [includeProductsTable, setIncludeProductsTable] = useState<boolean>(true);
+  const [includeContractSummary, setIncludeContractSummary] = useState<boolean>(true);
 
   const [showVersionDialog, setShowVersionDialog] = useState(false);
   const [versionStatus, setVersionStatus] = useState<VersionStatus | null>(null);
@@ -1426,6 +1439,7 @@ function FormFillingContent({
     setPaymentOption(option ?? "online");
     setPaymentNote(payload.agreement?.paymentNote ?? "");
     setIncludeProductsTable((payload as any).includeProductsTable !== false);
+    setIncludeContractSummary((payload as any).includeContractSummary !== false);
 
     if (payload.agreement?.startDate) {
       setAgreementStartDate(payload.agreement.startDate);
@@ -1806,6 +1820,7 @@ function FormFillingContent({
           },
           customColumns: fromBackend.customColumns ?? { products: [], dispensers: [] }, 
           includeProductsTable: (fromBackend as any).includeProductsTable !== false,
+          includeContractSummary: (fromBackend as any).includeContractSummary !== false,
           serviceAgreement: fromBackend.serviceAgreement,
           summary: fromBackend.summary,
         };
@@ -1984,6 +1999,7 @@ function FormFillingContent({
       serviceAgreement: agreementData,
       customerName,
       includeProductsTable,
+      includeContractSummary,
       customColumns: (productsData as any).customColumns || { products: [], dispensers: [] },
       summary,
       
@@ -3015,6 +3031,8 @@ const attachRefreshPowerScrubDraftCustomField = (services?: Record<string, any>)
               isConnectedToBigin={isConnectedToBigin}
               accountTypeDetection={accountTypeDetection}
               repActualSalesBefore={repActualSales}
+              includeInPdf={includeContractSummary}
+              onIncludeInPdfChange={setIncludeContractSummary}
             />
 
             <div className="formfilling__payment-options">

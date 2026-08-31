@@ -5,6 +5,7 @@
   "loadingFormData": "Loading form data…",
   "savingAgreementData": "Saving agreement data…",
   "includeProductsTable": "Include Products Table in PDF",
+  "includeContractSummary": "Include in PDF",
   "saving": "Saving...",
   "saveAsDraft": "Save as Draft",
   "saveAndGeneratePdf": "Save & Generate PDF",

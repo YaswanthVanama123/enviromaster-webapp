@@ -5,6 +5,7 @@
   "loadingFormData": "Cargando datos del formulario…",
   "savingAgreementData": "Guardando datos del acuerdo…",
   "includeProductsTable": "Incluir la tabla de productos en el PDF",
+  "includeContractSummary": "Incluir en el PDF",
   "saving": "Guardando...",
   "saveAsDraft": "Guardar como borrador",
   "saveAndGeneratePdf": "Guardar y generar PDF",
