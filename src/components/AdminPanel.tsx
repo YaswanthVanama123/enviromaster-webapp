@@ -25,6 +25,7 @@ import {
   faBriefcase,
   faEye,
   faDollarSign,
+  faPlug,
   faFolder,
   faFolderOpen,
   faChevronRight,
@@ -43,9 +44,10 @@ import { UserManagement } from "./admin/UserManagement";
 import { EditHistory } from "./admin/EditHistory";
 import { EmployeeAgreements } from "./admin/EmployeeAgreements";
 import { PayrollTab } from "./admin/payroll/PayrollTab";
+import { SystemConnections } from "./admin/SystemConnections";
 import { PayrollAgreementsAdmin } from "./admin/payroll/PayrollAgreementsAdmin";
 
-type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "agreement-activity" | "email-template" | "service-agreement-template" | "trash" | "payroll" | "payroll-agreements";
+type TabType = "dashboard" | "saved-pdfs" | "approval-documents" | "pricing-details" | "user-management" | "edit-history" | "employee-agreements" | "agreement-activity" | "email-template" | "service-agreement-template" | "trash" | "payroll" | "payroll-agreements" | "connections";
 
 type FileStatus = "draft" | "pending_approval" | "approved_salesman" | "approved_admin";
 
@@ -456,6 +458,8 @@ export default function AdminPanel() {
 
   const getTabTitle = () => {
     switch (activeTab) {
+      case "connections":
+        return "Database Connections";
       case "dashboard":
         return t("adminPanel.titles.dashboard");
       case "saved-pdfs":
@@ -651,6 +655,13 @@ export default function AdminPanel() {
         >
           <FontAwesomeIcon icon={faDollarSign} size="lg" />
           Payroll Agreements
+        </button>
+        <button
+          className={`secondary-nav-item ${activeTab === "connections" ? "active" : ""}`}
+          onClick={() => handleTabChange("connections")}
+        >
+          <FontAwesomeIcon icon={faPlug} size="lg" />
+          Connections
         </button>
         </nav>
         <button
@@ -1151,6 +1162,12 @@ export default function AdminPanel() {
         {activeTab === "payroll-agreements" && (
           <div className="tab-content-full">
             <PayrollAgreementsAdmin />
+          </div>
+        )}
+
+        {activeTab === "connections" && (
+          <div className="tab-content-full">
+            <SystemConnections />
           </div>
         )}
       </main>
