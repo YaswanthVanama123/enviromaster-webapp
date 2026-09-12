@@ -29,6 +29,18 @@ function readWithLegacy(primary: string, legacy: readonly string[]): string | nu
   return null;
 }
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+    return JSON.parse(atob(padded)) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
 export type Role = "admin" | "employee";
 
 export interface StoredUser {
@@ -76,7 +88,18 @@ export const tokenStore = {
     );
   },
 
+  isTokenExpired(): boolean {
+    const token = tokenStore.getToken();
+    if (!token) return true;
+    const payload = decodeJwtPayload(token);
+    const exp = payload && typeof payload.exp === "number" ? payload.exp : null;
+    if (exp === null) return false;
+    return exp * 1000 <= Date.now();
+  },
+
   isAuthenticated(): boolean {
-    return !!tokenStore.getToken() && !!tokenStore.getUser();
+    return (
+      !!tokenStore.getToken() && !!tokenStore.getUser() && !tokenStore.isTokenExpired()
+    );
   },
 };

@@ -157,6 +157,11 @@ export const authApi = {
     const token = storage.getToken();
     const user = storage.getUser();
 
+    if (token && user && !storage.isAuthenticated()) {
+      storage.clearAuth();
+      return { user: null, isAuthenticated: false };
+    }
+
     if (token && user) {
       apiClient.setToken(token);
       return { user, isAuthenticated: true };

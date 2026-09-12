@@ -26,10 +26,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       const { user: storedUser, isAuthenticated: isAuth } = authApi.initializeAuth();
-      setUser(storedUser);
-      setIsAuthenticated(isAuth);
+
+      if (!isAuth) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
+      const profile = await authApi.getProfile();
+
+      if (profile) {
+        setUser(profile);
+        setIsAuthenticated(true);
+      } else {
+        authApi.logout();
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+
       setLoading(false);
     };
 

@@ -9,6 +9,13 @@ export interface ApiResponse<T> {
 
 type UnauthorizedHandler = () => void;
 
+function endsSession(status: number, data: unknown): boolean {
+  if (status === 401) return true;
+  if (status !== 403) return false;
+  const code = (data as Record<string, unknown> | null)?.code;
+  return code !== "permission_denied";
+}
+
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 // Surface the most meaningful server error message. The backend returns errors
@@ -96,7 +103,7 @@ class ApiClient {
 
       if (!response.ok) {
         if (
-          response.status === 401 &&
+          endsSession(response.status, data) &&
           shouldAutoLogoutOnUnauthorized(endpoint) &&
           this.onUnauthorized
         ) {
@@ -149,7 +156,7 @@ class ApiClient {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         if (
-          response.status === 401 &&
+          endsSession(response.status, data) &&
           shouldAutoLogoutOnUnauthorized(endpoint) &&
           this.onUnauthorized
         ) {
