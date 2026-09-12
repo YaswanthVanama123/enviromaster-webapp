@@ -107,6 +107,25 @@ export interface AccountTypeDetectionResult {
 
 const BASE_PATH = '/api/map-distance';
 
+export interface MapDistanceSyncFailure {
+  jobId: string;
+  jobType: string;
+  at: string | null;
+  error: string;
+  processedCustomers: number;
+  totalCustomers: number;
+}
+
+export interface MapDistanceSyncStatus {
+  success: boolean;
+  isRunning: boolean;
+  isInterrupted: boolean;
+  isPaused: boolean;
+  heartbeatAgeMs?: number | null;
+  lastFailure: MapDistanceSyncFailure | null;
+  job: MapDistanceSyncJob | null;
+}
+
 export const mapDistanceApi = {
   
   async getCustomers(search?: string): Promise<RouteStarCustomerOption[]> {
@@ -226,24 +245,18 @@ export const mapDistanceApi = {
     }
   },
 
-  async getSyncStatus(): Promise<{ success: boolean; isRunning: boolean; isInterrupted: boolean; isPaused: boolean; job: MapDistanceSyncJob | null }> {
+  async getSyncStatus(): Promise<MapDistanceSyncStatus> {
     try {
-      const response = await apiClient.get<{
-        success: boolean;
-        isRunning: boolean;
-        isInterrupted: boolean;
-        isPaused: boolean;
-        job: MapDistanceSyncJob | null;
-      }>(`${BASE_PATH}/sync/status`);
+      const response = await apiClient.get<MapDistanceSyncStatus>(`${BASE_PATH}/sync/status`);
 
       if (response.data) {
         return response.data;
       }
 
-      return { success: false, isRunning: false, isInterrupted: false, isPaused: false, job: null };
+      return { success: false, isRunning: false, isInterrupted: false, isPaused: false, lastFailure: null, job: null };
     } catch (error) {
       console.error('Error getting sync status:', error);
-      return { success: false, isRunning: false, isInterrupted: false, isPaused: false, job: null };
+      return { success: false, isRunning: false, isInterrupted: false, isPaused: false, lastFailure: null, job: null };
     }
   },
 

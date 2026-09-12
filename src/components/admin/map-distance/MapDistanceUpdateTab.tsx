@@ -3,12 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { mapDistanceApi, MapDistanceSyncJob, MapDistanceStats, MapDistanceRecord, RouteStarCustomerOption } from '../../../backendservice/api/mapDistanceApi';
+import { mapDistanceApi, MapDistanceSyncJob, MapDistanceStats, MapDistanceRecord, RouteStarCustomerOption, MapDistanceSyncFailure } from '../../../backendservice/api/mapDistanceApi';
 import { MdRefresh, MdCancel, MdStorage, MdHistory, MdPerson, MdCalendarToday, MdLocationOn, MdStraighten, MdCheckCircle, MdError, MdSchedule, MdSync, MdPlayArrow, MdPause, MdFilterList, MdClose, MdExpandMore, MdDeleteForever } from 'react-icons/md';
 import './MapDistanceUpdateTab.css';
 
 export const MapDistanceUpdateTab: React.FC = () => {
   const { t } = useTranslation();
+  const [isStarting, setIsStarting] = useState(false);
+  const [lastFailure, setLastFailure] = useState<MapDistanceSyncFailure | null>(null);
   const [syncStatus, setSyncStatus] = useState<{ isRunning: boolean; isInterrupted: boolean; isPaused: boolean; job: MapDistanceSyncJob | null }>({
     isRunning: false,
     isInterrupted: false,
@@ -60,7 +62,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (syncStatus.isRunning) {
+    if (syncStatus.isRunning || isStarting) {
       pollIntervalRef.current = setInterval(() => {
         checkSyncStatus();
       }, 2000);
@@ -78,7 +80,7 @@ export const MapDistanceUpdateTab: React.FC = () => {
         clearInterval(pollIntervalRef.current);
       }
     };
-  }, [syncStatus.isRunning]);
+  }, [syncStatus.isRunning, isStarting]);
 
   const loadStats = async () => {
     const data = await mapDistanceApi.getStats();
@@ -93,6 +95,11 @@ export const MapDistanceUpdateTab: React.FC = () => {
       isPaused: status.isPaused,
       job: status.job
     });
+    setLastFailure(status.lastFailure ?? null);
+
+    if (status.isRunning || status.isInterrupted || status.isPaused || status.lastFailure) {
+      setIsStarting(false);
+    }
   };
 
   const loadSyncHistory = async () => {
@@ -157,20 +164,26 @@ export const MapDistanceUpdateTab: React.FC = () => {
 
   const handleStartUpdateSync = async () => {
     setError(null);
+    setLastFailure(null);
+    setIsStarting(true);
     const result = await mapDistanceApi.startUpdateSync();
     if (result.success) {
       checkSyncStatus();
     } else {
+      setIsStarting(false);
       setError(result.error || t('adminTools.mapDistanceUpdate.failedToStartUpdate'));
     }
   };
 
   const handleStartMissingSync = async () => {
     setError(null);
+    setLastFailure(null);
+    setIsStarting(true);
     const result = await mapDistanceApi.startMissingSync();
     if (result.success) {
       checkSyncStatus();
     } else {
+      setIsStarting(false);
       setError(result.error || t('adminTools.mapDistanceUpdate.failedToStartUpdate'));
     }
   };
@@ -381,6 +394,29 @@ export const MapDistanceUpdateTab: React.FC = () => {
         {error && (
           <div className="mdu-error">
             <strong>{t('adminTools.mapDistanceUpdate.error')}</strong> {error}
+          </div>
+        )}
+
+        {isStarting && !isUpdateSyncRunning && (
+          <div className="mdu-sync-progress">
+            <div className="mdu-sync-progress-header">
+              <span className="mdu-sync-progress-title">
+                <MdRefresh className="mdu-spin" size={16} />
+                {t('adminTools.mapDistanceUpdate.starting')}
+              </span>
+            </div>
+            <div className="mdu-progress-bar">
+              <div className="mdu-progress-fill" style={{ width: '5%' }} />
+            </div>
+          </div>
+        )}
+
+        {lastFailure && !isUpdateSyncRunning && !isStarting && (
+          <div className="mdu-error">
+            <strong>{t('adminTools.mapDistanceUpdate.error')}</strong> {lastFailure.error}
+            {lastFailure.totalCustomers > 0 && (
+              <> ({lastFailure.processedCustomers}/{lastFailure.totalCustomers} processed)</>
+            )}
           </div>
         )}
 
