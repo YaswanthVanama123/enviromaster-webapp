@@ -35,7 +35,11 @@
     "allStatus": "Todos los estados",
     "yetToStart": "Por comenzar",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "allSources": "Todas las fuentes",
+    "migratedDocuments": "Documentos migrados",
+    "localDocuments": "Creados aquí",
+    "migratedBadge": "Migrado"
   },
   "actions": {
     "edit": "Editar",

@@ -96,6 +96,7 @@ export default function SavedFilesAgreements() {
   const [query, setQuery] = useState("");
   const [timelineFilter, setTimelineFilter] = useState<'all' | 'yet-to-start' | 'active' | 'inactive'>('all');
   const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'mine'>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'migrated' | 'local'>('all');
   const [loading, setLoading] = useState(false);
   const [emailTemplateLoading, setEmailTemplateLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -229,7 +230,8 @@ export default function SavedFilesAgreements() {
         search: search.trim() || undefined,
         includeLogs: true,
         includeDrafts: true,
-        isDeleted: false
+        isDeleted: false,
+        source: sourceFilter
       });
 
       const allAgreements = groupedResponse.groups;
@@ -395,7 +397,7 @@ export default function SavedFilesAgreements() {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query, timelineFilter, ownershipFilter]);
+  }, [query, timelineFilter, ownershipFilter, sourceFilter]);
 
   useEffect(() => {
     const loadEmailTemplate = async () => {
@@ -892,6 +894,24 @@ export default function SavedFilesAgreements() {
           >
             <option value="all">{t("savedFiles.filters.allAgreements")}</option>
             <option value="mine">{t("savedFiles.filters.myAgreements")}</option>
+          </select>
+
+          <select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value as 'all' | 'migrated' | 'local')}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '6px',
+              border: '1px solid #d1d5db',
+              fontSize: '14px',
+              backgroundColor: '#fff',
+              cursor: 'pointer',
+              minWidth: '160px'
+            }}
+          >
+            <option value="all">{t("savedFiles.filters.allSources")}</option>
+            <option value="migrated">{t("savedFiles.filters.migratedDocuments")}</option>
+            <option value="local">{t("savedFiles.filters.localDocuments")}</option>
           </select>
 
           <select

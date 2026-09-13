@@ -140,6 +140,10 @@ export interface SavedFileGroup {
   annualCommission?: number;
   weeklyCommission?: number;
   monthlyValue?: number;
+  isMigrated?: boolean;
+  migratedAt?: string | null;
+  migratedBy?: string | null;
+  migratedFromEnv?: string | null;
 }
 
 export interface AddFileToAgreementRequest {
@@ -733,6 +737,7 @@ export const pdfApi = {
       includeDrafts?: boolean;
       isTrashView?: boolean;
       commissionOnly?: boolean;
+      source?: 'all' | 'migrated' | 'local';
     } = {}
   ): Promise<SavedFilesGroupedResponse> {
     const params = new URLSearchParams();
@@ -745,6 +750,9 @@ export const pdfApi = {
     }
     if (filters.search) {
       params.set('search', filters.search);
+    }
+    if (filters.source && filters.source !== 'all') {
+      params.set('source', filters.source);
     }
     if (filters.isDeleted !== undefined) {
       params.set('isDeleted', filters.isDeleted.toString());

@@ -508,6 +508,18 @@
 .em-conn__row dd { margin: 0; font-size: var(--em-font-size-sm); color: var(--em-color-text); text-align: right; }
 .em-conn__mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--em-font-size-xs); word-break: break-all; }
 .em-conn__note { margin: var(--em-space-3) 0 0; font-size: var(--em-font-size-sm); color: var(--em-color-text-muted); }
+.ag-migrated-badge {
+  background: #ecfdf5;
+  color: #0f766e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .em-conn__error { margin: var(--em-space-3) 0 0; font-size: var(--em-font-size-sm); color: var(--em-color-danger); word-break: break-word; }
 
 .em-toast {

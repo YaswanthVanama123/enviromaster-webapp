@@ -35,7 +35,11 @@
     "allStatus": "All Status",
     "yetToStart": "Yet to Start",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "allSources": "All Sources",
+    "migratedDocuments": "Migrated Documents",
+    "localDocuments": "Created Here",
+    "migratedBadge": "Migrated"
   },
   "actions": {
     "edit": "Edit",

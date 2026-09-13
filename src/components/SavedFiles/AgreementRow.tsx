@@ -5,7 +5,7 @@ import {
   faFolder, faFolderOpen, faChevronDown, faChevronRight,
   faPlus, faCheckSquare, faSquare, faCloudUploadAlt,
   faTrash, faPencilAlt, faRedo, faFileAlt, faTasks,
-  faUserPlus, faEdit
+  faUserPlus, faEdit, faCloudArrowUp
 } from "@fortawesome/free-solid-svg-icons";
 import type { SavedFileGroup, SavedFileListItem } from "../../backendservice/api/pdfApi";
 import { FileRow } from "./FileRow";
@@ -286,6 +286,19 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
             }}>
               <FontAwesomeIcon icon={faUserPlus} style={{ fontSize: '9px' }} />
               {t("savedFiles.rows.created", { name: createdBy })}
+            </span>
+          )}
+          {agreement.isMigrated && (
+            <span
+              className="ag-migrated-badge"
+              title={
+                agreement.migratedFromEnv
+                  ? `Migrated from ${agreement.migratedFromEnv}${agreement.migratedBy ? ` by ${agreement.migratedBy}` : ''}`
+                  : undefined
+              }
+            >
+              <FontAwesomeIcon icon={faCloudArrowUp} style={{ fontSize: '9px' }} />
+              {t("savedFiles.filters.migratedBadge")}
             </span>
           )}
           {lastEditedBy && lastEditedBy !== createdBy && (
