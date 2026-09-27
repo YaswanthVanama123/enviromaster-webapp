@@ -195,6 +195,12 @@
     "uploadToBiginTitle": "Upload to Bigin",
     "changeStatusTitle": "Change status",
     "updatingStatusTitle": "Updating status...",
-    "statusReadOnlyTitle": "Status (read-only)"
+    "statusReadOnlyTitle": "Status (read-only)",
+    "readyForSignature": "Ready for Signature",
+    "readyForSignatureTitle": "Open the signature room for the latest version of this agreement",
+    "signatureProgress": "Signing {{signed}}/{{total}}",
+    "signatureProgressTitle": "Signatures are being collected — open the signature room",
+    "signatureSigned": "Signed",
+    "signatureSignedTitle": "All {{total}} signatures collected — open the signed agreement"
   }
 }

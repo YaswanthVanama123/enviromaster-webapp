@@ -1,29 +1,20 @@
 import { memo, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FiEdit3 } from "react-icons/fi";
 import {
   faFolder, faFolderOpen, faChevronDown, faChevronRight,
   faPlus, faCheckSquare, faSquare, faCloudUploadAlt,
   faTrash, faPencilAlt, faRedo, faFileAlt, faTasks,
-  faUserPlus, faEdit, faCloudArrowUp
+  faUserPlus, faEdit, faCloudArrowUp,
+  faCircleCheck, faHourglassHalf
 } from "@fortawesome/free-solid-svg-icons";
 import type { SavedFileGroup, SavedFileListItem } from "../../backendservice/api/pdfApi";
 import { FileRow } from "./FileRow";
 import AgreementTimelineBadge from "../AgreementTimelineBadge";
 import { PushToProductionButton } from "../molecules";
+import { formatTimeAgo } from "../../utils/timeAgo";
 import "./AgreementRow.css";
-
-function timeAgo(iso: string) {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const sec = Math.max(1, Math.floor(diffMs / 1000));
-  const min = Math.floor(sec / 60);
-  const hr = Math.floor(min / 60);
-  const day = Math.floor(hr / 24);
-  if (day > 0) return `${day} day${day > 1 ? "s" : ""} ago`;
-  if (hr > 0) return `${hr} hour${hr > 1 ? "s" : ""} ago`;
-  if (min > 0) return `${min} minute${min > 1 ? "s" : ""} ago`;
-  return `${sec} sec ago`;
-}
 
 function formatDeletionMeta(t: (key: string, opts?: Record<string, unknown>) => string, deletedBy?: string | null, deletedAt?: string | null) {
   const parts: string[] = [];
@@ -87,6 +78,7 @@ interface AgreementRowProps {
   onAgreementZohoUpload: (agreement: SavedFileGroup) => void;
   onAgreementTaskCreate: (agreement: SavedFileGroup) => void;
   onDateChange: (agreementId: string, newDate: string) => Promise<void>;
+  onReadyForSignature?: (agreement: SavedFileGroup) => void;
   onView: (file: SavedFileListItem, watermark: boolean) => void;
   onDownload: (file: SavedFileListItem, watermark: boolean) => void;
   onEmail: (file: SavedFileListItem) => void;
@@ -117,6 +109,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
     onAgreementZohoUpload,
     onAgreementTaskCreate,
     onDateChange,
+    onReadyForSignature,
     onView,
     onDownload,
     onEmail,
@@ -145,6 +138,46 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
   const handleZohoUpload = useCallback(() => onAgreementZohoUpload(agreement), [agreement, onAgreementZohoUpload]);
   const handleTaskCreate = useCallback(() => onAgreementTaskCreate(agreement), [agreement, onAgreementTaskCreate]);
   const handleDateChange = useCallback((newDate: string) => onDateChange(agreement.id, newDate), [agreement.id, onDateChange]);
+  const handleReadyForSignature = useCallback(() => onReadyForSignature?.(agreement), [agreement, onReadyForSignature]);
+
+  const signableFiles = agreement.files.filter(
+    file => (file.fileType === 'version_pdf' || file.fileType === 'main_pdf') && file.isDeleted !== true
+  );
+  const signature = agreement.signature || null;
+  const hasSignatureEnvelope = !!signature && signature.totalSigners > 0;
+  const signatureComplete = signature?.status === 'completed';
+  const canStartSignature =
+    !isTrashView && !!onReadyForSignature && (signableFiles.length > 0 || hasSignatureEnvelope);
+
+  const signatureButton = signatureComplete
+    ? {
+        background: '#16a34a',
+        border: '1px solid #15803d',
+        icon: <FontAwesomeIcon icon={faCircleCheck} style={{ fontSize: '10px' }} />,
+        label: t("savedFiles.rows.signatureSigned"),
+        title: t("savedFiles.rows.signatureSignedTitle", {
+          signed: signature?.signedCount ?? 0,
+          total: signature?.totalSigners ?? 0,
+        }),
+      }
+    : hasSignatureEnvelope
+      ? {
+          background: '#d97706',
+          border: '1px solid #b45309',
+          icon: <FontAwesomeIcon icon={faHourglassHalf} style={{ fontSize: '10px' }} />,
+          label: t("savedFiles.rows.signatureProgress", {
+            signed: signature?.signedCount ?? 0,
+            total: signature?.totalSigners ?? 0,
+          }),
+          title: t("savedFiles.rows.signatureProgressTitle"),
+        }
+      : {
+          background: '#c00000',
+          border: '1px solid #a00000',
+          icon: <FiEdit3 style={{ fontSize: '10px' }} />,
+          label: t("savedFiles.rows.readyForSignature"),
+          title: t("savedFiles.rows.readyForSignatureTitle"),
+        };
 
   const { createdBy, lastEditedBy, lastEditTime } = useMemo(() => getCreatorAndEditor(agreement), [agreement]);
 
@@ -230,7 +263,7 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
           color: '#6b7280'
         }}>
           <span>{t("savedFiles.rows.filesCount", { count: agreement.fileCount })}</span>
-          <span>{timeAgo(agreement.latestUpdate)}</span>
+          <span>{formatTimeAgo(agreement.latestUpdate)}</span>
           {agreement.hasUploads && (
               <span style={{
                 background: '#fef3c7',
@@ -414,6 +447,32 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
             </>
           ) : (
             <>
+              {canStartSignature && (
+                <button
+                  style={{
+                    background: signatureButton.background,
+                    border: signatureButton.border,
+                    borderRadius: '6px',
+                    padding: '6px 8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    color: '#fff',
+                    fontWeight: '500'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReadyForSignature();
+                  }}
+                  title={signatureButton.title}
+                >
+                  {signatureButton.icon}
+                  <span className="ag-act-label">{signatureButton.label}</span>
+                </button>
+              )}
+
               <button
                 style={{
                   background: '#f97316',
@@ -587,6 +646,8 @@ export const AgreementRow = memo((props: AgreementRowProps) => {
     prevProps.agreement.fileCount === nextProps.agreement.fileCount &&
     prevProps.isTrashView === nextProps.isTrashView &&
     prevProps.onAgreementTaskCreate === nextProps.onAgreementTaskCreate &&
+    prevProps.onReadyForSignature === nextProps.onReadyForSignature &&
+    JSON.stringify(prevProps.agreement.signature) === JSON.stringify(nextProps.agreement.signature) &&
     JSON.stringify(prevProps.selectedFiles) === JSON.stringify(nextProps.selectedFiles) &&
     JSON.stringify(prevProps.statusChangeLoading) === JSON.stringify(nextProps.statusChangeLoading) &&
     prevWatermarkStr === nextWatermarkStr

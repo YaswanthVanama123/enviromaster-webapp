@@ -194,6 +194,12 @@
     "uploadToBiginTitle": "Téléverser vers Bigin",
     "changeStatusTitle": "Changer le statut",
     "updatingStatusTitle": "Mise à jour du statut...",
-    "statusReadOnlyTitle": "Statut (lecture seule)"
+    "statusReadOnlyTitle": "Statut (lecture seule)",
+    "readyForSignature": "Prêt à signer",
+    "readyForSignatureTitle": "Ouvrir l'espace de signature pour la dernière version de cet accord",
+    "signatureProgress": "Signature {{signed}}/{{total}}",
+    "signatureProgressTitle": "Les signatures sont en cours de collecte — ouvrez l'espace de signature",
+    "signatureSigned": "Signé",
+    "signatureSignedTitle": "Les {{total}} signatures ont été recueillies — ouvrez l'accord signé"
   }
 }

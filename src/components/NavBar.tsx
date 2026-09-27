@@ -6,6 +6,7 @@ import {
   FiHome,
   FiFileText,
   FiFolder,
+  FiEdit3,
   FiDollarSign,
   FiTrendingUp,
   FiPhone,
@@ -105,6 +106,7 @@ export default function NavBar() {
     { path: "/home", label: t("nav.home"), icon: <FiHome /> },
     { path: "/form-filling", label: t("nav.formFilling"), icon: <FiFileText /> },
     { path: "/saved-pdfs", label: t("nav.savedPdfs"), icon: <FiFolder /> },
+    { path: "/signatures", label: t("nav.signatures"), icon: <FiEdit3 /> },
     ...(!isAdmin
       ? [
           { path: "/my-commissions", label: t("nav.myCommissions"), icon: <FiDollarSign /> },

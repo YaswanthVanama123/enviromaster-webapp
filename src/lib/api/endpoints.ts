@@ -24,6 +24,7 @@ export const ENDPOINTS = {
 export const SKIP_AUTO_LOGOUT_PATHS: readonly string[] = [
   "/api/admin/login",
   "/api/employee/login",
+  "/api/signatures/public",
 ];
 
 export function shouldAutoLogoutOnUnauthorized(endpoint: string): boolean {

@@ -3,6 +3,26 @@ export { adminAuthApi } from "./adminAuthApi";
 export { serviceConfigApi } from "./serviceConfigApi";
 export { productCatalogApi } from "./productCatalogApi";
 export { pdfApi } from "./pdfApi";
+export { signatureApi } from "./signatureApi";
+export type {
+  SignatureRequest,
+  SignatureRequestStatus,
+  SignatureRoomResponse,
+  SignatureDocument,
+  SignatureLocation,
+  SignatureMethod,
+  Signer,
+  SignerInput,
+  SignerRole,
+  SignerStatus,
+  SignPayload,
+  CapturedLocation,
+  PublicSigningContext,
+  SignatureListFilters,
+  SignatureListResponse,
+  SignatureSummary,
+  SignedPdfInfo,
+} from "./signatureApi";
 export { productionPushApi } from "./productionPushApi";
 export type {
   ProductionPushStatus,

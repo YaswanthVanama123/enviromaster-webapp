@@ -659,6 +659,12 @@ export default function SavedFilesAgreements() {
     setTaskModalOpen(true);
   }, []);
 
+  const handleReadyForSignature = useCallback((agreement: SavedFileGroup) => {
+    navigate(`/signature-room/${agreement.id}`, {
+      state: { returnPath, agreementTitle: agreement.agreementTitle },
+    });
+  }, [navigate, returnPath]);
+
   const handleEdit = async (file: SavedFileListItem) => {
     try {
       const canEdit = file.fileType === 'main_pdf' ||
@@ -1094,6 +1100,7 @@ export default function SavedFilesAgreements() {
               onDelete={handleDelete}
               onAgreementZohoUpload={handleAgreementZohoUpload}
               onAgreementTaskCreate={handleAgreementTaskCreate}
+              onReadyForSignature={handleReadyForSignature}
               onDateChange={async (agreementId: string, newDate: string) => {
                 console.log(`📅 [SAVED-FILES-AGREEMENTS] Updating start date for agreement ${agreementId}: ${newDate}`);
                 try {

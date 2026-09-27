@@ -116,8 +116,19 @@ export interface SavedFilesListResponse {
   };
 }
 
+export interface SavedFileGroupSignature {
+  status: 'draft' | 'ready' | 'in_progress' | 'completed' | 'cancelled';
+  envelopeId: string | null;
+  totalSigners: number;
+  signedCount: number;
+  signedPdfAvailable: boolean;
+  updatedAt: string | null;
+  completedAt: string | null;
+}
+
 export interface SavedFileGroup {
   id: string;
+  signature?: SavedFileGroupSignature | null;
   agreementTitle: string;
   agreementStatus: AgreementStatus;
   fileCount: number;

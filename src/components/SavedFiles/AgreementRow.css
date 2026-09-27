@@ -1,4 +1,5 @@
 .sf .agreement-card,
+.em-sigov .agreement-card,
 .trash-view-page .agreement-card {
   background: #fff;
   border: 1px solid #e6e6e6;
@@ -10,11 +11,13 @@
 }
 
 .sf .agreement-card:has(.timeline-date-picker-popup),
+.em-sigov .agreement-card:has(.timeline-date-picker-popup),
 .trash-view-page .agreement-card:has(.timeline-date-picker-popup) {
   z-index: 9999;
 }
 
 .sf .agreement-header,
+.em-sigov .agreement-header,
 .trash-view-page .agreement-header {
   display: flex;
   align-items: center;
@@ -23,6 +26,7 @@
 }
 
 .sf .agreement-main-content,
+.em-sigov .agreement-main-content,
 .trash-view-page .agreement-main-content {
   display: flex;
   align-items: center;
@@ -31,6 +35,7 @@
 }
 
 .sf .agreement-actions,
+.em-sigov .agreement-actions,
 .trash-view-page .agreement-actions {
   display: flex;
   align-items: center;
@@ -40,48 +45,55 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .sf .agreement-header,
-  .trash-view-page .agreement-header {
+  .em-sigov .agreement-header,
+.trash-view-page .agreement-header {
     padding: 14px;
     flex-wrap: wrap;
     gap: 8px;
   }
 
   .sf .agreement-main-content,
-  .trash-view-page .agreement-main-content {
+  .em-sigov .agreement-main-content,
+.trash-view-page .agreement-main-content {
     flex: 1 1 100%;
     min-width: 0;
     align-items: flex-start;
   }
 
   .sf .agreement-actions,
-  .trash-view-page .agreement-actions {
+  .em-sigov .agreement-actions,
+.trash-view-page .agreement-actions {
     flex: 0 0 auto;
     gap: 6px;
     flex-wrap: wrap;
   }
 
   .sf .agreement-actions button,
+  .em-sigov .agreement-actions,
+  .em-sigov .agreement-actions button,
   .trash-view-page .agreement-actions button {
     font-size: 11px !important;
     padding: 5px 6px !important;
   }
-}
 
 @media (max-width: 768px) {
   .sf .agreement-card,
-  .trash-view-page .agreement-card {
+  .em-sigov .agreement-card,
+.trash-view-page .agreement-card {
     margin-bottom: 6px;
   }
 
   .sf .agreement-header,
-  .trash-view-page .agreement-header {
+  .em-sigov .agreement-header,
+.trash-view-page .agreement-header {
     padding: 12px;
     flex-wrap: wrap;
     gap: 6px;
   }
 
   .sf .agreement-main-content,
-  .trash-view-page .agreement-main-content {
+  .em-sigov .agreement-main-content,
+.trash-view-page .agreement-main-content {
     flex: 1 1 100%;
     min-width: 0;
     margin-bottom: 8px;
@@ -89,7 +101,8 @@
   }
 
   .sf .agreement-actions,
-  .trash-view-page .agreement-actions {
+  .em-sigov .agreement-actions,
+.trash-view-page .agreement-actions {
     flex: 1 1 100%;
     width: 100%;
     gap: 6px;
@@ -99,6 +112,8 @@
   }
 
   .sf .agreement-actions button,
+  .em-sigov .agreement-actions,
+  .em-sigov .agreement-actions button,
   .trash-view-page .agreement-actions button {
     font-size: 10px !important;
     padding: 5px 6px !important;
@@ -106,36 +121,43 @@
   }
 
   .sf .agreement-actions button svg,
+  .em-sigov .agreement-actions,
+  .em-sigov .agreement-actions button svg,
   .trash-view-page .agreement-actions button svg {
     font-size: 9px !important;
   }
-}
 
 @media (max-width: 480px) {
   .sf .agreement-card,
-  .trash-view-page .agreement-card {
+  .em-sigov .agreement-card,
+.trash-view-page .agreement-card {
     border-radius: 8px;
     margin-bottom: 6px;
   }
 
   .sf .agreement-header,
-  .trash-view-page .agreement-header {
+  .em-sigov .agreement-header,
+.trash-view-page .agreement-header {
     padding: 10px;
     gap: 4px;
   }
 
   .sf .agreement-main-content,
-  .trash-view-page .agreement-main-content {
+  .em-sigov .agreement-main-content,
+.trash-view-page .agreement-main-content {
     margin-bottom: 6px;
   }
 
   .sf .agreement-actions,
-  .trash-view-page .agreement-actions {
+  .em-sigov .agreement-actions,
+.trash-view-page .agreement-actions {
     gap: 4px;
     margin-left: 32px;
   }
 
   .sf .agreement-actions button,
+  .em-sigov .agreement-actions,
+  .em-sigov .agreement-actions button,
   .trash-view-page .agreement-actions button {
     font-size: 9px !important;
     padding: 4px 5px !important;
@@ -144,7 +166,8 @@
   }
 
   .sf .agreement-actions button svg,
+  .em-sigov .agreement-actions,
+  .em-sigov .agreement-actions button svg,
   .trash-view-page .agreement-actions button svg {
     font-size: 8px !important;
   }
-}

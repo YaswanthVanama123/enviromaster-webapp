@@ -7,6 +7,9 @@ import FormFilling from "./components/FormFilling";
 import SavedFilesAgreements from "./components/SavedFilesAgreements";
 import TrashView from "./components/TrashView";
 import PDFViewer from "./components/PDFViewer";
+import SignatureRoom from "./components/SignatureRoom";
+import SignaturesOverview from "./components/SignaturesOverview";
+import PublicSignPage from "./components/signatures/PublicSignPage";
 import AdminPanel from "./components/AdminPanel";
 import ApprovalDocuments from "./components/ApprovalDocuments";
 import PriceChanges from "./components/PriceChanges";
@@ -24,12 +27,13 @@ function AppContent() {
   const isEditMode = location.pathname.startsWith('/edit/pdf');
   const isLoginPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isLandingPage = location.pathname === '/';
+  const isPublicSignPage = location.pathname.startsWith('/sign/');
   const isFormFilling = isEditMode || location.pathname.startsWith('/form-filling');
-  const isOverlayPage = isFormFilling || isLoginPage || isLandingPage;
+  const isOverlayPage = isFormFilling || isLoginPage || isLandingPage || isPublicSignPage;
 
   return (
     <div className={`shell ${isEditMode ? 'edit-mode' : ''}`}>
-      {!isEditMode && !isLoginPage && !isLandingPage && <NavBar />}
+      {!isEditMode && !isLoginPage && !isLandingPage && !isPublicSignPage && <NavBar />}
       <main className={`page-body ${isEditMode ? 'edit-mode-body' : ''}`}>
         <div className={isOverlayPage ? undefined : 'page-enter'} key={location.pathname}>
         <Routes>
@@ -42,6 +46,8 @@ function AppContent() {
           {}
           <Route path="/admin-login" element={<LoginPage />} />
 
+          <Route path="/sign/:token" element={<PublicSignPage />} />
+
           {}
           <Route element={<AuthGuard />}>
             <Route path="/home" element={<Home />} />
@@ -50,6 +56,8 @@ function AppContent() {
             <Route path="/saved-pdfs" element={<SavedFilesAgreements />} />
             <Route path="/trash" element={<TrashView />} />
             <Route path="/pdf-viewer" element={<PDFViewer />} />
+            <Route path="/signatures" element={<SignaturesOverview />} />
+            <Route path="/signature-room/:agreementId" element={<SignatureRoom />} />
             <Route path="/approval-documents" element={<ApprovalDocuments />} />
             <Route path="/price-changes" element={<PriceChanges />} />
             <Route path="/my-commissions" element={<MyCommissions />} />

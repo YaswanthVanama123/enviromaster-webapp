@@ -194,6 +194,12 @@
     "uploadToBiginTitle": "Subir a Bigin",
     "changeStatusTitle": "Cambiar estado",
     "updatingStatusTitle": "Actualizando estado...",
-    "statusReadOnlyTitle": "Estado (solo lectura)"
+    "statusReadOnlyTitle": "Estado (solo lectura)",
+    "readyForSignature": "Listo para firmar",
+    "readyForSignatureTitle": "Abrir la sala de firmas para la última versión de este acuerdo",
+    "signatureProgress": "Firmando {{signed}}/{{total}}",
+    "signatureProgressTitle": "Se están recogiendo las firmas: abra la sala de firmas",
+    "signatureSigned": "Firmado",
+    "signatureSignedTitle": "Las {{total}} firmas fueron recogidas: abra el acuerdo firmado"
   }
 }
