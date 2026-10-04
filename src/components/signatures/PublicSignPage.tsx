@@ -15,6 +15,7 @@ import type {
   PublicSigningContext,
   SignPayload,
 } from "../../backendservice/api/signatureApi";
+import { faDownload, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "../atoms/Button";
 import { Spinner } from "../atoms/Spinner";
 import { Banner, Modal } from "../molecules";
@@ -45,6 +46,13 @@ export default function PublicSignPage() {
     where: string;
   } | null>(null);
 
+  const initialReceipt = useRef<string | null>(
+    new URLSearchParams(window.location.search).get("receipt"),
+  );
+  const [receipt, setReceipt] = useState<string | null>(initialReceipt.current);
+  const [showingSigned, setShowingSigned] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [declining, setDeclining] = useState(false);
@@ -52,9 +60,56 @@ export default function PublicSignPage() {
 
   const pdfUrlRef = useRef<string | null>(null);
 
+  const showSignedCopy = useCallback(async (receiptToken: string) => {
+    const blob = await signatureApi.downloadReceiptSignedPdf(receiptToken);
+    if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
+    const objectUrl = URL.createObjectURL(blob);
+    pdfUrlRef.current = objectUrl;
+    setPdfUrl(objectUrl);
+    setPdfError(null);
+    setShowingSigned(true);
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
+
+    const openedReceipt = initialReceipt.current;
+    if (openedReceipt) {
+      try {
+        const data = await signatureApi.getReceiptContext(openedReceipt);
+        setContext({
+          success: data.success,
+          agreementTitle: data.agreementTitle,
+          documentLabel: data.documentLabel,
+          requestStatus: data.requestStatus,
+          totalSigners: data.totalSigners,
+          signedCount: data.signedCount,
+          signer: {
+            id: "",
+            name: data.signer.name,
+            email: "",
+            title: "",
+            role: data.signer.role,
+            placement: data.signer.placement,
+            status: "signed",
+            signedAt: data.signer.signedAt,
+          },
+        });
+        setCompleted({ signedAt: data.signer.signedAt || "", where: "" });
+        if (data.signedPdfAvailable) {
+          await showSignedCopy(openedReceipt);
+        } else {
+          setPdfError(t("signatures.public.signedPdfPending"));
+        }
+        setLoading(false);
+        return;
+      } catch {
+        initialReceipt.current = null;
+        setReceipt(null);
+      }
+    }
+
     try {
       const data = await signatureApi.getPublicContext(token);
       setContext(data);
@@ -71,14 +126,14 @@ export default function PublicSignPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, t]);
+  }, [token, showSignedCopy, t]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   useEffect(() => {
-    if (!context || declined) return;
+    if (!context || declined || showingSigned || receipt) return;
 
     let cancelled = false;
     signatureApi
@@ -97,7 +152,7 @@ export default function PublicSignPage() {
     return () => {
       cancelled = true;
     };
-  }, [context, declined, token, t]);
+  }, [context, declined, showingSigned, receipt, token, t]);
 
   useEffect(
     () => () => {
@@ -116,6 +171,21 @@ export default function PublicSignPage() {
         signedAt: result.signedAt,
         where: formatLocationSummary(result.location),
       });
+
+      if (result.receiptToken) {
+        setReceipt(result.receiptToken);
+        const url = new URL(window.location.href);
+        url.searchParams.set("receipt", result.receiptToken);
+        window.history.replaceState(null, "", url.toString());
+
+        if (result.signedPdfAvailable) {
+          try {
+            await showSignedCopy(result.receiptToken);
+          } catch {
+            setPdfError(t("signatures.public.signedPdfPending"));
+          }
+        }
+      }
     } catch (error) {
       setSignError(
         error instanceof Error
@@ -124,6 +194,29 @@ export default function PublicSignPage() {
       );
     } finally {
       setSigning(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!receipt) return;
+    setDownloading(true);
+    try {
+      const blob = await signatureApi.downloadReceiptSignedPdf(receipt);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${(context?.agreementTitle || "agreement").replace(
+        /[^\w-]+/g,
+        "_",
+      )}_signed.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setPdfError(t("signatures.public.signedPdfPending"));
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -209,15 +302,36 @@ export default function PublicSignPage() {
 
       {completed && (
         <Banner tone="success" title={t("signatures.public.doneTitle")}>
-          <span>
-            <FontAwesomeIcon icon={faCircleCheck} />{" "}
-            {t("signatures.public.doneBody", {
-              time: new Date(completed.signedAt).toLocaleString(),
-            })}
-            {completed.where
-              ? ` ${t("signatures.public.doneLocation", { place: completed.where })}`
-              : ""}
-          </span>
+          <div className="em-sig-public__done">
+            <span>
+              <FontAwesomeIcon icon={faCircleCheck} />{" "}
+              {completed.signedAt
+                ? t("signatures.public.doneBody", {
+                    time: new Date(completed.signedAt).toLocaleString(),
+                  })
+                : t("signatures.public.doneTitle")}
+              {completed.where
+                ? ` ${t("signatures.public.doneLocation", { place: completed.where })}`
+                : ""}
+            </span>
+            {showingSigned && (
+              <span className="em-sig-public__done-note">
+                <FontAwesomeIcon icon={faShieldHalved} />{" "}
+                {t("signatures.public.signedCopyShown")}
+              </span>
+            )}
+            {receipt && (
+              <Button
+                variant="secondary"
+                size="sm"
+                loading={downloading}
+                leftIcon={<FontAwesomeIcon icon={faDownload} />}
+                onClick={handleDownload}
+              >
+                {t("signatures.public.downloadSigned")}
+              </Button>
+            )}
+          </div>
         </Banner>
       )}
 

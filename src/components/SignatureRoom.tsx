@@ -69,6 +69,7 @@ export default function SignatureRoom() {
   const documentId = room?.document.id ?? null;
   const documentKind = room?.document.kind ?? null;
   const signedAvailable = room?.request.signedPdf?.available ?? false;
+  const signedFingerprint = room?.request.signedPdf?.sha256 ?? null;
   const viewingSigned = signedAvailable && showSignedCopy;
 
   const loadRoom = useCallback(async () => {
@@ -129,7 +130,14 @@ export default function SignatureRoom() {
     return () => {
       cancelled = true;
     };
-  }, [documentId, documentKind, viewingSigned, agreementId, t]);
+  }, [
+    documentId,
+    documentKind,
+    viewingSigned,
+    signedFingerprint,
+    agreementId,
+    t,
+  ]);
 
   useEffect(
     () => () => {

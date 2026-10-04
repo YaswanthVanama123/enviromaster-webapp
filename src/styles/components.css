@@ -1656,3 +1656,11 @@
   border-color: #86efac;
   color: var(--em-color-success);
 }
+.em-sig-public__done { display: flex; flex-wrap: wrap; align-items: center; gap: var(--em-space-3); }
+.em-sig-public__done-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: var(--em-font-weight-semibold);
+  color: var(--em-color-success-text, #166534);
+}

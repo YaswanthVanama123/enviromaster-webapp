@@ -235,6 +235,7 @@ export const SignerStatusPanel: React.FC<SignerStatusPanelProps> = ({
                       <SignatureImage
                         agreementId={agreementId}
                         signerId={signer.id}
+                        version={signer.signedAt}
                         fallback={
                           <span
                             className="em-sig-row__typed"

@@ -176,7 +176,10 @@
     "declineSubtitle": "Cuéntenos por qué para poder darle seguimiento.",
     "declineConfirm": "Rechazar la firma",
     "declinePlaceholder": "Opcional: indíquenos qué debe cambiar",
-    "declineFailed": "No pudimos registrar su respuesta. Inténtelo de nuevo."
+    "declineFailed": "No pudimos registrar su respuesta. Inténtelo de nuevo.",
+    "signedCopyShown": "Está viendo la copia firmada de este acuerdo.",
+    "downloadSigned": "Descargar copia firmada",
+    "signedPdfPending": "Su firma quedó registrada. La copia firmada aún se está preparando; su contacto de EnviroMaster puede enviársela por correo."
   },
   "overview": {
     "title": "Firmas",

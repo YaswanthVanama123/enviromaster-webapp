@@ -176,7 +176,10 @@
     "declineSubtitle": "Let us know why so we can follow up.",
     "declineConfirm": "Decline to sign",
     "declinePlaceholder": "Optional — tell us what needs to change",
-    "declineFailed": "We could not record your response. Please try again."
+    "declineFailed": "We could not record your response. Please try again.",
+    "signedCopyShown": "You are viewing the signed copy of this agreement.",
+    "downloadSigned": "Download signed copy",
+    "signedPdfPending": "Your signature was recorded. The signed copy is still being prepared — your EnviroMaster contact can email it to you."
   },
   "overview": {
     "title": "Signatures",

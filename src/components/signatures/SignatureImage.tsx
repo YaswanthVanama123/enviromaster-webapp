@@ -6,6 +6,7 @@ export interface SignatureImageProps {
   agreementId: string;
   signerId: string;
   className?: string;
+  version?: string | null;
   fallback?: React.ReactNode;
 }
 
@@ -13,6 +14,7 @@ export const SignatureImage: React.FC<SignatureImageProps> = ({
   agreementId,
   signerId,
   className = "",
+  version,
   fallback,
 }) => {
   const { t } = useTranslation();
@@ -22,6 +24,8 @@ export const SignatureImage: React.FC<SignatureImageProps> = ({
   useEffect(() => {
     let objectUrl: string | null = null;
     let cancelled = false;
+    setFailed(false);
+    setUrl(null);
 
     signatureApi
       .downloadSignerImage(agreementId, signerId)
@@ -38,7 +42,7 @@ export const SignatureImage: React.FC<SignatureImageProps> = ({
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [agreementId, signerId]);
+  }, [agreementId, signerId, version]);
 
   if (failed) {
     if (fallback !== undefined) return <>{fallback}</>;

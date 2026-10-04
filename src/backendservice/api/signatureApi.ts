@@ -151,6 +151,36 @@ export interface PublicSigningContext {
   };
 }
 
+export interface PublicSignResult {
+  success: boolean;
+  signedAt: string;
+  location: SignatureLocation | null;
+  receiptToken: string | null;
+  receiptExpiresAt: string | null;
+  signedPdfAvailable: boolean;
+  signatureId: string | null;
+  envelopeId: string;
+}
+
+export interface SignatureReceiptContext {
+  success: boolean;
+  agreementTitle: string;
+  documentLabel: string;
+  requestStatus: SignatureRequestStatus;
+  envelopeId: string;
+  totalSigners: number;
+  signedCount: number;
+  signedPdfAvailable: boolean;
+  receiptExpiresAt: string | null;
+  signer: {
+    name: string;
+    role: SignerRole;
+    placement: string;
+    signedAt: string | null;
+    signatureId: string | null;
+  };
+}
+
 export interface SignatureListFilters {
   page?: number;
   limit?: number;
@@ -339,17 +369,22 @@ export const signatureApi = {
     return apiClient.downloadBlob(`${BASE}/public/${token}/pdf`);
   },
 
-  async signPublic(
-    token: string,
-    payload: SignPayload
-  ): Promise<{ success: boolean; signedAt: string; location: SignatureLocation | null }> {
+  async signPublic(token: string, payload: SignPayload): Promise<PublicSignResult> {
     return unwrap(
-      await apiClient.post<{
-        success: boolean;
-        signedAt: string;
-        location: SignatureLocation | null;
-      }>(`${BASE}/public/${token}/sign`, payload)
+      await apiClient.post<PublicSignResult>(`${BASE}/public/${token}/sign`, payload)
     );
+  },
+
+  async getReceiptContext(receipt: string): Promise<SignatureReceiptContext> {
+    return unwrap(
+      await apiClient.get<SignatureReceiptContext>(
+        `${BASE}/public/receipt/${receipt}`
+      )
+    );
+  },
+
+  async downloadReceiptSignedPdf(receipt: string): Promise<Blob> {
+    return apiClient.downloadBlob(`${BASE}/public/receipt/${receipt}/signed-pdf`);
   },
 
   async declinePublic(token: string, reason: string): Promise<{ success: boolean }> {

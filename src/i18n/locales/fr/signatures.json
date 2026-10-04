@@ -176,7 +176,10 @@
     "declineSubtitle": "Dites-nous pourquoi afin que nous puissions faire le suivi.",
     "declineConfirm": "Refuser de signer",
     "declinePlaceholder": "Facultatif — indiquez ce qui doit changer",
-    "declineFailed": "Nous n'avons pas pu enregistrer votre réponse. Veuillez réessayer."
+    "declineFailed": "Nous n'avons pas pu enregistrer votre réponse. Veuillez réessayer.",
+    "signedCopyShown": "Vous consultez la copie signée de ce contrat.",
+    "downloadSigned": "Télécharger la copie signée",
+    "signedPdfPending": "Votre signature a été enregistrée. La copie signée est encore en préparation — votre contact EnviroMaster peut vous l'envoyer par e-mail."
   },
   "overview": {
     "title": "Signatures",
